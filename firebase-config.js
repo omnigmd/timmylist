@@ -8,6 +8,6 @@ window.TML_FIREBASE = {
   appId: "1:343083999884:web:637d93fe45ee163e0911a9"
 };
 
-// Discord linking (optional). On Netlify set this to "/.netlify/functions/discord-link".
-// Leave it empty on hosts without Netlify functions (the Link Discord button is then switched off).
-window.TML_DISCORD_LINK = "";
+// Discord linking (optional). Set this to "/.netlify/functions/discord-link" on hosts that run the functions (Vercel or Netlify).
+// Leave it empty on hosts without functions (the Link Discord button is then switched off).
+window.TML_DISCORD_LINK = "/.netlify/functions/discord-link";
