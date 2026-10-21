@@ -5715,7 +5715,7 @@ setTimeout(function(){
       '<div class="abtns" style="margin-top:12px"><button class="ib" id="closeM">Close</button></div>';
     open();
     [].forEach.call(acct().querySelectorAll(".atabs button"),function(b){ b.onclick=function(){ authForm(b.getAttribute("data-m")); }; });
-    var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href="/.netlify/functions/discord-auth"; };
+    var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href=(window.TML_DISCORD_AUTH||"/.netlify/functions/discord-auth"); };
     document.getElementById("gsign").onclick=function(){
       setErr(""); busy(true);
       var prov=new firebase.auth.GoogleAuthProvider();
@@ -7462,7 +7462,7 @@ setTimeout(function(){
       '<div class="abtns" style="margin-top:12px"><button class="ib" id="closeM">Close</button></div>';
     open();
     [].forEach.call(acct().querySelectorAll(".atabs button"),function(b){ b.onclick=function(){ authForm(b.getAttribute("data-m")); }; });
-    var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href="/.netlify/functions/discord-auth"; };
+    var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href=(window.TML_DISCORD_AUTH||"/.netlify/functions/discord-auth"); };
     document.getElementById("gsign").onclick=function(){
       setErr(""); busy(true);
       var prov=new firebase.auth.GoogleAuthProvider();

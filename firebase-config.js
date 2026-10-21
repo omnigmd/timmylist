@@ -8,6 +8,7 @@ window.TML_FIREBASE = {
   appId: "1:343083999884:web:637d93fe45ee163e0911a9"
 };
 
-// Discord linking (optional). Set this to "/.netlify/functions/discord-link" on hosts that run the functions (Vercel or Netlify).
-// Leave it empty on hosts without functions (the Link Discord button is then switched off).
-window.TML_DISCORD_LINK = "/.netlify/functions/discord-link";
+// Where the Discord functions live on this host. These are the Cloudflare Pages addresses.
+// (On Netlify they were /.netlify/functions/discord-auth and /.netlify/functions/discord-link.)
+window.TML_DISCORD_AUTH = "/api/discord-auth";
+window.TML_DISCORD_LINK = "/api/discord-link";
