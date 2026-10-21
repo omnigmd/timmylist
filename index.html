@@ -2314,6 +2314,16 @@ button.bcard.pick:after{top:10px;right:10px;width:22px;height:22px;display:grid;
 .crow.m1 .crk,.crow.m2 .crk,.crow.m3 .crk{color:var(--mut)!important}
 .row.f,.row.m1,.gcard.f,.gcard.m1{--edge:linear-gradient(rgba(160,200,255,.16),rgba(160,200,255,.16));border-color:rgba(160,200,255,.16)!important;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 22px 50px -26px rgba(0,0,0,.9)!important}
 .row.m1 .thumb:after,.row.f .thumb:after{background:var(--acc);box-shadow:none}
+/* ---- v138: Geometry Dash progress ---- */
+.gdok{display:inline-grid;place-items:center;width:19px;height:19px;margin-left:9px;border-radius:50%;background:linear-gradient(180deg,#5af08f,#1fb35a);color:#04210f;font:900 12px/1 Inter,system-ui,sans-serif;vertical-align:middle;box-shadow:0 0 0 2px rgba(46,204,113,.25),0 2px 8px rgba(0,0,0,.4)}
+.row.gdb,.gcard.gdb{border-color:rgba(46,204,113,.38)!important}
+.gdsec{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.gdsec .gdline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px}
+.gdsec .gdline b{font-size:13px}
+.gdsec .gdst{margin:8px 0 2px;font-size:13px;color:var(--mut);line-height:1.5}
+.gdsec .gdsteam{display:flex;gap:8px;flex:1;min-width:220px;justify-content:flex-end}
+.gdsec .gdsteam input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.14));background:rgba(255,255,255,.05);color:inherit;font:inherit}
+.gdsec code{font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.08)}
 </style>
 </head>
 <body>
@@ -4669,6 +4679,16 @@ button.bcard.pick:after{top:10px;right:10px;width:22px;height:22px;display:grid;
 .crow.m1 .crk,.crow.m2 .crk,.crow.m3 .crk{color:var(--mut)!important}
 .row.f,.row.m1,.gcard.f,.gcard.m1{--edge:linear-gradient(rgba(160,200,255,.16),rgba(160,200,255,.16));border-color:rgba(160,200,255,.16)!important;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 22px 50px -26px rgba(0,0,0,.9)!important}
 .row.m1 .thumb:after,.row.f .thumb:after{background:var(--acc);box-shadow:none}
+/* ---- v138: Geometry Dash progress ---- */
+.gdok{display:inline-grid;place-items:center;width:19px;height:19px;margin-left:9px;border-radius:50%;background:linear-gradient(180deg,#5af08f,#1fb35a);color:#04210f;font:900 12px/1 Inter,system-ui,sans-serif;vertical-align:middle;box-shadow:0 0 0 2px rgba(46,204,113,.25),0 2px 8px rgba(0,0,0,.4)}
+.row.gdb,.gcard.gdb{border-color:rgba(46,204,113,.38)!important}
+.gdsec{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.gdsec .gdline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px}
+.gdsec .gdline b{font-size:13px}
+.gdsec .gdst{margin:8px 0 2px;font-size:13px;color:var(--mut);line-height:1.5}
+.gdsec .gdsteam{display:flex;gap:8px;flex:1;min-width:220px;justify-content:flex-end}
+.gdsec .gdsteam input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.14));background:rgba(255,255,255,.05);color:inherit;font:inherit}
+.gdsec code{font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.08)}
 </style>
 </head>
 <body>
@@ -6136,6 +6156,112 @@ function bChip(b){ return '<span class="bchip bt-'+b.t+'" title="'+esc(b.n+" - "
     try{
       var h1=app.querySelector(".pinfo h1"), show=bShow(name);
       if(h1&&show.length){ var row=document.createElement("div"); row.className="pbadges"; row.innerHTML=show.map(bChip).join(""); h1.parentNode.insertBefore(row,h1.nextSibling); }
+    }catch(e){}
+  };
+})();
+// ================= v138: Geometry Dash progress (save file import + Steam check) =================
+var GDK=function(){ try{ return "tml_gd_"+(ownKey()||"guest"); }catch(e){ return "tml_gd_guest"; } };
+function gdLoad(){ try{ return JSON.parse(localStorage.getItem(GDK())||"null")||{}; }catch(e){ return {}; } }
+function gdStore(o){ try{ localStorage.setItem(GDK(),JSON.stringify(o)); }catch(e){} }
+function gdBeatenMap(){ var o=gdLoad(), m={}; (o.ids||[]).forEach(function(i){ m[String(i)]=1; }); return m; }
+function gdU8str(u){ var s="",i,c=8192; for(i=0;i<u.length;i+=c) s+=String.fromCharCode.apply(null,u.subarray(i,i+c)); return s; }
+// CCGameManager.dat is XOR 11 -> url-safe base64 -> gzip -> plist xml
+function gdDecode(buf){
+  var u=new Uint8Array(buf), i;
+  if(u[0]===60) return Promise.resolve(new TextDecoder().decode(u));
+  var x=new Uint8Array(u.length); for(i=0;i<u.length;i++) x[i]=u[i]^11;
+  var s=gdU8str(x).replace(/\0+$/,"").replace(/\s+/g,"").replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4) s+="=";
+  var bin; try{ bin=atob(s); }catch(e){ return Promise.reject(new Error("That doesn't look like a Geometry Dash save file.")); }
+  var b=new Uint8Array(bin.length); for(i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+  if(typeof DecompressionStream==="undefined") return Promise.reject(new Error("This browser can't open save files. Try a recent Chrome, Edge or Firefox."));
+  var ds=new DecompressionStream("gzip"), w=ds.writable.getWriter(); w.write(b); w.close().catch(function(){});
+  return new Response(ds.readable).arrayBuffer().then(function(ab){ return new TextDecoder().decode(ab); },function(){ throw new Error("That doesn't look like a Geometry Dash save file."); });
+}
+function gdDictAfter(doc,key){ var ks=doc.getElementsByTagName("k"), i, n; for(i=0;i<ks.length;i++) if(ks[i].textContent===key){ n=ks[i].nextElementSibling; if(n&&n.tagName==="d") return n; } return null; }
+// level ids the save says were beaten: GS_completed, GS_3 / GS_4 (with coins), GS_7 at 100%
+function gdIds(xml){
+  var doc=new DOMParser().parseFromString(xml,"text/xml"), out={}, d, ch, i, m, v;
+  if(doc.getElementsByTagName("parsererror").length) throw new Error("That doesn't look like a Geometry Dash save file.");
+  ["GS_completed","GS_3","GS_4"].forEach(function(key){
+    d=gdDictAfter(doc,key); if(!d) return; ch=d.children;
+    for(i=0;i<ch.length;i++) if(ch[i].tagName==="k"){ m=/(\d+)/.exec(ch[i].textContent); if(m) out[m[1]]=1; }
+  });
+  d=gdDictAfter(doc,"GS_7");
+  if(d){ ch=d.children; for(i=0;i<ch.length-1;i++) if(ch[i].tagName==="k"){ v=parseInt(ch[i+1].textContent,10); m=/(\d+)/.exec(ch[i].textContent); if(m&&v>=100) out[m[1]]=1; } }
+  return Object.keys(out);
+}
+function gdTimmyIds(all){ var m={}; all.forEach(function(i){ m[i]=1; }); return LEVELS.filter(function(l){ return l.id>0&&m[String(l.id)]; }).map(function(l){ return l.id; }); }
+function gdImport(buf){
+  return gdDecode(buf).then(function(xml){
+    var all=gdIds(xml), ids=gdTimmyIds(all), o=gdLoad(); o.ids=ids; o.ts=Date.now(); o.seen=all.length; gdStore(o); gdDecor(); return o;
+  });
+}
+function gdSummary(){
+  var o=gdLoad(), real=LEVELS.filter(function(l){ return l.id>0; }), m=gdBeatenMap();
+  if(!o.ts) return "No save file imported yet.";
+  var done=real.filter(function(l){ return m[String(l.id)]; });
+  return "Beaten "+done.length+" of "+real.length+" Timmy levels"+(done.length?": "+done.map(function(l){ return l.name; }).join(", "):".")+" (imported "+new Date(o.ts).toLocaleDateString()+")";
+}
+function gdDecor(){
+  try{
+    var m=gdBeatenMap();
+    [].forEach.call(document.querySelectorAll(".row[data-id],.gcard[data-id],.crow[data-id]"),function(e){
+      var on=!!m[e.getAttribute("data-id")], t=e.querySelector(".name,.gname,.cname"), x=e.querySelector(".gdok");
+      if(on&&!x&&t){ x=document.createElement("span"); x.className="gdok"; x.title="You beat this level"; x.textContent="✓"; t.appendChild(x); }
+      else if(!on&&x) x.remove();
+      e.classList.toggle("gdb",on);
+    });
+  }catch(e){}
+}
+(function(){
+  var busy=false, mo=new MutationObserver(function(){ if(busy) return; busy=true; setTimeout(function(){ gdDecor(); busy=false; },60); });
+  function go(){ if(typeof app!=="undefined"&&app) mo.observe(app,{childList:true,subtree:true}); gdDecor(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",go); else setTimeout(go,0);
+})();
+// profile settings: Geometry Dash section
+(function(){
+  var _op=openProfile;
+  openProfile=function(){
+    _op();
+    try{
+      var grid=document.querySelector("#pset .pset-grid"); if(!grid||document.getElementById("gdsec")) return;
+      var f=document.createElement("div"); f.className="pset-f gdsec"; f.id="gdsec"; f.style.gridColumn="1 / -1";
+      f.innerHTML='<span>Geometry Dash progress</span>'+
+        '<div class="gdline"><b>Save file</b><div class="pset-btns"><button type="button" class="btn" id="gdimp">Import save file</button><button type="button" class="ib" id="gdclr">Clear</button></div></div>'+
+        '<div class="gdst" id="gdst"></div>'+
+        '<small>Open <code>CCGameManager.dat</code> (Windows: <code>%localappdata%\\GeometryDash</code>). It is read in your browser and never uploaded. Only which Timmy levels you beat is kept, on this device. Levels with a green check on the list are the ones you beat.</small>'+
+        '<div class="gdline" style="margin-top:12px"><b>Steam</b><div class="gdsteam"><input id="gdsid" placeholder="Steam profile link or ID" maxlength="120"><button type="button" class="btn" id="gdsb">Check</button></div></div>'+
+        '<div class="gdst" id="gdsst"></div>'+
+        '<small>Checks whether the Steam account owns Geometry Dash. The game list on the profile must be public. This is not verified, so it is only shown to you.</small>'+
+        '<input type="file" id="gdfile" accept=".dat,.xml,.plist" hidden>';
+      var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
+      function paint(){
+        var o=gdLoad(); document.getElementById("gdst").textContent=gdSummary();
+        var s=document.getElementById("gdsst"), sid=document.getElementById("gdsid");
+        if(o.steam){ sid.value=o.steam.input||""; s.textContent=(o.steam.name?o.steam.name+": ":"")+(o.steam.owns===true?"owns Geometry Dash":o.steam.owns===false?"does not own Geometry Dash":"game list is private, so ownership can't be seen"); }
+        else s.textContent=window.TML_STEAM_API?"":"Steam checking isn't set up on this site yet.";
+        document.getElementById("gdsb").disabled=!window.TML_STEAM_API;
+      }
+      paint();
+      document.getElementById("gdimp").onclick=function(){ document.getElementById("gdfile").click(); };
+      document.getElementById("gdfile").onchange=function(){
+        var fl=this.files[0]; this.value=""; if(!fl) return;
+        document.getElementById("gdst").textContent="Reading save file...";
+        var r=new FileReader();
+        r.onload=function(){ gdImport(r.result).then(function(){ paint(); toast("Save file read"); },function(e){ document.getElementById("gdst").textContent=(e&&e.message)||"Couldn't read that file."; }); };
+        r.onerror=function(){ document.getElementById("gdst").textContent="Couldn't read that file."; };
+        r.readAsArrayBuffer(fl);
+      };
+      document.getElementById("gdclr").onclick=function(){ var o=gdLoad(); delete o.ids; delete o.ts; delete o.seen; gdStore(o); gdDecor(); paint(); };
+      document.getElementById("gdsb").onclick=function(){
+        var q=document.getElementById("gdsid").value.trim(), s=document.getElementById("gdsst"); if(!q||!window.TML_STEAM_API) return;
+        s.textContent="Checking...";
+        fetch(window.TML_STEAM_API+(window.TML_STEAM_API.indexOf("?")<0?"?":"&")+"q="+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(j){
+          if(j.error){ s.textContent=j.error; return; }
+          var o=gdLoad(); o.steam={input:q,id:j.steamid||"",name:j.name||"",owns:j.owns,ts:Date.now()}; gdStore(o); paint();
+        }).catch(function(){ s.textContent="Couldn't reach Steam. Try again later."; });
+      };
     }catch(e){}
   };
 })();
@@ -7735,6 +7861,112 @@ function bChip(b){ return '<span class="bchip bt-'+b.t+'" title="'+esc(b.n+" - "
     try{
       var h1=app.querySelector(".pinfo h1"), show=bShow(name);
       if(h1&&show.length){ var row=document.createElement("div"); row.className="pbadges"; row.innerHTML=show.map(bChip).join(""); h1.parentNode.insertBefore(row,h1.nextSibling); }
+    }catch(e){}
+  };
+})();
+// ================= v138: Geometry Dash progress (save file import + Steam check) =================
+var GDK=function(){ try{ return "tml_gd_"+(ownKey()||"guest"); }catch(e){ return "tml_gd_guest"; } };
+function gdLoad(){ try{ return JSON.parse(localStorage.getItem(GDK())||"null")||{}; }catch(e){ return {}; } }
+function gdStore(o){ try{ localStorage.setItem(GDK(),JSON.stringify(o)); }catch(e){} }
+function gdBeatenMap(){ var o=gdLoad(), m={}; (o.ids||[]).forEach(function(i){ m[String(i)]=1; }); return m; }
+function gdU8str(u){ var s="",i,c=8192; for(i=0;i<u.length;i+=c) s+=String.fromCharCode.apply(null,u.subarray(i,i+c)); return s; }
+// CCGameManager.dat is XOR 11 -> url-safe base64 -> gzip -> plist xml
+function gdDecode(buf){
+  var u=new Uint8Array(buf), i;
+  if(u[0]===60) return Promise.resolve(new TextDecoder().decode(u));
+  var x=new Uint8Array(u.length); for(i=0;i<u.length;i++) x[i]=u[i]^11;
+  var s=gdU8str(x).replace(/\0+$/,"").replace(/\s+/g,"").replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4) s+="=";
+  var bin; try{ bin=atob(s); }catch(e){ return Promise.reject(new Error("That doesn't look like a Geometry Dash save file.")); }
+  var b=new Uint8Array(bin.length); for(i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+  if(typeof DecompressionStream==="undefined") return Promise.reject(new Error("This browser can't open save files. Try a recent Chrome, Edge or Firefox."));
+  var ds=new DecompressionStream("gzip"), w=ds.writable.getWriter(); w.write(b); w.close().catch(function(){});
+  return new Response(ds.readable).arrayBuffer().then(function(ab){ return new TextDecoder().decode(ab); },function(){ throw new Error("That doesn't look like a Geometry Dash save file."); });
+}
+function gdDictAfter(doc,key){ var ks=doc.getElementsByTagName("k"), i, n; for(i=0;i<ks.length;i++) if(ks[i].textContent===key){ n=ks[i].nextElementSibling; if(n&&n.tagName==="d") return n; } return null; }
+// level ids the save says were beaten: GS_completed, GS_3 / GS_4 (with coins), GS_7 at 100%
+function gdIds(xml){
+  var doc=new DOMParser().parseFromString(xml,"text/xml"), out={}, d, ch, i, m, v;
+  if(doc.getElementsByTagName("parsererror").length) throw new Error("That doesn't look like a Geometry Dash save file.");
+  ["GS_completed","GS_3","GS_4"].forEach(function(key){
+    d=gdDictAfter(doc,key); if(!d) return; ch=d.children;
+    for(i=0;i<ch.length;i++) if(ch[i].tagName==="k"){ m=/(\d+)/.exec(ch[i].textContent); if(m) out[m[1]]=1; }
+  });
+  d=gdDictAfter(doc,"GS_7");
+  if(d){ ch=d.children; for(i=0;i<ch.length-1;i++) if(ch[i].tagName==="k"){ v=parseInt(ch[i+1].textContent,10); m=/(\d+)/.exec(ch[i].textContent); if(m&&v>=100) out[m[1]]=1; } }
+  return Object.keys(out);
+}
+function gdTimmyIds(all){ var m={}; all.forEach(function(i){ m[i]=1; }); return LEVELS.filter(function(l){ return l.id>0&&m[String(l.id)]; }).map(function(l){ return l.id; }); }
+function gdImport(buf){
+  return gdDecode(buf).then(function(xml){
+    var all=gdIds(xml), ids=gdTimmyIds(all), o=gdLoad(); o.ids=ids; o.ts=Date.now(); o.seen=all.length; gdStore(o); gdDecor(); return o;
+  });
+}
+function gdSummary(){
+  var o=gdLoad(), real=LEVELS.filter(function(l){ return l.id>0; }), m=gdBeatenMap();
+  if(!o.ts) return "No save file imported yet.";
+  var done=real.filter(function(l){ return m[String(l.id)]; });
+  return "Beaten "+done.length+" of "+real.length+" Timmy levels"+(done.length?": "+done.map(function(l){ return l.name; }).join(", "):".")+" (imported "+new Date(o.ts).toLocaleDateString()+")";
+}
+function gdDecor(){
+  try{
+    var m=gdBeatenMap();
+    [].forEach.call(document.querySelectorAll(".row[data-id],.gcard[data-id],.crow[data-id]"),function(e){
+      var on=!!m[e.getAttribute("data-id")], t=e.querySelector(".name,.gname,.cname"), x=e.querySelector(".gdok");
+      if(on&&!x&&t){ x=document.createElement("span"); x.className="gdok"; x.title="You beat this level"; x.textContent="✓"; t.appendChild(x); }
+      else if(!on&&x) x.remove();
+      e.classList.toggle("gdb",on);
+    });
+  }catch(e){}
+}
+(function(){
+  var busy=false, mo=new MutationObserver(function(){ if(busy) return; busy=true; setTimeout(function(){ gdDecor(); busy=false; },60); });
+  function go(){ if(typeof app!=="undefined"&&app) mo.observe(app,{childList:true,subtree:true}); gdDecor(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",go); else setTimeout(go,0);
+})();
+// profile settings: Geometry Dash section
+(function(){
+  var _op=openProfile;
+  openProfile=function(){
+    _op();
+    try{
+      var grid=document.querySelector("#pset .pset-grid"); if(!grid||document.getElementById("gdsec")) return;
+      var f=document.createElement("div"); f.className="pset-f gdsec"; f.id="gdsec"; f.style.gridColumn="1 / -1";
+      f.innerHTML='<span>Geometry Dash progress</span>'+
+        '<div class="gdline"><b>Save file</b><div class="pset-btns"><button type="button" class="btn" id="gdimp">Import save file</button><button type="button" class="ib" id="gdclr">Clear</button></div></div>'+
+        '<div class="gdst" id="gdst"></div>'+
+        '<small>Open <code>CCGameManager.dat</code> (Windows: <code>%localappdata%\\GeometryDash</code>). It is read in your browser and never uploaded. Only which Timmy levels you beat is kept, on this device. Levels with a green check on the list are the ones you beat.</small>'+
+        '<div class="gdline" style="margin-top:12px"><b>Steam</b><div class="gdsteam"><input id="gdsid" placeholder="Steam profile link or ID" maxlength="120"><button type="button" class="btn" id="gdsb">Check</button></div></div>'+
+        '<div class="gdst" id="gdsst"></div>'+
+        '<small>Checks whether the Steam account owns Geometry Dash. The game list on the profile must be public. This is not verified, so it is only shown to you.</small>'+
+        '<input type="file" id="gdfile" accept=".dat,.xml,.plist" hidden>';
+      var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
+      function paint(){
+        var o=gdLoad(); document.getElementById("gdst").textContent=gdSummary();
+        var s=document.getElementById("gdsst"), sid=document.getElementById("gdsid");
+        if(o.steam){ sid.value=o.steam.input||""; s.textContent=(o.steam.name?o.steam.name+": ":"")+(o.steam.owns===true?"owns Geometry Dash":o.steam.owns===false?"does not own Geometry Dash":"game list is private, so ownership can't be seen"); }
+        else s.textContent=window.TML_STEAM_API?"":"Steam checking isn't set up on this site yet.";
+        document.getElementById("gdsb").disabled=!window.TML_STEAM_API;
+      }
+      paint();
+      document.getElementById("gdimp").onclick=function(){ document.getElementById("gdfile").click(); };
+      document.getElementById("gdfile").onchange=function(){
+        var fl=this.files[0]; this.value=""; if(!fl) return;
+        document.getElementById("gdst").textContent="Reading save file...";
+        var r=new FileReader();
+        r.onload=function(){ gdImport(r.result).then(function(){ paint(); toast("Save file read"); },function(e){ document.getElementById("gdst").textContent=(e&&e.message)||"Couldn't read that file."; }); };
+        r.onerror=function(){ document.getElementById("gdst").textContent="Couldn't read that file."; };
+        r.readAsArrayBuffer(fl);
+      };
+      document.getElementById("gdclr").onclick=function(){ var o=gdLoad(); delete o.ids; delete o.ts; delete o.seen; gdStore(o); gdDecor(); paint(); };
+      document.getElementById("gdsb").onclick=function(){
+        var q=document.getElementById("gdsid").value.trim(), s=document.getElementById("gdsst"); if(!q||!window.TML_STEAM_API) return;
+        s.textContent="Checking...";
+        fetch(window.TML_STEAM_API+(window.TML_STEAM_API.indexOf("?")<0?"?":"&")+"q="+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(j){
+          if(j.error){ s.textContent=j.error; return; }
+          var o=gdLoad(); o.steam={input:q,id:j.steamid||"",name:j.name||"",owns:j.owns,ts:Date.now()}; gdStore(o); paint();
+        }).catch(function(){ s.textContent="Couldn't reach Steam. Try again later."; });
+      };
     }catch(e){}
   };
 })();
