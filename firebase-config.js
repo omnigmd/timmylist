@@ -8,6 +8,6 @@ window.TML_FIREBASE = {
   appId: "1:343083999884:web:637d93fe45ee163e0911a9"
 };
 
-// Steam check (optional). Set this to the address of the steam-owns function once the site is on Netlify,
-// for example "https://timmylist.netlify.app/.netlify/functions/steam-owns". Leave empty to hide the feature.
-window.TML_STEAM_API = "";
+// Discord linking (optional). On Netlify set this to "/.netlify/functions/discord-link".
+// Leave it empty on hosts without Netlify functions (the Link Discord button is then switched off).
+window.TML_DISCORD_LINK = "";

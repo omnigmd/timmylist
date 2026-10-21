@@ -2321,9 +2321,14 @@ button.bcard.pick:after{top:10px;right:10px;width:22px;height:22px;display:grid;
 .gdsec .gdline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px}
 .gdsec .gdline b{font-size:13px}
 .gdsec .gdst{margin:8px 0 2px;font-size:13px;color:var(--mut);line-height:1.5}
-.gdsec .gdsteam{display:flex;gap:8px;flex:1;min-width:220px;justify-content:flex-end}
-.gdsec .gdsteam input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.14));background:rgba(255,255,255,.05);color:inherit;font:inherit}
 .gdsec code{font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.08)}
+.dchip{color:#9db3ff;--bc:#7289da;--bg:rgba(114,137,218,.14)}
+.dchip i svg{width:18px;height:18px;fill:#fff;display:block}
+.dchip .dcv{font-style:normal;font-weight:900;color:#5af08f;margin-left:2px}
+.gdsec .dcb{display:inline-flex;align-items:center;gap:8px;background:#5865f2}
+.gdsec .dcb svg{width:18px;height:18px}
+.gdsec .dcb:disabled{opacity:.5}
+.gdsec [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -4686,9 +4691,14 @@ button.bcard.pick:after{top:10px;right:10px;width:22px;height:22px;display:grid;
 .gdsec .gdline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px}
 .gdsec .gdline b{font-size:13px}
 .gdsec .gdst{margin:8px 0 2px;font-size:13px;color:var(--mut);line-height:1.5}
-.gdsec .gdsteam{display:flex;gap:8px;flex:1;min-width:220px;justify-content:flex-end}
-.gdsec .gdsteam input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.14));background:rgba(255,255,255,.05);color:inherit;font:inherit}
 .gdsec code{font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.08)}
+.dchip{color:#9db3ff;--bc:#7289da;--bg:rgba(114,137,218,.14)}
+.dchip i svg{width:18px;height:18px;fill:#fff;display:block}
+.dchip .dcv{font-style:normal;font-weight:900;color:#5af08f;margin-left:2px}
+.gdsec .dcb{display:inline-flex;align-items:center;gap:8px;background:#5865f2}
+.gdsec .dcb svg{width:18px;height:18px}
+.gdsec .dcb:disabled{opacity:.5}
+.gdsec [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -6159,7 +6169,7 @@ function bChip(b){ return '<span class="bchip bt-'+b.t+'" title="'+esc(b.n+" - "
     }catch(e){}
   };
 })();
-// ================= v138: Geometry Dash progress (save file import + Steam check) =================
+// ================= v138: Geometry Dash progress (save file import) =================
 var GDK=function(){ try{ return "tml_gd_"+(ownKey()||"guest"); }catch(e){ return "tml_gd_guest"; } };
 function gdLoad(){ try{ return JSON.parse(localStorage.getItem(GDK())||"null")||{}; }catch(e){ return {}; } }
 function gdStore(o){ try{ localStorage.setItem(GDK(),JSON.stringify(o)); }catch(e){} }
@@ -6231,17 +6241,10 @@ function gdDecor(){
         '<div class="gdline"><b>Save file</b><div class="pset-btns"><button type="button" class="btn" id="gdimp">Import save file</button><button type="button" class="ib" id="gdclr">Clear</button></div></div>'+
         '<div class="gdst" id="gdst"></div>'+
         '<small>Open <code>CCGameManager.dat</code> (Windows: <code>%localappdata%\\GeometryDash</code>). It is read in your browser and never uploaded. Only which Timmy levels you beat is kept, on this device. Levels with a green check on the list are the ones you beat.</small>'+
-        '<div class="gdline" style="margin-top:12px"><b>Steam</b><div class="gdsteam"><input id="gdsid" placeholder="Steam profile link or ID" maxlength="120"><button type="button" class="btn" id="gdsb">Check</button></div></div>'+
-        '<div class="gdst" id="gdsst"></div>'+
-        '<small>Checks whether the Steam account owns Geometry Dash. The game list on the profile must be public. This is not verified, so it is only shown to you.</small>'+
         '<input type="file" id="gdfile" accept=".dat,.xml,.plist" hidden>';
       var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
       function paint(){
         var o=gdLoad(); document.getElementById("gdst").textContent=gdSummary();
-        var s=document.getElementById("gdsst"), sid=document.getElementById("gdsid");
-        if(o.steam){ sid.value=o.steam.input||""; s.textContent=(o.steam.name?o.steam.name+": ":"")+(o.steam.owns===true?"owns Geometry Dash":o.steam.owns===false?"does not own Geometry Dash":"game list is private, so ownership can't be seen"); }
-        else s.textContent=window.TML_STEAM_API?"":"Steam checking isn't set up on this site yet.";
-        document.getElementById("gdsb").disabled=!window.TML_STEAM_API;
       }
       paint();
       document.getElementById("gdimp").onclick=function(){ document.getElementById("gdfile").click(); };
@@ -6254,13 +6257,62 @@ function gdDecor(){
         r.readAsArrayBuffer(fl);
       };
       document.getElementById("gdclr").onclick=function(){ var o=gdLoad(); delete o.ids; delete o.ts; delete o.seen; gdStore(o); gdDecor(); paint(); };
-      document.getElementById("gdsb").onclick=function(){
-        var q=document.getElementById("gdsid").value.trim(), s=document.getElementById("gdsst"); if(!q||!window.TML_STEAM_API) return;
-        s.textContent="Checking...";
-        fetch(window.TML_STEAM_API+(window.TML_STEAM_API.indexOf("?")<0?"?":"&")+"q="+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(j){
-          if(j.error){ s.textContent=j.error; return; }
-          var o=gdLoad(); o.steam={input:q,id:j.steamid||"",name:j.name||"",owns:j.owns,ts:Date.now()}; gdStore(o); paint();
-        }).catch(function(){ s.textContent="Couldn't reach Steam. Try again later."; });
+    }catch(e){}
+  };
+})();
+
+// ================= v139: link your Discord account (verified through the Netlify function) =================
+var DCSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+var DCN={}, DCU={};
+(function(){
+  var _ap=applyProfile;
+  applyProfile=function(pl,o){ _ap(pl,o); if(o&&o.uid) DCU[String(pl).toLowerCase()]=o.uid; };
+  var T=window.TMLNET;
+  if(T&&T.ready) T.ready.then(function(){
+    if(!T.on) return;
+    T.db.collection("discord").get().then(function(s){
+      s.docs.forEach(function(d){ var o=d.data()||{}; if(o.name) DCN[d.id]=o.name; });
+      if(cur&&cur.v!=="admin") show(cur.v,cur.a,true);
+    },function(){});
+    var hm=/^#dl=ok&dn=([^&]*)/.exec(location.hash), he=/^#dl_err=(.*)$/.exec(location.hash);
+    if(hm||he){ try{ history.replaceState(null,"",location.pathname+location.search+"#/"); }catch(e){} setTimeout(function(){ toast(hm?"Discord linked: "+decodeURIComponent(hm[1]):decodeURIComponent(he[1])); },900); }
+  });
+  var _rp=rPlayer;
+  rPlayer=function(name){
+    _rp(name);
+    try{
+      var nm=DCN[DCU[String(name).toLowerCase()]]; if(!nm) return;
+      var h1=app.querySelector(".pinfo h1"); if(!h1) return;
+      var row=app.querySelector(".pbadges"); if(!row){ row=document.createElement("div"); row.className="pbadges"; h1.parentNode.insertBefore(row,h1.nextSibling); }
+      var c=document.createElement("span"); c.className="bchip dchip"; c.title="Verified Discord account"; c.innerHTML='<i>'+DCSVG+'</i><b>'+esc(nm)+'</b><em class="dcv">✓</em>';
+      row.appendChild(c);
+    }catch(e){}
+  };
+  var _op=openProfile;
+  openProfile=function(){
+    _op();
+    try{
+      var grid=document.querySelector("#pset .pset-grid"); if(!grid||document.getElementById("dcsec")) return;
+      var f=document.createElement("div"); f.className="pset-f gdsec"; f.id="dcsec"; f.style.gridColumn="1 / -1";
+      f.innerHTML='<span>Discord</span><div class="gdline"><b id="dcwho"></b><div class="pset-btns"><button type="button" class="btn dcb" id="dcbtn"></button><button type="button" class="ib" id="dcun">Unlink</button></div></div><div class="gdst" id="dcst"></div><small>Approve on Discord and your username shows on your player page with a check. We only read your Discord name, nothing else.</small>';
+      var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
+      var T=window.TMLNET, base=window.TML_DISCORD_LINK||"";
+      function paint(){
+        var who=document.getElementById("dcwho"), b=document.getElementById("dcbtn"), u=document.getElementById("dcun"), st=document.getElementById("dcst");
+        if(!(T&&T.on&&T.user&&T.prof)){ who.textContent="Sign in to link Discord"; b.hidden=true; u.hidden=true; st.textContent=""; return; }
+        var nm=DCN[T.user.uid];
+        if(nm){ who.textContent="Linked as "+nm+" ✓"; b.hidden=true; u.hidden=false; st.textContent=""; }
+        else { who.textContent="Not linked"; b.hidden=false; u.hidden=true; b.innerHTML=DCSVG+'<span>Link Discord</span>'; b.disabled=!base; st.textContent=base?"":"Discord linking isn't set up on this site yet."; }
+      }
+      function call(step){ return T.user.getIdToken().then(function(tok){ return fetch(base+"?step="+step,{method:"POST",headers:{Authorization:"Bearer "+tok}}); }).then(function(r){ return r.json(); }); }
+      paint();
+      document.getElementById("dcbtn").onclick=function(){
+        if(!base) return; var st=document.getElementById("dcst"); st.textContent="Opening Discord...";
+        call("start").then(function(j){ if(j&&j.url) location.href=j.url; else st.textContent=(j&&j.error)||"Couldn't start the link."; }).catch(function(){ st.textContent="Couldn't reach the link service."; });
+      };
+      document.getElementById("dcun").onclick=function(){
+        var st=document.getElementById("dcst"); st.textContent="Unlinking...";
+        call("unlink").then(function(j){ if(j&&j.ok){ delete DCN[T.user.uid]; paint(); if(cur&&cur.v!=="admin") show(cur.v,cur.a,true); toast("Discord unlinked"); } else st.textContent=(j&&j.error)||"Couldn't unlink."; }).catch(function(){ st.textContent="Couldn't reach the link service."; });
       };
     }catch(e){}
   };
@@ -7864,7 +7916,7 @@ function bChip(b){ return '<span class="bchip bt-'+b.t+'" title="'+esc(b.n+" - "
     }catch(e){}
   };
 })();
-// ================= v138: Geometry Dash progress (save file import + Steam check) =================
+// ================= v138: Geometry Dash progress (save file import) =================
 var GDK=function(){ try{ return "tml_gd_"+(ownKey()||"guest"); }catch(e){ return "tml_gd_guest"; } };
 function gdLoad(){ try{ return JSON.parse(localStorage.getItem(GDK())||"null")||{}; }catch(e){ return {}; } }
 function gdStore(o){ try{ localStorage.setItem(GDK(),JSON.stringify(o)); }catch(e){} }
@@ -7936,17 +7988,10 @@ function gdDecor(){
         '<div class="gdline"><b>Save file</b><div class="pset-btns"><button type="button" class="btn" id="gdimp">Import save file</button><button type="button" class="ib" id="gdclr">Clear</button></div></div>'+
         '<div class="gdst" id="gdst"></div>'+
         '<small>Open <code>CCGameManager.dat</code> (Windows: <code>%localappdata%\\GeometryDash</code>). It is read in your browser and never uploaded. Only which Timmy levels you beat is kept, on this device. Levels with a green check on the list are the ones you beat.</small>'+
-        '<div class="gdline" style="margin-top:12px"><b>Steam</b><div class="gdsteam"><input id="gdsid" placeholder="Steam profile link or ID" maxlength="120"><button type="button" class="btn" id="gdsb">Check</button></div></div>'+
-        '<div class="gdst" id="gdsst"></div>'+
-        '<small>Checks whether the Steam account owns Geometry Dash. The game list on the profile must be public. This is not verified, so it is only shown to you.</small>'+
         '<input type="file" id="gdfile" accept=".dat,.xml,.plist" hidden>';
       var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
       function paint(){
         var o=gdLoad(); document.getElementById("gdst").textContent=gdSummary();
-        var s=document.getElementById("gdsst"), sid=document.getElementById("gdsid");
-        if(o.steam){ sid.value=o.steam.input||""; s.textContent=(o.steam.name?o.steam.name+": ":"")+(o.steam.owns===true?"owns Geometry Dash":o.steam.owns===false?"does not own Geometry Dash":"game list is private, so ownership can't be seen"); }
-        else s.textContent=window.TML_STEAM_API?"":"Steam checking isn't set up on this site yet.";
-        document.getElementById("gdsb").disabled=!window.TML_STEAM_API;
       }
       paint();
       document.getElementById("gdimp").onclick=function(){ document.getElementById("gdfile").click(); };
@@ -7959,13 +8004,62 @@ function gdDecor(){
         r.readAsArrayBuffer(fl);
       };
       document.getElementById("gdclr").onclick=function(){ var o=gdLoad(); delete o.ids; delete o.ts; delete o.seen; gdStore(o); gdDecor(); paint(); };
-      document.getElementById("gdsb").onclick=function(){
-        var q=document.getElementById("gdsid").value.trim(), s=document.getElementById("gdsst"); if(!q||!window.TML_STEAM_API) return;
-        s.textContent="Checking...";
-        fetch(window.TML_STEAM_API+(window.TML_STEAM_API.indexOf("?")<0?"?":"&")+"q="+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(j){
-          if(j.error){ s.textContent=j.error; return; }
-          var o=gdLoad(); o.steam={input:q,id:j.steamid||"",name:j.name||"",owns:j.owns,ts:Date.now()}; gdStore(o); paint();
-        }).catch(function(){ s.textContent="Couldn't reach Steam. Try again later."; });
+    }catch(e){}
+  };
+})();
+
+// ================= v139: link your Discord account (verified through the Netlify function) =================
+var DCSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+var DCN={}, DCU={};
+(function(){
+  var _ap=applyProfile;
+  applyProfile=function(pl,o){ _ap(pl,o); if(o&&o.uid) DCU[String(pl).toLowerCase()]=o.uid; };
+  var T=window.TMLNET;
+  if(T&&T.ready) T.ready.then(function(){
+    if(!T.on) return;
+    T.db.collection("discord").get().then(function(s){
+      s.docs.forEach(function(d){ var o=d.data()||{}; if(o.name) DCN[d.id]=o.name; });
+      if(cur&&cur.v!=="admin") show(cur.v,cur.a,true);
+    },function(){});
+    var hm=/^#dl=ok&dn=([^&]*)/.exec(location.hash), he=/^#dl_err=(.*)$/.exec(location.hash);
+    if(hm||he){ try{ history.replaceState(null,"",location.pathname+location.search+"#/"); }catch(e){} setTimeout(function(){ toast(hm?"Discord linked: "+decodeURIComponent(hm[1]):decodeURIComponent(he[1])); },900); }
+  });
+  var _rp=rPlayer;
+  rPlayer=function(name){
+    _rp(name);
+    try{
+      var nm=DCN[DCU[String(name).toLowerCase()]]; if(!nm) return;
+      var h1=app.querySelector(".pinfo h1"); if(!h1) return;
+      var row=app.querySelector(".pbadges"); if(!row){ row=document.createElement("div"); row.className="pbadges"; h1.parentNode.insertBefore(row,h1.nextSibling); }
+      var c=document.createElement("span"); c.className="bchip dchip"; c.title="Verified Discord account"; c.innerHTML='<i>'+DCSVG+'</i><b>'+esc(nm)+'</b><em class="dcv">✓</em>';
+      row.appendChild(c);
+    }catch(e){}
+  };
+  var _op=openProfile;
+  openProfile=function(){
+    _op();
+    try{
+      var grid=document.querySelector("#pset .pset-grid"); if(!grid||document.getElementById("dcsec")) return;
+      var f=document.createElement("div"); f.className="pset-f gdsec"; f.id="dcsec"; f.style.gridColumn="1 / -1";
+      f.innerHTML='<span>Discord</span><div class="gdline"><b id="dcwho"></b><div class="pset-btns"><button type="button" class="btn dcb" id="dcbtn"></button><button type="button" class="ib" id="dcun">Unlink</button></div></div><div class="gdst" id="dcst"></div><small>Approve on Discord and your username shows on your player page with a check. We only read your Discord name, nothing else.</small>';
+      var note=document.getElementById("psnote"); if(note&&note.parentNode) note.parentNode.insertBefore(f,note); else grid.appendChild(f);
+      var T=window.TMLNET, base=window.TML_DISCORD_LINK||"";
+      function paint(){
+        var who=document.getElementById("dcwho"), b=document.getElementById("dcbtn"), u=document.getElementById("dcun"), st=document.getElementById("dcst");
+        if(!(T&&T.on&&T.user&&T.prof)){ who.textContent="Sign in to link Discord"; b.hidden=true; u.hidden=true; st.textContent=""; return; }
+        var nm=DCN[T.user.uid];
+        if(nm){ who.textContent="Linked as "+nm+" ✓"; b.hidden=true; u.hidden=false; st.textContent=""; }
+        else { who.textContent="Not linked"; b.hidden=false; u.hidden=true; b.innerHTML=DCSVG+'<span>Link Discord</span>'; b.disabled=!base; st.textContent=base?"":"Discord linking isn't set up on this site yet."; }
+      }
+      function call(step){ return T.user.getIdToken().then(function(tok){ return fetch(base+"?step="+step,{method:"POST",headers:{Authorization:"Bearer "+tok}}); }).then(function(r){ return r.json(); }); }
+      paint();
+      document.getElementById("dcbtn").onclick=function(){
+        if(!base) return; var st=document.getElementById("dcst"); st.textContent="Opening Discord...";
+        call("start").then(function(j){ if(j&&j.url) location.href=j.url; else st.textContent=(j&&j.error)||"Couldn't start the link."; }).catch(function(){ st.textContent="Couldn't reach the link service."; });
+      };
+      document.getElementById("dcun").onclick=function(){
+        var st=document.getElementById("dcst"); st.textContent="Unlinking...";
+        call("unlink").then(function(j){ if(j&&j.ok){ delete DCN[T.user.uid]; paint(); if(cur&&cur.v!=="admin") show(cur.v,cur.a,true); toast("Discord unlinked"); } else st.textContent=(j&&j.error)||"Couldn't unlink."; }).catch(function(){ st.textContent="Couldn't reach the link service."; });
       };
     }catch(e){}
   };
