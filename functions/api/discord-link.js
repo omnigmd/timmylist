@@ -79,9 +79,14 @@ export async function onRequest({ request, env }) {
     const me = await (await fetch("https://discord.com/api/users/@me", { headers: { Authorization: "Bearer " + tj.access_token } })).json();
     if (!me || !me.id) return fail("Discord link failed.");
     const name = String(me.global_name || me.username || "").slice(0, 40);
+    const cdn = "https://cdn.discordapp.com/";
+    const ext = (h) => (String(h).startsWith("a_") ? "gif" : "png");
+    const avatar = me.avatar ? cdn + "avatars/" + me.id + "/" + me.avatar + "." + ext(me.avatar) + "?size=256" : "";
+    const banner = me.banner ? cdn + "banners/" + me.id + "/" + me.banner + "." + ext(me.banner) + "?size=600" : "";
+    const deco = me.avatar_decoration_data && me.avatar_decoration_data.asset ? cdn + "avatar-decoration-presets/" + String(me.avatar_decoration_data.asset).replace(/[^A-Za-z0-9_-]/g, "") + ".png?size=256&passthrough=true" : "";
     const w = await fetch(docUrl(sa, uid), {
       method: "PATCH", headers: { Authorization: "Bearer " + (await googleToken(sa)), "content-type": "application/json" },
-      body: JSON.stringify({ fields: { id: { stringValue: String(me.id) }, name: { stringValue: name }, ts: { integerValue: String(Date.now()) } } }),
+      body: JSON.stringify({ fields: { id: { stringValue: String(me.id) }, name: { stringValue: name }, avatar: { stringValue: avatar }, banner: { stringValue: banner }, deco: { stringValue: deco }, ts: { integerValue: String(Date.now()) } } }),
     });
     if (!w.ok) return fail("Couldn't save the link. Please try again.");
     return redirect(origin + "/#dl=ok&dn=" + encodeURIComponent(name), clear);
