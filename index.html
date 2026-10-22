@@ -7728,7 +7728,7 @@ var r0=route(); show(r0.v,r0.a,true);
 <\/script>
 <script>try{if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)&&location.hostname!=="claude.ai"&&!/claudeusercontent|artifact/.test(location.hostname)){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}}catch(e){}<\/script><script>(function(){try{
 var h=location.hostname; if(!/^https?:/.test(location.protocol)||h==="claude.ai"||/claudeusercontent|artifact/.test(h)) return;
-if(matchMedia("(display-mode:standalone)").matches||navigator.standalone) return;
+if(matchMedia("(display-mode:standalone)").matches||navigator.standalone||/Electron/i.test(navigator.userAgent)) return;
 var ua=navigator.userAgent, ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1), dp=null;
 addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); dp=e; });
 addEventListener("appinstalled",function(){ var b=document.getElementById("instBtn"); if(b) b.remove(); });
@@ -9649,7 +9649,7 @@ var r0=route(); show(r0.v,r0.a,true);
 </script>
 <script>try{if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)&&location.hostname!=="claude.ai"&&!/claudeusercontent|artifact/.test(location.hostname)){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}}catch(e){}</script><script>(function(){try{
 var h=location.hostname; if(!/^https?:/.test(location.protocol)||h==="claude.ai"||/claudeusercontent|artifact/.test(h)) return;
-if(matchMedia("(display-mode:standalone)").matches||navigator.standalone) return;
+if(matchMedia("(display-mode:standalone)").matches||navigator.standalone||/Electron/i.test(navigator.userAgent)) return;
 var ua=navigator.userAgent, ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1), dp=null;
 addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); dp=e; });
 addEventListener("appinstalled",function(){ var b=document.getElementById("instBtn"); if(b) b.remove(); });
