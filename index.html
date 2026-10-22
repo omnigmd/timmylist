@@ -5610,8 +5610,9 @@ function wmShow(cc,fly){
   if(WM.sel===cc&&fly!==false){ WM.sel=""; wmMark(); box.innerHTML='<p class="wmhint">Pick a country on the map or one of the flags above.</p>'; wmFly(0,0,1); return; }
   WM.sel=cc; wmMark();
   var l=(WM.by[cc]||[]).slice().sort(function(a,b){return b.p-a.p;}), tot=l.reduce(function(t,x){return t+x.p;},0);
-  var h='<div class="wmrh">'+wmFlag(cc)+'<b>'+esc(cname(cc))+'</b><span>'+(l.length?l.length+" player"+(l.length>1?"s":"")+" &middot; "+P2(tot)+" pts":"No players yet")+'</span></div>';
+  var h='<div class="wmrh">'+wmFlag(cc)+'<b>'+esc(cname(cc))+'</b><span>'+(l.length?l.length+" player"+(l.length>1?"s":"")+" &middot; "+P2(tot)+" pts":(String(cc).toLowerCase()==="kp"?"":"No players yet"))+'</span></div>';
   if(l.length){ h+='<div class="wmlist">'+l.map(function(x){ return '<div class="wmp lk" tabindex="0" role="button" data-p="'+esc(x.u)+'">'+av(x.u)+'<span class="wmn">'+esc(x.u)+'</span><span class="wmrk">#'+WM.rank[x.u]+'</span><span class="wmv">'+P2(x.p)+'<small>pts</small></span></div>'; }).join("")+'</div>'; }
+  else if(String(cc).toLowerCase()==="kp") h+='<p class="wmhint">are we deadass</p>';
   else h+='<p class="wmhint">Nobody from here is on the list yet. Set your country in profile settings to put yourself on the map.</p>';
   box.innerHTML=h; box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
   if(fly!==false&&WORLD.c[cc]){
@@ -7463,8 +7464,9 @@ function wmShow(cc,fly){
   if(WM.sel===cc&&fly!==false){ WM.sel=""; wmMark(); box.innerHTML='<p class="wmhint">Pick a country on the map or one of the flags above.</p>'; wmFly(0,0,1); return; }
   WM.sel=cc; wmMark();
   var l=(WM.by[cc]||[]).slice().sort(function(a,b){return b.p-a.p;}), tot=l.reduce(function(t,x){return t+x.p;},0);
-  var h='<div class="wmrh">'+wmFlag(cc)+'<b>'+esc(cname(cc))+'</b><span>'+(l.length?l.length+" player"+(l.length>1?"s":"")+" &middot; "+P2(tot)+" pts":"No players yet")+'</span></div>';
+  var h='<div class="wmrh">'+wmFlag(cc)+'<b>'+esc(cname(cc))+'</b><span>'+(l.length?l.length+" player"+(l.length>1?"s":"")+" &middot; "+P2(tot)+" pts":(String(cc).toLowerCase()==="kp"?"":"No players yet"))+'</span></div>';
   if(l.length){ h+='<div class="wmlist">'+l.map(function(x){ return '<div class="wmp lk" tabindex="0" role="button" data-p="'+esc(x.u)+'">'+av(x.u)+'<span class="wmn">'+esc(x.u)+'</span><span class="wmrk">#'+WM.rank[x.u]+'</span><span class="wmv">'+P2(x.p)+'<small>pts</small></span></div>'; }).join("")+'</div>'; }
+  else if(String(cc).toLowerCase()==="kp") h+='<p class="wmhint">are we deadass</p>';
   else h+='<p class="wmhint">Nobody from here is on the list yet. Set your country in profile settings to put yourself on the map.</p>';
   box.innerHTML=h; box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
   if(fly!==false&&WORLD.c[cc]){
