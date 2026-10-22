@@ -3095,6 +3095,19 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 @media(max-width:780px){#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
 #app .playbtn .vp::after,#app .fcta .ghost[data-fplay] .vp::after{content:"";position:absolute;border-style:solid}
 #app .fcta .ghost[data-fplay] .vp,#app .playbtn .vp{display:block}
+/* ---- v167: wave tab ---- */
+.wvpanel{padding:18px}
+.wvbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.wvst{display:flex;gap:8px;flex-wrap:wrap}
+.wvst button{display:grid;gap:1px;text-align:left;padding:9px 16px;border-radius:14px;border:1px solid hsl(var(--h) 100% 80%/.2);background:hsl(var(--h) 80% 60%/.08);color:inherit;font:inherit;cursor:pointer;transition:all .25s}
+.wvst button b{font:800 14px Outfit,Inter,sans-serif}.wvst button small{opacity:.7;font-size:11px;letter-spacing:.6px}
+.wvst button:hover{transform:translateY(-2px);border-color:hsl(var(--h) 100% 78%/.5)}
+.wvst button.on{background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 100% 46%));border-color:hsl(var(--h) 100% 80%/.6);color:#fff;box-shadow:0 8px 24px -8px hsl(var(--h) 100% 55%/.7)}
+.wvopt{display:flex;gap:16px;font-weight:700;font-size:13px}.wvopt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.wvwrap{border-radius:18px;overflow:hidden;border:1px solid hsl(var(--h) 100% 80%/.25);box-shadow:0 20px 60px -20px hsl(var(--h) 100% 50%/.5);background:#06143a;touch-action:none;line-height:0}
+#wvcv{width:100%;height:auto;display:block;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.wvinfo{margin-top:12px;font:800 14px Outfit,Inter,sans-serif;letter-spacing:.6px;opacity:.9}
+.wvnote{margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -3110,6 +3123,7 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
     <button data-v="list" class="on">TIMMY LIST</button>
     <button data-v="lb">LEADERBOARD</button>
     <button data-v="wheel">WHEEL</button>
+    <button data-v="wave">WAVE</button>
     <button data-v="sub">SUBMIT A RECORD</button>
     <button data-v="admin" id="navAdmin" hidden>ADMIN</button>
   </nav>
@@ -3122,6 +3136,7 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
   <button data-v="list"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>List</span></button>
   <button data-v="lb"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span>Ranks</span></button>
   <button data-v="wheel"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/></svg><span>Wheel</span></button>
+  <button data-v="wave"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-10 4 8 4-8 5 10"/></svg><span>Wave</span></button>
   <button data-v="sub"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>Submit</span></button>
   <button data-v="admin" id="tabAdmin" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>Admin</span></button>
 </nav>
@@ -6231,6 +6246,19 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 @media(max-width:780px){#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
 #app .playbtn .vp::after,#app .fcta .ghost[data-fplay] .vp::after{content:"";position:absolute;border-style:solid}
 #app .fcta .ghost[data-fplay] .vp,#app .playbtn .vp{display:block}
+/* ---- v167: wave tab ---- */
+.wvpanel{padding:18px}
+.wvbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.wvst{display:flex;gap:8px;flex-wrap:wrap}
+.wvst button{display:grid;gap:1px;text-align:left;padding:9px 16px;border-radius:14px;border:1px solid hsl(var(--h) 100% 80%/.2);background:hsl(var(--h) 80% 60%/.08);color:inherit;font:inherit;cursor:pointer;transition:all .25s}
+.wvst button b{font:800 14px Outfit,Inter,sans-serif}.wvst button small{opacity:.7;font-size:11px;letter-spacing:.6px}
+.wvst button:hover{transform:translateY(-2px);border-color:hsl(var(--h) 100% 78%/.5)}
+.wvst button.on{background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 100% 46%));border-color:hsl(var(--h) 100% 80%/.6);color:#fff;box-shadow:0 8px 24px -8px hsl(var(--h) 100% 55%/.7)}
+.wvopt{display:flex;gap:16px;font-weight:700;font-size:13px}.wvopt label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.wvwrap{border-radius:18px;overflow:hidden;border:1px solid hsl(var(--h) 100% 80%/.25);box-shadow:0 20px 60px -20px hsl(var(--h) 100% 50%/.5);background:#06143a;touch-action:none;line-height:0}
+#wvcv{width:100%;height:auto;display:block;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.wvinfo{margin-top:12px;font:800 14px Outfit,Inter,sans-serif;letter-spacing:.6px;opacity:.9}
+.wvnote{margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -6246,6 +6274,7 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
     <button data-v="list" class="on">TIMMY LIST</button>
     <button data-v="lb">LEADERBOARD</button>
     <button data-v="wheel">WHEEL</button>
+    <button data-v="wave">WAVE</button>
     <button data-v="sub">SUBMIT A RECORD</button>
     <button data-v="admin" id="navAdmin" hidden>ADMIN</button>
   </nav>
@@ -6258,6 +6287,7 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
   <button data-v="list"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>List</span></button>
   <button data-v="lb"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span>Ranks</span></button>
   <button data-v="wheel"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/></svg><span>Wheel</span></button>
+  <button data-v="wave"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-10 4 8 4-8 5 10"/></svg><span>Wave</span></button>
   <button data-v="sub"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>Submit</span></button>
   <button data-v="admin" id="tabAdmin" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>Admin</span></button>
 </nav>
@@ -6362,12 +6392,145 @@ function tint(l,cb){
   };
   im.src=l.img;
 }
+// ================= v167: wave game =================
+// Physics constants (Geometry Dash wiki: Portals / GD Creator School "Using gamemodes")
+//  - normal wave: 45 deg, vertical speed == horizontal speed
+//  - mini wave: slope 2 (about 63.43 deg), vertical speed == 2 x horizontal speed
+//  - wave has no momentum: direction flips instantly on press / release
+//  - speeds in blocks (grid units) per second: slow 8.372, normal 10.386, fast 12.914, very fast 15.6, extremely fast 19.2
+var WSPD=[8.372,10.386,12.914,15.6,19.2], WSPN=["Slow","Normal","Fast","Very fast","Extremely fast"];
+var WCH=10, WVH=320/30, WVW=WVH*16/9, WTICK=1/240, WPX=0.28;
+var WHB=5/30;            // wave hitbox half-size in blocks (10 units wide, NOT wiki-verified)
+var WTRAILW=0.30, WFADE=0.55;
+var WSTAGES=[
+ {name:"Stage 1",tag:"Warm up",seed:11,start:1,secs:[{n:26,s:1,gap:6.2,sg:[2,5]},{n:40,s:1,gap:4.6,sg:[1.5,4]},{n:40,s:1,gap:3.6,sg:[1,3.4],spd:1}]},
+ {name:"Stage 2",tag:"Mini + speed",seed:29,start:2,secs:[{n:22,s:1,gap:4.4,sg:[1.5,4],spd:2},{n:40,s:2,gap:3.8,sg:[1,2.6],mini:1},{n:36,s:1,gap:3.2,sg:[.8,3],spd:2},{n:46,s:2,gap:3.4,sg:[.8,2.2],mini:1,spd:3}]},
+ {name:"Stage 3",tag:"Spam",seed:73,start:3,secs:[{n:26,s:1,gap:3.6,sg:[.8,2.4],spd:3},{n:44,s:1,gap:3.0,sg:[.5,1.8]},{n:48,s:2,gap:3.0,sg:[.5,1.6],mini:1,spd:4},{n:40,s:1,gap:2.8,sg:[.5,1.4],spd:4}]}
+];
+var WVS={raf:0,stage:0,hold:false,hb:false,trail:true,best:[0,0,0],lvl:null,S:null,att:1,last:0,acc:0,ev:null};
+try{ var _wb=JSON.parse(localStorage.getItem("tml_wave_best")||"[0,0,0]"); if(Array.isArray(_wb)) WVS.best=_wb; }catch(e){}
+function wRng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function wGen(def){
+  var r=wRng(def.seed), pts=[], marks=[{x:0,spd:def.start,mini:0}], x=0, c=WCH/2, dir=1, mini=0, spd=def.start;
+  pts.push({x:0,c:c,gap:WCH}); x=18; pts.push({x:x,c:c,gap:WCH});
+  def.secs.forEach(function(sec){
+    if(sec.spd!==undefined) spd=sec.spd; if(sec.mini!==undefined||sec.s===1) mini=sec.mini?1:0;
+    marks.push({x:x,spd:spd,mini:mini});
+    var end=x+sec.n*3.4, g=sec.gap, s=sec.s;
+    while(x<end){
+      var L=sec.sg[0]+r()*(sec.sg[1]-sec.sg[0]), lo=g/2+.15, hi=WCH-g/2-.15;
+      var room=dir>0?(hi-c):(c-lo);
+      if(room<s*.8){ dir=-dir; room=dir>0?(hi-c):(c-lo); }
+      L=Math.min(L,room/s); L=Math.max(L,.4); if(x+L>end+3) L=end-x+.5;
+      x+=L; c+=dir*s*L; pts.push({x:x,c:c,gap:g}); dir=-dir;
+    }
+  });
+  x+=10; pts.push({x:x,c:pts[pts.length-1].c,gap:WCH}); x+=14; pts.push({x:x,c:WCH/2,gap:WCH});
+  var len=x-14; return {pts:pts,marks:marks,len:len};
+}
+function wBounds(L,x){ // lower/upper wall at x (linear interpolation)
+  var p=L.pts, lo=0, hi=p.length-1;
+  while(hi-lo>1){ var m=(lo+hi)>>1; if(p[m].x<=x) lo=m; else hi=m; }
+  var a=p[lo], b=p[hi], t=b.x===a.x?0:Math.max(0,Math.min(1,(x-a.x)/(b.x-a.x)));
+  var c=a.c+(b.c-a.c)*t, g=a.gap+(b.gap-a.gap)*t;
+  return [Math.max(0,c-g/2),Math.min(WCH,c+g/2),lo];
+}
+function wHit(L,x,y,h){
+  var xs=[x-h,x+h], b0=wBounds(L,x-h), b1=wBounds(L,x+h), mlo=Math.max(b0[0],b1[0]), mhi=Math.min(b0[1],b1[1]);
+  for(var i=b0[2]+1;i<=b1[2];i++){ var q=wBounds(L,L.pts[i].x); mlo=Math.max(mlo,q[0]); mhi=Math.min(mhi,q[1]); }
+  return (y-h<mlo-1e-9&&mlo>0)||(y+h>mhi+1e-9&&mhi<WCH);
+}
+function wNew(){
+  var def=WSTAGES[WVS.stage]; if(!WVS.lvl||WVS.lvl.stage!==WVS.stage){ WVS.lvl=wGen(def); WVS.lvl.stage=WVS.stage; }
+  WVS.S={x:0,y:WCH/2,dir:-1,spd:def.start,mini:0,mk:1,dead:0,done:0,t:0,tr:[{x:0,y:WCH/2,t:0}],parts:[],flash:0};
+}
+function wStep(S,L,hold){
+  var mini=S.mini, h=WHB*(mini?.5:1), vx=WSPD[S.spd], slope=mini?2:1, dir=hold?1:-1;
+  if(dir!==S.dir){ S.tr.push({x:S.x,y:S.y,t:S.t}); S.dir=dir; }
+  S.x+=vx*WTICK; S.y+=dir*slope*vx*WTICK; S.t+=WTICK;
+  if(S.y<h) S.y=h; if(S.y>WCH-h) S.y=WCH-h;
+  while(S.mk<L.marks.length&&S.x>=L.marks[S.mk].x){ var m=L.marks[S.mk++]; if(m.spd!==S.spd||m.mini!==S.mini){ S.tr.push({x:S.x,y:S.y,t:S.t}); } S.spd=m.spd; S.mini=m.mini; }
+  if(wHit(L,S.x,S.y,h)){ S.dead=1; S.dt=0; for(var i=0;i<22;i++){ var a=Math.random()*6.283, v=2+Math.random()*7; S.parts.push({x:S.x,y:S.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1}); } }
+  else if(S.x>=L.len){ S.done=1; }
+}
+function wPct(){ var S=WVS.S; return Math.max(0,Math.min(100,Math.floor(S.x/WVS.lvl.len*100))); }
+function wDeadEnd(){ var p=wPct(), st=WVS.stage; if(p>(WVS.best[st]||0)){ WVS.best[st]=p; try{ localStorage.setItem("tml_wave_best",JSON.stringify(WVS.best)); }catch(e){} } }
+function wvDraw(){
+  var cv=document.getElementById("wvcv"); if(!cv) return; var g=cv.getContext("2d"), W=cv.width, H=cv.height, S=WVS.S, L=WVS.lvl;
+  var sc=W/WVW, camX=S.x-WPX*WVW, oy=-(WVH-WCH)/2;
+  function X(x){ return (x-camX)*sc; } function Y(y){ return H-(y-oy)*sc; }
+  var bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#06143a"); bg.addColorStop(1,"#0b3b9a"); g.fillStyle=bg; g.fillRect(0,0,W,H);
+  // parallax grid
+  g.save(); g.strokeStyle="rgba(150,200,255,.07)"; g.lineWidth=1; var p0=camX*.5; for(var gx=Math.floor(p0)-1;gx<p0+WVW+2;gx++){ var px=(gx-p0)*sc; g.beginPath(); g.moveTo(px,0); g.lineTo(px,H); g.stroke(); }
+  for(var gy=0;gy<=WVH+1;gy++){ var py=H-(gy+oy%1)*sc; g.beginPath(); g.moveTo(0,py); g.lineTo(W,py); g.stroke(); } g.restore();
+  g.fillStyle="rgba(120,180,255,.05)"; for(var k=0;k<5;k++){ var bx=((k*7.3-camX*.25)%(WVW+8)+WVW+8)%(WVW+8)-4; g.beginPath(); g.arc(bx*sc,H*(.2+.13*k),sc*(1.6+k*.4),0,6.283); g.fill(); }
+  // speed / size markers
+  for(var m=1;m<L.marks.length;m++){ var mx=X(L.marks[m].x); if(mx<-20||mx>W+20) continue; var mk=L.marks[m]; g.fillStyle="rgba(255,255,255,.16)"; g.fillRect(mx-2,0,4,H); g.fillStyle="rgba(235,245,255,.9)"; g.font="800 "+Math.round(sc*.34)+"px Outfit,Inter,sans-serif"; g.fillText(WSPN[mk.spd]+(mk.mini?" · MINI":""),mx+8,Y(WCH)+sc*.9); }
+  // walls
+  var a=Math.max(0,L.pts.findIndex?L.pts.findIndex(function(p){return p.x>camX;})-1:0), bI=L.pts.length;
+  function poly(upper){
+    g.beginPath(); var first=true;
+    for(var i=Math.max(0,a);i<bI;i++){ var p=L.pts[i], c=p.c, gp=p.gap, lo=Math.max(0,c-gp/2), hi=Math.min(WCH,c+gp/2), yy=upper?hi:lo; var px=X(p.x); if(first){ g.moveTo(px,Y(yy)); first=false; } else g.lineTo(px,Y(yy)); if(px>W+40) break; }
+    var lastx=Math.min(W+60,X(L.pts[bI-1].x)); g.lineTo(lastx,Y(upper?WCH+3:-3)); g.lineTo(X(L.pts[Math.max(0,a)].x)-4,Y(upper?WCH+3:-3)); g.closePath();
+  }
+  [false,true].forEach(function(up){ poly(up); var gr=g.createLinearGradient(0,up?0:H,0,up?H*.6:H*.4); gr.addColorStop(0,"#030a1f"); gr.addColorStop(1,"#0a2a78"); g.fillStyle=gr; g.fill(); g.lineJoin="round"; g.strokeStyle="rgba(255,255,255,.95)"; g.lineWidth=Math.max(2,sc*.07); g.shadowColor="rgba(70,150,255,.9)"; g.shadowBlur=sc*.35; g.stroke(); g.shadowBlur=0; });
+  // floor and ceiling bars
+  g.fillStyle="#030a1f"; g.fillRect(0,Y(0),W,H-Y(0)+2); g.fillRect(0,0,W,Y(WCH)); g.fillStyle="rgba(255,255,255,.95)"; g.fillRect(0,Y(0)-1,W,3); g.fillRect(0,Y(WCH)-2,W,3);
+  // trail
+  var hbx=WHB*(S.mini?.5:1), tw=WTRAILW*(S.mini?.5:1)*sc;
+  if(WVS.trail){ var tr=S.tr.slice(); tr.push({x:S.x,y:S.y,t:S.t}); g.lineCap="round"; g.lineJoin="round";
+    for(var pass=0;pass<2;pass++){ for(var i=tr.length-1;i>0;i--){ var A=tr[i-1], B=tr[i], age=S.t-A.t; if(S.t-B.t>WFADE) break; var al=Math.max(0,1-(S.t-B.t)/WFADE);
+      g.beginPath(); g.moveTo(X(A.x),Y(A.y)); g.lineTo(X(B.x),Y(B.y)); g.lineWidth=pass?tw*.5:tw*1.5; g.strokeStyle=pass?"rgba(255,255,255,"+(.95*al)+")":"rgba(60,140,255,"+(.55*al)+")"; g.stroke(); } } }
+  // wave icon
+  if(!S.dead){ var ang=Math.atan2(S.dir*(S.mini?2:1),1), px=X(S.x), py=Y(S.y), r=sc*.55*(S.mini?.5:1);
+    g.save(); g.translate(px,py); g.rotate(-ang); g.shadowColor="rgba(80,160,255,1)"; g.shadowBlur=sc*.5;
+    g.beginPath(); g.moveTo(r*1.05,0); g.lineTo(-r*.8,-r*.78); g.lineTo(-r*.35,0); g.lineTo(-r*.8,r*.78); g.closePath(); g.fillStyle="#fff"; g.fill(); g.lineWidth=Math.max(2,sc*.07); g.strokeStyle="#2f7dff"; g.stroke(); g.restore(); }
+  if(WVS.hb){ g.strokeStyle="#00ff9c"; g.lineWidth=2; g.strokeRect(X(S.x-hbx),Y(S.y+hbx),hbx*2*sc,hbx*2*sc); }
+  S.parts.forEach(function(q){ g.fillStyle="rgba(255,255,255,"+q.l+")"; g.beginPath(); g.arc(X(q.x),Y(q.y),sc*.12*q.l+1,0,6.283); g.fill(); });
+  if(S.flash>0){ g.fillStyle="rgba(255,255,255,"+(S.flash*.5)+")"; g.fillRect(0,0,W,H); }
+  // progress bar
+  var pct=wPct(), bw=W*.5, bx0=(W-bw)/2; g.fillStyle="rgba(0,10,40,.6)"; g.fillRect(bx0,10,bw,10); g.fillStyle="#fff"; g.fillRect(bx0,10,bw*Math.min(1,S.x/L.len),10); g.strokeStyle="rgba(255,255,255,.7)"; g.lineWidth=2; g.strokeRect(bx0,10,bw,10);
+  g.fillStyle="#fff"; g.font="800 "+Math.round(sc*.5)+"px Outfit,Inter,sans-serif"; g.textAlign="left"; g.fillText(pct+"%",bx0+bw+14,22); g.textAlign="center";
+  if(!WVS.started&&!S.dead){ g.fillStyle="rgba(0,10,40,.55)"; g.fillRect(0,0,W,H); g.fillStyle="#fff"; g.font="900 "+Math.round(sc*.9)+"px Outfit,Inter,sans-serif"; g.fillText("Hold to go up · release to go down",W/2,H*.46); g.font="700 "+Math.round(sc*.42)+"px Outfit,Inter,sans-serif"; g.fillStyle="rgba(200,225,255,.9)"; g.fillText("Click, tap, or press Space to start",W/2,H*.46+sc*.9); }
+  if(S.done){ g.fillStyle="rgba(0,10,40,.6)"; g.fillRect(0,0,W,H); g.fillStyle="#fff"; g.font="900 "+Math.round(sc*1.3)+"px Outfit,Inter,sans-serif"; g.fillText("Level Complete!",W/2,H*.44); g.font="700 "+Math.round(sc*.5)+"px Outfit,Inter,sans-serif"; g.fillStyle="rgba(200,225,255,.95)"; g.fillText("Attempts: "+WVS.att+" · tap to play again",W/2,H*.44+sc*1); }
+  g.textAlign="left";
+  var info=document.getElementById("wvinfo"); if(info) info.textContent="Attempt "+WVS.att+" · Best "+(WVS.best[WVS.stage]||0)+"% · "+WSPN[S.spd]+(S.mini?" · Mini":"");
+}
+function wLoop(ts){
+  if(cur.v!=="wave"||!document.getElementById("wvcv")){ WVS.raf=0; return; }
+  var dt=Math.min(.05,(ts-(WVS.last||ts))/1000); WVS.last=ts; var S=WVS.S;
+  if(WVS.started&&!S.dead&&!S.done){ WVS.acc+=dt; var n=0; while(WVS.acc>=WTICK&&n<40){ wStep(S,WVS.lvl,WVS.hold); WVS.acc-=WTICK; n++; if(S.dead||S.done) break; } if(S.dead){ wDeadEnd(); S.flash=1; } }
+  if(S.dead){ S.dt+=dt; S.flash=Math.max(0,S.flash-dt*4); S.parts.forEach(function(q){ q.x+=q.vx*dt; q.y+=q.vy*dt; q.l=Math.max(0,q.l-dt*1.6); }); if(S.dt>.7){ WVS.att++; wNew(); WVS.acc=0; WVS.started=1; } }
+  wvDraw(); WVS.raf=requestAnimationFrame(wLoop);
+}
+function wPress(on){ WVS.hold=on; if(on){ if(!WVS.started){ WVS.started=1; WVS.last=0; } if(WVS.S.done){ WVS.att=1; wNew(); WVS.started=1; WVS.acc=0; } } }
+function wSetStage(i){ WVS.stage=i; WVS.att=1; WVS.lvl=null; WVS.started=0; WVS.acc=0; wNew(); [].forEach.call(document.querySelectorAll(".wvst button"),function(b,j){ b.className=j===i?"on":""; }); }
+function rWave(){
+  WVS.started=0; WVS.hold=false; WVS.last=0; WVS.acc=0; WVS.lvl=null; wNew();
+  app.innerHTML='<div class="shead"><h2>Wave</h2><span>HOLD TO GO UP · RELEASE TO GO DOWN</span></div>'+
+   '<div class="panel wvpanel"><div class="wvbar"><div class="wvst">'+WSTAGES.map(function(s,i){ return '<button class="'+(i===WVS.stage?'on':'')+'" data-st="'+i+'"><b>'+s.name+'</b><small>'+s.tag+'</small></button>'; }).join("")+'</div><div class="wvopt"><label><input type="checkbox" id="wvhb"'+(WVS.hb?' checked':'')+'> Hitbox</label><label><input type="checkbox" id="wvtr"'+(WVS.trail?' checked':'')+'> Trail</label></div></div>'+
+   '<div class="wvwrap"><canvas id="wvcv" width="1280" height="720" aria-label="Wave game"></canvas></div><div class="wvinfo" id="wvinfo"></div>'+
+   '<p class="note wvnote">Physics: normal wave moves at exactly 45° (vertical speed = horizontal speed). Mini wave uses a 2:1 slope (about 63.4°). No momentum, and it slides along the floor and ceiling but dies on walls. Speeds match the five GD speed portals (8.372 / 10.386 / 12.914 / 15.6 / 19.2 blocks per second).</p></div>';
+  var cv=document.getElementById("wvcv");
+  cv.addEventListener("pointerdown",function(e){ e.preventDefault(); wPress(true); });
+  addEventListener("pointerup",function(){ if(cur.v==="wave") WVS.hold=false; });
+  cv.addEventListener("contextmenu",function(e){ e.preventDefault(); });
+  [].forEach.call(document.querySelectorAll(".wvst button"),function(b){ b.onclick=function(){ wSetStage(+b.getAttribute("data-st")); }; });
+  document.getElementById("wvhb").onchange=function(){ WVS.hb=this.checked; };
+  document.getElementById("wvtr").onchange=function(){ WVS.trail=this.checked; };
+  if(!WVS.ev){ WVS.ev=1;
+    document.addEventListener("keydown",function(e){ if(cur.v!=="wave") return; var t=e.target; if(t&&(t.tagName==="INPUT"||t.tagName==="SELECT"||t.tagName==="TEXTAREA")&&t.type!=="checkbox") return; if(e.key===" "||e.key==="ArrowUp"||e.key==="w"||e.key==="W"){ e.preventDefault(); if(!e.repeat) wPress(true); } });
+    document.addEventListener("keyup",function(e){ if(cur.v!=="wave") return; if(e.key===" "||e.key==="ArrowUp"||e.key==="w"||e.key==="W") WVS.hold=false; });
+  }
+  wvDraw(); if(!WVS.raf) WVS.raf=requestAnimationFrame(wLoop);
+}
+
 var cur={v:"list",a:null};
 function route(){
   var p=location.hash.replace(/^#\/?/,"").split("/");
   if(p[0]==="level"&&lv(+p[1])) return {v:"level",a:+p[1]};
   if(p[0]==="player"&&p[1]) return {v:"player",a:decodeURIComponent(p[1])};
-  if(p[0]==="lb"||p[0]==="sub"||p[0]==="wheel") return {v:p[0],a:null};
+  if(p[0]==="lb"||p[0]==="sub"||p[0]==="wheel"||p[0]==="wave") return {v:p[0],a:null};
   if(p[0]==="admin"&&IS_OWNER) return {v:"admin",a:null};
   if(p[0]==="list") return {v:"list",a:null};
   return {v:"home",a:null};
@@ -6378,7 +6541,7 @@ function show(v,a,fromHash){
   var tb=document.querySelectorAll("#tabbar button"); for(var j=0;j<tb.length;j++) tb[j].className=tb[j].getAttribute("data-v")===(v==="level"?"list":(v==="player"?"lb":v))?"on":"";
   if(v==="list"&&cur.v!=="list"){ sortBy="rank"; ff="all"; vf="all"; vidF=false; q=""; }
   window.curId=null; app.style.removeProperty("--tint"); app.style.animation="none"; void app.offsetWidth; app.style.animation="";
-  ({home:rHome,list:rList,level:rLevel,lb:rLb,sub:rSub,player:rPlayer,admin:rAdmin,wheel:rWheel})[v](a);
+  ({home:rHome,list:rList,level:rLevel,lb:rLb,sub:rSub,player:rPlayer,admin:rAdmin,wheel:rWheel,wave:rWave})[v](a);
   cur={v:v,a:a===undefined?null:a};
   document.title=(v==="level"&&lv(a)?lv(a).name+" \u00b7 ":(v==="player"?a+" \u00b7 ":""))+"The Timmylist";
   window.scrollTo(0,0);
@@ -7187,7 +7350,7 @@ document.addEventListener("keydown",function(e){ if((e.key==="Enter"||e.key===" 
 setTimeout(function(){
   try{
     var hin=document.querySelector("header .hin"), nav=document.getElementById("nav"); if(!hin||!nav) return;
-    var I={list:'<path d="M4 6h16M4 12h16M4 18h10"/>',lb:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',wheel:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/>',sub:'<path d="M12 5v14M5 12h14"/>',admin:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'};
+    var I={list:'<path d="M4 6h16M4 12h16M4 18h10"/>',lb:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',wheel:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/>',wave:'<path d="M3 17l5-10 4 8 4-8 5 10"/>',sub:'<path d="M12 5v14M5 12h14"/>',admin:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'};
     [].forEach.call(nav.querySelectorAll("button"),function(b){ var k=b.getAttribute("data-v"); if(I[k]&&!b.querySelector("svg")){ var t=b.textContent; b.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[k]+'</svg><span>'+t+'</span>'; } });
     var ind=document.createElement("i"); ind.className="nind"; nav.insertBefore(ind,nav.firstChild);
     var act=document.createElement("div"); act.className="hact";
@@ -8293,12 +8456,145 @@ function tint(l,cb){
   };
   im.src=l.img;
 }
+// ================= v167: wave game =================
+// Physics constants (Geometry Dash wiki: Portals / GD Creator School "Using gamemodes")
+//  - normal wave: 45 deg, vertical speed == horizontal speed
+//  - mini wave: slope 2 (about 63.43 deg), vertical speed == 2 x horizontal speed
+//  - wave has no momentum: direction flips instantly on press / release
+//  - speeds in blocks (grid units) per second: slow 8.372, normal 10.386, fast 12.914, very fast 15.6, extremely fast 19.2
+var WSPD=[8.372,10.386,12.914,15.6,19.2], WSPN=["Slow","Normal","Fast","Very fast","Extremely fast"];
+var WCH=10, WVH=320/30, WVW=WVH*16/9, WTICK=1/240, WPX=0.28;
+var WHB=5/30;            // wave hitbox half-size in blocks (10 units wide, NOT wiki-verified)
+var WTRAILW=0.30, WFADE=0.55;
+var WSTAGES=[
+ {name:"Stage 1",tag:"Warm up",seed:11,start:1,secs:[{n:26,s:1,gap:6.2,sg:[2,5]},{n:40,s:1,gap:4.6,sg:[1.5,4]},{n:40,s:1,gap:3.6,sg:[1,3.4],spd:1}]},
+ {name:"Stage 2",tag:"Mini + speed",seed:29,start:2,secs:[{n:22,s:1,gap:4.4,sg:[1.5,4],spd:2},{n:40,s:2,gap:3.8,sg:[1,2.6],mini:1},{n:36,s:1,gap:3.2,sg:[.8,3],spd:2},{n:46,s:2,gap:3.4,sg:[.8,2.2],mini:1,spd:3}]},
+ {name:"Stage 3",tag:"Spam",seed:73,start:3,secs:[{n:26,s:1,gap:3.6,sg:[.8,2.4],spd:3},{n:44,s:1,gap:3.0,sg:[.5,1.8]},{n:48,s:2,gap:3.0,sg:[.5,1.6],mini:1,spd:4},{n:40,s:1,gap:2.8,sg:[.5,1.4],spd:4}]}
+];
+var WVS={raf:0,stage:0,hold:false,hb:false,trail:true,best:[0,0,0],lvl:null,S:null,att:1,last:0,acc:0,ev:null};
+try{ var _wb=JSON.parse(localStorage.getItem("tml_wave_best")||"[0,0,0]"); if(Array.isArray(_wb)) WVS.best=_wb; }catch(e){}
+function wRng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function wGen(def){
+  var r=wRng(def.seed), pts=[], marks=[{x:0,spd:def.start,mini:0}], x=0, c=WCH/2, dir=1, mini=0, spd=def.start;
+  pts.push({x:0,c:c,gap:WCH}); x=18; pts.push({x:x,c:c,gap:WCH});
+  def.secs.forEach(function(sec){
+    if(sec.spd!==undefined) spd=sec.spd; if(sec.mini!==undefined||sec.s===1) mini=sec.mini?1:0;
+    marks.push({x:x,spd:spd,mini:mini});
+    var end=x+sec.n*3.4, g=sec.gap, s=sec.s;
+    while(x<end){
+      var L=sec.sg[0]+r()*(sec.sg[1]-sec.sg[0]), lo=g/2+.15, hi=WCH-g/2-.15;
+      var room=dir>0?(hi-c):(c-lo);
+      if(room<s*.8){ dir=-dir; room=dir>0?(hi-c):(c-lo); }
+      L=Math.min(L,room/s); L=Math.max(L,.4); if(x+L>end+3) L=end-x+.5;
+      x+=L; c+=dir*s*L; pts.push({x:x,c:c,gap:g}); dir=-dir;
+    }
+  });
+  x+=10; pts.push({x:x,c:pts[pts.length-1].c,gap:WCH}); x+=14; pts.push({x:x,c:WCH/2,gap:WCH});
+  var len=x-14; return {pts:pts,marks:marks,len:len};
+}
+function wBounds(L,x){ // lower/upper wall at x (linear interpolation)
+  var p=L.pts, lo=0, hi=p.length-1;
+  while(hi-lo>1){ var m=(lo+hi)>>1; if(p[m].x<=x) lo=m; else hi=m; }
+  var a=p[lo], b=p[hi], t=b.x===a.x?0:Math.max(0,Math.min(1,(x-a.x)/(b.x-a.x)));
+  var c=a.c+(b.c-a.c)*t, g=a.gap+(b.gap-a.gap)*t;
+  return [Math.max(0,c-g/2),Math.min(WCH,c+g/2),lo];
+}
+function wHit(L,x,y,h){
+  var xs=[x-h,x+h], b0=wBounds(L,x-h), b1=wBounds(L,x+h), mlo=Math.max(b0[0],b1[0]), mhi=Math.min(b0[1],b1[1]);
+  for(var i=b0[2]+1;i<=b1[2];i++){ var q=wBounds(L,L.pts[i].x); mlo=Math.max(mlo,q[0]); mhi=Math.min(mhi,q[1]); }
+  return (y-h<mlo-1e-9&&mlo>0)||(y+h>mhi+1e-9&&mhi<WCH);
+}
+function wNew(){
+  var def=WSTAGES[WVS.stage]; if(!WVS.lvl||WVS.lvl.stage!==WVS.stage){ WVS.lvl=wGen(def); WVS.lvl.stage=WVS.stage; }
+  WVS.S={x:0,y:WCH/2,dir:-1,spd:def.start,mini:0,mk:1,dead:0,done:0,t:0,tr:[{x:0,y:WCH/2,t:0}],parts:[],flash:0};
+}
+function wStep(S,L,hold){
+  var mini=S.mini, h=WHB*(mini?.5:1), vx=WSPD[S.spd], slope=mini?2:1, dir=hold?1:-1;
+  if(dir!==S.dir){ S.tr.push({x:S.x,y:S.y,t:S.t}); S.dir=dir; }
+  S.x+=vx*WTICK; S.y+=dir*slope*vx*WTICK; S.t+=WTICK;
+  if(S.y<h) S.y=h; if(S.y>WCH-h) S.y=WCH-h;
+  while(S.mk<L.marks.length&&S.x>=L.marks[S.mk].x){ var m=L.marks[S.mk++]; if(m.spd!==S.spd||m.mini!==S.mini){ S.tr.push({x:S.x,y:S.y,t:S.t}); } S.spd=m.spd; S.mini=m.mini; }
+  if(wHit(L,S.x,S.y,h)){ S.dead=1; S.dt=0; for(var i=0;i<22;i++){ var a=Math.random()*6.283, v=2+Math.random()*7; S.parts.push({x:S.x,y:S.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1}); } }
+  else if(S.x>=L.len){ S.done=1; }
+}
+function wPct(){ var S=WVS.S; return Math.max(0,Math.min(100,Math.floor(S.x/WVS.lvl.len*100))); }
+function wDeadEnd(){ var p=wPct(), st=WVS.stage; if(p>(WVS.best[st]||0)){ WVS.best[st]=p; try{ localStorage.setItem("tml_wave_best",JSON.stringify(WVS.best)); }catch(e){} } }
+function wvDraw(){
+  var cv=document.getElementById("wvcv"); if(!cv) return; var g=cv.getContext("2d"), W=cv.width, H=cv.height, S=WVS.S, L=WVS.lvl;
+  var sc=W/WVW, camX=S.x-WPX*WVW, oy=-(WVH-WCH)/2;
+  function X(x){ return (x-camX)*sc; } function Y(y){ return H-(y-oy)*sc; }
+  var bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#06143a"); bg.addColorStop(1,"#0b3b9a"); g.fillStyle=bg; g.fillRect(0,0,W,H);
+  // parallax grid
+  g.save(); g.strokeStyle="rgba(150,200,255,.07)"; g.lineWidth=1; var p0=camX*.5; for(var gx=Math.floor(p0)-1;gx<p0+WVW+2;gx++){ var px=(gx-p0)*sc; g.beginPath(); g.moveTo(px,0); g.lineTo(px,H); g.stroke(); }
+  for(var gy=0;gy<=WVH+1;gy++){ var py=H-(gy+oy%1)*sc; g.beginPath(); g.moveTo(0,py); g.lineTo(W,py); g.stroke(); } g.restore();
+  g.fillStyle="rgba(120,180,255,.05)"; for(var k=0;k<5;k++){ var bx=((k*7.3-camX*.25)%(WVW+8)+WVW+8)%(WVW+8)-4; g.beginPath(); g.arc(bx*sc,H*(.2+.13*k),sc*(1.6+k*.4),0,6.283); g.fill(); }
+  // speed / size markers
+  for(var m=1;m<L.marks.length;m++){ var mx=X(L.marks[m].x); if(mx<-20||mx>W+20) continue; var mk=L.marks[m]; g.fillStyle="rgba(255,255,255,.16)"; g.fillRect(mx-2,0,4,H); g.fillStyle="rgba(235,245,255,.9)"; g.font="800 "+Math.round(sc*.34)+"px Outfit,Inter,sans-serif"; g.fillText(WSPN[mk.spd]+(mk.mini?" · MINI":""),mx+8,Y(WCH)+sc*.9); }
+  // walls
+  var a=Math.max(0,L.pts.findIndex?L.pts.findIndex(function(p){return p.x>camX;})-1:0), bI=L.pts.length;
+  function poly(upper){
+    g.beginPath(); var first=true;
+    for(var i=Math.max(0,a);i<bI;i++){ var p=L.pts[i], c=p.c, gp=p.gap, lo=Math.max(0,c-gp/2), hi=Math.min(WCH,c+gp/2), yy=upper?hi:lo; var px=X(p.x); if(first){ g.moveTo(px,Y(yy)); first=false; } else g.lineTo(px,Y(yy)); if(px>W+40) break; }
+    var lastx=Math.min(W+60,X(L.pts[bI-1].x)); g.lineTo(lastx,Y(upper?WCH+3:-3)); g.lineTo(X(L.pts[Math.max(0,a)].x)-4,Y(upper?WCH+3:-3)); g.closePath();
+  }
+  [false,true].forEach(function(up){ poly(up); var gr=g.createLinearGradient(0,up?0:H,0,up?H*.6:H*.4); gr.addColorStop(0,"#030a1f"); gr.addColorStop(1,"#0a2a78"); g.fillStyle=gr; g.fill(); g.lineJoin="round"; g.strokeStyle="rgba(255,255,255,.95)"; g.lineWidth=Math.max(2,sc*.07); g.shadowColor="rgba(70,150,255,.9)"; g.shadowBlur=sc*.35; g.stroke(); g.shadowBlur=0; });
+  // floor and ceiling bars
+  g.fillStyle="#030a1f"; g.fillRect(0,Y(0),W,H-Y(0)+2); g.fillRect(0,0,W,Y(WCH)); g.fillStyle="rgba(255,255,255,.95)"; g.fillRect(0,Y(0)-1,W,3); g.fillRect(0,Y(WCH)-2,W,3);
+  // trail
+  var hbx=WHB*(S.mini?.5:1), tw=WTRAILW*(S.mini?.5:1)*sc;
+  if(WVS.trail){ var tr=S.tr.slice(); tr.push({x:S.x,y:S.y,t:S.t}); g.lineCap="round"; g.lineJoin="round";
+    for(var pass=0;pass<2;pass++){ for(var i=tr.length-1;i>0;i--){ var A=tr[i-1], B=tr[i], age=S.t-A.t; if(S.t-B.t>WFADE) break; var al=Math.max(0,1-(S.t-B.t)/WFADE);
+      g.beginPath(); g.moveTo(X(A.x),Y(A.y)); g.lineTo(X(B.x),Y(B.y)); g.lineWidth=pass?tw*.5:tw*1.5; g.strokeStyle=pass?"rgba(255,255,255,"+(.95*al)+")":"rgba(60,140,255,"+(.55*al)+")"; g.stroke(); } } }
+  // wave icon
+  if(!S.dead){ var ang=Math.atan2(S.dir*(S.mini?2:1),1), px=X(S.x), py=Y(S.y), r=sc*.55*(S.mini?.5:1);
+    g.save(); g.translate(px,py); g.rotate(-ang); g.shadowColor="rgba(80,160,255,1)"; g.shadowBlur=sc*.5;
+    g.beginPath(); g.moveTo(r*1.05,0); g.lineTo(-r*.8,-r*.78); g.lineTo(-r*.35,0); g.lineTo(-r*.8,r*.78); g.closePath(); g.fillStyle="#fff"; g.fill(); g.lineWidth=Math.max(2,sc*.07); g.strokeStyle="#2f7dff"; g.stroke(); g.restore(); }
+  if(WVS.hb){ g.strokeStyle="#00ff9c"; g.lineWidth=2; g.strokeRect(X(S.x-hbx),Y(S.y+hbx),hbx*2*sc,hbx*2*sc); }
+  S.parts.forEach(function(q){ g.fillStyle="rgba(255,255,255,"+q.l+")"; g.beginPath(); g.arc(X(q.x),Y(q.y),sc*.12*q.l+1,0,6.283); g.fill(); });
+  if(S.flash>0){ g.fillStyle="rgba(255,255,255,"+(S.flash*.5)+")"; g.fillRect(0,0,W,H); }
+  // progress bar
+  var pct=wPct(), bw=W*.5, bx0=(W-bw)/2; g.fillStyle="rgba(0,10,40,.6)"; g.fillRect(bx0,10,bw,10); g.fillStyle="#fff"; g.fillRect(bx0,10,bw*Math.min(1,S.x/L.len),10); g.strokeStyle="rgba(255,255,255,.7)"; g.lineWidth=2; g.strokeRect(bx0,10,bw,10);
+  g.fillStyle="#fff"; g.font="800 "+Math.round(sc*.5)+"px Outfit,Inter,sans-serif"; g.textAlign="left"; g.fillText(pct+"%",bx0+bw+14,22); g.textAlign="center";
+  if(!WVS.started&&!S.dead){ g.fillStyle="rgba(0,10,40,.55)"; g.fillRect(0,0,W,H); g.fillStyle="#fff"; g.font="900 "+Math.round(sc*.9)+"px Outfit,Inter,sans-serif"; g.fillText("Hold to go up · release to go down",W/2,H*.46); g.font="700 "+Math.round(sc*.42)+"px Outfit,Inter,sans-serif"; g.fillStyle="rgba(200,225,255,.9)"; g.fillText("Click, tap, or press Space to start",W/2,H*.46+sc*.9); }
+  if(S.done){ g.fillStyle="rgba(0,10,40,.6)"; g.fillRect(0,0,W,H); g.fillStyle="#fff"; g.font="900 "+Math.round(sc*1.3)+"px Outfit,Inter,sans-serif"; g.fillText("Level Complete!",W/2,H*.44); g.font="700 "+Math.round(sc*.5)+"px Outfit,Inter,sans-serif"; g.fillStyle="rgba(200,225,255,.95)"; g.fillText("Attempts: "+WVS.att+" · tap to play again",W/2,H*.44+sc*1); }
+  g.textAlign="left";
+  var info=document.getElementById("wvinfo"); if(info) info.textContent="Attempt "+WVS.att+" · Best "+(WVS.best[WVS.stage]||0)+"% · "+WSPN[S.spd]+(S.mini?" · Mini":"");
+}
+function wLoop(ts){
+  if(cur.v!=="wave"||!document.getElementById("wvcv")){ WVS.raf=0; return; }
+  var dt=Math.min(.05,(ts-(WVS.last||ts))/1000); WVS.last=ts; var S=WVS.S;
+  if(WVS.started&&!S.dead&&!S.done){ WVS.acc+=dt; var n=0; while(WVS.acc>=WTICK&&n<40){ wStep(S,WVS.lvl,WVS.hold); WVS.acc-=WTICK; n++; if(S.dead||S.done) break; } if(S.dead){ wDeadEnd(); S.flash=1; } }
+  if(S.dead){ S.dt+=dt; S.flash=Math.max(0,S.flash-dt*4); S.parts.forEach(function(q){ q.x+=q.vx*dt; q.y+=q.vy*dt; q.l=Math.max(0,q.l-dt*1.6); }); if(S.dt>.7){ WVS.att++; wNew(); WVS.acc=0; WVS.started=1; } }
+  wvDraw(); WVS.raf=requestAnimationFrame(wLoop);
+}
+function wPress(on){ WVS.hold=on; if(on){ if(!WVS.started){ WVS.started=1; WVS.last=0; } if(WVS.S.done){ WVS.att=1; wNew(); WVS.started=1; WVS.acc=0; } } }
+function wSetStage(i){ WVS.stage=i; WVS.att=1; WVS.lvl=null; WVS.started=0; WVS.acc=0; wNew(); [].forEach.call(document.querySelectorAll(".wvst button"),function(b,j){ b.className=j===i?"on":""; }); }
+function rWave(){
+  WVS.started=0; WVS.hold=false; WVS.last=0; WVS.acc=0; WVS.lvl=null; wNew();
+  app.innerHTML='<div class="shead"><h2>Wave</h2><span>HOLD TO GO UP · RELEASE TO GO DOWN</span></div>'+
+   '<div class="panel wvpanel"><div class="wvbar"><div class="wvst">'+WSTAGES.map(function(s,i){ return '<button class="'+(i===WVS.stage?'on':'')+'" data-st="'+i+'"><b>'+s.name+'</b><small>'+s.tag+'</small></button>'; }).join("")+'</div><div class="wvopt"><label><input type="checkbox" id="wvhb"'+(WVS.hb?' checked':'')+'> Hitbox</label><label><input type="checkbox" id="wvtr"'+(WVS.trail?' checked':'')+'> Trail</label></div></div>'+
+   '<div class="wvwrap"><canvas id="wvcv" width="1280" height="720" aria-label="Wave game"></canvas></div><div class="wvinfo" id="wvinfo"></div>'+
+   '<p class="note wvnote">Physics: normal wave moves at exactly 45° (vertical speed = horizontal speed). Mini wave uses a 2:1 slope (about 63.4°). No momentum, and it slides along the floor and ceiling but dies on walls. Speeds match the five GD speed portals (8.372 / 10.386 / 12.914 / 15.6 / 19.2 blocks per second).</p></div>';
+  var cv=document.getElementById("wvcv");
+  cv.addEventListener("pointerdown",function(e){ e.preventDefault(); wPress(true); });
+  addEventListener("pointerup",function(){ if(cur.v==="wave") WVS.hold=false; });
+  cv.addEventListener("contextmenu",function(e){ e.preventDefault(); });
+  [].forEach.call(document.querySelectorAll(".wvst button"),function(b){ b.onclick=function(){ wSetStage(+b.getAttribute("data-st")); }; });
+  document.getElementById("wvhb").onchange=function(){ WVS.hb=this.checked; };
+  document.getElementById("wvtr").onchange=function(){ WVS.trail=this.checked; };
+  if(!WVS.ev){ WVS.ev=1;
+    document.addEventListener("keydown",function(e){ if(cur.v!=="wave") return; var t=e.target; if(t&&(t.tagName==="INPUT"||t.tagName==="SELECT"||t.tagName==="TEXTAREA")&&t.type!=="checkbox") return; if(e.key===" "||e.key==="ArrowUp"||e.key==="w"||e.key==="W"){ e.preventDefault(); if(!e.repeat) wPress(true); } });
+    document.addEventListener("keyup",function(e){ if(cur.v!=="wave") return; if(e.key===" "||e.key==="ArrowUp"||e.key==="w"||e.key==="W") WVS.hold=false; });
+  }
+  wvDraw(); if(!WVS.raf) WVS.raf=requestAnimationFrame(wLoop);
+}
+
 var cur={v:"list",a:null};
 function route(){
   var p=location.hash.replace(/^#\/?/,"").split("/");
   if(p[0]==="level"&&lv(+p[1])) return {v:"level",a:+p[1]};
   if(p[0]==="player"&&p[1]) return {v:"player",a:decodeURIComponent(p[1])};
-  if(p[0]==="lb"||p[0]==="sub"||p[0]==="wheel") return {v:p[0],a:null};
+  if(p[0]==="lb"||p[0]==="sub"||p[0]==="wheel"||p[0]==="wave") return {v:p[0],a:null};
   if(p[0]==="admin"&&IS_OWNER) return {v:"admin",a:null};
   if(p[0]==="list") return {v:"list",a:null};
   return {v:"home",a:null};
@@ -8309,7 +8605,7 @@ function show(v,a,fromHash){
   var tb=document.querySelectorAll("#tabbar button"); for(var j=0;j<tb.length;j++) tb[j].className=tb[j].getAttribute("data-v")===(v==="level"?"list":(v==="player"?"lb":v))?"on":"";
   if(v==="list"&&cur.v!=="list"){ sortBy="rank"; ff="all"; vf="all"; vidF=false; q=""; }
   window.curId=null; app.style.removeProperty("--tint"); app.style.animation="none"; void app.offsetWidth; app.style.animation="";
-  ({home:rHome,list:rList,level:rLevel,lb:rLb,sub:rSub,player:rPlayer,admin:rAdmin,wheel:rWheel})[v](a);
+  ({home:rHome,list:rList,level:rLevel,lb:rLb,sub:rSub,player:rPlayer,admin:rAdmin,wheel:rWheel,wave:rWave})[v](a);
   cur={v:v,a:a===undefined?null:a};
   document.title=(v==="level"&&lv(a)?lv(a).name+" \u00b7 ":(v==="player"?a+" \u00b7 ":""))+"The Timmylist";
   window.scrollTo(0,0);
@@ -9118,7 +9414,7 @@ document.addEventListener("keydown",function(e){ if((e.key==="Enter"||e.key===" 
 setTimeout(function(){
   try{
     var hin=document.querySelector("header .hin"), nav=document.getElementById("nav"); if(!hin||!nav) return;
-    var I={list:'<path d="M4 6h16M4 12h16M4 18h10"/>',lb:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',wheel:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/>',sub:'<path d="M12 5v14M5 12h14"/>',admin:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'};
+    var I={list:'<path d="M4 6h16M4 12h16M4 18h10"/>',lb:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',wheel:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/>',wave:'<path d="M3 17l5-10 4 8 4-8 5 10"/>',sub:'<path d="M12 5v14M5 12h14"/>',admin:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'};
     [].forEach.call(nav.querySelectorAll("button"),function(b){ var k=b.getAttribute("data-v"); if(I[k]&&!b.querySelector("svg")){ var t=b.textContent; b.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[k]+'</svg><span>'+t+'</span>'; } });
     var ind=document.createElement("i"); ind.className="nind"; nav.insertBefore(ind,nav.firstChild);
     var act=document.createElement("div"); act.className="hact";
