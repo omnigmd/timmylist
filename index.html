@@ -3047,18 +3047,54 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 #app .phero h1,#app .banner h1{background:linear-gradient(180deg,#fff 0%,#fff 45%,hsl(var(--h) 100% 78%) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 3px 18px hsl(var(--h) 100% 55%/.5)) drop-shadow(0 2px 0 rgba(0,20,60,.5))!important}
 #app .chead{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 80%))!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
 :root[data-theme="light"] #app .phero h1,:root[data-theme="light"] #app .banner h1{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 90%))!important;-webkit-background-clip:text!important;background-clip:text!important}
-/* level page: Watch verification matches the homepage button, and never covers the title */
-#app .banner .playbtn{right:28px!important;bottom:30px!important;gap:8px!important;padding:13px 20px!important;border-radius:12px!important;
- font:800 14px "Outfit",Inter,system-ui,sans-serif!important;color:#fff!important;letter-spacing:0;
- background:hsl(var(--h) 60% 80%/.1)!important;border:1px solid hsl(var(--h) 100% 80%/.3)!important;
- -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:none!important;
- transition:all .25s!important;animation:none!important}
-#app .banner .playbtn:hover{background:hsl(var(--h) 80% 70%/.22)!important;border-color:hsl(var(--h) 100% 80%/.4)!important;transform:translateY(-2px)!important}
-#app .banner .playbtn i{width:auto!important;height:auto!important;background:none!important;color:#fff!important;border-radius:0!important;padding:0!important;font-size:12px!important;display:inline-block}
+/* level page: keep the title clear of the Watch verification button */
 #app .banner:has(.playbtn) h1{max-width:calc(100% - 310px)!important;flex-wrap:nowrap}
-@media(max-width:640px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important;padding:9px 14px!important;font-size:13px!important}}
-:root[data-theme="light"] #app .banner .playbtn{color:#fff!important;background:hsl(var(--h) 60% 20%/.45)!important}
-@media(max-width:780px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
+@media(max-width:780px){#app .banner:has(.playbtn) h1{max-width:100%!important}}
+/* ---- v166: watch buttons match the VIDEO pill ---- */
+#app .playbtn{isolation:isolate;overflow:hidden;gap:10px!important;padding:6px 20px 6px 7px!important;border:0!important;border-radius:99px!important;
+ font:900 13px Outfit,system-ui,sans-serif!important;letter-spacing:1.6px!important;color:#fff!important;cursor:pointer;
+ background:linear-gradient(180deg,hsl(var(--h) 80% 22%/.92),hsl(var(--h) 90% 9%/.95))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 24px -6px hsl(var(--h) 100% 50%/.55),0 0 0 1px hsl(var(--h) 100% 70%/.18)!important;
+ transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,letter-spacing .3s!important}
+#app .fcta .ghost[data-fplay]{isolation:isolate;overflow:hidden;gap:10px!important;padding:6px 20px 6px 7px!important;border:0!important;border-radius:99px!important;
+ font:900 13px Outfit,system-ui,sans-serif!important;letter-spacing:1.6px!important;color:#fff!important;cursor:pointer;
+ background:linear-gradient(180deg,hsl(var(--h) 80% 22%/.92),hsl(var(--h) 90% 9%/.95))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 24px -6px hsl(var(--h) 100% 50%/.55),0 0 0 1px hsl(var(--h) 100% 70%/.18)!important;
+ transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,letter-spacing .3s!important}
+#app .playbtn::before{content:"";position:absolute;inset:0;z-index:-2;border-radius:inherit;padding:1.5px;
+ background:conic-gradient(from var(--vang),hsl(var(--h) 100% 72%),hsl(calc(var(--h) + 6) 100% 70%),hsl(var(--h) 100% 45%/.15) 40%,hsl(var(--h) 100% 72%) 70%,hsl(var(--h) 100% 72%));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:vspin 3.2s linear infinite}
+#app .fcta .ghost[data-fplay]::before{content:"";position:absolute;inset:0;z-index:-2;border-radius:inherit;padding:1.5px;
+ background:conic-gradient(from var(--vang),hsl(var(--h) 100% 72%),hsl(calc(var(--h) + 6) 100% 70%),hsl(var(--h) 100% 45%/.15) 40%,hsl(var(--h) 100% 72%) 70%,hsl(var(--h) 100% 72%));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:vspin 3.2s linear infinite}
+#app .playbtn::after{content:"";position:absolute;top:0;bottom:0;left:0;width:34%;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:vshine 3.4s ease-in-out infinite}
+#app .fcta .ghost[data-fplay]::after{content:"";position:absolute;top:0;bottom:0;left:0;width:34%;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:vshine 3.4s ease-in-out infinite}
+#app .playbtn .vp{position:relative;width:30px!important;height:30px!important;border-radius:50%!important;flex:none;
+ background:radial-gradient(circle at 32% 25%,#fff 0,hsl(var(--h) 100% 82%) 22%,hsl(var(--h) 100% 55%) 62%,hsl(calc(var(--h) + 25) 100% 42%))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 18px hsl(var(--h) 100% 62%/.9)!important}
+#app .fcta .ghost[data-fplay] .vp{position:relative;width:30px!important;height:30px!important;border-radius:50%!important;flex:none;
+ background:radial-gradient(circle at 32% 25%,#fff 0,hsl(var(--h) 100% 82%) 22%,hsl(var(--h) 100% 55%) 62%,hsl(calc(var(--h) + 25) 100% 42%))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 18px hsl(var(--h) 100% 62%/.9)!important}
+#app .playbtn .vp::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid hsl(var(--h) 100% 78%);animation:vripple 2s ease-out infinite}
+#app .fcta .ghost[data-fplay] .vp::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid hsl(var(--h) 100% 78%);animation:vripple 2s ease-out infinite}
+#app .playbtn .vp::after{left:11.5px!important;top:8.5px!important;border-width:6.5px 0 6.5px 10px!important;border-color:transparent transparent transparent #fff!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))!important}
+#app .fcta .ghost[data-fplay] .vp::after{left:11.5px!important;top:8.5px!important;border-width:6.5px 0 6.5px 10px!important;border-color:transparent transparent transparent #fff!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))!important}
+#app .playbtn:hover{transform:translateY(-3px) scale(1.06)!important;letter-spacing:2.2px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 16px 34px -6px hsl(var(--h) 100% 55%/.8),0 0 28px hsl(var(--h) 100% 62%/.45)!important}
+#app .fcta .ghost[data-fplay]:hover{transform:translateY(-3px) scale(1.06)!important;letter-spacing:2.2px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 16px 34px -6px hsl(var(--h) 100% 55%/.8),0 0 28px hsl(var(--h) 100% 62%/.45)!important}
+#app .playbtn:hover::before{animation-duration:1.4s}
+#app .fcta .ghost[data-fplay]:hover::before{animation-duration:1.4s}
+#app .playbtn:active{transform:scale(.95)!important}
+#app .fcta .ghost[data-fplay]:active{transform:scale(.95)!important}
+#app .banner .playbtn{right:28px!important;bottom:30px!important;top:auto!important;position:absolute!important;margin:0!important;transform:none}
+#app .banner .playbtn:hover{transform:translateY(-3px) scale(1.06)!important}
+#app .fcta .ghost[data-fplay]{margin:0!important;display:inline-flex!important;align-items:center}
+@media(max-width:780px){#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
+#app .playbtn .vp::after,#app .fcta .ghost[data-fplay] .vp::after{content:"";position:absolute;border-style:solid}
+#app .fcta .ghost[data-fplay] .vp,#app .playbtn .vp{display:block}
 </style>
 </head>
 <body>
@@ -6147,18 +6183,54 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 #app .phero h1,#app .banner h1{background:linear-gradient(180deg,#fff 0%,#fff 45%,hsl(var(--h) 100% 78%) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 3px 18px hsl(var(--h) 100% 55%/.5)) drop-shadow(0 2px 0 rgba(0,20,60,.5))!important}
 #app .chead{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 80%))!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
 :root[data-theme="light"] #app .phero h1,:root[data-theme="light"] #app .banner h1{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 90%))!important;-webkit-background-clip:text!important;background-clip:text!important}
-/* level page: Watch verification matches the homepage button, and never covers the title */
-#app .banner .playbtn{right:28px!important;bottom:30px!important;gap:8px!important;padding:13px 20px!important;border-radius:12px!important;
- font:800 14px "Outfit",Inter,system-ui,sans-serif!important;color:#fff!important;letter-spacing:0;
- background:hsl(var(--h) 60% 80%/.1)!important;border:1px solid hsl(var(--h) 100% 80%/.3)!important;
- -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:none!important;
- transition:all .25s!important;animation:none!important}
-#app .banner .playbtn:hover{background:hsl(var(--h) 80% 70%/.22)!important;border-color:hsl(var(--h) 100% 80%/.4)!important;transform:translateY(-2px)!important}
-#app .banner .playbtn i{width:auto!important;height:auto!important;background:none!important;color:#fff!important;border-radius:0!important;padding:0!important;font-size:12px!important;display:inline-block}
+/* level page: keep the title clear of the Watch verification button */
 #app .banner:has(.playbtn) h1{max-width:calc(100% - 310px)!important;flex-wrap:nowrap}
-@media(max-width:640px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important;padding:9px 14px!important;font-size:13px!important}}
-:root[data-theme="light"] #app .banner .playbtn{color:#fff!important;background:hsl(var(--h) 60% 20%/.45)!important}
-@media(max-width:780px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
+@media(max-width:780px){#app .banner:has(.playbtn) h1{max-width:100%!important}}
+/* ---- v166: watch buttons match the VIDEO pill ---- */
+#app .playbtn{isolation:isolate;overflow:hidden;gap:10px!important;padding:6px 20px 6px 7px!important;border:0!important;border-radius:99px!important;
+ font:900 13px Outfit,system-ui,sans-serif!important;letter-spacing:1.6px!important;color:#fff!important;cursor:pointer;
+ background:linear-gradient(180deg,hsl(var(--h) 80% 22%/.92),hsl(var(--h) 90% 9%/.95))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 24px -6px hsl(var(--h) 100% 50%/.55),0 0 0 1px hsl(var(--h) 100% 70%/.18)!important;
+ transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,letter-spacing .3s!important}
+#app .fcta .ghost[data-fplay]{isolation:isolate;overflow:hidden;gap:10px!important;padding:6px 20px 6px 7px!important;border:0!important;border-radius:99px!important;
+ font:900 13px Outfit,system-ui,sans-serif!important;letter-spacing:1.6px!important;color:#fff!important;cursor:pointer;
+ background:linear-gradient(180deg,hsl(var(--h) 80% 22%/.92),hsl(var(--h) 90% 9%/.95))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 24px -6px hsl(var(--h) 100% 50%/.55),0 0 0 1px hsl(var(--h) 100% 70%/.18)!important;
+ transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,letter-spacing .3s!important}
+#app .playbtn::before{content:"";position:absolute;inset:0;z-index:-2;border-radius:inherit;padding:1.5px;
+ background:conic-gradient(from var(--vang),hsl(var(--h) 100% 72%),hsl(calc(var(--h) + 6) 100% 70%),hsl(var(--h) 100% 45%/.15) 40%,hsl(var(--h) 100% 72%) 70%,hsl(var(--h) 100% 72%));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:vspin 3.2s linear infinite}
+#app .fcta .ghost[data-fplay]::before{content:"";position:absolute;inset:0;z-index:-2;border-radius:inherit;padding:1.5px;
+ background:conic-gradient(from var(--vang),hsl(var(--h) 100% 72%),hsl(calc(var(--h) + 6) 100% 70%),hsl(var(--h) 100% 45%/.15) 40%,hsl(var(--h) 100% 72%) 70%,hsl(var(--h) 100% 72%));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:vspin 3.2s linear infinite}
+#app .playbtn::after{content:"";position:absolute;top:0;bottom:0;left:0;width:34%;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:vshine 3.4s ease-in-out infinite}
+#app .fcta .ghost[data-fplay]::after{content:"";position:absolute;top:0;bottom:0;left:0;width:34%;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:vshine 3.4s ease-in-out infinite}
+#app .playbtn .vp{position:relative;width:30px!important;height:30px!important;border-radius:50%!important;flex:none;
+ background:radial-gradient(circle at 32% 25%,#fff 0,hsl(var(--h) 100% 82%) 22%,hsl(var(--h) 100% 55%) 62%,hsl(calc(var(--h) + 25) 100% 42%))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 18px hsl(var(--h) 100% 62%/.9)!important}
+#app .fcta .ghost[data-fplay] .vp{position:relative;width:30px!important;height:30px!important;border-radius:50%!important;flex:none;
+ background:radial-gradient(circle at 32% 25%,#fff 0,hsl(var(--h) 100% 82%) 22%,hsl(var(--h) 100% 55%) 62%,hsl(calc(var(--h) + 25) 100% 42%))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 18px hsl(var(--h) 100% 62%/.9)!important}
+#app .playbtn .vp::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid hsl(var(--h) 100% 78%);animation:vripple 2s ease-out infinite}
+#app .fcta .ghost[data-fplay] .vp::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid hsl(var(--h) 100% 78%);animation:vripple 2s ease-out infinite}
+#app .playbtn .vp::after{left:11.5px!important;top:8.5px!important;border-width:6.5px 0 6.5px 10px!important;border-color:transparent transparent transparent #fff!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))!important}
+#app .fcta .ghost[data-fplay] .vp::after{left:11.5px!important;top:8.5px!important;border-width:6.5px 0 6.5px 10px!important;border-color:transparent transparent transparent #fff!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))!important}
+#app .playbtn:hover{transform:translateY(-3px) scale(1.06)!important;letter-spacing:2.2px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 16px 34px -6px hsl(var(--h) 100% 55%/.8),0 0 28px hsl(var(--h) 100% 62%/.45)!important}
+#app .fcta .ghost[data-fplay]:hover{transform:translateY(-3px) scale(1.06)!important;letter-spacing:2.2px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 16px 34px -6px hsl(var(--h) 100% 55%/.8),0 0 28px hsl(var(--h) 100% 62%/.45)!important}
+#app .playbtn:hover::before{animation-duration:1.4s}
+#app .fcta .ghost[data-fplay]:hover::before{animation-duration:1.4s}
+#app .playbtn:active{transform:scale(.95)!important}
+#app .fcta .ghost[data-fplay]:active{transform:scale(.95)!important}
+#app .banner .playbtn{right:28px!important;bottom:30px!important;top:auto!important;position:absolute!important;margin:0!important;transform:none}
+#app .banner .playbtn:hover{transform:translateY(-3px) scale(1.06)!important}
+#app .fcta .ghost[data-fplay]{margin:0!important;display:inline-flex!important;align-items:center}
+@media(max-width:780px){#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important}}
+#app .playbtn .vp::after,#app .fcta .ghost[data-fplay] .vp::after{content:"";position:absolute;border-style:solid}
+#app .fcta .ghost[data-fplay] .vp,#app .playbtn .vp{display:block}
 </style>
 </head>
 <body>
@@ -6417,7 +6489,7 @@ function rLevel(id){
       (has?'<a class="watch" target="_blank" rel="noopener" data-vid="'+esc(x.user)+'" href="'+esc(x.video)+'">&#9654; Watch</a>':'<span class="mut" style="font-size:12px">No video</span>')+'</div>';
   }).join("");
   app.innerHTML='<div class="topbar"><button class="link" id="back">&larr; Back to list</button><button class="link" id="share">Copy link</button></div>'+
-   '<div class="banner'+(l.img?' img':'')+'" style="background:'+grad(l)+'">'+(l.img?'':'<img class="ph" src="'+LOGO_BIG+'" alt="">')+'<h1>'+faceImg(l,"big")+'#'+r+' '+esc(l.name)+'</h1>'+(vid?'<button class="playbtn" id="playbtn" aria-label="Play verification video"><i>&#9654;</i><span>Watch verification</span></button>':'')+'</div>'+
+   '<div class="banner'+(l.img?' img':'')+'" style="background:'+grad(l)+'">'+(l.img?'':'<img class="ph" src="'+LOGO_BIG+'" alt="">')+'<h1>'+faceImg(l,"big")+'#'+r+' '+esc(l.name)+'</h1>'+(vid?'<button class="playbtn" id="playbtn" aria-label="Play verification video"><i class="vp"></i><span>Watch verification</span></button>':'')+'</div>'+
    (vid?'<div class="vbar" id="vbar"><span>Verification by <b>'+esc(vid.user)+'</b></span><a href="'+esc(vid.video)+'" target="_blank" rel="noopener">Open on YouTube &#8599;</a></div>':'')+
    kpis+
    '<div class="panel details"><h2>Details</h2>'+(meta||l.desc?'<div class="dmeta">'+meta+(l.desc?'<p>'+esc(l.desc)+'</p>':'')+'</div>':'')+
@@ -6843,7 +6915,7 @@ function featHtml(){
       '<div class="fbody"><div class="fkick">'+(i===0?'#1 &middot; TOP OF THE LIST':'#'+(i+1)+' ON THE LIST')+'</div>'+
       '<h2>'+faceImg(l)+'<span>'+esc(l.name)+'</span></h2>'+
       '<div class="fmeta"><span>'+P2(pts(i+1))+' points</span><span>&middot;</span>'+(l.verifier?av(l.verifier,"sm")+'<span>verified by '+esc(l.verifier)+'</span>':'<span>Verifier to be announced</span>')+'</div>'+
-      '<div class="fcta"><button class="btn" data-fopen="'+l.id+'">View level</button>'+(vr?'<button class="ghost" data-fplay="'+l.id+'">&#9654; Watch verification</button>':'')+'</div></div></div>';
+      '<div class="fcta"><button class="btn" data-fopen="'+l.id+'">View level</button>'+(vr?'<button class="ghost" data-fplay="'+l.id+'"><i class="vp"></i>Watch verification</button>':'')+'</div></div></div>';
     d+='<button data-i="'+i+'" class="'+(i===0?'on':'')+'" aria-label="Slide '+(i+1)+'"></button>';
   }
   return '<div class="feat" id="feat">'+s+'<button class="farr prev" aria-label="Previous">&#8249;</button><button class="farr next" aria-label="Next">&#8250;</button><div class="fdots">'+d+'</div></div>';
@@ -8348,7 +8420,7 @@ function rLevel(id){
       (has?'<a class="watch" target="_blank" rel="noopener" data-vid="'+esc(x.user)+'" href="'+esc(x.video)+'">&#9654; Watch</a>':'<span class="mut" style="font-size:12px">No video</span>')+'</div>';
   }).join("");
   app.innerHTML='<div class="topbar"><button class="link" id="back">&larr; Back to list</button><button class="link" id="share">Copy link</button></div>'+
-   '<div class="banner'+(l.img?' img':'')+'" style="background:'+grad(l)+'">'+(l.img?'':'<img class="ph" src="'+LOGO_BIG+'" alt="">')+'<h1>'+faceImg(l,"big")+'#'+r+' '+esc(l.name)+'</h1>'+(vid?'<button class="playbtn" id="playbtn" aria-label="Play verification video"><i>&#9654;</i><span>Watch verification</span></button>':'')+'</div>'+
+   '<div class="banner'+(l.img?' img':'')+'" style="background:'+grad(l)+'">'+(l.img?'':'<img class="ph" src="'+LOGO_BIG+'" alt="">')+'<h1>'+faceImg(l,"big")+'#'+r+' '+esc(l.name)+'</h1>'+(vid?'<button class="playbtn" id="playbtn" aria-label="Play verification video"><i class="vp"></i><span>Watch verification</span></button>':'')+'</div>'+
    (vid?'<div class="vbar" id="vbar"><span>Verification by <b>'+esc(vid.user)+'</b></span><a href="'+esc(vid.video)+'" target="_blank" rel="noopener">Open on YouTube &#8599;</a></div>':'')+
    kpis+
    '<div class="panel details"><h2>Details</h2>'+(meta||l.desc?'<div class="dmeta">'+meta+(l.desc?'<p>'+esc(l.desc)+'</p>':'')+'</div>':'')+
@@ -8774,7 +8846,7 @@ function featHtml(){
       '<div class="fbody"><div class="fkick">'+(i===0?'#1 &middot; TOP OF THE LIST':'#'+(i+1)+' ON THE LIST')+'</div>'+
       '<h2>'+faceImg(l)+'<span>'+esc(l.name)+'</span></h2>'+
       '<div class="fmeta"><span>'+P2(pts(i+1))+' points</span><span>&middot;</span>'+(l.verifier?av(l.verifier,"sm")+'<span>verified by '+esc(l.verifier)+'</span>':'<span>Verifier to be announced</span>')+'</div>'+
-      '<div class="fcta"><button class="btn" data-fopen="'+l.id+'">View level</button>'+(vr?'<button class="ghost" data-fplay="'+l.id+'">&#9654; Watch verification</button>':'')+'</div></div></div>';
+      '<div class="fcta"><button class="btn" data-fopen="'+l.id+'">View level</button>'+(vr?'<button class="ghost" data-fplay="'+l.id+'"><i class="vp"></i>Watch verification</button>':'')+'</div></div></div>';
     d+='<button data-i="'+i+'" class="'+(i===0?'on':'')+'" aria-label="Slide '+(i+1)+'"></button>';
   }
   return '<div class="feat" id="feat">'+s+'<button class="farr prev" aria-label="Previous">&#8249;</button><button class="farr next" aria-label="Next">&#8250;</button><div class="fdots">'+d+'</div></div>';
