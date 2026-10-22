@@ -3047,6 +3047,17 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 #app .phero h1,#app .banner h1{background:linear-gradient(180deg,#fff 0%,#fff 45%,hsl(var(--h) 100% 78%) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 3px 18px hsl(var(--h) 100% 55%/.5)) drop-shadow(0 2px 0 rgba(0,20,60,.5))!important}
 #app .chead{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 80%))!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
 :root[data-theme="light"] #app .phero h1,:root[data-theme="light"] #app .banner h1{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 90%))!important;-webkit-background-clip:text!important;background-clip:text!important}
+/* level page: Watch verification matches the homepage button, and never covers the title */
+#app .banner .playbtn{right:28px!important;bottom:30px!important;gap:8px!important;padding:13px 20px!important;border-radius:12px!important;
+ font:800 14px "Outfit",Inter,system-ui,sans-serif!important;color:#fff!important;letter-spacing:0;
+ background:hsl(var(--h) 60% 80%/.1)!important;border:1px solid hsl(var(--h) 100% 80%/.3)!important;
+ -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:none!important;
+ transition:all .25s!important;animation:none!important}
+#app .banner .playbtn:hover{background:hsl(var(--h) 80% 70%/.22)!important;border-color:hsl(var(--h) 100% 80%/.4)!important;transform:translateY(-2px)!important}
+#app .banner .playbtn i{width:auto!important;height:auto!important;background:none!important;color:#fff!important;border-radius:0!important;padding:0!important;font-size:12px!important;display:inline-block}
+#app .banner:has(.playbtn) h1{max-width:calc(100% - 250px)!important;flex-wrap:nowrap}
+@media(max-width:640px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important;padding:9px 14px!important;font-size:13px!important}}
+:root[data-theme="light"] #app .banner .playbtn{color:#fff!important;background:hsl(var(--h) 60% 20%/.45)!important}
 </style>
 </head>
 <body>
@@ -6135,6 +6146,17 @@ nav a:hover,nav button:hover{transform:perspective(400px) translateZ(14px) rotat
 #app .phero h1,#app .banner h1{background:linear-gradient(180deg,#fff 0%,#fff 45%,hsl(var(--h) 100% 78%) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 3px 18px hsl(var(--h) 100% 55%/.5)) drop-shadow(0 2px 0 rgba(0,20,60,.5))!important}
 #app .chead{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 80%))!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
 :root[data-theme="light"] #app .phero h1,:root[data-theme="light"] #app .banner h1{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 90%))!important;-webkit-background-clip:text!important;background-clip:text!important}
+/* level page: Watch verification matches the homepage button, and never covers the title */
+#app .banner .playbtn{right:28px!important;bottom:30px!important;gap:8px!important;padding:13px 20px!important;border-radius:12px!important;
+ font:800 14px "Outfit",Inter,system-ui,sans-serif!important;color:#fff!important;letter-spacing:0;
+ background:hsl(var(--h) 60% 80%/.1)!important;border:1px solid hsl(var(--h) 100% 80%/.3)!important;
+ -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:none!important;
+ transition:all .25s!important;animation:none!important}
+#app .banner .playbtn:hover{background:hsl(var(--h) 80% 70%/.22)!important;border-color:hsl(var(--h) 100% 80%/.4)!important;transform:translateY(-2px)!important}
+#app .banner .playbtn i{width:auto!important;height:auto!important;background:none!important;color:#fff!important;border-radius:0!important;padding:0!important;font-size:12px!important;display:inline-block}
+#app .banner:has(.playbtn) h1{max-width:calc(100% - 250px)!important;flex-wrap:nowrap}
+@media(max-width:640px){#app .banner:has(.playbtn) h1{max-width:100%!important}#app .banner .playbtn{top:14px!important;bottom:auto!important;right:14px!important;padding:9px 14px!important;font-size:13px!important}}
+:root[data-theme="light"] #app .banner .playbtn{color:#fff!important;background:hsl(var(--h) 60% 20%/.45)!important}
 </style>
 </head>
 <body>
