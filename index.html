@@ -7386,6 +7386,77 @@ setTimeout(function(){
 // ---- v93: sign-in screens for self-hosted sites ----
 (function(){
   var N=window.TMLNET; if(!N) return;
+  // ---- shared admin edits: saved to the "approved" collection as cfg docs, so every visitor sees them ----
+  var LVF=["name","verifier","publisher","song","songUrl","face","unverified","desc"];
+  var LV0={}, IDMAP={}, CL0=(STATE.changelog||[]).length, CLBASE=CL0, CLDOC=[], CFGLAST={}, CFGREADY=false, cfgT=null;
+  LEVELS.forEach(function(l){ l._k=l.id; var o={}; LVF.forEach(function(f){ o[f]=l[f]; }); o.creators=JSON.stringify(l.creators||[]); LV0[l._k]=o; });
+  function mapId(x){ return Object.prototype.hasOwnProperty.call(IDMAP,x)?IDMAP[x]:x; }
+  function byKey(k){ for(var i=0;i<LEVELS.length;i++) if(String(LEVELS[i]._k)===String(k)) return LEVELS[i]; return null; }
+  function sig(d){ var o={}; Object.keys(d).forEach(function(k){ if(k!=="ts") o[k]=d[k]; }); return JSON.stringify(o); }
+  function buildLevels(){
+    var order=[], patch={}, added={}, idmap={}, seen={};
+    LEVELS.forEach(function(l){
+      if(l._k===undefined) l._k=l.id;
+      var k=l._k; order.push(k); seen[k]=1;
+      if(l.id!==k) idmap[k]=l.id;
+      if(LV0[k]){
+        var p={}, b=LV0[k], any=false;
+        LVF.forEach(function(f){ var a=l[f], z=b[f], d=(f==="unverified")?(!!a!==!!z):((a||"")!==(z||"")); if(d){ p[f]=(f==="unverified")?!!a:(a||""); any=true; } });
+        if(JSON.stringify(l.creators||[])!==b.creators){ p.creators=l.creators||[]; any=true; }
+        if(any) patch[k]=p;
+      } else added[k]={name:l.name,verifier:l.verifier,publisher:l.publisher||"",song:l.song||"",songUrl:l.songUrl||"",face:l.face||"",unverified:!!l.unverified,desc:l.desc||"",creators:l.creators||[],mode:l.mode||""};
+    });
+    var removed=Object.keys(LV0).filter(function(k){ return !seen[k]; });
+    return {cfg:"levels",order:order,patch:patch,added:added,removed:removed,idmap:idmap,cl:CLDOC.concat((STATE.changelog||[]).slice(CLBASE))};
+  }
+  function applyLevels(c){
+    var gone=[];
+    (c.removed||[]).forEach(function(k){ var l=byKey(k); if(l){ gone.push(l.id); LEVELS.splice(LEVELS.indexOf(l),1); } });
+    Object.keys(c.added||{}).forEach(function(k){ if(byKey(k)) return; var o=c.added[k]; o._k=+k; o.id=+k; o.tags=o.tags||[]; o.creators=o.creators||[]; o.mode=o.mode||""; o.ver=o.ver||""; o.size=o.size||""; LEVELS.push(o); });
+    Object.keys(c.patch||{}).forEach(function(k){ var l=byKey(k), p=c.patch[k]; if(!l) return; Object.keys(p).forEach(function(f){ if(LVF.indexOf(f)>-1||f==="creators") l[f]=p[f]; }); });
+    Object.keys(c.idmap||{}).forEach(function(k){ var l=byKey(k); if(!l) return; IDMAP[k]=c.idmap[k]; var old=l.id; if(old!==c.idmap[k]){ l.id=c.idmap[k]; BASE.forEach(function(r){ if(r.lvl===old) r.lvl=l.id; }); (STATE.changelog||[]).forEach(function(e){ if(e.id===old) e.id=l.id; }); } });
+    if(gone.length) BASE=BASE.filter(function(r){ return gone.indexOf(r.lvl)<0; });
+    var ord=c.order||[];
+    if(ord.length){
+      var pos={}; ord.forEach(function(k,i){ pos[String(k)]=i; });
+      var arr=LEVELS.map(function(l,i){ return {l:l,i:i,p:pos[String(l._k)]!==undefined?pos[String(l._k)]:1e6+i}; }).sort(function(a,b){ return a.p-b.p||a.i-b.i; }).map(function(x){ return x.l; });
+      LEVELS.length=0; arr.forEach(function(l){ LEVELS.push(l); });
+    }
+  }
+  function cfgApply(cfg,imgs){
+    var ch=false;
+    if(cfg.levels){ var c=cfg.levels; STATE.changelog=(STATE.changelog||[]).concat(c.cl||[]); CLDOC=c.cl||[]; CLBASE=STATE.changelog.length; applyLevels(c); ch=true; }
+    if(cfg.team&&cfg.team.team){ STATE.team=cfg.team.team; ch=true; }
+    if(cfg.players&&cfg.players.players){ STATE.players=cfg.players.players; ch=true; }
+    if(cfg.avatars&&cfg.avatars.avatars){ STATE.avatars=STATE.avatars||{}; Object.keys(cfg.avatars.avatars).forEach(function(k){ STATE.avatars[k]=cfg.avatars.avatars[k]; }); ch=true; }
+    imgs.forEach(function(o){ var l=byKey(o.k); if(l&&o.img){ l.img=o.img; ch=true; } });
+    CFGLAST.levels=sig(buildLevels()); CFGLAST.team=sig({cfg:"team",team:STATE.team||[]}); CFGLAST.players=sig({cfg:"players",players:STATE.players||{}}); CFGLAST.avatars=sig({cfg:"avatars",avatars:STATE.avatars||{}});
+    CFGREADY=true;
+    return ch;
+  }
+  function cfgPut(id,d){ d=JSON.parse(JSON.stringify(d)); var ref=N.db.collection("approved").doc(id); return ref.delete().catch(function(){}).then(function(){ return ref.set(d); }); }
+  window.cfgSync=function(){
+    clearTimeout(cfgT);
+    cfgT=setTimeout(function(){
+      if(!N.on||!CFGREADY) return;
+      var ds={levels:buildLevels(),team:{cfg:"team",team:STATE.team||[]},players:{cfg:"players",players:STATE.players||{}},avatars:{cfg:"avatars",avatars:STATE.avatars||{}}}, jobs=[];
+      Object.keys(ds).forEach(function(n){
+        var d=ds[n], sg=sig(d); if(sg===CFGLAST[n]) return;
+        if(sg.length>900000){ toast("That change is too big to save for everyone"); return; }
+        d.ts=Date.now(); jobs.push(cfgPut("cfg_"+n,d).then(function(){ CFGLAST[n]=sg; }));
+      });
+      if(!jobs.length) return;
+      Promise.all(jobs).then(function(){ toast("Saved for everyone"); }).catch(function(e){ toast(errText(e)); });
+    },500);
+  };
+  window.cfgImg=function(l){
+    if(!l||!l.img||!N.on) return;
+    if(l.img.length>800000){ toast("That image is too big to save for everyone"); return; }
+    cfgPut("cfg_img_"+l._k,{cfg:"img",k:l._k,img:l.img,ts:Date.now()}).then(function(){ toast("Saved for everyone"); }).catch(function(e){ toast(errText(e)); });
+  };
+  window.netRec=function(lvl,user,video){
+    N.db.collection("approved").add({lvl:lvl,user:String(user||"").slice(0,30),video:okUrl(video)?video:"",ts:Date.now()}).catch(function(e){ toast(errText(e)); });
+  };
   var DSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
   var GSVG='<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
   function acct(){ return document.getElementById("acct"); }
@@ -7507,14 +7578,20 @@ setTimeout(function(){
     if(!N.on) return;
     N.db.collection("approved").get().then(function(s){
       var add=false, ds=s.docs.map(function(d){ return d.data()||{}; }).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+      var cfg={}, cimgs=[]; ds.forEach(function(o){ if(o.cfg==="img") cimgs.push(o); else if(o.cfg) cfg[o.cfg]=o; });
+      if(cfgApply(cfg,cimgs)) add=true;
       ds.forEach(function(o){
-        if(o.user==="__unverified"){ var UL=lv(o.lvl); if(UL){ UL.unverified=!o.rm; add=true; } return; }
+        if(o.cfg) return;
+        if(typeof o.lvl==="number") o.lvl=mapId(o.lvl);
+        if(o.user==="__unverified"){ var UL=lv(o.lvl); if(UL&&!cfg.levels){ UL.unverified=!o.rm; add=true; } return; }
         if(!lv(o.lvl)||!o.user) return;
         var u=String(o.user).toLowerCase(), has=BASE.some(function(r){ return r.lvl===o.lvl&&r.user.toLowerCase()===u; });
         if(o.rm){ if(has){ BASE=BASE.filter(function(r){ return !(r.lvl===o.lvl&&r.user.toLowerCase()===u); }); add=true; } }
         else if(!has){ BASE.push({lvl:o.lvl,user:String(o.user).slice(0,30),video:okUrl(o.video)?o.video:""}); add=true; }
+        else if(okUrl(o.video)){ BASE.forEach(function(r){ if(r.lvl===o.lvl&&r.user.toLowerCase()===u&&r.video!==o.video){ r.video=o.video; add=true; } }); }
       });
       if(add&&cur&&cur.v!=="admin") show(cur.v,cur.a,true);
+      else if(add&&cur&&cur.v==="admin"&&IS_OWNER) rAdmin();
     },function(){});
   });
 })();
@@ -7528,7 +7605,7 @@ function buildDoc(){
   var enc=tpl.split("<"+"/script").join("<\\/script");
   return tpl.slice(0,i1)+stateJson()+tpl.slice(i1+m1.length,i2)+enc+tpl.slice(i2+m2.length);
 }
-function dirty(){ DIRTY++; var f=document.getElementById("pubfab"); if(f&&IS_OWNER){ f.className="btn on"; f.textContent="Publish "+DIRTY+" change"+(DIRTY===1?"":"s")+" to everyone"; } }
+function dirty(){ if(window.TMLNET&&TMLNET.on&&window.cfgSync){ window.cfgSync(); return; } DIRTY++; var f=document.getElementById("pubfab"); if(f&&IS_OWNER){ f.className="btn on"; f.textContent="Publish "+DIRTY+" change"+(DIRTY===1?"":"s")+" to everyone"; } }
 function pub(){
   if(window.TMLNET&&TMLNET.on){ toast("On this site, list edits need a new index.html. Ask Claude to make it."); return; }
   toast("Publishing...");
@@ -7540,9 +7617,8 @@ function pub(){
 }
 function setUnv(id,on){
   var l=lv(id); if(!l) return;
-  var prev=!!l.unverified; l.unverified=!!on;
-  if(window.TMLNET&&TMLNET.on&&window.netUnv){ window.netUnv(id,!!on,function(){ l.unverified=prev; if(cur&&cur.v==="level") show("level",id,true); else if(cur&&cur.v==="admin") rAdmin(); }); }
-  else { dirty(); toast(on?"Unverified tag added":"Unverified tag removed"); }
+  l.unverified=!!on; dirty();
+  if(!(window.TMLNET&&TMLNET.on)) toast(on?"Unverified tag added":"Unverified tag removed");
 }
 function lvName(id){ var l=lv(id); return l?"#"+rk(id)+" "+l.name:"(removed level)"; }
 function okUrl(u){ return /^https?:\/\//.test(u||""); }
@@ -7625,7 +7701,7 @@ function rAdmin(){
   function pane(id,title,sub,body){ return '<section class="adm-pane" data-pane="'+id+'"'+(admTab===id?'':' hidden')+'><div class="adm-ph"><h1>'+title+'</h1><p>'+sub+'</p></div>'+body+'</section>'; }
   var kpi=function(go,n,l,id){ return '<button class="adm-kpi" data-go="'+go+'"><b'+(id?' id="'+id+'"':'')+'>'+n+'</b><small>'+l+'</small></button>'; };
   var overview=
-    (DIRTY?'<div class="adm-alert"><b>'+DIRTY+' unpublished change'+(DIRTY===1?'':'s')+'</b><span>Press the Publish button at the bottom left to put them on the live site.</span></div>':'<div class="adm-alert calm"><b>Everything is saved</b><span>Changes you make here are staged until you press Publish (bottom left).</span></div>')+
+    ((window.TMLNET&&TMLNET.on)?'<div class="adm-alert calm"><b>Changes save for everyone</b><span>Everything you change here is saved to the live site right away. No publishing needed.</span></div>':DIRTY?'<div class="adm-alert"><b>'+DIRTY+' unpublished change'+(DIRTY===1?'':'s')+'</b><span>Press the Publish button at the bottom left to put them on the live site.</span></div>':'<div class="adm-alert calm"><b>Everything is saved</b><span>Changes you make here are staged until you press Publish (bottom left).</span></div>')+
     '<div class="adm-kpis">'+kpi("review",PEND.length,"Waiting for review","adm-k-pend")+kpi("levels",LEVELS.length,"Levels")+kpi("records",BASE.length,"Records")+kpi("levels",nMiss,"Missing info")+kpi("levels",nUnv,"Unverified")+'</div>'+
     '<div class="panel"><h2>Quick actions</h2><div class="adm-qa"><button class="adm-big" data-go="review">'+ADMI.review+'<span><b>Review submissions</b><small>Accept or decline new records</small></span></button><button class="adm-big" data-act="newlvl">'+ADMI.levels+'<span><b>Add a level</b><small>Put a new level on the list</small></span></button><button class="adm-big" data-go="records" data-focus="rp">'+ADMI.records+'<span><b>Add a record</b><small>Give a player a completion</small></span></button><button class="adm-big" data-go="players">'+ADMI.players+'<span><b>Player pictures</b><small>Pictures and locations</small></span></button></div></div>'+
     '<div class="panel"><h2>Still missing</h2>'+(missRows||'<div class="adm-empty"><b>Nothing is missing</b><span>Every level has its screenshot, verifier, ID, song and video.</span></div>')+'</div>';
@@ -7664,7 +7740,7 @@ function rAdmin(){
     var u=document.getElementById("rp").value.trim(), l=LEVELS[+document.getElementById("rl").value], v=document.getElementById("rv").value.trim();
     if(!u||!l) return;
     if(BASE.some(function(r){return r.lvl===l.id&&r.user.toLowerCase()===u.toLowerCase();})){ toast(u+" already has a record there"); return; }
-    BASE.push({lvl:l.id,user:u,video:okUrl(v)?v:""}); dirty(); toast("Record added"); rAdmin();
+    BASE.push({lvl:l.id,user:u,video:okUrl(v)?v:""}); if(window.TMLNET&&TMLNET.on&&window.netRec) netRec(l.id,u,v); else dirty(); toast("Record added"); rAdmin();
   };
   document.getElementById("lsel").onchange=fillEditor;
   document.getElementById("af").onsubmit=function(e){
@@ -7701,9 +7777,9 @@ function readThumb(file,cb){
   fr.onload=function(){
     var im=new Image();
     im.onload=function(){
-      var w=Math.min(1280,im.width), h=Math.round(im.height*w/im.width), c=document.createElement("canvas");
+      var live=!!(window.TMLNET&&TMLNET.on), w=Math.min(live?900:1280,im.width), h=Math.round(im.height*w/im.width), c=document.createElement("canvas");
       c.width=w; c.height=h; c.getContext("2d").drawImage(im,0,0,w,h);
-      cb(c.toDataURL("image/jpeg",.72));
+      cb(c.toDataURL("image/jpeg",live?.6:.72));
     };
     im.onerror=function(){ toast("Couldn't read that image"); };
     im.src=fr.result;
@@ -7727,14 +7803,17 @@ function saveLevel(thumb){
   o.song=sname||(sid?"Newgrounds "+sid:""); o.songUrl=sid?"https://www.newgrounds.com/audio/listen/"+sid:"";
   if(!l&&o.publisher) o.creators=[o.publisher];
   if(thumb){ o.img=thumb; delete TINT[id]; delete TINT[oldId]; }
-  if(!l) LEVELS.push(o);
+  if(!l){ o._k=o.id; LEVELS.push(o); }
   else if(oldId!==id) BASE.forEach(function(r){ if(r.lvl===oldId) r.lvl=id; });
   var pos=Math.max(1,Math.min(LEVELS.length,+g("lpos")||LEVELS.length));
   var oldIdx=LEVELS.indexOf(o); LEVELS.splice(oldIdx,1); LEVELS.splice(pos-1,0,o);
   if(!l) logPos(pos-1,"placed",null); else if(oldIdx!==pos-1) logPos(pos-1,pos-1<oldIdx?"raised":"lowered",oldIdx+1);
   var vr=BASE.filter(function(r){return r.lvl===id&&r.user.toLowerCase()===ver.toLowerCase();})[0];
+  var needNet=!vr||(vv&&vr.video!==vv);
   if(!vr) BASE.push({lvl:id,user:ver,video:vv}); else if(vv) vr.video=vv;
-  dirty(); toast(l?"Level updated":"Level added"); rAdmin();
+  if(needNet&&window.TMLNET&&TMLNET.on&&window.netRec) netRec(id,vr?vr.user:ver,vv);
+  dirty(); if(thumb&&window.TMLNET&&TMLNET.on&&window.cfgImg) cfgImg(o);
+  toast(l?"Level updated":"Level added"); rAdmin();
 }
 function delPending(id){ if(DB&&id) DB.doc("pending/"+id).delete().catch(function(){}); }
 function adminAct(act,i,btn){
@@ -9416,6 +9495,77 @@ setTimeout(function(){
 // ---- v93: sign-in screens for self-hosted sites ----
 (function(){
   var N=window.TMLNET; if(!N) return;
+  // ---- shared admin edits: saved to the "approved" collection as cfg docs, so every visitor sees them ----
+  var LVF=["name","verifier","publisher","song","songUrl","face","unverified","desc"];
+  var LV0={}, IDMAP={}, CL0=(STATE.changelog||[]).length, CLBASE=CL0, CLDOC=[], CFGLAST={}, CFGREADY=false, cfgT=null;
+  LEVELS.forEach(function(l){ l._k=l.id; var o={}; LVF.forEach(function(f){ o[f]=l[f]; }); o.creators=JSON.stringify(l.creators||[]); LV0[l._k]=o; });
+  function mapId(x){ return Object.prototype.hasOwnProperty.call(IDMAP,x)?IDMAP[x]:x; }
+  function byKey(k){ for(var i=0;i<LEVELS.length;i++) if(String(LEVELS[i]._k)===String(k)) return LEVELS[i]; return null; }
+  function sig(d){ var o={}; Object.keys(d).forEach(function(k){ if(k!=="ts") o[k]=d[k]; }); return JSON.stringify(o); }
+  function buildLevels(){
+    var order=[], patch={}, added={}, idmap={}, seen={};
+    LEVELS.forEach(function(l){
+      if(l._k===undefined) l._k=l.id;
+      var k=l._k; order.push(k); seen[k]=1;
+      if(l.id!==k) idmap[k]=l.id;
+      if(LV0[k]){
+        var p={}, b=LV0[k], any=false;
+        LVF.forEach(function(f){ var a=l[f], z=b[f], d=(f==="unverified")?(!!a!==!!z):((a||"")!==(z||"")); if(d){ p[f]=(f==="unverified")?!!a:(a||""); any=true; } });
+        if(JSON.stringify(l.creators||[])!==b.creators){ p.creators=l.creators||[]; any=true; }
+        if(any) patch[k]=p;
+      } else added[k]={name:l.name,verifier:l.verifier,publisher:l.publisher||"",song:l.song||"",songUrl:l.songUrl||"",face:l.face||"",unverified:!!l.unverified,desc:l.desc||"",creators:l.creators||[],mode:l.mode||""};
+    });
+    var removed=Object.keys(LV0).filter(function(k){ return !seen[k]; });
+    return {cfg:"levels",order:order,patch:patch,added:added,removed:removed,idmap:idmap,cl:CLDOC.concat((STATE.changelog||[]).slice(CLBASE))};
+  }
+  function applyLevels(c){
+    var gone=[];
+    (c.removed||[]).forEach(function(k){ var l=byKey(k); if(l){ gone.push(l.id); LEVELS.splice(LEVELS.indexOf(l),1); } });
+    Object.keys(c.added||{}).forEach(function(k){ if(byKey(k)) return; var o=c.added[k]; o._k=+k; o.id=+k; o.tags=o.tags||[]; o.creators=o.creators||[]; o.mode=o.mode||""; o.ver=o.ver||""; o.size=o.size||""; LEVELS.push(o); });
+    Object.keys(c.patch||{}).forEach(function(k){ var l=byKey(k), p=c.patch[k]; if(!l) return; Object.keys(p).forEach(function(f){ if(LVF.indexOf(f)>-1||f==="creators") l[f]=p[f]; }); });
+    Object.keys(c.idmap||{}).forEach(function(k){ var l=byKey(k); if(!l) return; IDMAP[k]=c.idmap[k]; var old=l.id; if(old!==c.idmap[k]){ l.id=c.idmap[k]; BASE.forEach(function(r){ if(r.lvl===old) r.lvl=l.id; }); (STATE.changelog||[]).forEach(function(e){ if(e.id===old) e.id=l.id; }); } });
+    if(gone.length) BASE=BASE.filter(function(r){ return gone.indexOf(r.lvl)<0; });
+    var ord=c.order||[];
+    if(ord.length){
+      var pos={}; ord.forEach(function(k,i){ pos[String(k)]=i; });
+      var arr=LEVELS.map(function(l,i){ return {l:l,i:i,p:pos[String(l._k)]!==undefined?pos[String(l._k)]:1e6+i}; }).sort(function(a,b){ return a.p-b.p||a.i-b.i; }).map(function(x){ return x.l; });
+      LEVELS.length=0; arr.forEach(function(l){ LEVELS.push(l); });
+    }
+  }
+  function cfgApply(cfg,imgs){
+    var ch=false;
+    if(cfg.levels){ var c=cfg.levels; STATE.changelog=(STATE.changelog||[]).concat(c.cl||[]); CLDOC=c.cl||[]; CLBASE=STATE.changelog.length; applyLevels(c); ch=true; }
+    if(cfg.team&&cfg.team.team){ STATE.team=cfg.team.team; ch=true; }
+    if(cfg.players&&cfg.players.players){ STATE.players=cfg.players.players; ch=true; }
+    if(cfg.avatars&&cfg.avatars.avatars){ STATE.avatars=STATE.avatars||{}; Object.keys(cfg.avatars.avatars).forEach(function(k){ STATE.avatars[k]=cfg.avatars.avatars[k]; }); ch=true; }
+    imgs.forEach(function(o){ var l=byKey(o.k); if(l&&o.img){ l.img=o.img; ch=true; } });
+    CFGLAST.levels=sig(buildLevels()); CFGLAST.team=sig({cfg:"team",team:STATE.team||[]}); CFGLAST.players=sig({cfg:"players",players:STATE.players||{}}); CFGLAST.avatars=sig({cfg:"avatars",avatars:STATE.avatars||{}});
+    CFGREADY=true;
+    return ch;
+  }
+  function cfgPut(id,d){ d=JSON.parse(JSON.stringify(d)); var ref=N.db.collection("approved").doc(id); return ref.delete().catch(function(){}).then(function(){ return ref.set(d); }); }
+  window.cfgSync=function(){
+    clearTimeout(cfgT);
+    cfgT=setTimeout(function(){
+      if(!N.on||!CFGREADY) return;
+      var ds={levels:buildLevels(),team:{cfg:"team",team:STATE.team||[]},players:{cfg:"players",players:STATE.players||{}},avatars:{cfg:"avatars",avatars:STATE.avatars||{}}}, jobs=[];
+      Object.keys(ds).forEach(function(n){
+        var d=ds[n], sg=sig(d); if(sg===CFGLAST[n]) return;
+        if(sg.length>900000){ toast("That change is too big to save for everyone"); return; }
+        d.ts=Date.now(); jobs.push(cfgPut("cfg_"+n,d).then(function(){ CFGLAST[n]=sg; }));
+      });
+      if(!jobs.length) return;
+      Promise.all(jobs).then(function(){ toast("Saved for everyone"); }).catch(function(e){ toast(errText(e)); });
+    },500);
+  };
+  window.cfgImg=function(l){
+    if(!l||!l.img||!N.on) return;
+    if(l.img.length>800000){ toast("That image is too big to save for everyone"); return; }
+    cfgPut("cfg_img_"+l._k,{cfg:"img",k:l._k,img:l.img,ts:Date.now()}).then(function(){ toast("Saved for everyone"); }).catch(function(e){ toast(errText(e)); });
+  };
+  window.netRec=function(lvl,user,video){
+    N.db.collection("approved").add({lvl:lvl,user:String(user||"").slice(0,30),video:okUrl(video)?video:"",ts:Date.now()}).catch(function(e){ toast(errText(e)); });
+  };
   var DSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
   var GSVG='<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
   function acct(){ return document.getElementById("acct"); }
@@ -9537,14 +9687,20 @@ setTimeout(function(){
     if(!N.on) return;
     N.db.collection("approved").get().then(function(s){
       var add=false, ds=s.docs.map(function(d){ return d.data()||{}; }).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+      var cfg={}, cimgs=[]; ds.forEach(function(o){ if(o.cfg==="img") cimgs.push(o); else if(o.cfg) cfg[o.cfg]=o; });
+      if(cfgApply(cfg,cimgs)) add=true;
       ds.forEach(function(o){
-        if(o.user==="__unverified"){ var UL=lv(o.lvl); if(UL){ UL.unverified=!o.rm; add=true; } return; }
+        if(o.cfg) return;
+        if(typeof o.lvl==="number") o.lvl=mapId(o.lvl);
+        if(o.user==="__unverified"){ var UL=lv(o.lvl); if(UL&&!cfg.levels){ UL.unverified=!o.rm; add=true; } return; }
         if(!lv(o.lvl)||!o.user) return;
         var u=String(o.user).toLowerCase(), has=BASE.some(function(r){ return r.lvl===o.lvl&&r.user.toLowerCase()===u; });
         if(o.rm){ if(has){ BASE=BASE.filter(function(r){ return !(r.lvl===o.lvl&&r.user.toLowerCase()===u); }); add=true; } }
         else if(!has){ BASE.push({lvl:o.lvl,user:String(o.user).slice(0,30),video:okUrl(o.video)?o.video:""}); add=true; }
+        else if(okUrl(o.video)){ BASE.forEach(function(r){ if(r.lvl===o.lvl&&r.user.toLowerCase()===u&&r.video!==o.video){ r.video=o.video; add=true; } }); }
       });
       if(add&&cur&&cur.v!=="admin") show(cur.v,cur.a,true);
+      else if(add&&cur&&cur.v==="admin"&&IS_OWNER) rAdmin();
     },function(){});
   });
 })();
@@ -9558,7 +9714,7 @@ function buildDoc(){
   var enc=tpl.split("<"+"/script").join("<\\/script");
   return tpl.slice(0,i1)+stateJson()+tpl.slice(i1+m1.length,i2)+enc+tpl.slice(i2+m2.length);
 }
-function dirty(){ DIRTY++; var f=document.getElementById("pubfab"); if(f&&IS_OWNER){ f.className="btn on"; f.textContent="Publish "+DIRTY+" change"+(DIRTY===1?"":"s")+" to everyone"; } }
+function dirty(){ if(window.TMLNET&&TMLNET.on&&window.cfgSync){ window.cfgSync(); return; } DIRTY++; var f=document.getElementById("pubfab"); if(f&&IS_OWNER){ f.className="btn on"; f.textContent="Publish "+DIRTY+" change"+(DIRTY===1?"":"s")+" to everyone"; } }
 function pub(){
   if(window.TMLNET&&TMLNET.on){ toast("On this site, list edits need a new index.html. Ask Claude to make it."); return; }
   toast("Publishing...");
@@ -9570,9 +9726,8 @@ function pub(){
 }
 function setUnv(id,on){
   var l=lv(id); if(!l) return;
-  var prev=!!l.unverified; l.unverified=!!on;
-  if(window.TMLNET&&TMLNET.on&&window.netUnv){ window.netUnv(id,!!on,function(){ l.unverified=prev; if(cur&&cur.v==="level") show("level",id,true); else if(cur&&cur.v==="admin") rAdmin(); }); }
-  else { dirty(); toast(on?"Unverified tag added":"Unverified tag removed"); }
+  l.unverified=!!on; dirty();
+  if(!(window.TMLNET&&TMLNET.on)) toast(on?"Unverified tag added":"Unverified tag removed");
 }
 function lvName(id){ var l=lv(id); return l?"#"+rk(id)+" "+l.name:"(removed level)"; }
 function okUrl(u){ return /^https?:\/\//.test(u||""); }
@@ -9655,7 +9810,7 @@ function rAdmin(){
   function pane(id,title,sub,body){ return '<section class="adm-pane" data-pane="'+id+'"'+(admTab===id?'':' hidden')+'><div class="adm-ph"><h1>'+title+'</h1><p>'+sub+'</p></div>'+body+'</section>'; }
   var kpi=function(go,n,l,id){ return '<button class="adm-kpi" data-go="'+go+'"><b'+(id?' id="'+id+'"':'')+'>'+n+'</b><small>'+l+'</small></button>'; };
   var overview=
-    (DIRTY?'<div class="adm-alert"><b>'+DIRTY+' unpublished change'+(DIRTY===1?'':'s')+'</b><span>Press the Publish button at the bottom left to put them on the live site.</span></div>':'<div class="adm-alert calm"><b>Everything is saved</b><span>Changes you make here are staged until you press Publish (bottom left).</span></div>')+
+    ((window.TMLNET&&TMLNET.on)?'<div class="adm-alert calm"><b>Changes save for everyone</b><span>Everything you change here is saved to the live site right away. No publishing needed.</span></div>':DIRTY?'<div class="adm-alert"><b>'+DIRTY+' unpublished change'+(DIRTY===1?'':'s')+'</b><span>Press the Publish button at the bottom left to put them on the live site.</span></div>':'<div class="adm-alert calm"><b>Everything is saved</b><span>Changes you make here are staged until you press Publish (bottom left).</span></div>')+
     '<div class="adm-kpis">'+kpi("review",PEND.length,"Waiting for review","adm-k-pend")+kpi("levels",LEVELS.length,"Levels")+kpi("records",BASE.length,"Records")+kpi("levels",nMiss,"Missing info")+kpi("levels",nUnv,"Unverified")+'</div>'+
     '<div class="panel"><h2>Quick actions</h2><div class="adm-qa"><button class="adm-big" data-go="review">'+ADMI.review+'<span><b>Review submissions</b><small>Accept or decline new records</small></span></button><button class="adm-big" data-act="newlvl">'+ADMI.levels+'<span><b>Add a level</b><small>Put a new level on the list</small></span></button><button class="adm-big" data-go="records" data-focus="rp">'+ADMI.records+'<span><b>Add a record</b><small>Give a player a completion</small></span></button><button class="adm-big" data-go="players">'+ADMI.players+'<span><b>Player pictures</b><small>Pictures and locations</small></span></button></div></div>'+
     '<div class="panel"><h2>Still missing</h2>'+(missRows||'<div class="adm-empty"><b>Nothing is missing</b><span>Every level has its screenshot, verifier, ID, song and video.</span></div>')+'</div>';
@@ -9694,7 +9849,7 @@ function rAdmin(){
     var u=document.getElementById("rp").value.trim(), l=LEVELS[+document.getElementById("rl").value], v=document.getElementById("rv").value.trim();
     if(!u||!l) return;
     if(BASE.some(function(r){return r.lvl===l.id&&r.user.toLowerCase()===u.toLowerCase();})){ toast(u+" already has a record there"); return; }
-    BASE.push({lvl:l.id,user:u,video:okUrl(v)?v:""}); dirty(); toast("Record added"); rAdmin();
+    BASE.push({lvl:l.id,user:u,video:okUrl(v)?v:""}); if(window.TMLNET&&TMLNET.on&&window.netRec) netRec(l.id,u,v); else dirty(); toast("Record added"); rAdmin();
   };
   document.getElementById("lsel").onchange=fillEditor;
   document.getElementById("af").onsubmit=function(e){
@@ -9731,9 +9886,9 @@ function readThumb(file,cb){
   fr.onload=function(){
     var im=new Image();
     im.onload=function(){
-      var w=Math.min(1280,im.width), h=Math.round(im.height*w/im.width), c=document.createElement("canvas");
+      var live=!!(window.TMLNET&&TMLNET.on), w=Math.min(live?900:1280,im.width), h=Math.round(im.height*w/im.width), c=document.createElement("canvas");
       c.width=w; c.height=h; c.getContext("2d").drawImage(im,0,0,w,h);
-      cb(c.toDataURL("image/jpeg",.72));
+      cb(c.toDataURL("image/jpeg",live?.6:.72));
     };
     im.onerror=function(){ toast("Couldn't read that image"); };
     im.src=fr.result;
@@ -9757,14 +9912,17 @@ function saveLevel(thumb){
   o.song=sname||(sid?"Newgrounds "+sid:""); o.songUrl=sid?"https://www.newgrounds.com/audio/listen/"+sid:"";
   if(!l&&o.publisher) o.creators=[o.publisher];
   if(thumb){ o.img=thumb; delete TINT[id]; delete TINT[oldId]; }
-  if(!l) LEVELS.push(o);
+  if(!l){ o._k=o.id; LEVELS.push(o); }
   else if(oldId!==id) BASE.forEach(function(r){ if(r.lvl===oldId) r.lvl=id; });
   var pos=Math.max(1,Math.min(LEVELS.length,+g("lpos")||LEVELS.length));
   var oldIdx=LEVELS.indexOf(o); LEVELS.splice(oldIdx,1); LEVELS.splice(pos-1,0,o);
   if(!l) logPos(pos-1,"placed",null); else if(oldIdx!==pos-1) logPos(pos-1,pos-1<oldIdx?"raised":"lowered",oldIdx+1);
   var vr=BASE.filter(function(r){return r.lvl===id&&r.user.toLowerCase()===ver.toLowerCase();})[0];
+  var needNet=!vr||(vv&&vr.video!==vv);
   if(!vr) BASE.push({lvl:id,user:ver,video:vv}); else if(vv) vr.video=vv;
-  dirty(); toast(l?"Level updated":"Level added"); rAdmin();
+  if(needNet&&window.TMLNET&&TMLNET.on&&window.netRec) netRec(id,vr?vr.user:ver,vv);
+  dirty(); if(thumb&&window.TMLNET&&TMLNET.on&&window.cfgImg) cfgImg(o);
+  toast(l?"Level updated":"Level added"); rAdmin();
 }
 function delPending(id){ if(DB&&id) DB.doc("pending/"+id).delete().catch(function(){}); }
 function adminAct(act,i,btn){
