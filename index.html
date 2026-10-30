@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v211">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v214">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -4980,6 +4980,37 @@ header #loginBtn.in .lav{border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 14px hs
 :root[data-theme="light"] header #guestChip{color:hsl(var(--h) 45% 26%);background:hsl(var(--h) 100% 55% / .08);border-color:hsl(var(--h) 80% 50% / .25)}
 :root[data-theme="light"] header .hsep{background:linear-gradient(180deg,transparent,hsl(var(--h) 80% 50% / .35),transparent)!important}
 :root[data-theme="light"] header #loginBtn.in .lav{box-shadow:0 0 0 2px #fff,0 0 12px hsl(var(--h) 100% 55% / .6)}
+
+/* ================= v213: top bar never overlaps (all desktop widths) ================= */
+@media(min-width:861px){
+  header .hin{grid-template-columns:auto minmax(0,1fr) auto!important}
+  header #nav{justify-self:center;min-width:0;max-width:100%}
+  header .logo{min-width:0}
+  header .hact{min-width:0}
+}
+@media(min-width:861px) and (max-width:1100px){
+  header #guestChip{display:none}
+  header #nav button{padding:10px 9px;font-size:11px;letter-spacing:.35px}
+  header #nav button svg{display:none}
+}
+@media(min-width:861px) and (max-width:960px){
+  header #nav button{padding:10px 7px;font-size:10.5px;letter-spacing:.2px}
+  header .hin{gap:8px;padding-left:14px;padding-right:14px}
+}
+
+/* ================= v214: Discord profile extras ================= */
+.phero{position:relative}
+.phero>.pav,.phero>.pinfo{position:relative;z-index:1}
+.dnp{position:absolute;right:0;top:0;bottom:0;width:min(48%,540px);z-index:0;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--np) 62%,transparent));-webkit-mask-image:linear-gradient(90deg,transparent,#000 42%);mask-image:linear-gradient(90deg,transparent,#000 42%);opacity:.95}
+.dnp i{position:absolute;inset:0;background-size:cover;background-position:center right;background-repeat:no-repeat}
+.phero.hasacc{box-shadow:0 22px 70px -34px var(--dacc),inset 0 0 0 1px color-mix(in srgb,var(--dacc) 42%,transparent)!important}
+.phero.hasacc .pav .av{box-shadow:0 0 0 3px var(--dacc),0 0 28px color-mix(in srgb,var(--dacc) 55%,transparent)}
+.bchip.dtag i{width:22px!important;height:22px!important;border-radius:6px!important}
+.bchip.dtag b{letter-spacing:.06em}
+@media(max-width:700px){.dnp{width:70%;opacity:.7}}
+/* light theme: profile name was white-on-white */
+:root[data-theme="light"] #app .phero h1{background:linear-gradient(180deg,#0b1f4a,#1f55c0)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;color:transparent!important}
+:root[data-theme="light"] #app .phero h1 .ctag{background:#e3eeff!important;-webkit-text-fill-color:#1747a8!important;color:#1747a8!important;border-color:#9dbcf0!important}
 </style>
 </head>
 <body>
@@ -8853,7 +8884,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v211">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v214">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -10036,6 +10067,37 @@ header #loginBtn.in .lav{border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 14px hs
 :root[data-theme="light"] header #guestChip{color:hsl(var(--h) 45% 26%);background:hsl(var(--h) 100% 55% / .08);border-color:hsl(var(--h) 80% 50% / .25)}
 :root[data-theme="light"] header .hsep{background:linear-gradient(180deg,transparent,hsl(var(--h) 80% 50% / .35),transparent)!important}
 :root[data-theme="light"] header #loginBtn.in .lav{box-shadow:0 0 0 2px #fff,0 0 12px hsl(var(--h) 100% 55% / .6)}
+
+/* ================= v213: top bar never overlaps (all desktop widths) ================= */
+@media(min-width:861px){
+  header .hin{grid-template-columns:auto minmax(0,1fr) auto!important}
+  header #nav{justify-self:center;min-width:0;max-width:100%}
+  header .logo{min-width:0}
+  header .hact{min-width:0}
+}
+@media(min-width:861px) and (max-width:1100px){
+  header #guestChip{display:none}
+  header #nav button{padding:10px 9px;font-size:11px;letter-spacing:.35px}
+  header #nav button svg{display:none}
+}
+@media(min-width:861px) and (max-width:960px){
+  header #nav button{padding:10px 7px;font-size:10.5px;letter-spacing:.2px}
+  header .hin{gap:8px;padding-left:14px;padding-right:14px}
+}
+
+/* ================= v214: Discord profile extras ================= */
+.phero{position:relative}
+.phero>.pav,.phero>.pinfo{position:relative;z-index:1}
+.dnp{position:absolute;right:0;top:0;bottom:0;width:min(48%,540px);z-index:0;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--np) 62%,transparent));-webkit-mask-image:linear-gradient(90deg,transparent,#000 42%);mask-image:linear-gradient(90deg,transparent,#000 42%);opacity:.95}
+.dnp i{position:absolute;inset:0;background-size:cover;background-position:center right;background-repeat:no-repeat}
+.phero.hasacc{box-shadow:0 22px 70px -34px var(--dacc),inset 0 0 0 1px color-mix(in srgb,var(--dacc) 42%,transparent)!important}
+.phero.hasacc .pav .av{box-shadow:0 0 0 3px var(--dacc),0 0 28px color-mix(in srgb,var(--dacc) 55%,transparent)}
+.bchip.dtag i{width:22px!important;height:22px!important;border-radius:6px!important}
+.bchip.dtag b{letter-spacing:.06em}
+@media(max-width:700px){.dnp{width:70%;opacity:.7}}
+/* light theme: profile name was white-on-white */
+:root[data-theme="light"] #app .phero h1{background:linear-gradient(180deg,#0b1f4a,#1f55c0)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;color:transparent!important}
+:root[data-theme="light"] #app .phero h1 .ctag{background:#e3eeff!important;-webkit-text-fill-color:#1747a8!important;color:#1747a8!important;border-color:#9dbcf0!important}
 </style>
 </head>
 <body>
@@ -12365,7 +12427,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v211js">
+<script id="v214js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -13159,6 +13221,40 @@ var _sh=window.show;
       };
     }
   };
+})();
+
+/* ================= v214: Discord nameplate, server tag and accent on the player profile ================= */
+(function(){
+  try{
+    if(typeof rPlayer!=="function"||typeof DCD==="undefined"||typeof DCU==="undefined") return;
+    var PAL={crimson:"#c23a4b",berry:"#b03a86",sky:"#3aa0f0",teal:"#1fae9e",forest:"#3a9456",bubble_gum:"#ff7fbf",violet:"#7a63f0",cobalt:"#3363e6",clover:"#62a843",lemon:"#e9cb2c",white:"#e9eef8"};
+    function safe(u){ return String(u||"").replace(/[()"'\s\\<>]/g,""); }
+    var _rp=rPlayer;
+    rPlayer=function(name){
+      _rp(name);
+      try{
+        var d=DCD[DCU[String(name).toLowerCase()]]; if(!d) return;
+        var hero=app.querySelector(".phero"); if(!hero) return;
+        var acc=/^#[0-9a-f]{6}$/i.test(d.accent||"")?d.accent:"";
+        if(acc){ hero.classList.add("hasacc"); hero.style.setProperty("--dacc",acc); }
+        if(d.nameplate||d.npPal){
+          var np=document.createElement("div"); np.className="dnp";
+          np.style.setProperty("--np",PAL[d.npPal]||"#3a8dff");
+          np.innerHTML=d.nameplate?'<i style="background-image:url('+safe(d.nameplate)+')"></i>':"";
+          hero.appendChild(np);
+        }
+        if(d.tag){
+          var row=app.querySelector(".pbadges");
+          if(!row){ var h1=app.querySelector(".pinfo h1"); if(h1){ row=document.createElement("div"); row.className="pbadges"; h1.parentNode.insertBefore(row,h1.nextSibling); } }
+          if(row){
+            var c=document.createElement("span"); c.className="bchip dtag"; c.style.setProperty("--bc","#8fb4ff"); c.title="Discord server tag";
+            c.innerHTML=(d.tagBadge?'<i><img src="'+safe(d.tagBadge)+'" alt=""></i>':"")+'<b>'+esc(d.tag)+'</b>';
+            row.appendChild(c);
+          }
+        }
+      }catch(e){}
+    };
+  }catch(e){}
 })();
 <\/script>
 </body>
@@ -15418,7 +15514,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v211js">
+<script id="v214js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -16212,6 +16308,40 @@ var _sh=window.show;
       };
     }
   };
+})();
+
+/* ================= v214: Discord nameplate, server tag and accent on the player profile ================= */
+(function(){
+  try{
+    if(typeof rPlayer!=="function"||typeof DCD==="undefined"||typeof DCU==="undefined") return;
+    var PAL={crimson:"#c23a4b",berry:"#b03a86",sky:"#3aa0f0",teal:"#1fae9e",forest:"#3a9456",bubble_gum:"#ff7fbf",violet:"#7a63f0",cobalt:"#3363e6",clover:"#62a843",lemon:"#e9cb2c",white:"#e9eef8"};
+    function safe(u){ return String(u||"").replace(/[()"'\s\\<>]/g,""); }
+    var _rp=rPlayer;
+    rPlayer=function(name){
+      _rp(name);
+      try{
+        var d=DCD[DCU[String(name).toLowerCase()]]; if(!d) return;
+        var hero=app.querySelector(".phero"); if(!hero) return;
+        var acc=/^#[0-9a-f]{6}$/i.test(d.accent||"")?d.accent:"";
+        if(acc){ hero.classList.add("hasacc"); hero.style.setProperty("--dacc",acc); }
+        if(d.nameplate||d.npPal){
+          var np=document.createElement("div"); np.className="dnp";
+          np.style.setProperty("--np",PAL[d.npPal]||"#3a8dff");
+          np.innerHTML=d.nameplate?'<i style="background-image:url('+safe(d.nameplate)+')"></i>':"";
+          hero.appendChild(np);
+        }
+        if(d.tag){
+          var row=app.querySelector(".pbadges");
+          if(!row){ var h1=app.querySelector(".pinfo h1"); if(h1){ row=document.createElement("div"); row.className="pbadges"; h1.parentNode.insertBefore(row,h1.nextSibling); } }
+          if(row){
+            var c=document.createElement("span"); c.className="bchip dtag"; c.style.setProperty("--bc","#8fb4ff"); c.title="Discord server tag";
+            c.innerHTML=(d.tagBadge?'<i><img src="'+safe(d.tagBadge)+'" alt=""></i>':"")+'<b>'+esc(d.tag)+'</b>';
+            row.appendChild(c);
+          }
+        }
+      }catch(e){}
+    };
+  }catch(e){}
 })();
 </script>
 </body>
