@@ -84,9 +84,19 @@ export async function onRequest({ request, env }) {
     const avatar = me.avatar ? cdn + "avatars/" + me.id + "/" + me.avatar + "." + ext(me.avatar) + "?size=256" : "";
     const banner = me.banner ? cdn + "banners/" + me.id + "/" + me.banner + "." + ext(me.banner) + "?size=600" : "";
     const deco = me.avatar_decoration_data && me.avatar_decoration_data.asset ? cdn + "avatar-decoration-presets/" + String(me.avatar_decoration_data.asset).replace(/[^A-Za-z0-9_-]/g, "") + ".png?size=256&passthrough=true" : "";
+    // Profile effects are not part of Discord's public API, so they can't be read. These are:
+    const clean = (v) => String(v || "").replace(/[^A-Za-z0-9_\-\/]/g, "");
+    const accent = Number.isInteger(me.accent_color) ? "#" + (me.accent_color >>> 0).toString(16).padStart(6, "0").slice(-6) : "";
+    const np = me.collectibles && me.collectibles.nameplate ? me.collectibles.nameplate : null;
+    const nameplate = np && np.asset ? cdn + "assets/collectibles/" + clean(np.asset) + "static.png" : "";
+    const npPal = np && np.palette ? clean(np.palette) : "";
+    const pg = me.primary_guild && me.primary_guild.identity_enabled && me.primary_guild.tag ? me.primary_guild : null;
+    const tag = pg ? String(pg.tag).replace(/[<>&"']/g, "").slice(0, 4) : "";
+    const tagBadge = pg && pg.badge && pg.identity_guild_id ? cdn + "guild-tag-badges/" + clean(pg.identity_guild_id) + "/" + clean(pg.badge) + ".png?size=64" : "";
+    const sv = (x) => ({ stringValue: x });
     const w = await fetch(docUrl(sa, uid), {
       method: "PATCH", headers: { Authorization: "Bearer " + (await googleToken(sa)), "content-type": "application/json" },
-      body: JSON.stringify({ fields: { id: { stringValue: String(me.id) }, name: { stringValue: name }, avatar: { stringValue: avatar }, banner: { stringValue: banner }, deco: { stringValue: deco }, ts: { integerValue: String(Date.now()) } } }),
+      body: JSON.stringify({ fields: { id: sv(String(me.id)), name: sv(name), avatar: sv(avatar), banner: sv(banner), deco: sv(deco), accent: sv(accent), nameplate: sv(nameplate), npPal: sv(npPal), tag: sv(tag), tagBadge: sv(tagBadge), ts: { integerValue: String(Date.now()) } } }),
     });
     if (!w.ok) return fail("Couldn't save the link. Please try again.");
     return redirect(origin + "/#dl=ok&dn=" + encodeURIComponent(name), clear);
