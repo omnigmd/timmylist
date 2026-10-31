@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v221">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v223">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -5462,6 +5462,110 @@ body.chopen{overflow-x:hidden}
 .cvb.mute.on{background:#fff;color:#0b2a66}
 body.incall .chfab{bottom:96px}
 @media(prefers-reduced-motion:reduce){.cvc,.cvwho .av{animation:none!important}}
+
+/* ================= v222: visual refinement (white + blue, design only) ================= */
+:root{--tml-ease:cubic-bezier(.22,.8,.2,1)}
+html{-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{-webkit-tap-highlight-color:transparent}
+/* numbers line up everywhere: points, ranks, counts, dates */
+#app,header,footer,.chdr,.cvc{font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1,"kern" 1}
+#app h1,#app h2,#app h3{font-feature-settings:"kern" 1,"lnum" 1;text-wrap:balance}
+#app p,#app .sub,#app .desc{text-wrap:pretty}
+::selection{background:#2f7bff;color:#fff;text-shadow:none}
+:root[data-theme="light"] ::selection{background:#1f66e8;color:#fff}
+
+/* ---- calm, quick page change (was a ~1s blur-in) ---- */
+@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tmlUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ulin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#app{animation-duration:.3s!important}
+#app>*{animation-duration:.4s!important}
+#app>*:nth-child(2){animation-delay:.03s!important}#app>*:nth-child(3){animation-delay:.06s!important}#app>*:nth-child(4){animation-delay:.09s!important}#app>*:nth-child(5){animation-delay:.12s!important}
+#app .feat,#app .homegrid .hcol>.panel{animation-duration:.45s!important}
+#app .homegrid .hcol>.panel:nth-child(1){animation-delay:.05s!important}#app .homegrid .hcol>.panel:nth-child(2){animation-delay:.1s!important}#app .homegrid .hcol>.panel:nth-child(3){animation-delay:.15s!important}
+
+/* ---- crisp white titles and numerals (no fading gray tails) ---- */
+:root:not([data-theme="light"]) #app :is(h1,.shead>h2,.lbh h2,h1.wtitle,.lstats b,.kpis>div b,.ulv b,.ulr.t1 .ulv b,.gm b,.holscore b,.holrk){
+  background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:#fff!important;color:#fff!important}
+:root:not([data-theme="light"]) #app h1.wtitle b{-webkit-text-fill-color:transparent!important}
+:root:not([data-theme="light"]) #app .chead{background:none!important;-webkit-text-fill-color:hsl(var(--h) 100% 90%)!important;color:hsl(var(--h) 100% 90%)!important}
+:root[data-theme="light"] #app .banner h1{background:none!important;-webkit-text-fill-color:#fff!important;color:#fff!important}
+:root[data-theme="light"] #app .chead{background:none!important;-webkit-text-fill-color:#0b3d91!important;color:#0b3d91!important}
+:root:not([data-theme="light"]) header .logo span b{-webkit-text-fill-color:transparent}
+
+/* ---- light mode: fixes for text that was too pale or smeared ---- */
+:root[data-theme="light"] #app .cdate{text-shadow:none!important;color:#083f91!important;letter-spacing:.1em}
+:root[data-theme="light"] #app .homegrid .trow:not(:first-of-type) .trk{color:#0b3d91!important;background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 93%))!important;border-color:hsl(var(--h) 85% 55% / .45)!important}
+:root[data-theme="light"] #app .homegrid .trow .mut{color:#38558a!important}
+:root[data-theme="light"] #app .homegrid .cli .mut{color:#4a5f86}
+:root[data-theme="light"] #app .clf .chip.on{background:linear-gradient(180deg,hsl(var(--h) 100% 58%),hsl(var(--h) 100% 44%))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 18px -8px hsl(var(--h) 100% 45% / .7),inset 0 1px 0 rgba(255,255,255,.4)!important}
+:root[data-theme="light"] #app .clf .chip.on b{background:rgba(255,255,255,.25)!important;color:#fff!important}
+
+/* ---- phone: nothing is clipped ---- */
+@media(max-width:520px){
+  #app .lhead .lstats{gap:8px;width:100%}
+  #app .lhead .lstats .mstat{flex:1 1 0!important;min-width:0!important;padding-left:8px!important;padding-right:8px!important}
+  #app .lhead .lstats .mstat b{font-size:clamp(13px,3.7vw,16px)!important;letter-spacing:-.02em}
+  #app .ltabs{gap:2px}#app .ltabs button{padding-left:12px;padding-right:12px}
+  #app .pxsr{flex:1 1 0;min-width:0;width:auto!important}
+}
+
+/* ---- focus, scrollbars, press feedback ---- */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:inherit}
+:root[data-theme="light"] a:focus-visible,:root[data-theme="light"] button:focus-visible,:root[data-theme="light"] input:focus-visible,:root[data-theme="light"] select:focus-visible,:root[data-theme="light"] textarea:focus-visible,:root[data-theme="light"] [tabindex]:focus-visible{outline-color:#0b4fd0}
+*{scrollbar-width:thin;scrollbar-color:hsl(var(--h) 90% 60% / .55) transparent}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:hsl(var(--h) 90% 60% / .45);border:3px solid transparent;border-radius:99px;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:hsl(var(--h) 100% 70% / .8);background-clip:content-box}
+:root[data-theme="light"] *{scrollbar-color:hsl(var(--h) 80% 45% / .5) transparent}
+:root[data-theme="light"] *::-webkit-scrollbar-thumb{background:hsl(var(--h) 80% 45% / .4);background-clip:content-box}
+.btn,.chip,#app button{transition-timing-function:var(--tml-ease)}
+.btn:active,#app .chip:active{transform:translateY(1px) scale(.985)}
+@media(prefers-reduced-motion:reduce){#app,#app>*,#app .feat,#app .homegrid .hcol>.panel{animation:none!important}}
+
+/* ================= v223: guided sessions (admin Sessions pane + player banner) ================= */
+.ctlbar[hidden]{display:none!important}
+.ctlbar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:12px;width:max-content;max-width:min(460px,calc(100vw - 100px));padding:10px 10px 10px 16px;border-radius:18px;border:1px solid hsl(var(--h) 100% 82% / .5);background:linear-gradient(180deg,hsl(var(--h) calc(var(--sat)*70%) 16%),hsl(var(--h) calc(var(--sat)*75%) 9%));color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.4);animation:ctlin .35s cubic-bezier(.2,.8,.2,1) both}
+.ctlbar>div{min-width:0;flex:1}
+.ctlbar b{display:block;font:900 14px Outfit,sans-serif;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctlbar small{display:block;margin-top:1px;color:rgba(255,255,255,.72);font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctlbar button{flex:none;height:40px;padding:0 18px;border-radius:12px;border:0;background:#fff;color:#0a2a66;font:900 14px Outfit,sans-serif;cursor:pointer}
+.ctlbar button:hover{background:#e8f1ff}.ctlbar button:active{transform:scale(.96)}
+.ctlbar button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ctldot{flex:none;width:10px;height:10px;border-radius:50%;background:#8fd0ff;box-shadow:0 0 0 0 rgba(143,208,255,.6);animation:ctlpulse 1.8s ease-out infinite}
+@keyframes ctlin{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes ctlpulse{0%{box-shadow:0 0 0 0 rgba(143,208,255,.55)}80%,100%{box-shadow:0 0 0 10px rgba(143,208,255,0)}}
+:root[data-theme="light"] .ctlbar{background:#fff;color:#0b1b3d;border-color:rgba(20,70,200,.35);box-shadow:0 18px 44px rgba(20,50,120,.28)}
+:root[data-theme="light"] .ctlbar small{color:#4a5a7a}
+:root[data-theme="light"] .ctlbar button{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+@media(max-width:640px){.ctlbar{left:12px;right:80px;transform:none;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:none;width:auto;animation-name:ctlinm}@keyframes ctlinm{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}}
+@media(prefers-reduced-motion:reduce){.ctlbar,.ctldot{animation:none!important}}
+
+.csu{display:flex;flex-direction:column;gap:12px;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:var(--card2)}
+.csu.on{border-color:hsl(var(--h) 100% 78% / .5);background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .1),transparent),var(--card2)}
+.cshead{display:flex;align-items:center;gap:12px}
+.csav{flex:none;display:inline-flex}.csav .av{margin:0}
+.csw{flex:1;min-width:0}.csw b{display:block;font:900 15px Outfit,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.csw small{display:block;margin-top:2px;color:var(--mut);font-size:12.5px;line-height:1.35}
+.cstag{flex:none;padding:5px 12px;border-radius:99px;background:hsl(var(--h) 100% 70% / .16);border:1px solid hsl(var(--h) 100% 78% / .3);font:800 12px Outfit,sans-serif}
+.cstag.live{background:rgba(143,208,255,.16);border-color:rgba(143,208,255,.55)}
+.cspanel{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}
+.csstat{margin:0;font-size:13px;color:var(--mut);display:flex;align-items:center;gap:8px}
+.csstat::before{content:"";width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);flex:none}
+.csstat.ok{color:var(--text)}.csstat.ok::before{background:#8fd0ff}
+.csnav,.csrow2{display:flex;gap:8px;flex-wrap:wrap}
+.csrow2 input,.csrow2 select{flex:1;min-width:140px;height:42px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font:600 14px Outfit,sans-serif}
+.csrow2 input:focus,.csrow2 select:focus{outline:2px solid hsl(var(--h) 100% 78% / .7);outline-offset:1px}
+.csempty{padding:26px 16px}
+@media(max-width:520px){.cshead{flex-wrap:wrap}.csnav .adm-b,.csrow2 .adm-b{flex:1 1 auto}.csrow2 input,.csrow2 select{min-width:0;flex:1 1 100%;font-size:16px}}
+#csbanner:empty{display:none}
+/* light mode: the selected admin tab was white text on a pale wash */
+:root[data-theme="light"] #admnav button.on{background:linear-gradient(135deg,#3b86ff,#1857e8)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 20px rgba(30,90,230,.28)!important}
+:root[data-theme="light"] #admnav button.on *{color:#fff!important}
+:root[data-theme="light"] #admnav button.on svg{stroke:#fff!important}
+@media(max-width:640px){.ctlbar b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.ctlbar{padding:10px 10px 10px 14px;gap:10px}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -9339,7 +9443,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v221">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v223">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -11004,6 +11108,110 @@ body.chopen{overflow-x:hidden}
 .cvb.mute.on{background:#fff;color:#0b2a66}
 body.incall .chfab{bottom:96px}
 @media(prefers-reduced-motion:reduce){.cvc,.cvwho .av{animation:none!important}}
+
+/* ================= v222: visual refinement (white + blue, design only) ================= */
+:root{--tml-ease:cubic-bezier(.22,.8,.2,1)}
+html{-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{-webkit-tap-highlight-color:transparent}
+/* numbers line up everywhere: points, ranks, counts, dates */
+#app,header,footer,.chdr,.cvc{font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1,"kern" 1}
+#app h1,#app h2,#app h3{font-feature-settings:"kern" 1,"lnum" 1;text-wrap:balance}
+#app p,#app .sub,#app .desc{text-wrap:pretty}
+::selection{background:#2f7bff;color:#fff;text-shadow:none}
+:root[data-theme="light"] ::selection{background:#1f66e8;color:#fff}
+
+/* ---- calm, quick page change (was a ~1s blur-in) ---- */
+@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tmlUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ulin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#app{animation-duration:.3s!important}
+#app>*{animation-duration:.4s!important}
+#app>*:nth-child(2){animation-delay:.03s!important}#app>*:nth-child(3){animation-delay:.06s!important}#app>*:nth-child(4){animation-delay:.09s!important}#app>*:nth-child(5){animation-delay:.12s!important}
+#app .feat,#app .homegrid .hcol>.panel{animation-duration:.45s!important}
+#app .homegrid .hcol>.panel:nth-child(1){animation-delay:.05s!important}#app .homegrid .hcol>.panel:nth-child(2){animation-delay:.1s!important}#app .homegrid .hcol>.panel:nth-child(3){animation-delay:.15s!important}
+
+/* ---- crisp white titles and numerals (no fading gray tails) ---- */
+:root:not([data-theme="light"]) #app :is(h1,.shead>h2,.lbh h2,h1.wtitle,.lstats b,.kpis>div b,.ulv b,.ulr.t1 .ulv b,.gm b,.holscore b,.holrk){
+  background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:#fff!important;color:#fff!important}
+:root:not([data-theme="light"]) #app h1.wtitle b{-webkit-text-fill-color:transparent!important}
+:root:not([data-theme="light"]) #app .chead{background:none!important;-webkit-text-fill-color:hsl(var(--h) 100% 90%)!important;color:hsl(var(--h) 100% 90%)!important}
+:root[data-theme="light"] #app .banner h1{background:none!important;-webkit-text-fill-color:#fff!important;color:#fff!important}
+:root[data-theme="light"] #app .chead{background:none!important;-webkit-text-fill-color:#0b3d91!important;color:#0b3d91!important}
+:root:not([data-theme="light"]) header .logo span b{-webkit-text-fill-color:transparent}
+
+/* ---- light mode: fixes for text that was too pale or smeared ---- */
+:root[data-theme="light"] #app .cdate{text-shadow:none!important;color:#083f91!important;letter-spacing:.1em}
+:root[data-theme="light"] #app .homegrid .trow:not(:first-of-type) .trk{color:#0b3d91!important;background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 93%))!important;border-color:hsl(var(--h) 85% 55% / .45)!important}
+:root[data-theme="light"] #app .homegrid .trow .mut{color:#38558a!important}
+:root[data-theme="light"] #app .homegrid .cli .mut{color:#4a5f86}
+:root[data-theme="light"] #app .clf .chip.on{background:linear-gradient(180deg,hsl(var(--h) 100% 58%),hsl(var(--h) 100% 44%))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 18px -8px hsl(var(--h) 100% 45% / .7),inset 0 1px 0 rgba(255,255,255,.4)!important}
+:root[data-theme="light"] #app .clf .chip.on b{background:rgba(255,255,255,.25)!important;color:#fff!important}
+
+/* ---- phone: nothing is clipped ---- */
+@media(max-width:520px){
+  #app .lhead .lstats{gap:8px;width:100%}
+  #app .lhead .lstats .mstat{flex:1 1 0!important;min-width:0!important;padding-left:8px!important;padding-right:8px!important}
+  #app .lhead .lstats .mstat b{font-size:clamp(13px,3.7vw,16px)!important;letter-spacing:-.02em}
+  #app .ltabs{gap:2px}#app .ltabs button{padding-left:12px;padding-right:12px}
+  #app .pxsr{flex:1 1 0;min-width:0;width:auto!important}
+}
+
+/* ---- focus, scrollbars, press feedback ---- */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:inherit}
+:root[data-theme="light"] a:focus-visible,:root[data-theme="light"] button:focus-visible,:root[data-theme="light"] input:focus-visible,:root[data-theme="light"] select:focus-visible,:root[data-theme="light"] textarea:focus-visible,:root[data-theme="light"] [tabindex]:focus-visible{outline-color:#0b4fd0}
+*{scrollbar-width:thin;scrollbar-color:hsl(var(--h) 90% 60% / .55) transparent}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:hsl(var(--h) 90% 60% / .45);border:3px solid transparent;border-radius:99px;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:hsl(var(--h) 100% 70% / .8);background-clip:content-box}
+:root[data-theme="light"] *{scrollbar-color:hsl(var(--h) 80% 45% / .5) transparent}
+:root[data-theme="light"] *::-webkit-scrollbar-thumb{background:hsl(var(--h) 80% 45% / .4);background-clip:content-box}
+.btn,.chip,#app button{transition-timing-function:var(--tml-ease)}
+.btn:active,#app .chip:active{transform:translateY(1px) scale(.985)}
+@media(prefers-reduced-motion:reduce){#app,#app>*,#app .feat,#app .homegrid .hcol>.panel{animation:none!important}}
+
+/* ================= v223: guided sessions (admin Sessions pane + player banner) ================= */
+.ctlbar[hidden]{display:none!important}
+.ctlbar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:12px;width:max-content;max-width:min(460px,calc(100vw - 100px));padding:10px 10px 10px 16px;border-radius:18px;border:1px solid hsl(var(--h) 100% 82% / .5);background:linear-gradient(180deg,hsl(var(--h) calc(var(--sat)*70%) 16%),hsl(var(--h) calc(var(--sat)*75%) 9%));color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.4);animation:ctlin .35s cubic-bezier(.2,.8,.2,1) both}
+.ctlbar>div{min-width:0;flex:1}
+.ctlbar b{display:block;font:900 14px Outfit,sans-serif;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctlbar small{display:block;margin-top:1px;color:rgba(255,255,255,.72);font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctlbar button{flex:none;height:40px;padding:0 18px;border-radius:12px;border:0;background:#fff;color:#0a2a66;font:900 14px Outfit,sans-serif;cursor:pointer}
+.ctlbar button:hover{background:#e8f1ff}.ctlbar button:active{transform:scale(.96)}
+.ctlbar button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ctldot{flex:none;width:10px;height:10px;border-radius:50%;background:#8fd0ff;box-shadow:0 0 0 0 rgba(143,208,255,.6);animation:ctlpulse 1.8s ease-out infinite}
+@keyframes ctlin{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes ctlpulse{0%{box-shadow:0 0 0 0 rgba(143,208,255,.55)}80%,100%{box-shadow:0 0 0 10px rgba(143,208,255,0)}}
+:root[data-theme="light"] .ctlbar{background:#fff;color:#0b1b3d;border-color:rgba(20,70,200,.35);box-shadow:0 18px 44px rgba(20,50,120,.28)}
+:root[data-theme="light"] .ctlbar small{color:#4a5a7a}
+:root[data-theme="light"] .ctlbar button{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+@media(max-width:640px){.ctlbar{left:12px;right:80px;transform:none;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:none;width:auto;animation-name:ctlinm}@keyframes ctlinm{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}}
+@media(prefers-reduced-motion:reduce){.ctlbar,.ctldot{animation:none!important}}
+
+.csu{display:flex;flex-direction:column;gap:12px;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:var(--card2)}
+.csu.on{border-color:hsl(var(--h) 100% 78% / .5);background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .1),transparent),var(--card2)}
+.cshead{display:flex;align-items:center;gap:12px}
+.csav{flex:none;display:inline-flex}.csav .av{margin:0}
+.csw{flex:1;min-width:0}.csw b{display:block;font:900 15px Outfit,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.csw small{display:block;margin-top:2px;color:var(--mut);font-size:12.5px;line-height:1.35}
+.cstag{flex:none;padding:5px 12px;border-radius:99px;background:hsl(var(--h) 100% 70% / .16);border:1px solid hsl(var(--h) 100% 78% / .3);font:800 12px Outfit,sans-serif}
+.cstag.live{background:rgba(143,208,255,.16);border-color:rgba(143,208,255,.55)}
+.cspanel{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}
+.csstat{margin:0;font-size:13px;color:var(--mut);display:flex;align-items:center;gap:8px}
+.csstat::before{content:"";width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);flex:none}
+.csstat.ok{color:var(--text)}.csstat.ok::before{background:#8fd0ff}
+.csnav,.csrow2{display:flex;gap:8px;flex-wrap:wrap}
+.csrow2 input,.csrow2 select{flex:1;min-width:140px;height:42px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font:600 14px Outfit,sans-serif}
+.csrow2 input:focus,.csrow2 select:focus{outline:2px solid hsl(var(--h) 100% 78% / .7);outline-offset:1px}
+.csempty{padding:26px 16px}
+@media(max-width:520px){.cshead{flex-wrap:wrap}.csnav .adm-b,.csrow2 .adm-b{flex:1 1 auto}.csrow2 input,.csrow2 select{min-width:0;flex:1 1 100%;font-size:16px}}
+#csbanner:empty{display:none}
+/* light mode: the selected admin tab was white text on a pale wash */
+:root[data-theme="light"] #admnav button.on{background:linear-gradient(135deg,#3b86ff,#1857e8)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 20px rgba(30,90,230,.28)!important}
+:root[data-theme="light"] #admnav button.on *{color:#fff!important}
+:root[data-theme="light"] #admnav button.on svg{stroke:#fff!important}
+@media(max-width:640px){.ctlbar b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.ctlbar{padding:10px 10px 10px 14px;gap:10px}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -12264,6 +12472,7 @@ function okUrl(u){ return /^https?:\/\//.test(u||""); }
 var admTab="overview", admLQ="", admRQ="", admRL="";
 function admMissing(l){ var m=[]; if(!l.img) m.push("screenshot"); if(!l.verifier) m.push("verifier"); if(!(l.id>0)) m.push("level ID"); if(!l.song) m.push("song"); if(!vidOf(l)) m.push("video"); return m; }
 var ADMI={
+  sessions:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/><path d="M9 11l2 2 4-4"/></svg>',
   chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
   wheel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/></svg>',
   clans:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
@@ -12337,7 +12546,7 @@ function rAdmin(){
   }).join("");
   var lvlOpts='<option value="">All levels</option>'+LEVELS.map(function(l,i){return '<option value="'+l.id+'">#'+(i+1)+' '+esc(l.name)+'</option>';}).join("");
   var avRows=Object.keys(STATE.avatars||{}).map(function(k){var nm=(BASE.filter(function(r){return r.user.toLowerCase()===k;})[0]||{user:k}).user; return '<div class="adm-row">'+av(nm,"sm","margin:0")+'<div class="adm-lm"><div class="adm-ln">'+esc(nm)+'</div></div><div class="adm-ac"><button class="adm-b dng" data-act="rmav" data-k="'+esc(k)+'">Remove</button></div></div>';}).join("");
-  var tabs=[["overview","Overview",""],["review","Review","bd"],["levels","Levels","ct:"+LEVELS.length],["records","Records","ct:"+BASE.length],["players","Players",""],["team","Team",""],["packs","Packs",""],["soon","Soon",""],["clans","Clans",""],["wheel","Live wheel",""],["chat","Chat",""]];
+  var tabs=[["overview","Overview",""],["review","Review","bd"],["levels","Levels","ct:"+LEVELS.length],["records","Records","ct:"+BASE.length],["players","Players",""],["team","Team",""],["packs","Packs",""],["soon","Soon",""],["clans","Clans",""],["wheel","Live wheel",""],["chat","Chat",""],["sessions","Sessions",""]];
   var nav=tabs.map(function(t){
     var x=t[2]; var extra=x==="bd"?'<span class="bd" id="adm-bd-review"'+(PEND.length?'':' hidden')+'>'+PEND.length+'</span>':(x.indexOf("ct:")===0?'<span class="ct">'+x.slice(3)+'</span>':'');
     return '<button data-t="'+t[0]+'" class="'+(admTab===t[0]?"on":"")+'">'+ADMI[t[0]]+'<span>'+t[1]+'</span>'+extra+'</button>';
@@ -12359,7 +12568,7 @@ function rAdmin(){
     '<div class="adm-bar"><input id="adm-rq" type="search" placeholder="Search records by player or level..." value="'+esc(admRQ)+'" autocomplete="off"><select id="adm-rl">'+lvlOpts+'</select></div>'+
     '<div class="adm-list">'+recGroups+'<div class="adm-empty" id="adm-rempty" hidden><b>No records match</b><span>Try a different search or level.</span></div></div>';
   var players=locPanel()+'<div class="panel"><h2>Player pictures</h2><form id="af" class="fgrid"><label>Player name<input id="apn" required maxlength="30"></label><label>Picture<input id="apf" type="file" accept="image/*" required></label><button class="btn" type="submit" style="align-self:end">Save picture</button></form><div style="margin-top:14px">'+avRows+'</div></div>';
-  var packsHtml=window.TML203?TML203.adminPacks():'', soonHtml=window.TML203?TML203.adminSoon():'', clansHtml=window.TML203?TML203.adminClans():'', wheelHtml=window.TML218?TML218.adminWheel():'', chatHtml=window.TML220?TML220.adminChat():'';
+  var packsHtml=window.TML203?TML203.adminPacks():'', soonHtml=window.TML203?TML203.adminSoon():'', clansHtml=window.TML203?TML203.adminClans():'', wheelHtml=window.TML218?TML218.adminWheel():'', chatHtml=window.TML220?TML220.adminChat():'', sessHtml=window.TML223?TML223.adminSessions():'';
   var team='<div class="panel"><h2>List team</h2><form id="tf"><label>One role per line, like  Owner: name1, name2<textarea id="tm" rows="6" class="adm-ta">'+esc((STATE.team||[]).map(function(t){return t.role+": "+t.names.join(", ");}).join("\n"))+'</textarea></label><button class="btn" type="submit">Save team</button></form></div>';
   app.innerHTML='<div class="adm" id="admwrap"><aside class="adm-side"><div class="adm-who"><i></i><div><b>Admin panel</b><small>Owner only</small></div></div><div class="adm-nav" id="admnav">'+nav+'</div></aside><div class="adm-main">'+
     pane("overview","Overview","What needs your attention right now.",overview)+
@@ -12372,7 +12581,8 @@ function rAdmin(){
     pane("soon","Soon","Levels being verified, shown in the Pending tab of the list.",soonHtml)+
     pane("clans","Clans","Groups of players. Tags show next to member names.",clansHtml)+
     pane("wheel","Live wheel","See who is on the Wheel Spinner right now, set the winner and add levels back.",wheelHtml)+
-    pane("chat","Chat","Reports, muted players, and switches for chat and photos.",chatHtml)+'</div></div>';
+    pane("chat","Chat","Reports, muted players, and switches for chat and photos.",chatHtml)+
+    pane("sessions","Sessions","Guide a signed-in player's tab: open pages, scroll, and send a message. They always see a banner and can stop it.",sessHtml)+'</div></div>';
   renderPend();
   (function(){
     var w=document.getElementById("admwrap");
@@ -12411,6 +12621,7 @@ function rAdmin(){
   if(window.TML203) TML203.wireAdmin();
   if(window.TML218) TML218.wireAdmin();
   if(window.TML220) TML220.wireAdmin();
+  if(window.TML223) TML223.wireSessions();
   document.getElementById("lf").onsubmit=function(e){
     e.preventDefault();
     var f=document.getElementById("lth").files[0];
@@ -13343,7 +13554,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v221js">
+<script id="v223js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -14977,13 +15188,15 @@ var _sh=window.show;
   function refreshInbox(lite){
     if(!signed()||CH.inboxBusy) return Promise.resolve(); CH.inboxBusy=true;
     var before=unread();
-    return call("inbox",lite?{lite:true}:{}).then(function(r){
+    return call("inbox",Object.assign(lite?{lite:true}:{},ctlBody())).then(function(r){
       CH.inboxBusy=false;
       if(r&&r.ok){
         var prevMain=CH.inbox&&CH.inbox.main; if(lite&&CH.inbox&&r.main===undefined) r.main=prevMain;
         CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab();
         var after=unread(); if(after>before){ var latest=(r.dms||[]).filter(function(d){ return d.from!==r.me.uid&&d.ts>(CH.seen[d.peer]||0); })[0]; ping(); if(latest) notify(latest.name,latest.last||"New message"); }
         if(r.call) onIncoming(r.call);
+        ctlSync(r.ctl);
+        if(PR.fly){ PR.fly=false; if(r.ok&&!r.pr) PR.r=null; }
         if(CH.open){ paintBanner(); if(CH.view==="list") renderList(); else if(CH.view==="thread"){ var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
       } else { CH.errN++; if(r&&r.status===404) CH.gone=true; if(r&&r.status>=400&&r.status!==429) CH.srvErr=r; if(CH.open) paintBanner(); }
     });
@@ -14991,14 +15204,14 @@ var _sh=window.show;
   function schedule(ms){
     clearTimeout(CH.tm);
     if(!online()||!signed()||CH.gone) return;
-    var wait=ms!=null?ms:(CH.open?3000:20000);
+    var wait=ms!=null?ms:(CTL.on?2000:(CH.open?3000:20000));
     wait=wait*Math.min(6,1+CH.errN);
     CH.tm=setTimeout(function(){
       if(document.hidden){ schedule(); return; }
       CH.tick++;
-      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
+      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>(CTL.on?1500:9000)){ CH.inboxAt=Date.now(); refreshInbox(); } }
       else if(CH.open){ CH.inboxAt=Date.now(); refreshInbox(); }
-      else { CH.inboxAt=Date.now(); refreshInbox(CH.tick%3!==0); }
+      else { CH.inboxAt=Date.now(); refreshInbox(CTL.on||CH.tick%3!==0); }
       schedule();
     },wait);
   }
@@ -15152,6 +15365,61 @@ var _sh=window.show;
   }
   window.addEventListener("beforeunload",function(){ try{ if(CALL.st!=="idle"&&CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){} });
 
+  /* =============================== guided sessions (player side) ===============================
+     An admin can open a page, scroll or send a short message in your tab. You always see a banner saying who, and Stop ends it. */
+  var CTL={on:false,id:null,by:"",seq:0,msg:"",stopped:{},ackOk:false};
+  var PR={r:null,at:0,sc:-1,th:""};
+  var ROUTE_OK=/^(|list|lb|packs|games|clans|team|sub|wheel|level\/\d{1,12}|player\/[A-Za-z0-9_-]{3,20})$/;
+  function curRoute(){ return location.hash.replace(/^#\/?/,"").replace(/\?.*$/,"").slice(0,40); }
+  function scrollPct(){ var h=document.documentElement, m=Math.max(1,h.scrollHeight-innerHeight); return Math.max(0,Math.min(100,Math.round(100*(window.pageYOffset||h.scrollTop||0)/m))); }
+  function ctlBody(){
+    var out={}; if(!signed()) return out;
+    var r=curRoute(), sc=scrollPct(), th=document.documentElement.getAttribute("data-theme")==="light"?"light":"dark";
+    if(r!==PR.r||th!==PR.th||Math.abs(sc-PR.sc)>=(CTL.on?5:15)||Date.now()-PR.at>170000){ PR={r:r,at:Date.now(),sc:sc,th:th,fly:true}; out.pr={r:r,sc:sc,th:th,vw:innerWidth}; }
+    if(CTL.on&&!CTL.ackOk) out.ca=CTL.id;
+    return out;
+  }
+  function routeLabel(r){
+    r=String(r||""); var m;
+    if(r==="") return "Home"; if(r==="list") return "The List"; if(r==="lb") return "Leaderboard"; if(r==="packs") return "Packs"; if(r==="games") return "Games"; if(r==="clans") return "Clans"; if(r==="team") return "Team"; if(r==="sub") return "Submit a record"; if(r==="wheel") return "Wheel Spinner";
+    if((m=r.match(/^level\/(\d+)$/))){ try{ var l=lv(+m[1]); if(l) return l.name; }catch(e){} return "A level"; }
+    if((m=r.match(/^player\/(.+)$/))) return m[1]+"'s profile";
+    return "Somewhere else";
+  }
+  function ctlSync(c){
+    if(!c){ if(CTL.on){ CTL.on=false; CTL.id=null; CTL.ackOk=false; paintCtl(); } return; }
+    if(CTL.stopped[c.id]) return;
+    if(!CTL.on||CTL.id!==c.id){
+      CTL.on=true; CTL.id=c.id; CTL.by=c.by; CTL.msg="Connected"; CTL.ackOk=false;
+      try{ CTL.seq=+sessionStorage.getItem("tml_ctl_"+c.id)||0; }catch(e){ CTL.seq=0; }
+      paintCtl(); schedule(1200);
+    }
+    if(c.ok) CTL.ackOk=true;
+    (c.q||[]).forEach(function(x){ if(x&&x.n>CTL.seq){ CTL.seq=x.n; try{ sessionStorage.setItem("tml_ctl_"+c.id,String(x.n)); }catch(e){} ctlRun(x.c); } });
+  }
+  function ctlRun(c){
+    if(!c||typeof c!=="object") return;
+    if(c.t==="nav"){
+      var to=String(c.to==null?"":c.to); if(!ROUTE_OK.test(to)) return;
+      if(CH.open) closeChat(); CTL.msg="Opened "+routeLabel(to); location.hash="#/"+to;
+    } else if(c.t==="scroll"){
+      var h=document.documentElement, step=Math.round(innerHeight*.8), y=c.to==="top"?0:c.to==="bottom"?h.scrollHeight:(window.pageYOffset||0)+(c.to==="down"?step:-step);
+      if(["top","bottom","up","down"].indexOf(c.to)<0) return;
+      try{ window.scrollTo({top:y,behavior:"smooth"}); }catch(e){ window.scrollTo(0,y); } CTL.msg="Scrolled "+(c.to==="top"?"to the top":c.to==="bottom"?"to the bottom":c.to);
+    } else if(c.t==="say"){
+      var t=String(c.text||"").slice(0,120); if(!t) return; toast(CTL.by+": "+t); CTL.msg="Sent you a message";
+    } else return;
+    paintCtl();
+  }
+  function paintCtl(){
+    var el=$("ctlbar");
+    if(!CTL.on){ if(el) el.hidden=true; document.body.classList.remove("inctl"); return; }
+    if(!el){ el=document.createElement("div"); el.id="ctlbar"; el.className="ctlbar"; el.setAttribute("role","status"); document.body.appendChild(el); }
+    el.hidden=false; document.body.classList.add("inctl");
+    el.innerHTML='<i class="ctldot"></i><div><b>'+esc(CTL.by)+' is guiding your session</b><small>'+esc(CTL.msg||"")+'</small></div><button type="button" id="ctlstop">Stop</button>';
+    $("ctlstop").onclick=function(){ var id=CTL.id; CTL.stopped[id]=1; CTL.on=false; CTL.id=null; CTL.ackOk=false; paintCtl(); call("ctlStop"); toast("Session ended. Nobody is guiding your tab."); };
+  }
+
   /* ---- start ---- */
   function boot(){
     build();
@@ -15225,6 +15493,80 @@ var _sh=window.show;
     clearInterval(AD.tm); AD.tm=setInterval(function(){ if(!document.getElementById("cmodbody")){ clearInterval(AD.tm); return; } if(visiblePane()&&!document.hidden) adminLoad(); },10000);
     if(visiblePane()) adminLoad();
   }
+
+  /* =============================== admin: Sessions pane =============================== */
+  var SS={users:[],mine:{},tm:null,busy:false,sig:"",msg:"",err:"",loaded:false};
+  function ssVisible(){ var p=document.querySelector('.adm-pane[data-pane="sessions"]'); return p&&!p.hidden; }
+  function sessionsHtml(){ return '<div class="panel cmod" id="cswrap"><div id="csbanner"></div><div id="csbody"><p class="note" style="margin:0">Loading</p></div></div>'; }
+  function seen(ts){ var s=Math.max(0,(Date.now()-ts)/1000); return s<8?"just now":s<90?Math.round(s)+"s ago":Math.round(s/60)+" min ago"; }
+  function stText(u){ return routeLabel(u.r)+" · "+(u.vw&&u.vw<700?"Phone":"Computer")+" · scrolled "+u.sc+"% · "+(u.th==="light"?"Light":"Dark")+" · "+seen(u.ts); }
+  var NAVS=[["","Home"],["list","The List"],["lb","Leaderboard"],["packs","Packs"],["games","Games"],["wheel","Wheel Spinner"],["clans","Clans"],["team","Team"],["sub","Submit"]];
+  function ssPanel(u){
+    var lv2=""; try{ lv2=(LEVELS||[]).map(function(l,i){ return '<option value="'+l.id+'">#'+(i+1)+' '+esc(l.name)+'</option>'; }).join(""); }catch(e){}
+    return '<div class="cspanel"><p class="csstat" data-cstat>Waiting for them to connect. A closed chat can take up to 20 seconds.</p>'+
+      '<div class="csnav">'+NAVS.map(function(n){ return '<button type="button" class="adm-b" data-cn="'+esc(n[0])+'">'+esc(n[1])+'</button>'; }).join("")+'</div>'+
+      '<div class="csrow2"><select class="cslv" aria-label="Open a level"><option value="">Open a level…</option>'+lv2+'</select><input class="cspl" placeholder="Open a player profile" maxlength="20" autocomplete="off" aria-label="Player name"><button type="button" class="adm-b" data-cgo="1">Open</button></div>'+
+      '<div class="csrow2"><button type="button" class="adm-b ghost" data-csc="top">Top</button><button type="button" class="adm-b ghost" data-csc="up">Up</button><button type="button" class="adm-b ghost" data-csc="down">Down</button><button type="button" class="adm-b ghost" data-csc="bottom">Bottom</button></div>'+
+      '<div class="csrow2"><input class="cssay" placeholder="Show them a short message" maxlength="120" autocomplete="off" aria-label="Message"><button type="button" class="adm-b" data-csay="1">Send</button></div>'+
+      '<div class="csrow2"><button type="button" class="adm-b" data-cwheel="1">Wheel controls</button><button type="button" class="adm-b warn" data-cend="1">End control</button></div></div>';
+  }
+  function ssRender(){
+    var b=$("csbody"); if(!b) return;
+    var sig=SS.users.map(function(u){ return u.uid+":"+(u.ctl?(SS.mine[u.uid]?"m":"o"):"-"); }).join("|");
+    if(sig===SS.sig){ // same rows: just refresh the live text, keep whatever is being typed
+      SS.users.forEach(function(u){ var row=b.querySelector('[data-u="'+u.uid+'"]'); if(!row) return; var s=row.querySelector("[data-st]"); if(s) s.textContent=stText(u); var c=row.querySelector("[data-cstat]"); if(c&&u.ctl&&SS.mine[u.uid]){ c.textContent=u.ctl.ok?"Connected. Everything you press happens in their tab.":"Waiting for them to connect. A closed chat can take up to 20 seconds."; c.className="csstat"+(u.ctl.ok?" ok":""); } });
+      return;
+    }
+    var keep={}; b.querySelectorAll(".csu").forEach(function(r){ keep[r.getAttribute("data-u")]={say:(r.querySelector(".cssay")||{}).value||"",pl:(r.querySelector(".cspl")||{}).value||"",lv:(r.querySelector(".cslv")||{}).value||""}; });
+    SS.sig=sig;
+    var h='<p class="note" style="margin:0 0 4px">Signed-in players who have the Timmylist open right now. Guests can’t be guided. They always see a banner with a Stop button.</p>';
+    if(!SS.users.length) h+='<div class="chempty sm csempty"><p>Nobody is online right now.</p></div>';
+    SS.users.forEach(function(u){
+      var mine=u.ctl&&SS.mine[u.uid], other=u.ctl&&!mine;
+      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+av(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
+        (other?'<span class="cstag">'+esc(u.ctl.by)+' is guiding</span>':mine?'<span class="cstag live">Guiding</span>':'<button type="button" class="adm-b" data-take="1">Take control</button>')+'</div>'+(mine?ssPanel(u):'')+'</div>';
+    });
+    if(SS.msg) h+='<p class="cmmsg">'+esc(SS.msg)+'</p>';
+    b.innerHTML=h;
+    b.querySelectorAll(".csu").forEach(function(r){ var k=keep[r.getAttribute("data-u")]; if(k){ var a=r.querySelector(".cssay"),c=r.querySelector(".cspl"),d=r.querySelector(".cslv"); if(a) a.value=k.say; if(c) c.value=k.pl; if(d) d.value=k.lv; } });
+    ssWire(b);
+    SS.users.forEach(function(u){ if(u.ctl&&SS.mine[u.uid]){ var row=b.querySelector('[data-u="'+u.uid+'"]'),c=row&&row.querySelector("[data-cstat]"); if(c&&u.ctl.ok){ c.textContent="Connected. Everything you press happens in their tab."; c.className="csstat ok"; } } });
+  }
+  function ssSend(uid,cmd,okMsg){
+    call("ctlSend",{uid:uid,cmd:cmd}).then(function(r){
+      if(r&&r.ok){ SS.msg=""; if(okMsg) toast(okMsg); }
+      else { toast(r&&r.status===409?"That session ended.":whyNot(r)); delete SS.mine[uid]; SS.sig=""; ssLoad(); }
+    });
+  }
+  function ssWire(b){
+    b.querySelectorAll(".csu").forEach(function(row){
+      var uid=row.getAttribute("data-u"), t=row.querySelector("[data-take]");
+      if(t) t.onclick=function(){ t.disabled=true; call("ctlStart",{uid:uid}).then(function(r){ if(r&&r.ok){ SS.mine[uid]=r.id; SS.sig=""; ssLoad(); } else { t.disabled=false; SS.msg=whyNot(r); ssRender(); } }); };
+      row.querySelectorAll("[data-cn]").forEach(function(x){ x.onclick=function(){ ssSend(uid,{t:"nav",to:x.getAttribute("data-cn")}); }; });
+      var go=row.querySelector("[data-cgo]"); if(go) go.onclick=function(){ var sel=row.querySelector(".cslv"), inp=row.querySelector(".cspl"), l=sel.value, p=inp.value.trim().replace(/^@/,""); if(p){ if(/^[A-Za-z0-9_-]{3,20}$/.test(p)){ ssSend(uid,{t:"nav",to:"player/"+p}); inp.value=""; } else toast("That doesn\u2019t look like a player name."); } else if(l){ ssSend(uid,{t:"nav",to:"level/"+l}); sel.value=""; } else toast("Pick a level or type a player name."); };
+      row.querySelectorAll("[data-csc]").forEach(function(x){ x.onclick=function(){ ssSend(uid,{t:"scroll",to:x.getAttribute("data-csc")}); }; });
+      var sy=row.querySelector("[data-csay]"); if(sy){ var inp=row.querySelector(".cssay"); var send=function(){ var v=inp.value.trim(); if(!v) return; ssSend(uid,{t:"say",text:v},"Sent"); inp.value=""; }; sy.onclick=send; inp.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } }; }
+      var wh=row.querySelector("[data-cwheel]"); if(wh) wh.onclick=function(){ ssSend(uid,{t:"nav",to:"wheel"}); var tab=document.querySelector('#admnav button[data-t="wheel"]'); if(tab) tab.click(); toast("Opened the Wheel Spinner for them. Use Live wheel to control it."); };
+      var en=row.querySelector("[data-cend]"); if(en) en.onclick=function(){ call("ctlEnd",{uid:uid}).then(function(){ delete SS.mine[uid]; SS.sig=""; ssLoad(); toast("Control ended"); }); };
+    });
+  }
+  function ssLoad(){
+    if(SS.busy) return; SS.busy=true;
+    call("ctlList").then(function(r){
+      SS.busy=false; var bn=$("csbanner"); if(!bn) return;
+      if(r&&r.ok){ SS.users=r.users||[]; SS.err=""; bn.innerHTML=""; SS.loaded=true; var typing=document.activeElement&&/cssay|cspl/.test(document.activeElement.className||""); SS.users.forEach(function(u){ if(!u.ctl) delete SS.mine[u.uid]; }); ssRender(); }
+      else { bn.innerHTML='<div class="adm-alert"><b>Sessions unavailable</b><span>'+esc(r&&r.status===404?"The chat service isn't deployed yet. Upload functions/api/social.js to the site's GitHub repo.":whyNot(r))+'</span></div>'; }
+    });
+  }
+  function ssStart(){
+    clearInterval(SS.tm);
+    SS.tm=setInterval(function(){ if(!$("csbody")){ clearInterval(SS.tm); return; } if(ssVisible()&&!document.hidden) ssLoad(); },3500);
+    if(ssVisible()) ssLoad();
+  }
+  window.TML223={adminSessions:sessionsHtml,wireSessions:function(){
+    var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="sessions"]'); if(t) setTimeout(function(){ SS.sig=""; ssLoad(); },50); });
+    ssStart();
+  },_ctl:CTL,_ss:SS};
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
@@ -16415,6 +16757,7 @@ function okUrl(u){ return /^https?:\/\//.test(u||""); }
 var admTab="overview", admLQ="", admRQ="", admRL="";
 function admMissing(l){ var m=[]; if(!l.img) m.push("screenshot"); if(!l.verifier) m.push("verifier"); if(!(l.id>0)) m.push("level ID"); if(!l.song) m.push("song"); if(!vidOf(l)) m.push("video"); return m; }
 var ADMI={
+  sessions:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/><path d="M9 11l2 2 4-4"/></svg>',
   chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
   wheel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.4 6.4M12 12L5.6 18.4M12 12h9"/></svg>',
   clans:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
@@ -16488,7 +16831,7 @@ function rAdmin(){
   }).join("");
   var lvlOpts='<option value="">All levels</option>'+LEVELS.map(function(l,i){return '<option value="'+l.id+'">#'+(i+1)+' '+esc(l.name)+'</option>';}).join("");
   var avRows=Object.keys(STATE.avatars||{}).map(function(k){var nm=(BASE.filter(function(r){return r.user.toLowerCase()===k;})[0]||{user:k}).user; return '<div class="adm-row">'+av(nm,"sm","margin:0")+'<div class="adm-lm"><div class="adm-ln">'+esc(nm)+'</div></div><div class="adm-ac"><button class="adm-b dng" data-act="rmav" data-k="'+esc(k)+'">Remove</button></div></div>';}).join("");
-  var tabs=[["overview","Overview",""],["review","Review","bd"],["levels","Levels","ct:"+LEVELS.length],["records","Records","ct:"+BASE.length],["players","Players",""],["team","Team",""],["packs","Packs",""],["soon","Soon",""],["clans","Clans",""],["wheel","Live wheel",""],["chat","Chat",""]];
+  var tabs=[["overview","Overview",""],["review","Review","bd"],["levels","Levels","ct:"+LEVELS.length],["records","Records","ct:"+BASE.length],["players","Players",""],["team","Team",""],["packs","Packs",""],["soon","Soon",""],["clans","Clans",""],["wheel","Live wheel",""],["chat","Chat",""],["sessions","Sessions",""]];
   var nav=tabs.map(function(t){
     var x=t[2]; var extra=x==="bd"?'<span class="bd" id="adm-bd-review"'+(PEND.length?'':' hidden')+'>'+PEND.length+'</span>':(x.indexOf("ct:")===0?'<span class="ct">'+x.slice(3)+'</span>':'');
     return '<button data-t="'+t[0]+'" class="'+(admTab===t[0]?"on":"")+'">'+ADMI[t[0]]+'<span>'+t[1]+'</span>'+extra+'</button>';
@@ -16510,7 +16853,7 @@ function rAdmin(){
     '<div class="adm-bar"><input id="adm-rq" type="search" placeholder="Search records by player or level..." value="'+esc(admRQ)+'" autocomplete="off"><select id="adm-rl">'+lvlOpts+'</select></div>'+
     '<div class="adm-list">'+recGroups+'<div class="adm-empty" id="adm-rempty" hidden><b>No records match</b><span>Try a different search or level.</span></div></div>';
   var players=locPanel()+'<div class="panel"><h2>Player pictures</h2><form id="af" class="fgrid"><label>Player name<input id="apn" required maxlength="30"></label><label>Picture<input id="apf" type="file" accept="image/*" required></label><button class="btn" type="submit" style="align-self:end">Save picture</button></form><div style="margin-top:14px">'+avRows+'</div></div>';
-  var packsHtml=window.TML203?TML203.adminPacks():'', soonHtml=window.TML203?TML203.adminSoon():'', clansHtml=window.TML203?TML203.adminClans():'', wheelHtml=window.TML218?TML218.adminWheel():'', chatHtml=window.TML220?TML220.adminChat():'';
+  var packsHtml=window.TML203?TML203.adminPacks():'', soonHtml=window.TML203?TML203.adminSoon():'', clansHtml=window.TML203?TML203.adminClans():'', wheelHtml=window.TML218?TML218.adminWheel():'', chatHtml=window.TML220?TML220.adminChat():'', sessHtml=window.TML223?TML223.adminSessions():'';
   var team='<div class="panel"><h2>List team</h2><form id="tf"><label>One role per line, like  Owner: name1, name2<textarea id="tm" rows="6" class="adm-ta">'+esc((STATE.team||[]).map(function(t){return t.role+": "+t.names.join(", ");}).join("\n"))+'</textarea></label><button class="btn" type="submit">Save team</button></form></div>';
   app.innerHTML='<div class="adm" id="admwrap"><aside class="adm-side"><div class="adm-who"><i></i><div><b>Admin panel</b><small>Owner only</small></div></div><div class="adm-nav" id="admnav">'+nav+'</div></aside><div class="adm-main">'+
     pane("overview","Overview","What needs your attention right now.",overview)+
@@ -16523,7 +16866,8 @@ function rAdmin(){
     pane("soon","Soon","Levels being verified, shown in the Pending tab of the list.",soonHtml)+
     pane("clans","Clans","Groups of players. Tags show next to member names.",clansHtml)+
     pane("wheel","Live wheel","See who is on the Wheel Spinner right now, set the winner and add levels back.",wheelHtml)+
-    pane("chat","Chat","Reports, muted players, and switches for chat and photos.",chatHtml)+'</div></div>';
+    pane("chat","Chat","Reports, muted players, and switches for chat and photos.",chatHtml)+
+    pane("sessions","Sessions","Guide a signed-in player's tab: open pages, scroll, and send a message. They always see a banner and can stop it.",sessHtml)+'</div></div>';
   renderPend();
   (function(){
     var w=document.getElementById("admwrap");
@@ -16562,6 +16906,7 @@ function rAdmin(){
   if(window.TML203) TML203.wireAdmin();
   if(window.TML218) TML218.wireAdmin();
   if(window.TML220) TML220.wireAdmin();
+  if(window.TML223) TML223.wireSessions();
   document.getElementById("lf").onsubmit=function(e){
     e.preventDefault();
     var f=document.getElementById("lth").files[0];
@@ -17494,7 +17839,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v221js">
+<script id="v223js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -19128,13 +19473,15 @@ var _sh=window.show;
   function refreshInbox(lite){
     if(!signed()||CH.inboxBusy) return Promise.resolve(); CH.inboxBusy=true;
     var before=unread();
-    return call("inbox",lite?{lite:true}:{}).then(function(r){
+    return call("inbox",Object.assign(lite?{lite:true}:{},ctlBody())).then(function(r){
       CH.inboxBusy=false;
       if(r&&r.ok){
         var prevMain=CH.inbox&&CH.inbox.main; if(lite&&CH.inbox&&r.main===undefined) r.main=prevMain;
         CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab();
         var after=unread(); if(after>before){ var latest=(r.dms||[]).filter(function(d){ return d.from!==r.me.uid&&d.ts>(CH.seen[d.peer]||0); })[0]; ping(); if(latest) notify(latest.name,latest.last||"New message"); }
         if(r.call) onIncoming(r.call);
+        ctlSync(r.ctl);
+        if(PR.fly){ PR.fly=false; if(r.ok&&!r.pr) PR.r=null; }
         if(CH.open){ paintBanner(); if(CH.view==="list") renderList(); else if(CH.view==="thread"){ var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
       } else { CH.errN++; if(r&&r.status===404) CH.gone=true; if(r&&r.status>=400&&r.status!==429) CH.srvErr=r; if(CH.open) paintBanner(); }
     });
@@ -19142,14 +19489,14 @@ var _sh=window.show;
   function schedule(ms){
     clearTimeout(CH.tm);
     if(!online()||!signed()||CH.gone) return;
-    var wait=ms!=null?ms:(CH.open?3000:20000);
+    var wait=ms!=null?ms:(CTL.on?2000:(CH.open?3000:20000));
     wait=wait*Math.min(6,1+CH.errN);
     CH.tm=setTimeout(function(){
       if(document.hidden){ schedule(); return; }
       CH.tick++;
-      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
+      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>(CTL.on?1500:9000)){ CH.inboxAt=Date.now(); refreshInbox(); } }
       else if(CH.open){ CH.inboxAt=Date.now(); refreshInbox(); }
-      else { CH.inboxAt=Date.now(); refreshInbox(CH.tick%3!==0); }
+      else { CH.inboxAt=Date.now(); refreshInbox(CTL.on||CH.tick%3!==0); }
       schedule();
     },wait);
   }
@@ -19303,6 +19650,61 @@ var _sh=window.show;
   }
   window.addEventListener("beforeunload",function(){ try{ if(CALL.st!=="idle"&&CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){} });
 
+  /* =============================== guided sessions (player side) ===============================
+     An admin can open a page, scroll or send a short message in your tab. You always see a banner saying who, and Stop ends it. */
+  var CTL={on:false,id:null,by:"",seq:0,msg:"",stopped:{},ackOk:false};
+  var PR={r:null,at:0,sc:-1,th:""};
+  var ROUTE_OK=/^(|list|lb|packs|games|clans|team|sub|wheel|level\/\d{1,12}|player\/[A-Za-z0-9_-]{3,20})$/;
+  function curRoute(){ return location.hash.replace(/^#\/?/,"").replace(/\?.*$/,"").slice(0,40); }
+  function scrollPct(){ var h=document.documentElement, m=Math.max(1,h.scrollHeight-innerHeight); return Math.max(0,Math.min(100,Math.round(100*(window.pageYOffset||h.scrollTop||0)/m))); }
+  function ctlBody(){
+    var out={}; if(!signed()) return out;
+    var r=curRoute(), sc=scrollPct(), th=document.documentElement.getAttribute("data-theme")==="light"?"light":"dark";
+    if(r!==PR.r||th!==PR.th||Math.abs(sc-PR.sc)>=(CTL.on?5:15)||Date.now()-PR.at>170000){ PR={r:r,at:Date.now(),sc:sc,th:th,fly:true}; out.pr={r:r,sc:sc,th:th,vw:innerWidth}; }
+    if(CTL.on&&!CTL.ackOk) out.ca=CTL.id;
+    return out;
+  }
+  function routeLabel(r){
+    r=String(r||""); var m;
+    if(r==="") return "Home"; if(r==="list") return "The List"; if(r==="lb") return "Leaderboard"; if(r==="packs") return "Packs"; if(r==="games") return "Games"; if(r==="clans") return "Clans"; if(r==="team") return "Team"; if(r==="sub") return "Submit a record"; if(r==="wheel") return "Wheel Spinner";
+    if((m=r.match(/^level\/(\d+)$/))){ try{ var l=lv(+m[1]); if(l) return l.name; }catch(e){} return "A level"; }
+    if((m=r.match(/^player\/(.+)$/))) return m[1]+"'s profile";
+    return "Somewhere else";
+  }
+  function ctlSync(c){
+    if(!c){ if(CTL.on){ CTL.on=false; CTL.id=null; CTL.ackOk=false; paintCtl(); } return; }
+    if(CTL.stopped[c.id]) return;
+    if(!CTL.on||CTL.id!==c.id){
+      CTL.on=true; CTL.id=c.id; CTL.by=c.by; CTL.msg="Connected"; CTL.ackOk=false;
+      try{ CTL.seq=+sessionStorage.getItem("tml_ctl_"+c.id)||0; }catch(e){ CTL.seq=0; }
+      paintCtl(); schedule(1200);
+    }
+    if(c.ok) CTL.ackOk=true;
+    (c.q||[]).forEach(function(x){ if(x&&x.n>CTL.seq){ CTL.seq=x.n; try{ sessionStorage.setItem("tml_ctl_"+c.id,String(x.n)); }catch(e){} ctlRun(x.c); } });
+  }
+  function ctlRun(c){
+    if(!c||typeof c!=="object") return;
+    if(c.t==="nav"){
+      var to=String(c.to==null?"":c.to); if(!ROUTE_OK.test(to)) return;
+      if(CH.open) closeChat(); CTL.msg="Opened "+routeLabel(to); location.hash="#/"+to;
+    } else if(c.t==="scroll"){
+      var h=document.documentElement, step=Math.round(innerHeight*.8), y=c.to==="top"?0:c.to==="bottom"?h.scrollHeight:(window.pageYOffset||0)+(c.to==="down"?step:-step);
+      if(["top","bottom","up","down"].indexOf(c.to)<0) return;
+      try{ window.scrollTo({top:y,behavior:"smooth"}); }catch(e){ window.scrollTo(0,y); } CTL.msg="Scrolled "+(c.to==="top"?"to the top":c.to==="bottom"?"to the bottom":c.to);
+    } else if(c.t==="say"){
+      var t=String(c.text||"").slice(0,120); if(!t) return; toast(CTL.by+": "+t); CTL.msg="Sent you a message";
+    } else return;
+    paintCtl();
+  }
+  function paintCtl(){
+    var el=$("ctlbar");
+    if(!CTL.on){ if(el) el.hidden=true; document.body.classList.remove("inctl"); return; }
+    if(!el){ el=document.createElement("div"); el.id="ctlbar"; el.className="ctlbar"; el.setAttribute("role","status"); document.body.appendChild(el); }
+    el.hidden=false; document.body.classList.add("inctl");
+    el.innerHTML='<i class="ctldot"></i><div><b>'+esc(CTL.by)+' is guiding your session</b><small>'+esc(CTL.msg||"")+'</small></div><button type="button" id="ctlstop">Stop</button>';
+    $("ctlstop").onclick=function(){ var id=CTL.id; CTL.stopped[id]=1; CTL.on=false; CTL.id=null; CTL.ackOk=false; paintCtl(); call("ctlStop"); toast("Session ended. Nobody is guiding your tab."); };
+  }
+
   /* ---- start ---- */
   function boot(){
     build();
@@ -19376,6 +19778,80 @@ var _sh=window.show;
     clearInterval(AD.tm); AD.tm=setInterval(function(){ if(!document.getElementById("cmodbody")){ clearInterval(AD.tm); return; } if(visiblePane()&&!document.hidden) adminLoad(); },10000);
     if(visiblePane()) adminLoad();
   }
+
+  /* =============================== admin: Sessions pane =============================== */
+  var SS={users:[],mine:{},tm:null,busy:false,sig:"",msg:"",err:"",loaded:false};
+  function ssVisible(){ var p=document.querySelector('.adm-pane[data-pane="sessions"]'); return p&&!p.hidden; }
+  function sessionsHtml(){ return '<div class="panel cmod" id="cswrap"><div id="csbanner"></div><div id="csbody"><p class="note" style="margin:0">Loading</p></div></div>'; }
+  function seen(ts){ var s=Math.max(0,(Date.now()-ts)/1000); return s<8?"just now":s<90?Math.round(s)+"s ago":Math.round(s/60)+" min ago"; }
+  function stText(u){ return routeLabel(u.r)+" · "+(u.vw&&u.vw<700?"Phone":"Computer")+" · scrolled "+u.sc+"% · "+(u.th==="light"?"Light":"Dark")+" · "+seen(u.ts); }
+  var NAVS=[["","Home"],["list","The List"],["lb","Leaderboard"],["packs","Packs"],["games","Games"],["wheel","Wheel Spinner"],["clans","Clans"],["team","Team"],["sub","Submit"]];
+  function ssPanel(u){
+    var lv2=""; try{ lv2=(LEVELS||[]).map(function(l,i){ return '<option value="'+l.id+'">#'+(i+1)+' '+esc(l.name)+'</option>'; }).join(""); }catch(e){}
+    return '<div class="cspanel"><p class="csstat" data-cstat>Waiting for them to connect. A closed chat can take up to 20 seconds.</p>'+
+      '<div class="csnav">'+NAVS.map(function(n){ return '<button type="button" class="adm-b" data-cn="'+esc(n[0])+'">'+esc(n[1])+'</button>'; }).join("")+'</div>'+
+      '<div class="csrow2"><select class="cslv" aria-label="Open a level"><option value="">Open a level…</option>'+lv2+'</select><input class="cspl" placeholder="Open a player profile" maxlength="20" autocomplete="off" aria-label="Player name"><button type="button" class="adm-b" data-cgo="1">Open</button></div>'+
+      '<div class="csrow2"><button type="button" class="adm-b ghost" data-csc="top">Top</button><button type="button" class="adm-b ghost" data-csc="up">Up</button><button type="button" class="adm-b ghost" data-csc="down">Down</button><button type="button" class="adm-b ghost" data-csc="bottom">Bottom</button></div>'+
+      '<div class="csrow2"><input class="cssay" placeholder="Show them a short message" maxlength="120" autocomplete="off" aria-label="Message"><button type="button" class="adm-b" data-csay="1">Send</button></div>'+
+      '<div class="csrow2"><button type="button" class="adm-b" data-cwheel="1">Wheel controls</button><button type="button" class="adm-b warn" data-cend="1">End control</button></div></div>';
+  }
+  function ssRender(){
+    var b=$("csbody"); if(!b) return;
+    var sig=SS.users.map(function(u){ return u.uid+":"+(u.ctl?(SS.mine[u.uid]?"m":"o"):"-"); }).join("|");
+    if(sig===SS.sig){ // same rows: just refresh the live text, keep whatever is being typed
+      SS.users.forEach(function(u){ var row=b.querySelector('[data-u="'+u.uid+'"]'); if(!row) return; var s=row.querySelector("[data-st]"); if(s) s.textContent=stText(u); var c=row.querySelector("[data-cstat]"); if(c&&u.ctl&&SS.mine[u.uid]){ c.textContent=u.ctl.ok?"Connected. Everything you press happens in their tab.":"Waiting for them to connect. A closed chat can take up to 20 seconds."; c.className="csstat"+(u.ctl.ok?" ok":""); } });
+      return;
+    }
+    var keep={}; b.querySelectorAll(".csu").forEach(function(r){ keep[r.getAttribute("data-u")]={say:(r.querySelector(".cssay")||{}).value||"",pl:(r.querySelector(".cspl")||{}).value||"",lv:(r.querySelector(".cslv")||{}).value||""}; });
+    SS.sig=sig;
+    var h='<p class="note" style="margin:0 0 4px">Signed-in players who have the Timmylist open right now. Guests can’t be guided. They always see a banner with a Stop button.</p>';
+    if(!SS.users.length) h+='<div class="chempty sm csempty"><p>Nobody is online right now.</p></div>';
+    SS.users.forEach(function(u){
+      var mine=u.ctl&&SS.mine[u.uid], other=u.ctl&&!mine;
+      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+av(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
+        (other?'<span class="cstag">'+esc(u.ctl.by)+' is guiding</span>':mine?'<span class="cstag live">Guiding</span>':'<button type="button" class="adm-b" data-take="1">Take control</button>')+'</div>'+(mine?ssPanel(u):'')+'</div>';
+    });
+    if(SS.msg) h+='<p class="cmmsg">'+esc(SS.msg)+'</p>';
+    b.innerHTML=h;
+    b.querySelectorAll(".csu").forEach(function(r){ var k=keep[r.getAttribute("data-u")]; if(k){ var a=r.querySelector(".cssay"),c=r.querySelector(".cspl"),d=r.querySelector(".cslv"); if(a) a.value=k.say; if(c) c.value=k.pl; if(d) d.value=k.lv; } });
+    ssWire(b);
+    SS.users.forEach(function(u){ if(u.ctl&&SS.mine[u.uid]){ var row=b.querySelector('[data-u="'+u.uid+'"]'),c=row&&row.querySelector("[data-cstat]"); if(c&&u.ctl.ok){ c.textContent="Connected. Everything you press happens in their tab."; c.className="csstat ok"; } } });
+  }
+  function ssSend(uid,cmd,okMsg){
+    call("ctlSend",{uid:uid,cmd:cmd}).then(function(r){
+      if(r&&r.ok){ SS.msg=""; if(okMsg) toast(okMsg); }
+      else { toast(r&&r.status===409?"That session ended.":whyNot(r)); delete SS.mine[uid]; SS.sig=""; ssLoad(); }
+    });
+  }
+  function ssWire(b){
+    b.querySelectorAll(".csu").forEach(function(row){
+      var uid=row.getAttribute("data-u"), t=row.querySelector("[data-take]");
+      if(t) t.onclick=function(){ t.disabled=true; call("ctlStart",{uid:uid}).then(function(r){ if(r&&r.ok){ SS.mine[uid]=r.id; SS.sig=""; ssLoad(); } else { t.disabled=false; SS.msg=whyNot(r); ssRender(); } }); };
+      row.querySelectorAll("[data-cn]").forEach(function(x){ x.onclick=function(){ ssSend(uid,{t:"nav",to:x.getAttribute("data-cn")}); }; });
+      var go=row.querySelector("[data-cgo]"); if(go) go.onclick=function(){ var sel=row.querySelector(".cslv"), inp=row.querySelector(".cspl"), l=sel.value, p=inp.value.trim().replace(/^@/,""); if(p){ if(/^[A-Za-z0-9_-]{3,20}$/.test(p)){ ssSend(uid,{t:"nav",to:"player/"+p}); inp.value=""; } else toast("That doesn\u2019t look like a player name."); } else if(l){ ssSend(uid,{t:"nav",to:"level/"+l}); sel.value=""; } else toast("Pick a level or type a player name."); };
+      row.querySelectorAll("[data-csc]").forEach(function(x){ x.onclick=function(){ ssSend(uid,{t:"scroll",to:x.getAttribute("data-csc")}); }; });
+      var sy=row.querySelector("[data-csay]"); if(sy){ var inp=row.querySelector(".cssay"); var send=function(){ var v=inp.value.trim(); if(!v) return; ssSend(uid,{t:"say",text:v},"Sent"); inp.value=""; }; sy.onclick=send; inp.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } }; }
+      var wh=row.querySelector("[data-cwheel]"); if(wh) wh.onclick=function(){ ssSend(uid,{t:"nav",to:"wheel"}); var tab=document.querySelector('#admnav button[data-t="wheel"]'); if(tab) tab.click(); toast("Opened the Wheel Spinner for them. Use Live wheel to control it."); };
+      var en=row.querySelector("[data-cend]"); if(en) en.onclick=function(){ call("ctlEnd",{uid:uid}).then(function(){ delete SS.mine[uid]; SS.sig=""; ssLoad(); toast("Control ended"); }); };
+    });
+  }
+  function ssLoad(){
+    if(SS.busy) return; SS.busy=true;
+    call("ctlList").then(function(r){
+      SS.busy=false; var bn=$("csbanner"); if(!bn) return;
+      if(r&&r.ok){ SS.users=r.users||[]; SS.err=""; bn.innerHTML=""; SS.loaded=true; var typing=document.activeElement&&/cssay|cspl/.test(document.activeElement.className||""); SS.users.forEach(function(u){ if(!u.ctl) delete SS.mine[u.uid]; }); ssRender(); }
+      else { bn.innerHTML='<div class="adm-alert"><b>Sessions unavailable</b><span>'+esc(r&&r.status===404?"The chat service isn't deployed yet. Upload functions/api/social.js to the site's GitHub repo.":whyNot(r))+'</span></div>'; }
+    });
+  }
+  function ssStart(){
+    clearInterval(SS.tm);
+    SS.tm=setInterval(function(){ if(!$("csbody")){ clearInterval(SS.tm); return; } if(ssVisible()&&!document.hidden) ssLoad(); },3500);
+    if(ssVisible()) ssLoad();
+  }
+  window.TML223={adminSessions:sessionsHtml,wireSessions:function(){
+    var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="sessions"]'); if(t) setTimeout(function(){ SS.sig=""; ssLoad(); },50); });
+    ssStart();
+  },_ctl:CTL,_ss:SS};
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
