@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v220">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v221">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -5388,6 +5388,80 @@ body.chopen .chfab{display:none}
 .cmadd input{flex:1;min-width:150px}
 .cmmsg{margin:0;color:var(--mut);font-size:13px}
 @media(max-width:520px){.cmrow{flex-wrap:wrap}.cmadd .adm-b{flex:1}}
+
+/* ================= v221: chat upgrades + voice calls ================= */
+.chbanner[hidden],.chrbar[hidden],.chemo[hidden],.cvc[hidden]{display:none!important}
+.chbanner{margin:0;padding:9px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:hsl(var(--h) 100% 70% / .16);border-bottom:1px solid hsl(var(--h) 100% 78% / .22);font-size:13px}
+.chbanner>span{flex:1;min-width:0}
+.chbanner button{padding:6px 12px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .4);background:transparent;color:inherit;font:800 12px Outfit,sans-serif;cursor:pointer}
+.chbanner button:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chbanner>div{flex-basis:100%}
+.chk{display:flex;align-items:flex-start;gap:7px;margin:5px 0 0;font-size:12.5px;line-height:1.4}
+.chk svg{flex:none;margin-top:2px}.chk b{font-weight:800}.chk span{color:var(--mut)}
+.chk.ok svg{color:#9fd0ff}.chk.bad{color:#fff}.chk.bad svg{color:#ff9aa8}.chk.bad b{text-decoration:underline wavy rgba(255,154,168,.8);text-underline-offset:3px}
+.chfind{height:42px;margin:4px 4px 6px;padding:0 14px;border-radius:14px;border:1px solid hsl(var(--h) 100% 78% / .24);background:hsl(var(--h) 60% 8%);color:var(--text);font:600 14px Outfit,sans-serif;outline:none}
+.chfind:focus{border-color:#fff}
+.chmore{align-self:center;display:inline-flex;align-items:center;gap:6px;margin:4px 0 8px;padding:8px 14px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .3);background:hsl(var(--h) 100% 70% / .1);color:inherit;font:800 12px Outfit,sans-serif;cursor:pointer}
+.chmore:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chsys{align-self:center;display:inline-flex;align-items:center;gap:7px;margin:8px 0;padding:6px 13px;border-radius:99px;background:hsl(var(--h) 100% 70% / .1);color:var(--mut);font-size:12.5px}
+.chsys time{opacity:.7;font-size:11px}
+.chmen{color:#9fd0ff;font-weight:800}.chmen.me{background:hsl(var(--h) 100% 70% / .28);color:#fff;padding:0 4px;border-radius:6px}
+.chm.me .chmen{color:#fff;text-decoration:underline}
+.chbub a{color:inherit;text-decoration:underline;text-underline-offset:2px;font-weight:700}
+.chq{margin:0 0 6px;padding:6px 10px;border-left:3px solid #fff;border-radius:4px 10px 10px 4px;background:rgba(0,0,0,.2);display:flex;flex-direction:column;gap:1px;cursor:pointer;font-size:12.5px}
+.chq b{font:800 12px Outfit,sans-serif}.chq span{opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.chm.me .chq{background:rgba(255,255,255,.18)}
+.chm.flash .chbub{animation:chFlash 1.3s ease}
+@keyframes chFlash{0%,60%{box-shadow:0 0 0 3px #fff}100%{box-shadow:0 0 0 0 transparent}}
+.chm.pend .chbub{opacity:.7}.chm.fail .chbub{opacity:1;background:hsl(var(--h) 40% 22%);border:1px dashed #fff}
+.chrx{flex-basis:100%;display:flex;gap:5px;flex-wrap:wrap;padding:0 0 0 38px;margin-top:-4px}
+.chm.me .chrx{padding:0 38px 0 0;justify-content:flex-end}
+.chrxb{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .28);background:hsl(var(--h) 60% 12%);color:inherit;font-size:13px;cursor:pointer}
+.chrxb b{font:800 11px Outfit,sans-serif}.chrxb.on{background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
+.chpick{flex-basis:100%;display:flex;gap:2px;padding:4px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .28);background:hsl(var(--h) 60% 10%);width:max-content;max-width:100%;overflow-x:auto}
+.chact .chpick button{width:38px;height:38px;padding:0;justify-content:center;border:0;background:transparent;font-size:20px;border-radius:50%}
+.chact .chpick button:hover{background:hsl(var(--h) 100% 70% / .22);transform:scale(1.15)}.chact .chpick button.on{background:hsl(var(--h) 100% 70% / .3)}
+.chrbar{display:flex;align-items:center;gap:9px;margin:0 2px 8px;padding:7px 10px;border-radius:13px;border-left:3px solid #fff;background:hsl(var(--h) 100% 70% / .12);font-size:12.5px}
+.chrbar>div{flex:1;min-width:0;display:flex;flex-direction:column}.chrbar span{opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chrbar button{width:26px;height:26px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer}
+.chemo{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:170px;overflow-y:auto;margin:0 0 8px;padding:6px;border-radius:16px;border:1px solid hsl(var(--h) 100% 78% / .26);background:hsl(var(--h) 60% 10%)}
+.chemo button{height:38px;border:0;border-radius:10px;background:transparent;font-size:21px;cursor:pointer}.chemo button:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chnew{bottom:100px}
+body.chopen{overflow-x:hidden}
+@media(max-width:640px){.chdr{height:100dvh}.chrow textarea{font-size:16px}}
+/* light theme additions */
+:root[data-theme="light"] .chbanner{background:#eaf2ff;border-bottom-color:hsl(var(--h) 80% 50% / .25);color:#0b2a66}
+:root[data-theme="light"] .chbanner button{border-color:hsl(var(--h) 80% 50% / .4)}
+:root[data-theme="light"] .chk.ok svg{color:var(--acc2)}.chk.bad span{color:inherit}
+:root[data-theme="light"] .chk.bad{color:#b0182c}
+:root[data-theme="light"] .chfind{background:#fff;color:#0b2a66;border-color:hsl(var(--h) 80% 50% / .3)}
+:root[data-theme="light"] .chsys,:root[data-theme="light"] .chmore{background:hsl(var(--h) 90% 94%);color:#0b2a66;border-color:hsl(var(--h) 80% 50% / .25)}
+:root[data-theme="light"] .chmen{color:var(--acc2)}
+:root[data-theme="light"] .chq{background:hsl(var(--h) 80% 50% / .1);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chm.me .chq{background:rgba(255,255,255,.2);border-left-color:#fff}
+:root[data-theme="light"] .chrxb,:root[data-theme="light"] .chpick,:root[data-theme="light"] .chemo{background:#fff;border-color:hsl(var(--h) 80% 50% / .28);color:#0b2a66}
+:root[data-theme="light"] .chrxb.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+:root[data-theme="light"] .chrbar{background:hsl(var(--h) 90% 94%);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chm.fail .chbub{background:#eaf2ff;color:#0b2a66;border-color:var(--acc2)}
+:root[data-theme="light"] .chm.flash .chbub{animation-name:chFlashL}
+@keyframes chFlashL{0%,60%{box-shadow:0 0 0 3px var(--acc2)}100%{box-shadow:0 0 0 0 transparent}}
+
+/* ---- voice call panel ---- */
+.cvc{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:95;width:min(420px,calc(100vw - 24px));display:flex;flex-direction:column;gap:14px;padding:16px 18px;border-radius:26px;border:1px solid rgba(255,255,255,.3);background:linear-gradient(160deg,hsl(var(--h) 80% 22%),hsl(var(--h) 85% 10%));color:#fff;box-shadow:0 30px 80px -20px rgba(0,0,0,.85),0 0 0 1px hsl(var(--h) 100% 70% / .25);animation:cvIn .4s var(--spring) both}
+@keyframes cvIn{from{transform:translate(-50%,-30px) scale(.94);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.cvwho{display:flex;align-items:center;gap:13px}.cvwho>div{display:flex;flex-direction:column;min-width:0}
+.cvwho b{font:900 18px Outfit,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cvwho small{color:rgba(255,255,255,.78);font-size:13px;line-height:1.35}.cvwho small.live{color:#fff;font:800 15px Outfit,sans-serif;font-variant-numeric:tabular-nums}
+.cvwho .av{box-shadow:0 0 0 0 rgba(255,255,255,.5);animation:cvPulse 1.8s ease-out infinite}
+@keyframes cvPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}100%{box-shadow:0 0 0 16px rgba(255,255,255,0)}}
+.cvbtns{display:flex;gap:10px;justify-content:center}
+.cvb{flex:1;max-width:140px;min-height:54px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;border-radius:99px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;font:800 14px Outfit,sans-serif;cursor:pointer;transition:transform .18s,background .2s}
+.cvb:hover{background:rgba(255,255,255,.26)}.cvb:active{transform:scale(.96)}.cvb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.cvb.ok{background:#fff;color:#0b2a66;border-color:#fff}.cvb.ok:hover{background:#eaf3ff}
+.cvb.end{background:#0b2a66;border-color:rgba(255,255,255,.55)}.cvb.end svg{transform:rotate(135deg)}
+.cvb.mute.on{background:#fff;color:#0b2a66}
+body.incall .chfab{bottom:96px}
+@media(prefers-reduced-motion:reduce){.cvc,.cvwho .av{animation:none!important}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -9265,7 +9339,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v220">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v221">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -10856,6 +10930,80 @@ body.chopen .chfab{display:none}
 .cmadd input{flex:1;min-width:150px}
 .cmmsg{margin:0;color:var(--mut);font-size:13px}
 @media(max-width:520px){.cmrow{flex-wrap:wrap}.cmadd .adm-b{flex:1}}
+
+/* ================= v221: chat upgrades + voice calls ================= */
+.chbanner[hidden],.chrbar[hidden],.chemo[hidden],.cvc[hidden]{display:none!important}
+.chbanner{margin:0;padding:9px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:hsl(var(--h) 100% 70% / .16);border-bottom:1px solid hsl(var(--h) 100% 78% / .22);font-size:13px}
+.chbanner>span{flex:1;min-width:0}
+.chbanner button{padding:6px 12px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .4);background:transparent;color:inherit;font:800 12px Outfit,sans-serif;cursor:pointer}
+.chbanner button:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chbanner>div{flex-basis:100%}
+.chk{display:flex;align-items:flex-start;gap:7px;margin:5px 0 0;font-size:12.5px;line-height:1.4}
+.chk svg{flex:none;margin-top:2px}.chk b{font-weight:800}.chk span{color:var(--mut)}
+.chk.ok svg{color:#9fd0ff}.chk.bad{color:#fff}.chk.bad svg{color:#ff9aa8}.chk.bad b{text-decoration:underline wavy rgba(255,154,168,.8);text-underline-offset:3px}
+.chfind{height:42px;margin:4px 4px 6px;padding:0 14px;border-radius:14px;border:1px solid hsl(var(--h) 100% 78% / .24);background:hsl(var(--h) 60% 8%);color:var(--text);font:600 14px Outfit,sans-serif;outline:none}
+.chfind:focus{border-color:#fff}
+.chmore{align-self:center;display:inline-flex;align-items:center;gap:6px;margin:4px 0 8px;padding:8px 14px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .3);background:hsl(var(--h) 100% 70% / .1);color:inherit;font:800 12px Outfit,sans-serif;cursor:pointer}
+.chmore:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chsys{align-self:center;display:inline-flex;align-items:center;gap:7px;margin:8px 0;padding:6px 13px;border-radius:99px;background:hsl(var(--h) 100% 70% / .1);color:var(--mut);font-size:12.5px}
+.chsys time{opacity:.7;font-size:11px}
+.chmen{color:#9fd0ff;font-weight:800}.chmen.me{background:hsl(var(--h) 100% 70% / .28);color:#fff;padding:0 4px;border-radius:6px}
+.chm.me .chmen{color:#fff;text-decoration:underline}
+.chbub a{color:inherit;text-decoration:underline;text-underline-offset:2px;font-weight:700}
+.chq{margin:0 0 6px;padding:6px 10px;border-left:3px solid #fff;border-radius:4px 10px 10px 4px;background:rgba(0,0,0,.2);display:flex;flex-direction:column;gap:1px;cursor:pointer;font-size:12.5px}
+.chq b{font:800 12px Outfit,sans-serif}.chq span{opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.chm.me .chq{background:rgba(255,255,255,.18)}
+.chm.flash .chbub{animation:chFlash 1.3s ease}
+@keyframes chFlash{0%,60%{box-shadow:0 0 0 3px #fff}100%{box-shadow:0 0 0 0 transparent}}
+.chm.pend .chbub{opacity:.7}.chm.fail .chbub{opacity:1;background:hsl(var(--h) 40% 22%);border:1px dashed #fff}
+.chrx{flex-basis:100%;display:flex;gap:5px;flex-wrap:wrap;padding:0 0 0 38px;margin-top:-4px}
+.chm.me .chrx{padding:0 38px 0 0;justify-content:flex-end}
+.chrxb{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .28);background:hsl(var(--h) 60% 12%);color:inherit;font-size:13px;cursor:pointer}
+.chrxb b{font:800 11px Outfit,sans-serif}.chrxb.on{background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
+.chpick{flex-basis:100%;display:flex;gap:2px;padding:4px;border-radius:99px;border:1px solid hsl(var(--h) 100% 78% / .28);background:hsl(var(--h) 60% 10%);width:max-content;max-width:100%;overflow-x:auto}
+.chact .chpick button{width:38px;height:38px;padding:0;justify-content:center;border:0;background:transparent;font-size:20px;border-radius:50%}
+.chact .chpick button:hover{background:hsl(var(--h) 100% 70% / .22);transform:scale(1.15)}.chact .chpick button.on{background:hsl(var(--h) 100% 70% / .3)}
+.chrbar{display:flex;align-items:center;gap:9px;margin:0 2px 8px;padding:7px 10px;border-radius:13px;border-left:3px solid #fff;background:hsl(var(--h) 100% 70% / .12);font-size:12.5px}
+.chrbar>div{flex:1;min-width:0;display:flex;flex-direction:column}.chrbar span{opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chrbar button{width:26px;height:26px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer}
+.chemo{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:170px;overflow-y:auto;margin:0 0 8px;padding:6px;border-radius:16px;border:1px solid hsl(var(--h) 100% 78% / .26);background:hsl(var(--h) 60% 10%)}
+.chemo button{height:38px;border:0;border-radius:10px;background:transparent;font-size:21px;cursor:pointer}.chemo button:hover{background:hsl(var(--h) 100% 70% / .22)}
+.chnew{bottom:100px}
+body.chopen{overflow-x:hidden}
+@media(max-width:640px){.chdr{height:100dvh}.chrow textarea{font-size:16px}}
+/* light theme additions */
+:root[data-theme="light"] .chbanner{background:#eaf2ff;border-bottom-color:hsl(var(--h) 80% 50% / .25);color:#0b2a66}
+:root[data-theme="light"] .chbanner button{border-color:hsl(var(--h) 80% 50% / .4)}
+:root[data-theme="light"] .chk.ok svg{color:var(--acc2)}.chk.bad span{color:inherit}
+:root[data-theme="light"] .chk.bad{color:#b0182c}
+:root[data-theme="light"] .chfind{background:#fff;color:#0b2a66;border-color:hsl(var(--h) 80% 50% / .3)}
+:root[data-theme="light"] .chsys,:root[data-theme="light"] .chmore{background:hsl(var(--h) 90% 94%);color:#0b2a66;border-color:hsl(var(--h) 80% 50% / .25)}
+:root[data-theme="light"] .chmen{color:var(--acc2)}
+:root[data-theme="light"] .chq{background:hsl(var(--h) 80% 50% / .1);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chm.me .chq{background:rgba(255,255,255,.2);border-left-color:#fff}
+:root[data-theme="light"] .chrxb,:root[data-theme="light"] .chpick,:root[data-theme="light"] .chemo{background:#fff;border-color:hsl(var(--h) 80% 50% / .28);color:#0b2a66}
+:root[data-theme="light"] .chrxb.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+:root[data-theme="light"] .chrbar{background:hsl(var(--h) 90% 94%);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chm.fail .chbub{background:#eaf2ff;color:#0b2a66;border-color:var(--acc2)}
+:root[data-theme="light"] .chm.flash .chbub{animation-name:chFlashL}
+@keyframes chFlashL{0%,60%{box-shadow:0 0 0 3px var(--acc2)}100%{box-shadow:0 0 0 0 transparent}}
+
+/* ---- voice call panel ---- */
+.cvc{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:95;width:min(420px,calc(100vw - 24px));display:flex;flex-direction:column;gap:14px;padding:16px 18px;border-radius:26px;border:1px solid rgba(255,255,255,.3);background:linear-gradient(160deg,hsl(var(--h) 80% 22%),hsl(var(--h) 85% 10%));color:#fff;box-shadow:0 30px 80px -20px rgba(0,0,0,.85),0 0 0 1px hsl(var(--h) 100% 70% / .25);animation:cvIn .4s var(--spring) both}
+@keyframes cvIn{from{transform:translate(-50%,-30px) scale(.94);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.cvwho{display:flex;align-items:center;gap:13px}.cvwho>div{display:flex;flex-direction:column;min-width:0}
+.cvwho b{font:900 18px Outfit,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cvwho small{color:rgba(255,255,255,.78);font-size:13px;line-height:1.35}.cvwho small.live{color:#fff;font:800 15px Outfit,sans-serif;font-variant-numeric:tabular-nums}
+.cvwho .av{box-shadow:0 0 0 0 rgba(255,255,255,.5);animation:cvPulse 1.8s ease-out infinite}
+@keyframes cvPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}100%{box-shadow:0 0 0 16px rgba(255,255,255,0)}}
+.cvbtns{display:flex;gap:10px;justify-content:center}
+.cvb{flex:1;max-width:140px;min-height:54px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;border-radius:99px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;font:800 14px Outfit,sans-serif;cursor:pointer;transition:transform .18s,background .2s}
+.cvb:hover{background:rgba(255,255,255,.26)}.cvb:active{transform:scale(.96)}.cvb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.cvb.ok{background:#fff;color:#0b2a66;border-color:#fff}.cvb.ok:hover{background:#eaf3ff}
+.cvb.end{background:#0b2a66;border-color:rgba(255,255,255,.55)}.cvb.end svg{transform:rotate(135deg)}
+.cvb.mute.on{background:#fff;color:#0b2a66}
+body.incall .chfab{bottom:96px}
+@media(prefers-reduced-motion:reduce){.cvc,.cvwho .av{animation:none!important}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -13195,7 +13343,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v220js">
+<script id="v221js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -14282,7 +14430,7 @@ var _sh=window.show;
   };
 })();
 
-/* ================= v220: level likes/dislikes + chat (room, DMs, images) ================= */
+/* ================= v221: level likes/dislikes + chat (room, DMs, photos, replies, reactions) + voice calls ================= */
 (function(){
   if(typeof rLevel!=="function") return;
   var API=window.TML_SOCIAL_API||"/api/social";
@@ -14301,7 +14449,17 @@ var _sh=window.show;
     room:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.2 2.2 3.5 4.7"/>',
     plus:'<path d="M12 5v14M5 12h14"/>', flag:'<path d="M4 22V4M4 4h13l-2 4 2 4H4"/>',
     trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>', ban:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
-    user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 21c.7-4 3.7-6 7.5-6s6.8 2 7.5 6"/>', mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/>'
+    user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 21c.7-4 3.7-6 7.5-6s6.8 2 7.5 6"/>', mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+    phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+    mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4"/>',
+    micoff:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M2 2l20 20"/>',
+    reply:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/>',
+    smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',
+    copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+    down:'<path d="M12 5v14M6 13l6 6 6-6"/>', retry:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+    bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+    vol:'<path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',
+    check:'<path d="M20 6 9 17l-5-5"/>', pulse:'<path d="M3 12h4l3-8 4 16 3-8h4"/>', load:'<path d="M12 5v14M6 11l6-6 6 6"/>'
   };
   function call(a,body){
     var n=NT(), tp=(n&&n.user&&n.user.getIdToken)?n.user.getIdToken().catch(function(){ return ""; }):Promise.resolve("");
@@ -14313,19 +14471,20 @@ var _sh=window.show;
   }
   function whyNot(r){
     if(!r) return "Something went wrong.";
-    if(r.message) return r.message;
-    if(r.status===404||r.status===0) return "Chat and likes aren't live on this site yet.";
+    if(r.message&&r.error!=="server") return r.message;
+    if(r.status===404||(r.status===0&&r.error==="network")) return r.status===0?"Can't reach the chat server. Check your connection.":"Chat and likes aren't live on this site yet.";
     if(r.status===401) return "Please sign in again.";
-    return "Something went wrong. Please try again.";
+    return "Something went wrong"+(r.detail?" ("+r.detail+")":"")+". Please try again.";
   }
   function gate(what){ if(!online()){ toast(what+" aren't available here."); return false; } if(!signed()){ toast("Sign in to use "+what.toLowerCase()); try{ openAcct(); }catch(e){} return false; } return true; }
+  function $(i){ return document.getElementById(i); }
 
   /* =============================== likes =============================== */
   var VO={c:{},mine:{},at:0,busy:null};
   function loadVotes(force){
     if(VO.busy) return VO.busy;
     if(!force&&Date.now()-VO.at<6000) return Promise.resolve();
-    VO.busy=call("votes").then(function(r){ VO.busy=null; if(r&&r.ok){ VO.c=r.c||{}; VO.mine=r.mine||{}; VO.at=Date.now(); VO.ok=true; } else VO.ok=VO.ok||false; }).catch(function(){ VO.busy=null; });
+    VO.busy=call("votes").then(function(r){ VO.busy=null; if(r&&r.ok){ VO.c=r.c||{}; VO.mine=r.mine||{}; VO.at=Date.now(); } }).catch(function(){ VO.busy=null; });
     return VO.busy;
   }
   function tally(id){ var c=VO.c[id]||[0,0]; return {up:c[0]|0,dn:c[1]|0,my:VO.mine[id]|0}; }
@@ -14371,11 +14530,41 @@ var _sh=window.show;
     }catch(e){}
   };
 
-  /* =============================== chat =============================== */
-  var CH={open:false,view:"list",room:null,me:null,inbox:null,msgs:[],ids:{},last:"",imgs:{},pend:null,sel:"",err:"",stick:true,muted:0,busy:false,tm:null,errN:0,seen:{}};
-  try{ CH.seen=JSON.parse(localStorage.getItem("tml_chat_seen")||"{}")||{}; }catch(e){}
-  function saveSeen(){ try{ localStorage.setItem("tml_chat_seen",JSON.stringify(CH.seen)); }catch(e){} }
-  function $(i){ return document.getElementById(i); }
+  /* =============================== small helpers =============================== */
+  var REACTS=[["up","👍"],["heart","❤️"],["lol","😂"],["wow","😮"],["sad","😢"],["fire","🔥"],["party","🎉"],["skull","💀"]];
+  function rEmoji(k){ for(var i=0;i<REACTS.length;i++) if(REACTS[i][0]===k) return REACTS[i][1]; return ""; }
+  var EMO=(function(){ var a=[],i; for(i=0x1F600;i<=0x1F62F;i++) a.push(String.fromCodePoint(i)); [0x1F44D,0x1F44E,0x1F44F,0x1F64F,0x1F4AA,0x1F525,0x1F389,0x1F4AF,0x1F440,0x1F480,0x1F47B,0x1F916,0x1F3AE,0x1F451,0x2B50,0x1F31F,0x26A1,0x1F4A5,0x1F9E1,0x1F499,0x1F90D,0x1F44B,0x1F91D,0x1F937,0x1F926,0x1F64C,0x270C,0x1F44C,0x1F91E,0x1F4A4].forEach(function(c){ a.push(String.fromCodePoint(c)); }); return a; })();
+  function when(ts){ try{ return new Date(ts).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
+  function dayLbl(ts){
+    var d=new Date(ts), n=new Date(), y=new Date(n.getTime()-864e5);
+    if(d.toDateString()===n.toDateString()) return "Today"; if(d.toDateString()===y.toDateString()) return "Yesterday";
+    try{ return d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}); }catch(e){ return ""; }
+  }
+  function ago(ts){ var s=Math.max(0,(Date.now()-ts)/1000); if(s<60) return "now"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; return Math.floor(s/86400)+"d"; }
+  function mmss(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2); }
+  // text -> safe html: escapes everything, turns http(s) links into links, and highlights @mentions
+  function rich(text){
+    var out="", re=/https?:\/\/[^\s<>"]+/g, last=0, m, me=CH.me&&CH.me.name?String(CH.me.name).toLowerCase():"";
+    function plain(s){ return esc(s).replace(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g,function(_,p,n){ return p+'<span class="chmen'+(me&&n.toLowerCase()===me?' me':'')+'">@'+n+'</span>'; }).replace(/\n/g,"<br>"); }
+    while((m=re.exec(text))){
+      var u=m[0], tail=""; while(/[.,;:!?)\]}'"]$/.test(u)){ tail=u.slice(-1)+tail; u=u.slice(0,-1); }
+      var ok=false; try{ var P=new URL(u); ok=P.protocol==="https:"||P.protocol==="http:"; }catch(e){}
+      out+=plain(text.slice(last,m.index));
+      out+=ok?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer nofollow">'+esc(u.length>46?u.slice(0,44)+"…":u)+'</a>':esc(u);
+      out+=esc(tail); last=m.index+m[0].length;
+    }
+    return out+plain(text.slice(last));
+  }
+  var LS={ get:function(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }, set:function(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+  var AC=null;
+  function actx(){ try{ if(!AC){ var C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); } if(AC&&AC.state==="suspended") AC.resume(); }catch(e){} return AC; }
+  function tone(freq,t0,dur,vol){ var c=actx(); if(!c) return; try{ var o=c.createOscillator(), g=c.createGain(); o.type="sine"; o.frequency.value=freq; g.gain.setValueAtTime(0,c.currentTime+t0); g.gain.linearRampToValueAtTime(vol,c.currentTime+t0+.02); g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+t0+dur); o.connect(g); g.connect(c.destination); o.start(c.currentTime+t0); o.stop(c.currentTime+t0+dur+.05); }catch(e){} }
+  function ping(){ if(LS.get("tml_chat_snd","1")!=="1") return; tone(880,0,.16,.07); tone(1175,.12,.22,.07); }
+
+  /* =============================== chat state =============================== */
+  var CH={open:false,view:"list",room:null,me:null,inbox:null,msgs:[],ids:{},last:"",more:false,imgs:{},pend:null,pendMsgs:[],sel:"",reply:null,err:"",stick:true,muted:0,busy:false,tm:null,errN:0,seen:{},net:"",unreadN:0,emoji:false,tick:0,srvErr:null};
+  try{ CH.seen=JSON.parse(LS.get("tml_chat_seen","{}"))||{}; }catch(e){}
+  function saveSeen(){ LS.set("tml_chat_seen",JSON.stringify(CH.seen)); }
   function rkey(r){ return r&&r.dm?r.peer:"main"; }
   function unread(){
     var ib=CH.inbox; if(!ib||!CH.me) return 0; var n=0;
@@ -14383,96 +14572,132 @@ var _sh=window.show;
     (ib.dms||[]).forEach(function(d){ if(d.from!==CH.me.uid&&d.ts>(CH.seen[d.peer]||0)) n++; });
     return n;
   }
+  var baseTitle=null, titleBusy=false;
+  function paintTitle(){
+    if(titleBusy) return; titleBusy=true;
+    try{ var t=document.title.replace(/^\(\d+\+?\)\s*/,""); var n=signed()?unread():0; var want=(n?"("+(n>9?"9+":n)+") ":"")+t; if(document.title!==want) document.title=want; }catch(e){}
+    titleBusy=false;
+  }
   function paintFab(){
     var f=$("chfab"); if(!f) return;
     f.hidden=!online();
     var n=signed()?unread():0, dot=f.querySelector(".chdot");
     dot.hidden=!n; dot.textContent=n>9?"9+":n;
     f.setAttribute("aria-label",n?"Chat, "+n+" unread":"Chat");
+    paintTitle();
   }
+  function notify(title,body){
+    try{ if(document.hidden&&window.Notification&&Notification.permission==="granted"&&LS.get("tml_chat_ntf","0")==="1"){ var n=new Notification(title,{body:body,tag:"tml-chat"}); n.onclick=function(){ window.focus(); n.close(); }; } }catch(e){}
+  }
+
+  /* =============================== chat shell =============================== */
   function build(){
     if($("chfab")) return;
     var f=document.createElement("button"); f.id="chfab"; f.className="chfab"; f.hidden=true; f.type="button";
     f.innerHTML=svg(IC.chat,24)+'<i class="chdot" hidden></i>'; f.onclick=openChat; document.body.appendChild(f);
     var d=document.createElement("div"); d.id="chdr"; d.className="chdr"; d.hidden=true; d.setAttribute("role","dialog"); d.setAttribute("aria-label","Chat");
     d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
-      '<button class="chb" id="chmore" type="button" aria-label="More" hidden>'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
-      '<div class="chmenu" id="chmenu" hidden></div>'+
+      '<button class="chb" id="chcallb" type="button" aria-label="Start a voice call" title="Voice call" hidden>'+svg(IC.phone,19)+'</button>'+
+      '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
+      '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
       '<div class="chbody" id="chbody" role="log" aria-live="polite"></div><button class="chnew" id="chnew" type="button" hidden>New messages &darr;</button>'+
-      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chprev" id="chprev" hidden></div><div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button>'+
+      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div>'+
+      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button>'+
       '<textarea id="chtx" rows="1" maxlength="500" placeholder="Write a message" aria-label="Message"></textarea><button class="chsend" id="chsend" type="submit" aria-label="Send">'+svg(IC.send,18)+'</button></div>'+
       '<input type="file" id="chfile" accept="image/*" hidden></form>';
     document.body.appendChild(d);
-    var lb=document.createElement("div"); lb.id="chlb"; lb.className="chlb"; lb.hidden=true; lb.innerHTML='<img alt="Photo from chat">'; lb.onclick=function(){ lb.hidden=true; }; document.body.appendChild(lb);
+    var lb=document.createElement("div"); lb.id="chlb"; lb.className="chlb"; lb.hidden=true; lb.innerHTML='<img alt="Photo from chat"><button type="button" class="chlbx" aria-label="Close photo">'+svg(IC.x,22)+'</button>'; lb.onclick=function(){ lb.hidden=true; }; document.body.appendChild(lb);
+    var cv=document.createElement("div"); cv.id="cvc"; cv.className="cvc"; cv.hidden=true; cv.setAttribute("role","dialog"); cv.setAttribute("aria-label","Voice call"); document.body.appendChild(cv);
     $("chx").onclick=closeChat; $("chback").onclick=function(){ go("list"); };
     $("chmore").onclick=function(e){ e.stopPropagation(); toggleMenu(); };
-    $("chnew").onclick=function(){ scrollEnd(true); };
+    $("chcallb").onclick=function(){ var r=CH.room; if(r&&r.dm&&r.peer) startCall(r.peer,r.name); };
+    $("chnew").onclick=function(){ scrollEnd(); };
     $("chatt").onclick=function(){ $("chfile").click(); };
+    $("chsm").onclick=function(e){ e.stopPropagation(); toggleEmoji(); };
     $("chfile").onchange=function(){ var f=this.files&&this.files[0]; this.value=""; if(f) attach(f); };
     $("chcomp").onsubmit=function(e){ e.preventDefault(); sendNow(); };
     var tx=$("chtx");
-    tx.onkeydown=function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); sendNow(); } };
+    tx.onkeydown=function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); sendNow(); } else if(e.key==="Escape"&&CH.reply){ e.stopPropagation(); CH.reply=null; paintReply(); } };
     tx.oninput=function(){ tx.style.height="auto"; tx.style.height=Math.min(tx.scrollHeight,120)+"px"; };
     tx.onpaste=function(e){ var it=(e.clipboardData&&e.clipboardData.items)||[]; for(var i=0;i<it.length;i++) if(it[i].type.indexOf("image/")===0){ var f=it[i].getAsFile(); if(f){ e.preventDefault(); attach(f); return; } } };
     d.addEventListener("dragover",function(e){ if(CH.view==="thread") e.preventDefault(); });
     d.addEventListener("drop",function(e){ if(CH.view!=="thread") return; var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f&&f.type.indexOf("image/")===0){ e.preventDefault(); attach(f); } });
     $("chbody").addEventListener("scroll",function(){ var b=$("chbody"); CH.stick=b.scrollHeight-b.scrollTop-b.clientHeight<90; if(CH.stick) $("chnew").hidden=true; });
-    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; });
+    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
     document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!$("chlb").hidden){ $("chlb").hidden=true; return; } if(CH.open) closeChat(); });
-    document.addEventListener("visibilitychange",function(){ if(!document.hidden) schedule(300); });
+    document.addEventListener("visibilitychange",function(){ if(!document.hidden){ schedule(250); paintTitle(); } });
+    window.addEventListener("online",function(){ CH.errN=0; schedule(200); });
+    var vv=window.visualViewport; if(vv){ var fit=function(){ if(!CH.open||window.innerWidth>640){ d.style.removeProperty("height"); d.style.removeProperty("top"); return; } d.style.height=vv.height+"px"; d.style.top=vv.offsetTop+"px"; if(CH.stick&&CH.view==="thread") scrollEnd(); }; vv.addEventListener("resize",fit); vv.addEventListener("scroll",fit); }
+    var tt=document.querySelector("title"); if(tt&&window.MutationObserver) new MutationObserver(paintTitle).observe(tt,{childList:true,characterData:true,subtree:true});
     paintFab();
   }
   function openChat(){
     if(!gate("Chat")) return;
-    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true");
+    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); $("chfab").focus(); schedule(1000); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); }
   function go(v,room){
-    CH.view=v; $("chmenu").hidden=true;
-    if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.pend=null; CH.stick=true; CH.sel=""; $("chprev").hidden=true; $("chtx").value=""; $("chtx").style.height="auto"; }
-    if(v==="thread") { loadThread(); }
+    CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
+    if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.pendMsgs=[]; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=""; $("chtx").style.height="auto"; paintReply(); }
+    if(v==="thread") loadThread();
     render();
-    if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden) t.focus(); },60);
+    if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden&&!t.disabled) t.focus(); },60);
   }
-  function setHead(title,sub,back,more){
-    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chmore").hidden=!more;
+  function setHead(title,sub,back,callable){
+    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable;
+    if(callable) $("chcallb").disabled=CALL.st!=="idle";
   }
-  function when(ts){ var d=new Date(ts), n=new Date(); try{ return d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
-  function dayLbl(ts){
-    var d=new Date(ts), n=new Date(), y=new Date(n.getTime()-864e5);
-    if(d.toDateString()===n.toDateString()) return "Today"; if(d.toDateString()===y.toDateString()) return "Yesterday";
-    try{ return d.toLocaleDateString([],{month:"short",day:"numeric"}); }catch(e){ return ""; }
+  function pname(n){ return av(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
+
+  /* ---- banner: connection state + health check ---- */
+  function paintBanner(){
+    var b=$("chbanner"); if(!b) return;
+    var s=CH.srvErr;
+    if(!s&&CH.errN<2){ b.hidden=true; b.innerHTML=""; return; }
+    b.hidden=false;
+    var msg=s?whyNot(s):(navigator.onLine===false?"You're offline. Reconnecting…":"Can't reach chat right now. Retrying…");
+    b.innerHTML='<span>'+esc(msg)+'</span><button type="button" id="chchk">Run check</button><div id="chchkr"></div>';
+    $("chchk").onclick=function(){ runCheck($("chchkr")); };
   }
-  function ago(ts){ var s=Math.max(0,(Date.now()-ts)/1000); if(s<60) return "now"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; return Math.floor(s/86400)+"d"; }
-  function pname(n){ return av(n,"","width:38px;height:38px;font-size:15px;margin:0"); }
+  function runCheck(box){
+    box.innerHTML='<p class="chk">Checking…</p>';
+    call("diag").then(function(r){
+      if(!r||!r.ok){ box.innerHTML='<p class="chk bad">'+esc(r&&r.status===401?"Not signed in (or the sign-in expired). Sign out and back in.":r&&r.status===404?"The chat service isn't deployed on this site (no /api/social).":r&&r.error==="setup"?"The server isn't configured (service account missing).":"Check failed: "+whyNot(r))+'</p>'; return; }
+      box.innerHTML=r.steps.map(function(s){ return '<p class="chk '+(s.ok?'ok':'bad')+'">'+svg(s.ok?IC.check:IC.x,13)+'<b>'+esc(s.n)+'</b><span>'+esc(s.d)+'</span></p>'; }).join("")+(r.allOk?'<p class="chk ok"><b>Everything works.</b></p>':'');
+    });
+  }
 
   /* ---- views ---- */
   function render(){
     var body=$("chbody"), comp=$("chcomp"), ib=CH.inbox;
     if(!CH.open) return;
+    paintBanner();
     if(ib&&ib.chat===false&&!(CH.me&&CH.me.admin)){ setHead("Chat","",false,false); comp.hidden=true; body.innerHTML='<div class="chempty"><b>Chat is turned off</b><p>An admin switched chat off for now. Check back later.</p></div>'; return; }
     if(CH.view==="list") return renderList();
     if(CH.view==="new") return renderNew();
     renderThread();
   }
   function renderList(){
-    var body=$("chbody"), ib=CH.inbox||{dms:[],main:null}, me=CH.me;
+    var body=$("chbody"), ib=CH.inbox||{dms:[],main:null}, me=CH.me, q=(CH.filter||"").toLowerCase();
     setHead("Chat","Timmylist players",false,false); $("chcomp").hidden=true;
     var h='<button class="chrm" data-cr="main" type="button"><span class="chrav room">'+svg(IC.room,20)+'</span><span class="chrt"><b>Timmylist Room</b><small>'+
       (ib.main&&ib.main.last?esc(ib.main.name)+': '+esc(ib.main.last):'Everyone signed in can talk here')+'</small></span>'+
       '<span class="chrr">'+(ib.main&&ib.main.ts?ago(ib.main.ts):'')+(me&&ib.main&&ib.main.from!==me.uid&&ib.main.ts>(CH.seen.main||0)?'<i class="chud"></i>':'')+'</span></button>';
     h+='<div class="chsec"><span>Direct messages</span><button class="chnewb" id="chnewb" type="button">'+svg(IC.plus,14)+' New</button></div>';
-    var dms=ib.dms||[];
-    if(!dms.length) h+='<div class="chempty sm"><p>No direct messages yet. Start one with the New button, or tap a name in the room.</p></div>';
+    var dms=(ib.dms||[]).filter(function(d){ return !q||String(d.name).toLowerCase().indexOf(q)>=0; });
+    if((ib.dms||[]).length>5) h+='<input class="chfind" id="chfind" type="search" placeholder="Search your messages" value="'+esc(CH.filter||"")+'" aria-label="Search your messages">';
+    if(!dms.length) h+='<div class="chempty sm"><p>'+(q?'No one matches that.':'No direct messages yet. Start one with the New button, or tap a name in the room.')+'</p></div>';
     else dms.forEach(function(d){
-      h+='<button class="chrm" data-cp="'+esc(d.peer)+'" data-cn="'+esc(d.name)+'" type="button">'+pname(d.name)+'<span class="chrt"><b>'+esc(d.name)+'</b><small>'+(me&&d.from===me.uid?'You: ':'')+esc(d.last||'')+'</small></span>'+
-        '<span class="chrr">'+ago(d.ts)+(me&&d.from!==me.uid&&d.ts>(CH.seen[d.peer]||0)?'<i class="chud"></i>':'')+'</span></button>';
+      var un=me&&d.from!==me.uid&&d.ts>(CH.seen[d.peer]||0);
+      h+='<button class="chrm'+(un?' un':'')+'" data-cp="'+esc(d.peer)+'" data-cn="'+esc(d.name)+'" type="button">'+pname(d.name)+'<span class="chrt"><b>'+esc(d.name)+'</b><small>'+(me&&d.from===me.uid?'You: ':'')+esc(d.last||'')+'</small></span>'+
+        '<span class="chrr">'+ago(d.ts)+(un?'<i class="chud"></i>':'')+'</span></button>';
     });
     h+='<p class="chfoot">Be kind. Direct messages are private &mdash; admins only see a message if someone reports it.</p>';
     body.innerHTML=h;
     body.querySelector('[data-cr="main"]').onclick=function(){ go("thread",{dm:false,name:"Timmylist Room"}); };
     $("chnewb").onclick=function(){ go("new"); };
+    var fi=$("chfind"); if(fi) fi.oninput=function(){ CH.filter=this.value; var pos=this.selectionStart; renderList(); var n=$("chfind"); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } };
     var rs=body.querySelectorAll("[data-cp]"), i; for(i=0;i<rs.length;i++) rs[i].onclick=function(){ go("thread",{dm:true,peer:this.getAttribute("data-cp"),name:this.getAttribute("data-cn")}); };
   }
   function knownNames(){
@@ -14492,42 +14717,60 @@ var _sh=window.show;
     };
     setTimeout(function(){ var t=$("chto"); if(t) t.focus(); },60);
   }
+
+  /* ---- thread ---- */
+  function findMsg(id){ for(var i=0;i<CH.msgs.length;i++) if(CH.msgs[i].id===id) return CH.msgs[i]; return null; }
   function renderThread(){
     var r=CH.room, ib=CH.inbox||{}, body=$("chbody"), comp=$("chcomp");
     var blocked=r.dm&&r.peer&&(ib.blocked||[]).indexOf(r.peer)>=0, mutedNow=CH.muted&&CH.muted>Date.now();
-    setHead(r.name,r.dm?"Private message":"Everyone signed in can see this",true,!!(r.dm&&r.peer));
+    setHead(r.name,r.dm?"Private message":"Everyone signed in can see this",true,!!(r.dm&&r.peer&&callSupported()&&!blocked));
     comp.hidden=false;
     var tx=$("chtx");
     if(mutedNow){ tx.disabled=true; tx.placeholder="You're muted for now"; }
     else if(blocked){ tx.disabled=true; tx.placeholder="You blocked this player"; }
     else { tx.disabled=false; tx.placeholder=r.dm?"Message "+r.name:"Write a message"; }
-    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled;
-    var h="", lastDay="", prev=null, me=CH.me;
-    CH.msgs.forEach(function(m){
-      if(m.k==="del") return;
+    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled;
+    var h="", lastDay="", prev=null, me=CH.me, myId=me&&me.uid;
+    if(CH.more) h+='<button class="chmore" id="chmoreb" type="button">'+svg(IC.load,14)+' Load earlier messages</button>';
+    var list=CH.msgs.filter(function(m){ return m.k!=="del"&&m.k!=="re"; });
+    list.forEach(function(m){
       var day=dayLbl(m.ts); if(day!==lastDay){ h+='<div class="chday"><span>'+day+'</span></div>'; lastDay=day; prev=null; }
-      var mine=me&&m.from===me.uid, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del;
-      h+='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'">';
-      if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
-      h+='<div class="chbub">';
-      if(!grp&&!mine&&!r.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
-      if(m.del) h+='<em>Message removed</em>';
-      else {
-        if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
-        if(m.text) h+='<p>'+esc(m.text).replace(/\n/g,"<br>")+'</p>';
-      }
-      h+='<time>'+when(m.ts)+'</time></div>';
-      if(CH.sel===m.id&&!m.del) h+=actions(m,mine);
-      h+='</div>'; prev=m;
+      if(m.k==="call"){ h+='<div class="chsys" data-cid="'+esc(m.id)+'">'+svg(IC.phone,13)+'<span>'+esc(m.text)+'</span><time>'+when(m.ts)+'</time></div>'; prev=null; return; }
+      h+=msgHtml(m,prev,myId); prev=m;
     });
-    if(CH.err) h+='<div class="chnote bad">'+esc(CH.err)+'</div>';
-    if(!CH.msgs.length) h+='<div class="chempty sm">'+(CH.busy?'<p>Loading</p>':'<p>'+(r.dm?'No messages yet. Say hi to '+esc(r.name)+'.':'Nobody has said anything yet. Say hi!')+'</p>')+'</div>';
+    CH.pendMsgs.forEach(function(p){
+      h+='<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>':'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
+        '<time>'+(p.state==="failed"?'Not sent':'Sending…')+'</time></div>'+(p.state==="failed"?'<div class="chact"><button type="button" data-cpend="retry" data-ptmp="'+esc(p.tmp)+'">'+svg(IC.retry,15)+' Try again</button><button type="button" data-cpend="drop" data-ptmp="'+esc(p.tmp)+'" class="warn">'+svg(IC.trash,15)+' Discard</button></div>':'')+'</div>';
+    });
+    if(CH.err&&!CH.pendMsgs.length) h+='<div class="chnote bad">'+esc(CH.err)+'</div>';
+    if(!list.length&&!CH.pendMsgs.length) h+='<div class="chempty sm">'+(CH.busy?'<p>Loading…</p>':'<p>'+(r.dm?'No messages yet. Say hi to '+esc(r.name)+'.':'Nobody has said anything yet. Say hi!')+'</p>')+'</div>';
     var keep=body.scrollTop, wasEnd=CH.stick;
     body.innerHTML=h; if(wasEnd) body.scrollTop=body.scrollHeight; else body.scrollTop=keep;
     wireThread(body);
   }
+  function msgHtml(m,prev,myId){
+    var mine=myId&&m.from===myId, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del&&prev.k!=="call";
+    var h='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'">';
+    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
+    h+='<div class="chbub">';
+    if(!grp&&!mine&&!CH.room.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
+    if(m.del) h+='<em>Message removed</em>';
+    else {
+      if(m.rt) h+='<div class="chq" data-cq="'+esc(m.rt)+'"><b>'+esc(m.rn||"Someone")+'</b><span>'+esc(m.rq||"")+'</span></div>';
+      if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.text) h+='<p>'+rich(m.text)+'</p>';
+    }
+    h+='<time>'+when(m.ts)+'</time></div>';
+    var rx=m.rx||{}, ks=Object.keys(rx).filter(function(k){ return rx[k]&&rx[k].length; });
+    if(ks.length&&!m.del) h+='<div class="chrx">'+ks.map(function(k){ var mi=myId&&rx[k].indexOf(myId)>=0; return '<button type="button" class="chrxb'+(mi?' on':'')+'" data-crx="'+k+'" data-cid="'+esc(m.id)+'" aria-pressed="'+mi+'" aria-label="'+esc(rEmoji(k)+" "+rx[k].length)+'">'+rEmoji(k)+'<b>'+rx[k].length+'</b></button>'; }).join("")+'</div>';
+    if(CH.sel===m.id&&!m.del) h+=actions(m,mine);
+    return h+'</div>';
+  }
   function actions(m,mine){
     var me=CH.me, a='<div class="chact">';
+    a+='<div class="chpick">'+REACTS.map(function(x){ var mi=m.rx&&m.rx[x[0]]&&me&&m.rx[x[0]].indexOf(me.uid)>=0; return '<button type="button" data-cact="react" data-ck="'+x[0]+'" class="'+(mi?'on':'')+'" aria-label="React '+x[0]+'">'+x[1]+'</button>'; }).join("")+'</div>';
+    a+='<button data-cact="reply" type="button">'+svg(IC.reply,15)+' Reply</button>';
+    if(m.text) a+='<button data-cact="copy" type="button">'+svg(IC.copy,15)+' Copy</button>';
     if(!mine&&!CH.room.dm) a+='<button data-cact="dm" data-cuid="'+esc(m.from)+'" data-cn="'+esc(m.name)+'" type="button">'+svg(IC.mail,15)+' Message</button><button data-cact="prof" data-cn="'+esc(m.name)+'" type="button">'+svg(IC.user,15)+' Profile</button>';
     if(!mine) a+='<button data-cact="rep" type="button">'+svg(IC.flag,15)+' Report</button>';
     if(mine||(me&&me.admin&&!CH.room.dm)) a+='<button data-cact="del" type="button" class="warn">'+svg(IC.trash,15)+' Delete</button>';
@@ -14535,34 +14778,72 @@ var _sh=window.show;
     return a+'</div>';
   }
   function wireThread(body){
-    var ms=body.querySelectorAll(".chm"), i;
+    var ms=body.querySelectorAll(".chm[data-cid]"), i;
     for(i=0;i<ms.length;i++) ms[i].onclick=function(e){
       var id=this.getAttribute("data-cid"), t=e.target;
-      if(t.closest&&t.closest(".chact")) return;
+      if(t.closest&&(t.closest(".chact")||t.closest(".chrx")||t.closest("a"))) return;
       if(t.closest&&t.closest(".chimg img")){ var lb=$("chlb"); lb.querySelector("img").src=t.src; lb.hidden=false; return; }
-      var pf=t.closest&&t.closest("[data-cpf]"); if(pf&&!CH.room.dm){ CH.sel=CH.sel===id?"":id; renderThread(); return; }
+      var q=t.closest&&t.closest("[data-cq]"); if(q){ jumpTo(q.getAttribute("data-cq")); return; }
       CH.sel=CH.sel===id?"":id; renderThread();
     };
-    var bs=body.querySelectorAll(".chact button");
-    for(i=0;i<bs.length;i++) bs[i].onclick=function(e){ e.stopPropagation(); act(this); };
+    var bs=body.querySelectorAll(".chact button[data-cact]"); for(i=0;i<bs.length;i++) bs[i].onclick=function(e){ e.stopPropagation(); act(this); };
+    var rx=body.querySelectorAll(".chrxb"); for(i=0;i<rx.length;i++) rx[i].onclick=function(e){ e.stopPropagation(); react(this.getAttribute("data-cid"),this.getAttribute("data-crx")); };
+    var pb=body.querySelectorAll("[data-cpend]"); for(i=0;i<pb.length;i++) pb[i].onclick=function(){ var tmp=this.getAttribute("data-ptmp"), k=this.getAttribute("data-cpend"); if(k==="drop"){ CH.pendMsgs=CH.pendMsgs.filter(function(p){ return p.tmp!==tmp; }); renderThread(); } else retry(tmp); };
+    var mb=$("chmoreb"); if(mb) mb.onclick=loadEarlier;
     fillImages();
   }
+  function jumpTo(id){ var el=$("chbody").querySelector('.chm[data-cid="'+id+'"]'); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.add("flash"); setTimeout(function(){ el.classList.remove("flash"); },1400); } else toast("That message is further back. Load earlier messages."); }
   function act(b){
-    var k=b.getAttribute("data-cact"), id=CH.sel, r=CH.room, key=r.dm?{peer:r.peer}:{};
-    if(k==="dm"){ var u=b.getAttribute("data-cuid"), n=b.getAttribute("data-cn"); go("thread",{dm:true,peer:u,name:n}); return; }
+    var k=b.getAttribute("data-cact"), id=CH.sel, r=CH.room, key=r.dm?{peer:r.peer}:{}, m=findMsg(id);
+    if(k==="dm"){ go("thread",{dm:true,peer:b.getAttribute("data-cuid"),name:b.getAttribute("data-cn")}); return; }
     if(k==="prof"){ var nm=b.getAttribute("data-cn"); closeChat(); try{ show("player",nm); }catch(e){} return; }
-    CH.sel=""; renderThread();
+    if(k==="react"){ var kk=b.getAttribute("data-ck"); CH.sel=""; react(id,kk); return; }
+    CH.sel="";
+    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
+    if(k==="copy"&&m){ try{ navigator.clipboard.writeText(m.text).then(function(){ toast("Copied"); },function(){ toast("Copy blocked by browser"); }); }catch(e){ toast("Copy blocked by browser"); } renderThread(); return; }
+    renderThread();
     if(k==="del") call("del",Object.assign({id:id},key)).then(function(x){ if(x&&x.ok){ markDel(id); renderThread(); poll(); } else toast(whyNot(x)); });
     if(k==="rep") call("report",Object.assign({id:id},key)).then(function(x){ toast(x&&x.ok?"Reported. Thanks, an admin will take a look.":whyNot(x)); });
     if(k==="mute") call("mute",{uid:b.getAttribute("data-cuid"),hours:24}).then(function(x){ toast(x&&x.ok?"Muted for 24 hours":whyNot(x)); });
   }
   function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; } }); delete CH.imgs[id]; }
+  function react(id,k){
+    var m=findMsg(id), me=CH.me; if(!m||!me) return;
+    var arr=(m.rx&&m.rx[k])||[], has=arr.indexOf(me.uid)>=0, on=!has;
+    setRx(m,k,me.uid,on); renderThread();
+    var key=CH.room.dm?{peer:CH.room.peer}:{};
+    call("react",Object.assign({id:id,e:k,on:on},key)).then(function(r){ if(!r||!r.ok){ setRx(m,k,me.uid,!on); renderThread(); toast(whyNot(r)); } });
+  }
+  function setRx(m,k,u,on){
+    m.rx=m.rx||{}; var a=(m.rx[k]||[]).filter(function(x){ return x!==u; }); if(on) a.push(u); if(a.length) m.rx[k]=a; else delete m.rx[k];
+  }
+  function paintReply(){
+    var b=$("chrbar"); if(!b) return;
+    if(!CH.reply){ b.hidden=true; b.innerHTML=""; return; }
+    b.hidden=false; b.innerHTML=svg(IC.reply,15)+'<div><b>Replying to '+esc(CH.reply.name)+'</b><span>'+esc(String(CH.reply.text).slice(0,90))+'</span></div><button type="button" aria-label="Cancel reply">'+svg(IC.x,14)+'</button>';
+    b.querySelector("button").onclick=function(){ CH.reply=null; paintReply(); };
+  }
+  function toggleEmoji(){
+    var p=$("chemo"); if(!p.hidden){ p.hidden=true; return; }
+    p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
+    var bs=p.querySelectorAll("button"), i; for(i=0;i<bs.length;i++) bs[i].onclick=function(ev){ ev.stopPropagation(); var t=$("chtx"), s=t.selectionStart==null?t.value.length:t.selectionStart, e=t.selectionEnd==null?s:t.selectionEnd; t.value=t.value.slice(0,s)+this.textContent+t.value.slice(e); var c=s+this.textContent.length; t.focus(); try{ t.setSelectionRange(c,c); }catch(x){} };
+  }
   function toggleMenu(){
-    var m=$("chmenu"), r=CH.room; if(!r||!r.dm||!r.peer) return;
-    var bl=((CH.inbox||{}).blocked||[]).indexOf(r.peer)>=0;
-    m.innerHTML='<button type="button" id="chblk">'+svg(IC.ban,16)+(bl?' Unblock ':' Block ')+esc(r.name)+'</button>';
-    m.hidden=!m.hidden;
-    $("chblk").onclick=function(){ m.hidden=true; call("block",{peer:r.peer,on:!bl}).then(function(x){ if(x&&x.ok){ var b=(CH.inbox.blocked=CH.inbox.blocked||[]); if(bl) b.splice(b.indexOf(r.peer),1); else b.push(r.peer); toast(bl?"Unblocked":"Blocked. They can't message you."); renderThread(); } else toast(whyNot(x)); }); };
+    var m=$("chmenu"), r=CH.room, ib=CH.inbox||{}, h="";
+    var snd=LS.get("tml_chat_snd","1")==="1", ntf=LS.get("tml_chat_ntf","0")==="1"&&window.Notification&&Notification.permission==="granted";
+    if(CH.view==="thread"&&r&&r.dm&&r.peer){ var bl=(ib.blocked||[]).indexOf(r.peer)>=0; h+='<button type="button" role="menuitem" data-m="block">'+svg(IC.ban,16)+(bl?' Unblock ':' Block ')+esc(r.name)+'</button>'; }
+    h+='<button type="button" role="menuitem" data-m="snd">'+svg(IC.vol,16)+' Message sound: '+(snd?'on':'off')+'</button>';
+    if(window.Notification) h+='<button type="button" role="menuitem" data-m="ntf">'+svg(IC.bell,16)+' Desktop alerts: '+(ntf?'on':'off')+'</button>';
+    h+='<button type="button" role="menuitem" data-m="chk">'+svg(IC.pulse,16)+' Run connection check</button>';
+    m.innerHTML=h; m.hidden=!m.hidden;
+    var bs=m.querySelectorAll("[data-m]"), i;
+    for(i=0;i<bs.length;i++) bs[i].onclick=function(){
+      var k=this.getAttribute("data-m"); m.hidden=true;
+      if(k==="snd"){ LS.set("tml_chat_snd",snd?"0":"1"); toast("Message sound "+(snd?"off":"on")); if(!snd) ping(); }
+      if(k==="ntf"){ if(ntf){ LS.set("tml_chat_ntf","0"); toast("Desktop alerts off"); } else { Notification.requestPermission().then(function(p){ if(p==="granted"){ LS.set("tml_chat_ntf","1"); toast("Desktop alerts on"); } else toast("Alerts are blocked in your browser settings"); }); } }
+      if(k==="chk"){ CH.srvErr=CH.srvErr||null; var b=$("chbanner"); b.hidden=false; b.innerHTML='<span>Connection check</span><div id="chchkr"></div>'; runCheck($("chchkr")); }
+      if(k==="block"){ var bl2=(ib.blocked||[]).indexOf(r.peer)>=0; call("block",{peer:r.peer,on:!bl2}).then(function(x){ if(x&&x.ok){ var b2=(CH.inbox.blocked=CH.inbox.blocked||[]); if(bl2) b2.splice(b2.indexOf(r.peer),1); else b2.push(r.peer); toast(bl2?"Unblocked":"Blocked. They can't message or call you."); renderThread(); } else toast(whyNot(x)); }); }
+    };
   }
 
   /* ---- images ---- */
@@ -14612,45 +14893,65 @@ var _sh=window.show;
     fr.readAsDataURL(file);
   }
 
-  /* ---- talking to the server ---- */
+  /* ---- sending, receiving, polling ---- */
   function keyOf(){ var r=CH.room; return r.dm?(r.peer?{peer:r.peer}:{to:r.to||r.name}):{}; }
+  var tmpN=0;
   function sendNow(){
     var tx=$("chtx"), text=tx.value.trim(), img=CH.pend;
-    if(tx.disabled||CH.sending||(!text&&!img)) return;
-    CH.sending=true; $("chsend").disabled=true; CH.err="";
-    call("send",Object.assign({text:text,img:img||undefined},keyOf())).then(function(r){
-      CH.sending=false; $("chsend").disabled=tx.disabled;
+    if(tx.disabled||(!text&&!img)) return;
+    var p={tmp:"t"+(++tmpN),text:text,img:img,reply:CH.reply?CH.reply.id:null,state:"sending",room:CH.room};
+    tx.value=""; tx.style.height="auto"; CH.pend=null; $("chprev").hidden=true; $("chprev").innerHTML=""; CH.reply=null; paintReply(); $("chemo").hidden=true;
+    CH.pendMsgs.push(p); CH.stick=true; renderThread(); deliver(p);
+  }
+  function deliver(p){
+    p.state="sending";
+    var key=p.room.dm?(p.room.peer?{peer:p.room.peer}:{to:p.room.to||p.room.name}):{};
+    call("send",Object.assign({text:p.text,img:p.img||undefined,reply:p.reply||undefined},key)).then(function(r){
       if(r&&r.ok){
-        tx.value=""; tx.style.height="auto"; CH.pend=null; $("chprev").hidden=true; $("chprev").innerHTML="";
-        if(r.peer&&!CH.room.peer) CH.room.peer=r.peer;
-        if(r.msg.img&&img) CH.imgs[r.msg.id]=img;
-        addMsgs([r.msg]); CH.stick=true; renderThread(); refreshInbox(); schedule(2500);
+        CH.pendMsgs=CH.pendMsgs.filter(function(x){ return x!==p; });
+        if(r.peer&&p.room.dm&&!p.room.peer) p.room.peer=r.peer;
+        if(CH.room===p.room){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
+        refreshInbox(); schedule(2500);
       } else {
-        CH.err=whyNot(r); if(r&&r.error==="muted") refreshInbox();
-        renderThread();
+        p.state="failed"; p.err=whyNot(r); CH.err=p.err; if(r&&r.error==="muted") refreshInbox();
+        if(CH.room===p.room&&CH.view==="thread") renderThread();
+        if(r&&(r.status===0||r.status>=500)) { CH.srvErr=r.status===0?null:r; CH.errN=Math.max(CH.errN,2); paintBanner(); }
       }
     });
   }
+  function retry(tmp){ var p=CH.pendMsgs.filter(function(x){ return x.tmp===tmp; })[0]; if(!p) return; CH.err=""; renderThread(); deliver(p); }
   function addMsgs(list){
-    var changed=false;
+    var changed=false, incoming=0;
     list.forEach(function(m){
-      if(!m||!m.id||CH.ids[m.id]) { return; }
+      if(!m||!m.id||CH.ids[m.id]) return;
       CH.ids[m.id]=1; changed=true;
       if(m.k==="del"){ markDel(m.t); }
+      else if(m.k==="re"){ var t=findMsg(m.t); if(t) setRx(t,m.e,m.u,m.on); }
+      else if(CH.me&&m.from!==CH.me.uid&&CH.loaded) incoming++;
       CH.msgs.push(m);
       if(m.id>CH.last) CH.last=m.id;
     });
     CH.msgs.sort(function(a,b){ return a.id<b.id?-1:1; });
-    if(CH.msgs.length>300){ CH.msgs=CH.msgs.slice(-300); }
+    if(CH.msgs.length>400){ CH.msgs=CH.msgs.slice(-400); }
+    if(incoming&&(document.hidden||!CH.open)) ping();
     return changed;
   }
   function loadThread(){
-    var r=CH.room; if(r.dm&&!r.peer){ CH.busy=false; return; }
+    var r=CH.room; CH.loaded=false; if(r.dm&&!r.peer){ CH.busy=false; CH.loaded=true; return; }
     CH.busy=true; var rr=r;
     call("msgs",rr.dm?{peer:rr.peer}:{}).then(function(x){
       CH.busy=false; if(CH.room!==rr) return;
-      if(x&&x.ok){ CH.err=""; addMsgs(x.msgs||[]); markSeen(); } else CH.err=whyNot(x);
-      if(CH.open&&CH.view==="thread") renderThread();
+      if(x&&x.ok){ CH.err=""; CH.srvErr=null; CH.errN=0; CH.more=!!x.more; x.msgs.forEach(function(m){ if(m.k==="re"){ /* already reflected in the loaded messages */ CH.ids[m.id]=1; if(m.id>CH.last) CH.last=m.id; } }); addMsgs(x.msgs.filter(function(m){ return m.k!=="re"; })); CH.loaded=true; markSeen(); }
+      else { CH.err=whyNot(x); CH.srvErr=x&&x.status>=400?x:null; CH.errN++; }
+      if(CH.open&&CH.view==="thread") renderThread(); paintBanner();
+    });
+  }
+  function loadEarlier(){
+    var first=CH.msgs[0]; if(!first||CH.loadingOld) return; CH.loadingOld=true; var rr=CH.room, body=$("chbody"), oldH=body.scrollHeight;
+    call("msgs",Object.assign(rr.dm?{peer:rr.peer}:{},{before:first.id})).then(function(x){
+      CH.loadingOld=false; if(CH.room!==rr) return;
+      if(x&&x.ok){ CH.more=!!x.more; x.msgs.forEach(function(m){ if(m.k==="re"){ CH.ids[m.id]=1; return; } if(CH.ids[m.id]) return; CH.ids[m.id]=1; CH.msgs.push(m); }); CH.msgs.sort(function(a,b){ return a.id<b.id?-1:1; }); CH.stick=false; renderThread(); body.scrollTop=body.scrollHeight-oldH; }
+      else toast(whyNot(x));
     });
   }
   function markSeen(){
@@ -14659,50 +14960,206 @@ var _sh=window.show;
     if(t>(CH.seen[k]||0)){ CH.seen[k]=t; saveSeen(); paintFab(); }
   }
   function poll(){
-    if(!CH.open||CH.view!=="thread"||!CH.room||(CH.room.dm&&!CH.room.peer)||CH.polling) return;
+    if(!CH.open||CH.view!=="thread"||!CH.room||(CH.room.dm&&!CH.room.peer)||CH.polling||!CH.loaded) return;
     CH.polling=true; var rr=CH.room;
     call("msgs",Object.assign(rr.dm?{peer:rr.peer}:{},CH.last?{since:CH.last}:{})).then(function(x){
       CH.polling=false; if(CH.room!==rr||!CH.open) return;
       if(x&&x.ok){
-        CH.errN=0; if(CH.err&&!CH.sending) CH.err="";
+        if(CH.errN||CH.srvErr){ CH.errN=0; CH.srvErr=null; paintBanner(); }
         if(addMsgs(x.msgs||[])){
-          var b=$("chbody"); var near=CH.stick; renderThread(); markSeen();
-          if(!near&&x.msgs.some(function(m){ return m.k!=="del"&&CH.me&&m.from!==CH.me.uid; })) $("chnew").hidden=false;
+          var near=CH.stick; renderThread(); markSeen();
+          if(!near&&x.msgs.some(function(m){ return !m.k&&CH.me&&m.from!==CH.me.uid; })) $("chnew").hidden=false;
         }
-      } else { CH.errN++; }
+      } else { CH.errN++; if(x&&x.status>=400&&x.status!==429) CH.srvErr=x; paintBanner(); }
     });
   }
   function scrollEnd(){ var b=$("chbody"); b.scrollTop=b.scrollHeight; CH.stick=true; $("chnew").hidden=true; }
-  function refreshInbox(){
+  function refreshInbox(lite){
     if(!signed()||CH.inboxBusy) return Promise.resolve(); CH.inboxBusy=true;
-    return call("inbox").then(function(r){
+    var before=unread();
+    return call("inbox",lite?{lite:true}:{}).then(function(r){
       CH.inboxBusy=false;
-      if(r&&r.ok){ CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; paintFab(); if(CH.open&&CH.view==="list") renderList(); else if(CH.open&&CH.view==="thread") { var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
-      else { CH.errN++; if(r&&r.status===404) CH.gone=true; }
+      if(r&&r.ok){
+        var prevMain=CH.inbox&&CH.inbox.main; if(lite&&CH.inbox&&r.main===undefined) r.main=prevMain;
+        CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab();
+        var after=unread(); if(after>before){ var latest=(r.dms||[]).filter(function(d){ return d.from!==r.me.uid&&d.ts>(CH.seen[d.peer]||0); })[0]; ping(); if(latest) notify(latest.name,latest.last||"New message"); }
+        if(r.call) onIncoming(r.call);
+        if(CH.open){ paintBanner(); if(CH.view==="list") renderList(); else if(CH.view==="thread"){ var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
+      } else { CH.errN++; if(r&&r.status===404) CH.gone=true; if(r&&r.status>=400&&r.status!==429) CH.srvErr=r; if(CH.open) paintBanner(); }
     });
   }
   function schedule(ms){
     clearTimeout(CH.tm);
     if(!online()||!signed()||CH.gone) return;
-    var wait=ms!=null?ms:(CH.open?3000:30000);
+    var wait=ms!=null?ms:(CH.open?3000:20000);
     wait=wait*Math.min(6,1+CH.errN);
-    CH.tm=setTimeout(function tick(){
+    CH.tm=setTimeout(function(){
       if(document.hidden){ schedule(); return; }
-      if(CH.open&&CH.view==="thread") { poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
+      CH.tick++;
+      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
       else if(CH.open){ CH.inboxAt=Date.now(); refreshInbox(); }
-      else { CH.inboxAt=Date.now(); refreshInbox(); }
+      else { CH.inboxAt=Date.now(); refreshInbox(CH.tick%3!==0); }
       schedule();
     },wait);
   }
+
+  /* =============================== voice calls =============================== */
+  var CALL={st:"idle",id:null,peer:null,name:"",dir:"",pc:null,stream:null,dc:null,t0:0,tick:null,muted:false,rmuted:false,poll:null,ring:null,audio:null,gen:0,msg:"",ended:false,ignore:{},conTm:null,disTm:null};
+  function callSupported(){ return !!(window.RTCPeerConnection&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia); }
+  function iceCfg(){ return {iceServers:window.TML_ICE_SERVERS||[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}],bundlePolicy:"max-bundle"}; }
+  function micErr(e){
+    var n=e&&e.name||""; if(n==="NotAllowedError"||n==="SecurityError") return "Microphone is blocked. Allow it in your browser's address bar, then try again.";
+    if(n==="NotFoundError"||n==="OverconstrainedError") return "No microphone found."; if(n==="NotReadableError") return "Your microphone is being used by another app.";
+    return "Couldn't use the microphone.";
+  }
+  function getMic(){ return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false}); }
+  function gathered(pc){
+    return new Promise(function(res){
+      if(pc.iceGatheringState==="complete") return res();
+      var done=false, fin=function(){ if(done) return; done=true; res(); };
+      pc.addEventListener("icegatheringstatechange",function(){ if(pc.iceGatheringState==="complete") fin(); });
+      setTimeout(fin,3000);
+    });
+  }
+  function makePc(){
+    var pc=new RTCPeerConnection(iceCfg()); CALL.pc=pc;
+    if(!CALL.audio){ var a=document.createElement("audio"); a.autoplay=true; a.setAttribute("playsinline",""); a.style.display="none"; document.body.appendChild(a); CALL.audio=a; }
+    pc.ontrack=function(e){ CALL.audio.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]); var p=CALL.audio.play(); if(p&&p.catch) p.catch(function(){}); };
+    pc.ondatachannel=function(e){ wireDc(e.channel); };
+    pc.onconnectionstatechange=function(){
+      var s=pc.connectionState, g=CALL.gen;
+      if(s==="connected"){ clearTimeout(CALL.disTm); if(CALL.st!=="live"){ CALL.st="live"; CALL.t0=Date.now(); stopRing(); clearTimeout(CALL.conTm); clearInterval(CALL.poll); CALL.tick=setInterval(paintCall,1000); } CALL.msg=""; paintCall(); }
+      else if(s==="disconnected"){ CALL.msg="Reconnecting…"; paintCall(); clearTimeout(CALL.disTm); CALL.disTm=setTimeout(function(){ if(CALL.gen===g&&CALL.pc&&CALL.pc.connectionState!=="connected") endCall("failed","Connection lost."); },9000); }
+      else if(s==="failed"){ if(CALL.gen===g) endCall("failed","Couldn't connect. Your network may block voice calls."); }
+    };
+    return pc;
+  }
+  function wireDc(dc){
+    CALL.dc=dc;
+    dc.onmessage=function(e){ var d=String(e.data); if(d==="bye") remoteBye(); else if(d==="mute:1"||d==="mute:0"){ CALL.rmuted=d==="mute:1"; paintCall(); } };
+    dc.onopen=function(){ try{ if(CALL.muted) dc.send("mute:1"); }catch(e){} };
+  }
+  function startCall(peer,name){
+    if(CALL.st!=="idle"){ toast("You're already in a call."); return; }
+    if(!gate("Calls")) return; if(!callSupported()){ toast("Your browser can't make voice calls."); return; }
+    var g=++CALL.gen; CALL.st="calling"; CALL.dir="out"; CALL.peer=peer; CALL.name=name; CALL.id=null; CALL.msg="Starting…"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); setHead(CH.room.name,"Private message",true,true);
+    getMic().then(function(stream){
+      if(CALL.gen!==g){ stream.getTracks().forEach(function(t){ t.stop(); }); return Promise.reject({silent:1}); }
+      CALL.stream=stream; var pc=makePc(); stream.getTracks().forEach(function(t){ pc.addTrack(t,stream); });
+      wireDc(pc.createDataChannel("ctl")); return pc.createOffer();
+    }).then(function(o){ return CALL.pc.setLocalDescription(o); }).then(function(){ return gathered(CALL.pc); }).then(function(){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      return call("callStart",{peer:peer,offer:CALL.pc.localDescription.sdp});
+    }).then(function(r){
+      if(CALL.gen!==g) return;
+      if(!r||!r.ok){ cleanup(); toast(whyNot(r)); return; }
+      CALL.id=r.id; CALL.msg="Calling… they'll hear it when they have the Timmylist open"; paintCall(); ringback(); watchOut(g);
+    }).catch(function(e){ if(e&&e.silent) return; if(CALL.gen!==g) return; cleanup(); toast(e&&e.name?micErr(e):"Couldn't start the call."); });
+  }
+  function watchOut(g){
+    var t0=Date.now(); clearInterval(CALL.poll);
+    CALL.poll=setInterval(function(){
+      if(CALL.gen!==g){ clearInterval(CALL.poll); return; }
+      if(Date.now()-t0>60000){ endCall("missed","No answer."); return; }
+      call("callGet",{id:CALL.id}).then(function(r){
+        if(CALL.gen!==g||!r) return;
+        if(r.ok&&r.state==="active"&&r.answer&&CALL.st==="calling"){
+          clearInterval(CALL.poll); stopRing(); CALL.st="connecting"; CALL.msg="Connecting…"; paintCall();
+          CALL.pc.setRemoteDescription({type:"answer",sdp:r.answer}).catch(function(){ endCall("failed","Couldn't connect."); });
+          CALL.conTm=setTimeout(function(){ if(CALL.gen===g&&CALL.st!=="live") endCall("failed","Couldn't connect. Your network may block voice calls."); },20000);
+        } else if(r.ok&&r.state==="ended"){ var why=r.reason==="declined"?name0()+" declined the call.":r.reason==="missed"?"No answer.":"The call ended."; finishRemote(why); }
+      });
+    },1500);
+  }
+  function name0(){ return CALL.name||"They"; }
+  // incoming ring (found through the inbox)
+  function onIncoming(c){
+    if(!c||!c.id||CALL.ignore[c.id]) return;
+    if(CALL.st!=="idle"){ if(CALL.id!==c.id) CALL.ignore[c.id]=1; return; }
+    if(!callSupported()) return;
+    var g=++CALL.gen; CALL.st="ringing"; CALL.dir="in"; CALL.id=c.id; CALL.peer=c.from; CALL.name=c.name||"Someone"; CALL.msg="Incoming voice call"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); startRing(); notify(CALL.name,"Incoming voice call");
+    var t0=Date.now(); clearInterval(CALL.poll);
+    CALL.poll=setInterval(function(){
+      if(CALL.gen!==g||CALL.st!=="ringing"){ clearInterval(CALL.poll); return; }
+      if(Date.now()-t0>62000){ CALL.ignore[c.id]=1; cleanup(); return; }
+      call("callGet",{id:c.id}).then(function(r){ if(CALL.gen===g&&CALL.st==="ringing"&&r&&r.ok&&r.state!=="ring"){ CALL.ignore[c.id]=1; cleanup(); if(CH.open&&CH.view==="thread") poll(); } });
+    },2000);
+  }
+  function acceptCall(){
+    if(CALL.st!=="ringing") return; var g=CALL.gen, id=CALL.id; stopRing(); clearInterval(CALL.poll); CALL.st="connecting"; CALL.msg="Connecting…"; paintCall();
+    var offer;
+    getMic().then(function(stream){
+      if(CALL.gen!==g){ stream.getTracks().forEach(function(t){ t.stop(); }); return Promise.reject({silent:1}); }
+      CALL.stream=stream; return call("callGet",{id:id});
+    }).then(function(r){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      if(!r||!r.ok||r.state!=="ring"||!r.offer){ CALL.ignore[id]=1; cleanup(); toast("They hung up before you answered."); return Promise.reject({silent:1}); }
+      offer=r.offer; var pc=makePc(); CALL.stream.getTracks().forEach(function(t){ pc.addTrack(t,CALL.stream); });
+      return pc.setRemoteDescription({type:"offer",sdp:offer});
+    }).then(function(){ return CALL.pc.createAnswer(); }).then(function(a){ return CALL.pc.setLocalDescription(a); }).then(function(){ return gathered(CALL.pc); }).then(function(){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      return call("callAnswer",{id:id,answer:CALL.pc.localDescription.sdp});
+    }).then(function(r){
+      if(CALL.gen!==g) return;
+      if(!r||!r.ok){ CALL.ignore[id]=1; cleanup(); toast(whyNot(r)); return; }
+      CALL.conTm=setTimeout(function(){ if(CALL.gen===g&&CALL.st!=="live") endCall("failed","Couldn't connect. Your network may block voice calls."); },20000);
+    }).catch(function(e){ if(e&&e.silent) return; if(CALL.gen!==g) return; var m=e&&e.name?micErr(e):"Couldn't answer the call."; call("callEnd",{id:id,reason:"failed"}); CALL.ignore[id]=1; cleanup(); toast(m); });
+  }
+  function declineCall(){ if(CALL.st!=="ringing") return; var id=CALL.id; CALL.ignore[id]=1; call("callEnd",{id:id,reason:"declined"}); cleanup(); if(CH.open&&CH.view==="thread") setTimeout(poll,600); }
+  function hangUp(){ if(CALL.st==="ringing") return declineCall(); if(CALL.st==="idle") return; endCall(CALL.st==="live"?"ended":(CALL.st==="calling"?"missed":"failed")); }
+  function endCall(reason,why){
+    if(CALL.st==="idle") return; var id=CALL.id, dur=CALL.t0?Math.round((Date.now()-CALL.t0)/1000):0;
+    try{ if(CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){}
+    if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:reason,dur:dur}); }
+    cleanup(); if(why) toast(why); if(CH.open&&CH.view==="thread") setTimeout(poll,700);
+  }
+  function remoteBye(){
+    if(CALL.st==="idle") return; var id=CALL.id, dur=CALL.t0?Math.round((Date.now()-CALL.t0)/1000):0; var nm=name0();
+    if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:"ended",dur:dur}); }
+    cleanup(); toast(nm+" ended the call."); if(CH.open&&CH.view==="thread") setTimeout(poll,700);
+  }
+  function finishRemote(why){ var id=CALL.id; if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:"ended"}); } cleanup(); if(why) toast(why); if(CH.open&&CH.view==="thread") setTimeout(poll,700); }
+  function cleanup(){
+    CALL.gen++; clearInterval(CALL.poll); clearInterval(CALL.tick); clearTimeout(CALL.conTm); clearTimeout(CALL.disTm); stopRing();
+    try{ if(CALL.stream) CALL.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+    try{ if(CALL.pc){ CALL.pc.onconnectionstatechange=null; CALL.pc.close(); } }catch(e){}
+    if(CALL.audio){ try{ CALL.audio.srcObject=null; CALL.audio.remove(); }catch(e){} CALL.audio=null; }
+    CALL.st="idle"; CALL.id=null; CALL.pc=null; CALL.stream=null; CALL.dc=null; CALL.t0=0; CALL.msg=""; CALL.muted=false; CALL.rmuted=false;
+    paintCall(); if(CH.open&&CH.view==="thread"&&CH.room) setHead(CH.room.name,CH.room.dm?"Private message":"Everyone signed in can see this",true,!!(CH.room.dm&&CH.room.peer&&callSupported()));
+  }
+  function toggleMute(){
+    if(!CALL.stream) return; CALL.muted=!CALL.muted; CALL.stream.getAudioTracks().forEach(function(t){ t.enabled=!CALL.muted; });
+    try{ if(CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send(CALL.muted?"mute:1":"mute:0"); }catch(e){} paintCall();
+  }
+  // ring tones (generated, no audio files)
+  var ringIv=null;
+  function startRing(){ stopRing(); var go=function(){ tone(523,0,.35,.08); tone(659,.4,.35,.08); }; go(); ringIv=setInterval(go,2200); }
+  function ringback(){ stopRing(); var go=function(){ tone(440,0,.9,.035); }; go(); ringIv=setInterval(go,3200); }
+  function stopRing(){ if(ringIv){ clearInterval(ringIv); ringIv=null; } }
+  function paintCall(){
+    var el=$("cvc"); if(!el) return;
+    if(CALL.st==="idle"){ el.hidden=true; el.innerHTML=""; document.body.classList.remove("incall"); return; }
+    document.body.classList.add("incall");
+    var st=CALL.st, label=st==="live"?mmss((Date.now()-CALL.t0)/1000)+(CALL.rmuted?" · muted":""):(CALL.msg||"Connecting…");
+    var h='<div class="cvwho">'+av(CALL.name,"","width:46px;height:46px;font-size:18px;margin:0")+'<div><b>'+esc(CALL.name)+'</b><small class="'+(st==="live"?"live":"")+'" aria-live="polite">'+esc(label)+'</small></div></div><div class="cvbtns">';
+    if(st==="ringing") h+='<button type="button" class="cvb ok" id="cvacc" aria-label="Answer call">'+svg(IC.phone,22)+'<span>Answer</span></button><button type="button" class="cvb end" id="cvdec" aria-label="Decline call">'+svg(IC.phone,22)+'<span>Decline</span></button>';
+    else h+=(CALL.stream?'<button type="button" class="cvb mute'+(CALL.muted?' on':'')+'" id="cvmute" aria-pressed="'+CALL.muted+'" aria-label="'+(CALL.muted?'Unmute':'Mute')+'">'+svg(CALL.muted?IC.micoff:IC.mic,22)+'<span>'+(CALL.muted?'Unmute':'Mute')+'</span></button>':'')+'<button type="button" class="cvb end" id="cvend" aria-label="End call">'+svg(IC.phone,22)+'<span>End</span></button>';
+    h+='</div>';
+    el.hidden=false; if(el.getAttribute("data-st")!==st||!el.firstChild||el.getAttribute("data-n")!==CALL.name||el.getAttribute("data-m")!==String(CALL.muted)){ el.innerHTML=h; el.setAttribute("data-st",st); el.setAttribute("data-n",CALL.name); el.setAttribute("data-m",String(CALL.muted)); }
+    else { var s=el.querySelector("small"); if(s){ s.textContent=label; s.className=st==="live"?"live":""; } }
+    var b;
+    if((b=$("cvacc"))) b.onclick=acceptCall; if((b=$("cvdec"))) b.onclick=declineCall; if((b=$("cvend"))) b.onclick=hangUp; if((b=$("cvmute"))) b.onclick=toggleMute;
+  }
+  window.addEventListener("beforeunload",function(){ try{ if(CALL.st!=="idle"&&CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){} });
 
   /* ---- start ---- */
   function boot(){
     build();
     var n=NT(); if(!n||!n.ready) return;
-    n.ready.then(function(){ paintFab(); if(signed()){ refreshInbox().then(function(){ schedule(30000); }); } });
+    n.ready.then(function(){ paintFab(); if(signed()){ refreshInbox().then(function(){ schedule(20000); }); } });
   }
   var _paint=window.paintLogin;
-  if(typeof _paint==="function") window.paintLogin=function(){ var r=_paint.apply(this,arguments); try{ paintFab(); if(signed()&&!CH.inbox){ refreshInbox().then(function(){ schedule(30000); }); } }catch(e){} return r; };
+  if(typeof _paint==="function") window.paintLogin=function(){ var r=_paint.apply(this,arguments); try{ paintFab(); if(signed()&&!CH.inbox){ refreshInbox().then(function(){ schedule(20000); }); } }catch(e){} return r; };
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
 
   /* =============================== admin: Chat pane =============================== */
@@ -14716,7 +15173,8 @@ var _sh=window.show;
   function adminRender(){
     var b=$("cmodbody"); if(!b) return;
     var h='<div class="cmrow"><div><b>Chat</b><small>Turn the whole chat on or off.</small></div><label class="cmsw"><input type="checkbox" data-cs="chat"'+(AD.set.chat?' checked':'')+'><i></i><span class="vh">Chat on</span></label></div>'+
-      '<div class="cmrow"><div><b>Photos</b><small>Let players send photos in the room and in direct messages.</small></div><label class="cmsw"><input type="checkbox" data-cs="images"'+(AD.set.images?' checked':'')+'><i></i><span class="vh">Photos on</span></label></div>';
+      '<div class="cmrow"><div><b>Photos</b><small>Let players send photos in the room and in direct messages.</small></div><label class="cmsw"><input type="checkbox" data-cs="images"'+(AD.set.images?' checked':'')+'><i></i><span class="vh">Photos on</span></label></div>'+
+      '<div class="cmrow cmchk"><div><b>Connection check</b><small>Tests sign-in, the database and chat history for your account.</small><div id="cmchkr"></div></div><button type="button" class="adm-b" id="cmchkb">Run check</button></div>';
     h+='<h3 class="cmh">Reports <span>'+AD.rep.length+'</span></h3>';
     if(!AD.rep.length) h+='<p class="note" style="margin:0 0 6px">Nothing reported. Players can report a message by tapping it.</p>';
     AD.rep.forEach(function(r){
@@ -14728,7 +15186,8 @@ var _sh=window.show;
     AD.muted.forEach(function(m){ h+='<div class="cmmu"><span><b>'+esc(m.name||m.uid)+'</b><small>'+until(m.until)+'</small></span><button type="button" class="adm-b ghost" data-un="'+esc(m.uid)+'">Unmute</button></div>'; });
     h+='<form class="cmadd" id="cmadd"><input id="cmname" placeholder="Player username" maxlength="20" autocomplete="off" aria-label="Player username"><select id="cmhrs" aria-label="How long"><option value="1">1 hour</option><option value="24" selected>24 hours</option><option value="168">7 days</option><option value="720">30 days</option></select><button type="submit" class="adm-b">Mute player</button></form>';
     if(AD.msg) h+='<p class="cmmsg">'+esc(AD.msg)+'</p>';
-    b.innerHTML=h; wireAdminBody(b);
+    var keepChk=$("cmchkr")?$("cmchkr").innerHTML:"";
+    b.innerHTML=h; if(keepChk&&$("cmchkr")) $("cmchkr").innerHTML=keepChk; wireAdminBody(b);
   }
   function adminLoad(){
     if(AD.busy) return; AD.busy=true;
@@ -14747,6 +15206,7 @@ var _sh=window.show;
       AD.set[this.getAttribute("data-cs")]=this.checked;
       adminDo("settings",{chat:AD.set.chat,images:AD.set.images},"Saved");
     };
+    var ck=$("cmchkb"); if(ck) ck.onclick=function(){ runCheck($("cmchkr")); };
     var rs=b.querySelectorAll(".cmrep");
     for(i=0;i<rs.length;i++) (function(card){
       var id=card.getAttribute("data-cr"), bs=card.querySelectorAll("[data-ca]"), j;
@@ -14765,10 +15225,10 @@ var _sh=window.show;
     clearInterval(AD.tm); AD.tm=setInterval(function(){ if(!document.getElementById("cmodbody")){ clearInterval(AD.tm); return; } if(visiblePane()&&!document.hidden) adminLoad(); },10000);
     if(visiblePane()) adminLoad();
   }
-  window.TML220={adminChat:adminHtml,wireAdmin:function(){
+  window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO};
+  },_c:CH,_v:VO,_call:CALL};
 })();
 <\/script>
 </body>
@@ -17034,7 +17494,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v220js">
+<script id="v221js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -18121,7 +18581,7 @@ var _sh=window.show;
   };
 })();
 
-/* ================= v220: level likes/dislikes + chat (room, DMs, images) ================= */
+/* ================= v221: level likes/dislikes + chat (room, DMs, photos, replies, reactions) + voice calls ================= */
 (function(){
   if(typeof rLevel!=="function") return;
   var API=window.TML_SOCIAL_API||"/api/social";
@@ -18140,7 +18600,17 @@ var _sh=window.show;
     room:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.2 2.2 3.5 4.7"/>',
     plus:'<path d="M12 5v14M5 12h14"/>', flag:'<path d="M4 22V4M4 4h13l-2 4 2 4H4"/>',
     trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>', ban:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
-    user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 21c.7-4 3.7-6 7.5-6s6.8 2 7.5 6"/>', mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/>'
+    user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 21c.7-4 3.7-6 7.5-6s6.8 2 7.5 6"/>', mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+    phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+    mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4"/>',
+    micoff:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M2 2l20 20"/>',
+    reply:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/>',
+    smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',
+    copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+    down:'<path d="M12 5v14M6 13l6 6 6-6"/>', retry:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+    bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+    vol:'<path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',
+    check:'<path d="M20 6 9 17l-5-5"/>', pulse:'<path d="M3 12h4l3-8 4 16 3-8h4"/>', load:'<path d="M12 5v14M6 11l6-6 6 6"/>'
   };
   function call(a,body){
     var n=NT(), tp=(n&&n.user&&n.user.getIdToken)?n.user.getIdToken().catch(function(){ return ""; }):Promise.resolve("");
@@ -18152,19 +18622,20 @@ var _sh=window.show;
   }
   function whyNot(r){
     if(!r) return "Something went wrong.";
-    if(r.message) return r.message;
-    if(r.status===404||r.status===0) return "Chat and likes aren't live on this site yet.";
+    if(r.message&&r.error!=="server") return r.message;
+    if(r.status===404||(r.status===0&&r.error==="network")) return r.status===0?"Can't reach the chat server. Check your connection.":"Chat and likes aren't live on this site yet.";
     if(r.status===401) return "Please sign in again.";
-    return "Something went wrong. Please try again.";
+    return "Something went wrong"+(r.detail?" ("+r.detail+")":"")+". Please try again.";
   }
   function gate(what){ if(!online()){ toast(what+" aren't available here."); return false; } if(!signed()){ toast("Sign in to use "+what.toLowerCase()); try{ openAcct(); }catch(e){} return false; } return true; }
+  function $(i){ return document.getElementById(i); }
 
   /* =============================== likes =============================== */
   var VO={c:{},mine:{},at:0,busy:null};
   function loadVotes(force){
     if(VO.busy) return VO.busy;
     if(!force&&Date.now()-VO.at<6000) return Promise.resolve();
-    VO.busy=call("votes").then(function(r){ VO.busy=null; if(r&&r.ok){ VO.c=r.c||{}; VO.mine=r.mine||{}; VO.at=Date.now(); VO.ok=true; } else VO.ok=VO.ok||false; }).catch(function(){ VO.busy=null; });
+    VO.busy=call("votes").then(function(r){ VO.busy=null; if(r&&r.ok){ VO.c=r.c||{}; VO.mine=r.mine||{}; VO.at=Date.now(); } }).catch(function(){ VO.busy=null; });
     return VO.busy;
   }
   function tally(id){ var c=VO.c[id]||[0,0]; return {up:c[0]|0,dn:c[1]|0,my:VO.mine[id]|0}; }
@@ -18210,11 +18681,41 @@ var _sh=window.show;
     }catch(e){}
   };
 
-  /* =============================== chat =============================== */
-  var CH={open:false,view:"list",room:null,me:null,inbox:null,msgs:[],ids:{},last:"",imgs:{},pend:null,sel:"",err:"",stick:true,muted:0,busy:false,tm:null,errN:0,seen:{}};
-  try{ CH.seen=JSON.parse(localStorage.getItem("tml_chat_seen")||"{}")||{}; }catch(e){}
-  function saveSeen(){ try{ localStorage.setItem("tml_chat_seen",JSON.stringify(CH.seen)); }catch(e){} }
-  function $(i){ return document.getElementById(i); }
+  /* =============================== small helpers =============================== */
+  var REACTS=[["up","👍"],["heart","❤️"],["lol","😂"],["wow","😮"],["sad","😢"],["fire","🔥"],["party","🎉"],["skull","💀"]];
+  function rEmoji(k){ for(var i=0;i<REACTS.length;i++) if(REACTS[i][0]===k) return REACTS[i][1]; return ""; }
+  var EMO=(function(){ var a=[],i; for(i=0x1F600;i<=0x1F62F;i++) a.push(String.fromCodePoint(i)); [0x1F44D,0x1F44E,0x1F44F,0x1F64F,0x1F4AA,0x1F525,0x1F389,0x1F4AF,0x1F440,0x1F480,0x1F47B,0x1F916,0x1F3AE,0x1F451,0x2B50,0x1F31F,0x26A1,0x1F4A5,0x1F9E1,0x1F499,0x1F90D,0x1F44B,0x1F91D,0x1F937,0x1F926,0x1F64C,0x270C,0x1F44C,0x1F91E,0x1F4A4].forEach(function(c){ a.push(String.fromCodePoint(c)); }); return a; })();
+  function when(ts){ try{ return new Date(ts).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
+  function dayLbl(ts){
+    var d=new Date(ts), n=new Date(), y=new Date(n.getTime()-864e5);
+    if(d.toDateString()===n.toDateString()) return "Today"; if(d.toDateString()===y.toDateString()) return "Yesterday";
+    try{ return d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}); }catch(e){ return ""; }
+  }
+  function ago(ts){ var s=Math.max(0,(Date.now()-ts)/1000); if(s<60) return "now"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; return Math.floor(s/86400)+"d"; }
+  function mmss(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2); }
+  // text -> safe html: escapes everything, turns http(s) links into links, and highlights @mentions
+  function rich(text){
+    var out="", re=/https?:\/\/[^\s<>"]+/g, last=0, m, me=CH.me&&CH.me.name?String(CH.me.name).toLowerCase():"";
+    function plain(s){ return esc(s).replace(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g,function(_,p,n){ return p+'<span class="chmen'+(me&&n.toLowerCase()===me?' me':'')+'">@'+n+'</span>'; }).replace(/\n/g,"<br>"); }
+    while((m=re.exec(text))){
+      var u=m[0], tail=""; while(/[.,;:!?)\]}'"]$/.test(u)){ tail=u.slice(-1)+tail; u=u.slice(0,-1); }
+      var ok=false; try{ var P=new URL(u); ok=P.protocol==="https:"||P.protocol==="http:"; }catch(e){}
+      out+=plain(text.slice(last,m.index));
+      out+=ok?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer nofollow">'+esc(u.length>46?u.slice(0,44)+"…":u)+'</a>':esc(u);
+      out+=esc(tail); last=m.index+m[0].length;
+    }
+    return out+plain(text.slice(last));
+  }
+  var LS={ get:function(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }, set:function(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+  var AC=null;
+  function actx(){ try{ if(!AC){ var C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); } if(AC&&AC.state==="suspended") AC.resume(); }catch(e){} return AC; }
+  function tone(freq,t0,dur,vol){ var c=actx(); if(!c) return; try{ var o=c.createOscillator(), g=c.createGain(); o.type="sine"; o.frequency.value=freq; g.gain.setValueAtTime(0,c.currentTime+t0); g.gain.linearRampToValueAtTime(vol,c.currentTime+t0+.02); g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+t0+dur); o.connect(g); g.connect(c.destination); o.start(c.currentTime+t0); o.stop(c.currentTime+t0+dur+.05); }catch(e){} }
+  function ping(){ if(LS.get("tml_chat_snd","1")!=="1") return; tone(880,0,.16,.07); tone(1175,.12,.22,.07); }
+
+  /* =============================== chat state =============================== */
+  var CH={open:false,view:"list",room:null,me:null,inbox:null,msgs:[],ids:{},last:"",more:false,imgs:{},pend:null,pendMsgs:[],sel:"",reply:null,err:"",stick:true,muted:0,busy:false,tm:null,errN:0,seen:{},net:"",unreadN:0,emoji:false,tick:0,srvErr:null};
+  try{ CH.seen=JSON.parse(LS.get("tml_chat_seen","{}"))||{}; }catch(e){}
+  function saveSeen(){ LS.set("tml_chat_seen",JSON.stringify(CH.seen)); }
   function rkey(r){ return r&&r.dm?r.peer:"main"; }
   function unread(){
     var ib=CH.inbox; if(!ib||!CH.me) return 0; var n=0;
@@ -18222,96 +18723,132 @@ var _sh=window.show;
     (ib.dms||[]).forEach(function(d){ if(d.from!==CH.me.uid&&d.ts>(CH.seen[d.peer]||0)) n++; });
     return n;
   }
+  var baseTitle=null, titleBusy=false;
+  function paintTitle(){
+    if(titleBusy) return; titleBusy=true;
+    try{ var t=document.title.replace(/^\(\d+\+?\)\s*/,""); var n=signed()?unread():0; var want=(n?"("+(n>9?"9+":n)+") ":"")+t; if(document.title!==want) document.title=want; }catch(e){}
+    titleBusy=false;
+  }
   function paintFab(){
     var f=$("chfab"); if(!f) return;
     f.hidden=!online();
     var n=signed()?unread():0, dot=f.querySelector(".chdot");
     dot.hidden=!n; dot.textContent=n>9?"9+":n;
     f.setAttribute("aria-label",n?"Chat, "+n+" unread":"Chat");
+    paintTitle();
   }
+  function notify(title,body){
+    try{ if(document.hidden&&window.Notification&&Notification.permission==="granted"&&LS.get("tml_chat_ntf","0")==="1"){ var n=new Notification(title,{body:body,tag:"tml-chat"}); n.onclick=function(){ window.focus(); n.close(); }; } }catch(e){}
+  }
+
+  /* =============================== chat shell =============================== */
   function build(){
     if($("chfab")) return;
     var f=document.createElement("button"); f.id="chfab"; f.className="chfab"; f.hidden=true; f.type="button";
     f.innerHTML=svg(IC.chat,24)+'<i class="chdot" hidden></i>'; f.onclick=openChat; document.body.appendChild(f);
     var d=document.createElement("div"); d.id="chdr"; d.className="chdr"; d.hidden=true; d.setAttribute("role","dialog"); d.setAttribute("aria-label","Chat");
     d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
-      '<button class="chb" id="chmore" type="button" aria-label="More" hidden>'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
-      '<div class="chmenu" id="chmenu" hidden></div>'+
+      '<button class="chb" id="chcallb" type="button" aria-label="Start a voice call" title="Voice call" hidden>'+svg(IC.phone,19)+'</button>'+
+      '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
+      '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
       '<div class="chbody" id="chbody" role="log" aria-live="polite"></div><button class="chnew" id="chnew" type="button" hidden>New messages &darr;</button>'+
-      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chprev" id="chprev" hidden></div><div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button>'+
+      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div>'+
+      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button>'+
       '<textarea id="chtx" rows="1" maxlength="500" placeholder="Write a message" aria-label="Message"></textarea><button class="chsend" id="chsend" type="submit" aria-label="Send">'+svg(IC.send,18)+'</button></div>'+
       '<input type="file" id="chfile" accept="image/*" hidden></form>';
     document.body.appendChild(d);
-    var lb=document.createElement("div"); lb.id="chlb"; lb.className="chlb"; lb.hidden=true; lb.innerHTML='<img alt="Photo from chat">'; lb.onclick=function(){ lb.hidden=true; }; document.body.appendChild(lb);
+    var lb=document.createElement("div"); lb.id="chlb"; lb.className="chlb"; lb.hidden=true; lb.innerHTML='<img alt="Photo from chat"><button type="button" class="chlbx" aria-label="Close photo">'+svg(IC.x,22)+'</button>'; lb.onclick=function(){ lb.hidden=true; }; document.body.appendChild(lb);
+    var cv=document.createElement("div"); cv.id="cvc"; cv.className="cvc"; cv.hidden=true; cv.setAttribute("role","dialog"); cv.setAttribute("aria-label","Voice call"); document.body.appendChild(cv);
     $("chx").onclick=closeChat; $("chback").onclick=function(){ go("list"); };
     $("chmore").onclick=function(e){ e.stopPropagation(); toggleMenu(); };
-    $("chnew").onclick=function(){ scrollEnd(true); };
+    $("chcallb").onclick=function(){ var r=CH.room; if(r&&r.dm&&r.peer) startCall(r.peer,r.name); };
+    $("chnew").onclick=function(){ scrollEnd(); };
     $("chatt").onclick=function(){ $("chfile").click(); };
+    $("chsm").onclick=function(e){ e.stopPropagation(); toggleEmoji(); };
     $("chfile").onchange=function(){ var f=this.files&&this.files[0]; this.value=""; if(f) attach(f); };
     $("chcomp").onsubmit=function(e){ e.preventDefault(); sendNow(); };
     var tx=$("chtx");
-    tx.onkeydown=function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); sendNow(); } };
+    tx.onkeydown=function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); sendNow(); } else if(e.key==="Escape"&&CH.reply){ e.stopPropagation(); CH.reply=null; paintReply(); } };
     tx.oninput=function(){ tx.style.height="auto"; tx.style.height=Math.min(tx.scrollHeight,120)+"px"; };
     tx.onpaste=function(e){ var it=(e.clipboardData&&e.clipboardData.items)||[]; for(var i=0;i<it.length;i++) if(it[i].type.indexOf("image/")===0){ var f=it[i].getAsFile(); if(f){ e.preventDefault(); attach(f); return; } } };
     d.addEventListener("dragover",function(e){ if(CH.view==="thread") e.preventDefault(); });
     d.addEventListener("drop",function(e){ if(CH.view!=="thread") return; var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f&&f.type.indexOf("image/")===0){ e.preventDefault(); attach(f); } });
     $("chbody").addEventListener("scroll",function(){ var b=$("chbody"); CH.stick=b.scrollHeight-b.scrollTop-b.clientHeight<90; if(CH.stick) $("chnew").hidden=true; });
-    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; });
+    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
     document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!$("chlb").hidden){ $("chlb").hidden=true; return; } if(CH.open) closeChat(); });
-    document.addEventListener("visibilitychange",function(){ if(!document.hidden) schedule(300); });
+    document.addEventListener("visibilitychange",function(){ if(!document.hidden){ schedule(250); paintTitle(); } });
+    window.addEventListener("online",function(){ CH.errN=0; schedule(200); });
+    var vv=window.visualViewport; if(vv){ var fit=function(){ if(!CH.open||window.innerWidth>640){ d.style.removeProperty("height"); d.style.removeProperty("top"); return; } d.style.height=vv.height+"px"; d.style.top=vv.offsetTop+"px"; if(CH.stick&&CH.view==="thread") scrollEnd(); }; vv.addEventListener("resize",fit); vv.addEventListener("scroll",fit); }
+    var tt=document.querySelector("title"); if(tt&&window.MutationObserver) new MutationObserver(paintTitle).observe(tt,{childList:true,characterData:true,subtree:true});
     paintFab();
   }
   function openChat(){
     if(!gate("Chat")) return;
-    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true");
+    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); $("chfab").focus(); schedule(1000); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); }
   function go(v,room){
-    CH.view=v; $("chmenu").hidden=true;
-    if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.pend=null; CH.stick=true; CH.sel=""; $("chprev").hidden=true; $("chtx").value=""; $("chtx").style.height="auto"; }
-    if(v==="thread") { loadThread(); }
+    CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
+    if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.pendMsgs=[]; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=""; $("chtx").style.height="auto"; paintReply(); }
+    if(v==="thread") loadThread();
     render();
-    if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden) t.focus(); },60);
+    if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden&&!t.disabled) t.focus(); },60);
   }
-  function setHead(title,sub,back,more){
-    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chmore").hidden=!more;
+  function setHead(title,sub,back,callable){
+    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable;
+    if(callable) $("chcallb").disabled=CALL.st!=="idle";
   }
-  function when(ts){ var d=new Date(ts), n=new Date(); try{ return d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
-  function dayLbl(ts){
-    var d=new Date(ts), n=new Date(), y=new Date(n.getTime()-864e5);
-    if(d.toDateString()===n.toDateString()) return "Today"; if(d.toDateString()===y.toDateString()) return "Yesterday";
-    try{ return d.toLocaleDateString([],{month:"short",day:"numeric"}); }catch(e){ return ""; }
+  function pname(n){ return av(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
+
+  /* ---- banner: connection state + health check ---- */
+  function paintBanner(){
+    var b=$("chbanner"); if(!b) return;
+    var s=CH.srvErr;
+    if(!s&&CH.errN<2){ b.hidden=true; b.innerHTML=""; return; }
+    b.hidden=false;
+    var msg=s?whyNot(s):(navigator.onLine===false?"You're offline. Reconnecting…":"Can't reach chat right now. Retrying…");
+    b.innerHTML='<span>'+esc(msg)+'</span><button type="button" id="chchk">Run check</button><div id="chchkr"></div>';
+    $("chchk").onclick=function(){ runCheck($("chchkr")); };
   }
-  function ago(ts){ var s=Math.max(0,(Date.now()-ts)/1000); if(s<60) return "now"; if(s<3600) return Math.floor(s/60)+"m"; if(s<86400) return Math.floor(s/3600)+"h"; return Math.floor(s/86400)+"d"; }
-  function pname(n){ return av(n,"","width:38px;height:38px;font-size:15px;margin:0"); }
+  function runCheck(box){
+    box.innerHTML='<p class="chk">Checking…</p>';
+    call("diag").then(function(r){
+      if(!r||!r.ok){ box.innerHTML='<p class="chk bad">'+esc(r&&r.status===401?"Not signed in (or the sign-in expired). Sign out and back in.":r&&r.status===404?"The chat service isn't deployed on this site (no /api/social).":r&&r.error==="setup"?"The server isn't configured (service account missing).":"Check failed: "+whyNot(r))+'</p>'; return; }
+      box.innerHTML=r.steps.map(function(s){ return '<p class="chk '+(s.ok?'ok':'bad')+'">'+svg(s.ok?IC.check:IC.x,13)+'<b>'+esc(s.n)+'</b><span>'+esc(s.d)+'</span></p>'; }).join("")+(r.allOk?'<p class="chk ok"><b>Everything works.</b></p>':'');
+    });
+  }
 
   /* ---- views ---- */
   function render(){
     var body=$("chbody"), comp=$("chcomp"), ib=CH.inbox;
     if(!CH.open) return;
+    paintBanner();
     if(ib&&ib.chat===false&&!(CH.me&&CH.me.admin)){ setHead("Chat","",false,false); comp.hidden=true; body.innerHTML='<div class="chempty"><b>Chat is turned off</b><p>An admin switched chat off for now. Check back later.</p></div>'; return; }
     if(CH.view==="list") return renderList();
     if(CH.view==="new") return renderNew();
     renderThread();
   }
   function renderList(){
-    var body=$("chbody"), ib=CH.inbox||{dms:[],main:null}, me=CH.me;
+    var body=$("chbody"), ib=CH.inbox||{dms:[],main:null}, me=CH.me, q=(CH.filter||"").toLowerCase();
     setHead("Chat","Timmylist players",false,false); $("chcomp").hidden=true;
     var h='<button class="chrm" data-cr="main" type="button"><span class="chrav room">'+svg(IC.room,20)+'</span><span class="chrt"><b>Timmylist Room</b><small>'+
       (ib.main&&ib.main.last?esc(ib.main.name)+': '+esc(ib.main.last):'Everyone signed in can talk here')+'</small></span>'+
       '<span class="chrr">'+(ib.main&&ib.main.ts?ago(ib.main.ts):'')+(me&&ib.main&&ib.main.from!==me.uid&&ib.main.ts>(CH.seen.main||0)?'<i class="chud"></i>':'')+'</span></button>';
     h+='<div class="chsec"><span>Direct messages</span><button class="chnewb" id="chnewb" type="button">'+svg(IC.plus,14)+' New</button></div>';
-    var dms=ib.dms||[];
-    if(!dms.length) h+='<div class="chempty sm"><p>No direct messages yet. Start one with the New button, or tap a name in the room.</p></div>';
+    var dms=(ib.dms||[]).filter(function(d){ return !q||String(d.name).toLowerCase().indexOf(q)>=0; });
+    if((ib.dms||[]).length>5) h+='<input class="chfind" id="chfind" type="search" placeholder="Search your messages" value="'+esc(CH.filter||"")+'" aria-label="Search your messages">';
+    if(!dms.length) h+='<div class="chempty sm"><p>'+(q?'No one matches that.':'No direct messages yet. Start one with the New button, or tap a name in the room.')+'</p></div>';
     else dms.forEach(function(d){
-      h+='<button class="chrm" data-cp="'+esc(d.peer)+'" data-cn="'+esc(d.name)+'" type="button">'+pname(d.name)+'<span class="chrt"><b>'+esc(d.name)+'</b><small>'+(me&&d.from===me.uid?'You: ':'')+esc(d.last||'')+'</small></span>'+
-        '<span class="chrr">'+ago(d.ts)+(me&&d.from!==me.uid&&d.ts>(CH.seen[d.peer]||0)?'<i class="chud"></i>':'')+'</span></button>';
+      var un=me&&d.from!==me.uid&&d.ts>(CH.seen[d.peer]||0);
+      h+='<button class="chrm'+(un?' un':'')+'" data-cp="'+esc(d.peer)+'" data-cn="'+esc(d.name)+'" type="button">'+pname(d.name)+'<span class="chrt"><b>'+esc(d.name)+'</b><small>'+(me&&d.from===me.uid?'You: ':'')+esc(d.last||'')+'</small></span>'+
+        '<span class="chrr">'+ago(d.ts)+(un?'<i class="chud"></i>':'')+'</span></button>';
     });
     h+='<p class="chfoot">Be kind. Direct messages are private &mdash; admins only see a message if someone reports it.</p>';
     body.innerHTML=h;
     body.querySelector('[data-cr="main"]').onclick=function(){ go("thread",{dm:false,name:"Timmylist Room"}); };
     $("chnewb").onclick=function(){ go("new"); };
+    var fi=$("chfind"); if(fi) fi.oninput=function(){ CH.filter=this.value; var pos=this.selectionStart; renderList(); var n=$("chfind"); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } };
     var rs=body.querySelectorAll("[data-cp]"), i; for(i=0;i<rs.length;i++) rs[i].onclick=function(){ go("thread",{dm:true,peer:this.getAttribute("data-cp"),name:this.getAttribute("data-cn")}); };
   }
   function knownNames(){
@@ -18331,42 +18868,60 @@ var _sh=window.show;
     };
     setTimeout(function(){ var t=$("chto"); if(t) t.focus(); },60);
   }
+
+  /* ---- thread ---- */
+  function findMsg(id){ for(var i=0;i<CH.msgs.length;i++) if(CH.msgs[i].id===id) return CH.msgs[i]; return null; }
   function renderThread(){
     var r=CH.room, ib=CH.inbox||{}, body=$("chbody"), comp=$("chcomp");
     var blocked=r.dm&&r.peer&&(ib.blocked||[]).indexOf(r.peer)>=0, mutedNow=CH.muted&&CH.muted>Date.now();
-    setHead(r.name,r.dm?"Private message":"Everyone signed in can see this",true,!!(r.dm&&r.peer));
+    setHead(r.name,r.dm?"Private message":"Everyone signed in can see this",true,!!(r.dm&&r.peer&&callSupported()&&!blocked));
     comp.hidden=false;
     var tx=$("chtx");
     if(mutedNow){ tx.disabled=true; tx.placeholder="You're muted for now"; }
     else if(blocked){ tx.disabled=true; tx.placeholder="You blocked this player"; }
     else { tx.disabled=false; tx.placeholder=r.dm?"Message "+r.name:"Write a message"; }
-    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled;
-    var h="", lastDay="", prev=null, me=CH.me;
-    CH.msgs.forEach(function(m){
-      if(m.k==="del") return;
+    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled;
+    var h="", lastDay="", prev=null, me=CH.me, myId=me&&me.uid;
+    if(CH.more) h+='<button class="chmore" id="chmoreb" type="button">'+svg(IC.load,14)+' Load earlier messages</button>';
+    var list=CH.msgs.filter(function(m){ return m.k!=="del"&&m.k!=="re"; });
+    list.forEach(function(m){
       var day=dayLbl(m.ts); if(day!==lastDay){ h+='<div class="chday"><span>'+day+'</span></div>'; lastDay=day; prev=null; }
-      var mine=me&&m.from===me.uid, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del;
-      h+='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'">';
-      if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
-      h+='<div class="chbub">';
-      if(!grp&&!mine&&!r.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
-      if(m.del) h+='<em>Message removed</em>';
-      else {
-        if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
-        if(m.text) h+='<p>'+esc(m.text).replace(/\n/g,"<br>")+'</p>';
-      }
-      h+='<time>'+when(m.ts)+'</time></div>';
-      if(CH.sel===m.id&&!m.del) h+=actions(m,mine);
-      h+='</div>'; prev=m;
+      if(m.k==="call"){ h+='<div class="chsys" data-cid="'+esc(m.id)+'">'+svg(IC.phone,13)+'<span>'+esc(m.text)+'</span><time>'+when(m.ts)+'</time></div>'; prev=null; return; }
+      h+=msgHtml(m,prev,myId); prev=m;
     });
-    if(CH.err) h+='<div class="chnote bad">'+esc(CH.err)+'</div>';
-    if(!CH.msgs.length) h+='<div class="chempty sm">'+(CH.busy?'<p>Loading</p>':'<p>'+(r.dm?'No messages yet. Say hi to '+esc(r.name)+'.':'Nobody has said anything yet. Say hi!')+'</p>')+'</div>';
+    CH.pendMsgs.forEach(function(p){
+      h+='<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>':'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
+        '<time>'+(p.state==="failed"?'Not sent':'Sending…')+'</time></div>'+(p.state==="failed"?'<div class="chact"><button type="button" data-cpend="retry" data-ptmp="'+esc(p.tmp)+'">'+svg(IC.retry,15)+' Try again</button><button type="button" data-cpend="drop" data-ptmp="'+esc(p.tmp)+'" class="warn">'+svg(IC.trash,15)+' Discard</button></div>':'')+'</div>';
+    });
+    if(CH.err&&!CH.pendMsgs.length) h+='<div class="chnote bad">'+esc(CH.err)+'</div>';
+    if(!list.length&&!CH.pendMsgs.length) h+='<div class="chempty sm">'+(CH.busy?'<p>Loading…</p>':'<p>'+(r.dm?'No messages yet. Say hi to '+esc(r.name)+'.':'Nobody has said anything yet. Say hi!')+'</p>')+'</div>';
     var keep=body.scrollTop, wasEnd=CH.stick;
     body.innerHTML=h; if(wasEnd) body.scrollTop=body.scrollHeight; else body.scrollTop=keep;
     wireThread(body);
   }
+  function msgHtml(m,prev,myId){
+    var mine=myId&&m.from===myId, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del&&prev.k!=="call";
+    var h='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'">';
+    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
+    h+='<div class="chbub">';
+    if(!grp&&!mine&&!CH.room.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
+    if(m.del) h+='<em>Message removed</em>';
+    else {
+      if(m.rt) h+='<div class="chq" data-cq="'+esc(m.rt)+'"><b>'+esc(m.rn||"Someone")+'</b><span>'+esc(m.rq||"")+'</span></div>';
+      if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.text) h+='<p>'+rich(m.text)+'</p>';
+    }
+    h+='<time>'+when(m.ts)+'</time></div>';
+    var rx=m.rx||{}, ks=Object.keys(rx).filter(function(k){ return rx[k]&&rx[k].length; });
+    if(ks.length&&!m.del) h+='<div class="chrx">'+ks.map(function(k){ var mi=myId&&rx[k].indexOf(myId)>=0; return '<button type="button" class="chrxb'+(mi?' on':'')+'" data-crx="'+k+'" data-cid="'+esc(m.id)+'" aria-pressed="'+mi+'" aria-label="'+esc(rEmoji(k)+" "+rx[k].length)+'">'+rEmoji(k)+'<b>'+rx[k].length+'</b></button>'; }).join("")+'</div>';
+    if(CH.sel===m.id&&!m.del) h+=actions(m,mine);
+    return h+'</div>';
+  }
   function actions(m,mine){
     var me=CH.me, a='<div class="chact">';
+    a+='<div class="chpick">'+REACTS.map(function(x){ var mi=m.rx&&m.rx[x[0]]&&me&&m.rx[x[0]].indexOf(me.uid)>=0; return '<button type="button" data-cact="react" data-ck="'+x[0]+'" class="'+(mi?'on':'')+'" aria-label="React '+x[0]+'">'+x[1]+'</button>'; }).join("")+'</div>';
+    a+='<button data-cact="reply" type="button">'+svg(IC.reply,15)+' Reply</button>';
+    if(m.text) a+='<button data-cact="copy" type="button">'+svg(IC.copy,15)+' Copy</button>';
     if(!mine&&!CH.room.dm) a+='<button data-cact="dm" data-cuid="'+esc(m.from)+'" data-cn="'+esc(m.name)+'" type="button">'+svg(IC.mail,15)+' Message</button><button data-cact="prof" data-cn="'+esc(m.name)+'" type="button">'+svg(IC.user,15)+' Profile</button>';
     if(!mine) a+='<button data-cact="rep" type="button">'+svg(IC.flag,15)+' Report</button>';
     if(mine||(me&&me.admin&&!CH.room.dm)) a+='<button data-cact="del" type="button" class="warn">'+svg(IC.trash,15)+' Delete</button>';
@@ -18374,34 +18929,72 @@ var _sh=window.show;
     return a+'</div>';
   }
   function wireThread(body){
-    var ms=body.querySelectorAll(".chm"), i;
+    var ms=body.querySelectorAll(".chm[data-cid]"), i;
     for(i=0;i<ms.length;i++) ms[i].onclick=function(e){
       var id=this.getAttribute("data-cid"), t=e.target;
-      if(t.closest&&t.closest(".chact")) return;
+      if(t.closest&&(t.closest(".chact")||t.closest(".chrx")||t.closest("a"))) return;
       if(t.closest&&t.closest(".chimg img")){ var lb=$("chlb"); lb.querySelector("img").src=t.src; lb.hidden=false; return; }
-      var pf=t.closest&&t.closest("[data-cpf]"); if(pf&&!CH.room.dm){ CH.sel=CH.sel===id?"":id; renderThread(); return; }
+      var q=t.closest&&t.closest("[data-cq]"); if(q){ jumpTo(q.getAttribute("data-cq")); return; }
       CH.sel=CH.sel===id?"":id; renderThread();
     };
-    var bs=body.querySelectorAll(".chact button");
-    for(i=0;i<bs.length;i++) bs[i].onclick=function(e){ e.stopPropagation(); act(this); };
+    var bs=body.querySelectorAll(".chact button[data-cact]"); for(i=0;i<bs.length;i++) bs[i].onclick=function(e){ e.stopPropagation(); act(this); };
+    var rx=body.querySelectorAll(".chrxb"); for(i=0;i<rx.length;i++) rx[i].onclick=function(e){ e.stopPropagation(); react(this.getAttribute("data-cid"),this.getAttribute("data-crx")); };
+    var pb=body.querySelectorAll("[data-cpend]"); for(i=0;i<pb.length;i++) pb[i].onclick=function(){ var tmp=this.getAttribute("data-ptmp"), k=this.getAttribute("data-cpend"); if(k==="drop"){ CH.pendMsgs=CH.pendMsgs.filter(function(p){ return p.tmp!==tmp; }); renderThread(); } else retry(tmp); };
+    var mb=$("chmoreb"); if(mb) mb.onclick=loadEarlier;
     fillImages();
   }
+  function jumpTo(id){ var el=$("chbody").querySelector('.chm[data-cid="'+id+'"]'); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.add("flash"); setTimeout(function(){ el.classList.remove("flash"); },1400); } else toast("That message is further back. Load earlier messages."); }
   function act(b){
-    var k=b.getAttribute("data-cact"), id=CH.sel, r=CH.room, key=r.dm?{peer:r.peer}:{};
-    if(k==="dm"){ var u=b.getAttribute("data-cuid"), n=b.getAttribute("data-cn"); go("thread",{dm:true,peer:u,name:n}); return; }
+    var k=b.getAttribute("data-cact"), id=CH.sel, r=CH.room, key=r.dm?{peer:r.peer}:{}, m=findMsg(id);
+    if(k==="dm"){ go("thread",{dm:true,peer:b.getAttribute("data-cuid"),name:b.getAttribute("data-cn")}); return; }
     if(k==="prof"){ var nm=b.getAttribute("data-cn"); closeChat(); try{ show("player",nm); }catch(e){} return; }
-    CH.sel=""; renderThread();
+    if(k==="react"){ var kk=b.getAttribute("data-ck"); CH.sel=""; react(id,kk); return; }
+    CH.sel="";
+    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
+    if(k==="copy"&&m){ try{ navigator.clipboard.writeText(m.text).then(function(){ toast("Copied"); },function(){ toast("Copy blocked by browser"); }); }catch(e){ toast("Copy blocked by browser"); } renderThread(); return; }
+    renderThread();
     if(k==="del") call("del",Object.assign({id:id},key)).then(function(x){ if(x&&x.ok){ markDel(id); renderThread(); poll(); } else toast(whyNot(x)); });
     if(k==="rep") call("report",Object.assign({id:id},key)).then(function(x){ toast(x&&x.ok?"Reported. Thanks, an admin will take a look.":whyNot(x)); });
     if(k==="mute") call("mute",{uid:b.getAttribute("data-cuid"),hours:24}).then(function(x){ toast(x&&x.ok?"Muted for 24 hours":whyNot(x)); });
   }
   function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; } }); delete CH.imgs[id]; }
+  function react(id,k){
+    var m=findMsg(id), me=CH.me; if(!m||!me) return;
+    var arr=(m.rx&&m.rx[k])||[], has=arr.indexOf(me.uid)>=0, on=!has;
+    setRx(m,k,me.uid,on); renderThread();
+    var key=CH.room.dm?{peer:CH.room.peer}:{};
+    call("react",Object.assign({id:id,e:k,on:on},key)).then(function(r){ if(!r||!r.ok){ setRx(m,k,me.uid,!on); renderThread(); toast(whyNot(r)); } });
+  }
+  function setRx(m,k,u,on){
+    m.rx=m.rx||{}; var a=(m.rx[k]||[]).filter(function(x){ return x!==u; }); if(on) a.push(u); if(a.length) m.rx[k]=a; else delete m.rx[k];
+  }
+  function paintReply(){
+    var b=$("chrbar"); if(!b) return;
+    if(!CH.reply){ b.hidden=true; b.innerHTML=""; return; }
+    b.hidden=false; b.innerHTML=svg(IC.reply,15)+'<div><b>Replying to '+esc(CH.reply.name)+'</b><span>'+esc(String(CH.reply.text).slice(0,90))+'</span></div><button type="button" aria-label="Cancel reply">'+svg(IC.x,14)+'</button>';
+    b.querySelector("button").onclick=function(){ CH.reply=null; paintReply(); };
+  }
+  function toggleEmoji(){
+    var p=$("chemo"); if(!p.hidden){ p.hidden=true; return; }
+    p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
+    var bs=p.querySelectorAll("button"), i; for(i=0;i<bs.length;i++) bs[i].onclick=function(ev){ ev.stopPropagation(); var t=$("chtx"), s=t.selectionStart==null?t.value.length:t.selectionStart, e=t.selectionEnd==null?s:t.selectionEnd; t.value=t.value.slice(0,s)+this.textContent+t.value.slice(e); var c=s+this.textContent.length; t.focus(); try{ t.setSelectionRange(c,c); }catch(x){} };
+  }
   function toggleMenu(){
-    var m=$("chmenu"), r=CH.room; if(!r||!r.dm||!r.peer) return;
-    var bl=((CH.inbox||{}).blocked||[]).indexOf(r.peer)>=0;
-    m.innerHTML='<button type="button" id="chblk">'+svg(IC.ban,16)+(bl?' Unblock ':' Block ')+esc(r.name)+'</button>';
-    m.hidden=!m.hidden;
-    $("chblk").onclick=function(){ m.hidden=true; call("block",{peer:r.peer,on:!bl}).then(function(x){ if(x&&x.ok){ var b=(CH.inbox.blocked=CH.inbox.blocked||[]); if(bl) b.splice(b.indexOf(r.peer),1); else b.push(r.peer); toast(bl?"Unblocked":"Blocked. They can't message you."); renderThread(); } else toast(whyNot(x)); }); };
+    var m=$("chmenu"), r=CH.room, ib=CH.inbox||{}, h="";
+    var snd=LS.get("tml_chat_snd","1")==="1", ntf=LS.get("tml_chat_ntf","0")==="1"&&window.Notification&&Notification.permission==="granted";
+    if(CH.view==="thread"&&r&&r.dm&&r.peer){ var bl=(ib.blocked||[]).indexOf(r.peer)>=0; h+='<button type="button" role="menuitem" data-m="block">'+svg(IC.ban,16)+(bl?' Unblock ':' Block ')+esc(r.name)+'</button>'; }
+    h+='<button type="button" role="menuitem" data-m="snd">'+svg(IC.vol,16)+' Message sound: '+(snd?'on':'off')+'</button>';
+    if(window.Notification) h+='<button type="button" role="menuitem" data-m="ntf">'+svg(IC.bell,16)+' Desktop alerts: '+(ntf?'on':'off')+'</button>';
+    h+='<button type="button" role="menuitem" data-m="chk">'+svg(IC.pulse,16)+' Run connection check</button>';
+    m.innerHTML=h; m.hidden=!m.hidden;
+    var bs=m.querySelectorAll("[data-m]"), i;
+    for(i=0;i<bs.length;i++) bs[i].onclick=function(){
+      var k=this.getAttribute("data-m"); m.hidden=true;
+      if(k==="snd"){ LS.set("tml_chat_snd",snd?"0":"1"); toast("Message sound "+(snd?"off":"on")); if(!snd) ping(); }
+      if(k==="ntf"){ if(ntf){ LS.set("tml_chat_ntf","0"); toast("Desktop alerts off"); } else { Notification.requestPermission().then(function(p){ if(p==="granted"){ LS.set("tml_chat_ntf","1"); toast("Desktop alerts on"); } else toast("Alerts are blocked in your browser settings"); }); } }
+      if(k==="chk"){ CH.srvErr=CH.srvErr||null; var b=$("chbanner"); b.hidden=false; b.innerHTML='<span>Connection check</span><div id="chchkr"></div>'; runCheck($("chchkr")); }
+      if(k==="block"){ var bl2=(ib.blocked||[]).indexOf(r.peer)>=0; call("block",{peer:r.peer,on:!bl2}).then(function(x){ if(x&&x.ok){ var b2=(CH.inbox.blocked=CH.inbox.blocked||[]); if(bl2) b2.splice(b2.indexOf(r.peer),1); else b2.push(r.peer); toast(bl2?"Unblocked":"Blocked. They can't message or call you."); renderThread(); } else toast(whyNot(x)); }); }
+    };
   }
 
   /* ---- images ---- */
@@ -18451,45 +19044,65 @@ var _sh=window.show;
     fr.readAsDataURL(file);
   }
 
-  /* ---- talking to the server ---- */
+  /* ---- sending, receiving, polling ---- */
   function keyOf(){ var r=CH.room; return r.dm?(r.peer?{peer:r.peer}:{to:r.to||r.name}):{}; }
+  var tmpN=0;
   function sendNow(){
     var tx=$("chtx"), text=tx.value.trim(), img=CH.pend;
-    if(tx.disabled||CH.sending||(!text&&!img)) return;
-    CH.sending=true; $("chsend").disabled=true; CH.err="";
-    call("send",Object.assign({text:text,img:img||undefined},keyOf())).then(function(r){
-      CH.sending=false; $("chsend").disabled=tx.disabled;
+    if(tx.disabled||(!text&&!img)) return;
+    var p={tmp:"t"+(++tmpN),text:text,img:img,reply:CH.reply?CH.reply.id:null,state:"sending",room:CH.room};
+    tx.value=""; tx.style.height="auto"; CH.pend=null; $("chprev").hidden=true; $("chprev").innerHTML=""; CH.reply=null; paintReply(); $("chemo").hidden=true;
+    CH.pendMsgs.push(p); CH.stick=true; renderThread(); deliver(p);
+  }
+  function deliver(p){
+    p.state="sending";
+    var key=p.room.dm?(p.room.peer?{peer:p.room.peer}:{to:p.room.to||p.room.name}):{};
+    call("send",Object.assign({text:p.text,img:p.img||undefined,reply:p.reply||undefined},key)).then(function(r){
       if(r&&r.ok){
-        tx.value=""; tx.style.height="auto"; CH.pend=null; $("chprev").hidden=true; $("chprev").innerHTML="";
-        if(r.peer&&!CH.room.peer) CH.room.peer=r.peer;
-        if(r.msg.img&&img) CH.imgs[r.msg.id]=img;
-        addMsgs([r.msg]); CH.stick=true; renderThread(); refreshInbox(); schedule(2500);
+        CH.pendMsgs=CH.pendMsgs.filter(function(x){ return x!==p; });
+        if(r.peer&&p.room.dm&&!p.room.peer) p.room.peer=r.peer;
+        if(CH.room===p.room){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
+        refreshInbox(); schedule(2500);
       } else {
-        CH.err=whyNot(r); if(r&&r.error==="muted") refreshInbox();
-        renderThread();
+        p.state="failed"; p.err=whyNot(r); CH.err=p.err; if(r&&r.error==="muted") refreshInbox();
+        if(CH.room===p.room&&CH.view==="thread") renderThread();
+        if(r&&(r.status===0||r.status>=500)) { CH.srvErr=r.status===0?null:r; CH.errN=Math.max(CH.errN,2); paintBanner(); }
       }
     });
   }
+  function retry(tmp){ var p=CH.pendMsgs.filter(function(x){ return x.tmp===tmp; })[0]; if(!p) return; CH.err=""; renderThread(); deliver(p); }
   function addMsgs(list){
-    var changed=false;
+    var changed=false, incoming=0;
     list.forEach(function(m){
-      if(!m||!m.id||CH.ids[m.id]) { return; }
+      if(!m||!m.id||CH.ids[m.id]) return;
       CH.ids[m.id]=1; changed=true;
       if(m.k==="del"){ markDel(m.t); }
+      else if(m.k==="re"){ var t=findMsg(m.t); if(t) setRx(t,m.e,m.u,m.on); }
+      else if(CH.me&&m.from!==CH.me.uid&&CH.loaded) incoming++;
       CH.msgs.push(m);
       if(m.id>CH.last) CH.last=m.id;
     });
     CH.msgs.sort(function(a,b){ return a.id<b.id?-1:1; });
-    if(CH.msgs.length>300){ CH.msgs=CH.msgs.slice(-300); }
+    if(CH.msgs.length>400){ CH.msgs=CH.msgs.slice(-400); }
+    if(incoming&&(document.hidden||!CH.open)) ping();
     return changed;
   }
   function loadThread(){
-    var r=CH.room; if(r.dm&&!r.peer){ CH.busy=false; return; }
+    var r=CH.room; CH.loaded=false; if(r.dm&&!r.peer){ CH.busy=false; CH.loaded=true; return; }
     CH.busy=true; var rr=r;
     call("msgs",rr.dm?{peer:rr.peer}:{}).then(function(x){
       CH.busy=false; if(CH.room!==rr) return;
-      if(x&&x.ok){ CH.err=""; addMsgs(x.msgs||[]); markSeen(); } else CH.err=whyNot(x);
-      if(CH.open&&CH.view==="thread") renderThread();
+      if(x&&x.ok){ CH.err=""; CH.srvErr=null; CH.errN=0; CH.more=!!x.more; x.msgs.forEach(function(m){ if(m.k==="re"){ /* already reflected in the loaded messages */ CH.ids[m.id]=1; if(m.id>CH.last) CH.last=m.id; } }); addMsgs(x.msgs.filter(function(m){ return m.k!=="re"; })); CH.loaded=true; markSeen(); }
+      else { CH.err=whyNot(x); CH.srvErr=x&&x.status>=400?x:null; CH.errN++; }
+      if(CH.open&&CH.view==="thread") renderThread(); paintBanner();
+    });
+  }
+  function loadEarlier(){
+    var first=CH.msgs[0]; if(!first||CH.loadingOld) return; CH.loadingOld=true; var rr=CH.room, body=$("chbody"), oldH=body.scrollHeight;
+    call("msgs",Object.assign(rr.dm?{peer:rr.peer}:{},{before:first.id})).then(function(x){
+      CH.loadingOld=false; if(CH.room!==rr) return;
+      if(x&&x.ok){ CH.more=!!x.more; x.msgs.forEach(function(m){ if(m.k==="re"){ CH.ids[m.id]=1; return; } if(CH.ids[m.id]) return; CH.ids[m.id]=1; CH.msgs.push(m); }); CH.msgs.sort(function(a,b){ return a.id<b.id?-1:1; }); CH.stick=false; renderThread(); body.scrollTop=body.scrollHeight-oldH; }
+      else toast(whyNot(x));
     });
   }
   function markSeen(){
@@ -18498,50 +19111,206 @@ var _sh=window.show;
     if(t>(CH.seen[k]||0)){ CH.seen[k]=t; saveSeen(); paintFab(); }
   }
   function poll(){
-    if(!CH.open||CH.view!=="thread"||!CH.room||(CH.room.dm&&!CH.room.peer)||CH.polling) return;
+    if(!CH.open||CH.view!=="thread"||!CH.room||(CH.room.dm&&!CH.room.peer)||CH.polling||!CH.loaded) return;
     CH.polling=true; var rr=CH.room;
     call("msgs",Object.assign(rr.dm?{peer:rr.peer}:{},CH.last?{since:CH.last}:{})).then(function(x){
       CH.polling=false; if(CH.room!==rr||!CH.open) return;
       if(x&&x.ok){
-        CH.errN=0; if(CH.err&&!CH.sending) CH.err="";
+        if(CH.errN||CH.srvErr){ CH.errN=0; CH.srvErr=null; paintBanner(); }
         if(addMsgs(x.msgs||[])){
-          var b=$("chbody"); var near=CH.stick; renderThread(); markSeen();
-          if(!near&&x.msgs.some(function(m){ return m.k!=="del"&&CH.me&&m.from!==CH.me.uid; })) $("chnew").hidden=false;
+          var near=CH.stick; renderThread(); markSeen();
+          if(!near&&x.msgs.some(function(m){ return !m.k&&CH.me&&m.from!==CH.me.uid; })) $("chnew").hidden=false;
         }
-      } else { CH.errN++; }
+      } else { CH.errN++; if(x&&x.status>=400&&x.status!==429) CH.srvErr=x; paintBanner(); }
     });
   }
   function scrollEnd(){ var b=$("chbody"); b.scrollTop=b.scrollHeight; CH.stick=true; $("chnew").hidden=true; }
-  function refreshInbox(){
+  function refreshInbox(lite){
     if(!signed()||CH.inboxBusy) return Promise.resolve(); CH.inboxBusy=true;
-    return call("inbox").then(function(r){
+    var before=unread();
+    return call("inbox",lite?{lite:true}:{}).then(function(r){
       CH.inboxBusy=false;
-      if(r&&r.ok){ CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; paintFab(); if(CH.open&&CH.view==="list") renderList(); else if(CH.open&&CH.view==="thread") { var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
-      else { CH.errN++; if(r&&r.status===404) CH.gone=true; }
+      if(r&&r.ok){
+        var prevMain=CH.inbox&&CH.inbox.main; if(lite&&CH.inbox&&r.main===undefined) r.main=prevMain;
+        CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab();
+        var after=unread(); if(after>before){ var latest=(r.dms||[]).filter(function(d){ return d.from!==r.me.uid&&d.ts>(CH.seen[d.peer]||0); })[0]; ping(); if(latest) notify(latest.name,latest.last||"New message"); }
+        if(r.call) onIncoming(r.call);
+        if(CH.open){ paintBanner(); if(CH.view==="list") renderList(); else if(CH.view==="thread"){ var t=$("chtx"); if(t){ var m=CH.muted>Date.now(); if(t.disabled!==m&&!((r.blocked||[]).indexOf(CH.room&&CH.room.peer)>=0)) renderThread(); } } }
+      } else { CH.errN++; if(r&&r.status===404) CH.gone=true; if(r&&r.status>=400&&r.status!==429) CH.srvErr=r; if(CH.open) paintBanner(); }
     });
   }
   function schedule(ms){
     clearTimeout(CH.tm);
     if(!online()||!signed()||CH.gone) return;
-    var wait=ms!=null?ms:(CH.open?3000:30000);
+    var wait=ms!=null?ms:(CH.open?3000:20000);
     wait=wait*Math.min(6,1+CH.errN);
-    CH.tm=setTimeout(function tick(){
+    CH.tm=setTimeout(function(){
       if(document.hidden){ schedule(); return; }
-      if(CH.open&&CH.view==="thread") { poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
+      CH.tick++;
+      if(CH.open&&CH.view==="thread"){ poll(); if(!CH.inboxAt||Date.now()-CH.inboxAt>9000){ CH.inboxAt=Date.now(); refreshInbox(); } }
       else if(CH.open){ CH.inboxAt=Date.now(); refreshInbox(); }
-      else { CH.inboxAt=Date.now(); refreshInbox(); }
+      else { CH.inboxAt=Date.now(); refreshInbox(CH.tick%3!==0); }
       schedule();
     },wait);
   }
+
+  /* =============================== voice calls =============================== */
+  var CALL={st:"idle",id:null,peer:null,name:"",dir:"",pc:null,stream:null,dc:null,t0:0,tick:null,muted:false,rmuted:false,poll:null,ring:null,audio:null,gen:0,msg:"",ended:false,ignore:{},conTm:null,disTm:null};
+  function callSupported(){ return !!(window.RTCPeerConnection&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia); }
+  function iceCfg(){ return {iceServers:window.TML_ICE_SERVERS||[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}],bundlePolicy:"max-bundle"}; }
+  function micErr(e){
+    var n=e&&e.name||""; if(n==="NotAllowedError"||n==="SecurityError") return "Microphone is blocked. Allow it in your browser's address bar, then try again.";
+    if(n==="NotFoundError"||n==="OverconstrainedError") return "No microphone found."; if(n==="NotReadableError") return "Your microphone is being used by another app.";
+    return "Couldn't use the microphone.";
+  }
+  function getMic(){ return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false}); }
+  function gathered(pc){
+    return new Promise(function(res){
+      if(pc.iceGatheringState==="complete") return res();
+      var done=false, fin=function(){ if(done) return; done=true; res(); };
+      pc.addEventListener("icegatheringstatechange",function(){ if(pc.iceGatheringState==="complete") fin(); });
+      setTimeout(fin,3000);
+    });
+  }
+  function makePc(){
+    var pc=new RTCPeerConnection(iceCfg()); CALL.pc=pc;
+    if(!CALL.audio){ var a=document.createElement("audio"); a.autoplay=true; a.setAttribute("playsinline",""); a.style.display="none"; document.body.appendChild(a); CALL.audio=a; }
+    pc.ontrack=function(e){ CALL.audio.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]); var p=CALL.audio.play(); if(p&&p.catch) p.catch(function(){}); };
+    pc.ondatachannel=function(e){ wireDc(e.channel); };
+    pc.onconnectionstatechange=function(){
+      var s=pc.connectionState, g=CALL.gen;
+      if(s==="connected"){ clearTimeout(CALL.disTm); if(CALL.st!=="live"){ CALL.st="live"; CALL.t0=Date.now(); stopRing(); clearTimeout(CALL.conTm); clearInterval(CALL.poll); CALL.tick=setInterval(paintCall,1000); } CALL.msg=""; paintCall(); }
+      else if(s==="disconnected"){ CALL.msg="Reconnecting…"; paintCall(); clearTimeout(CALL.disTm); CALL.disTm=setTimeout(function(){ if(CALL.gen===g&&CALL.pc&&CALL.pc.connectionState!=="connected") endCall("failed","Connection lost."); },9000); }
+      else if(s==="failed"){ if(CALL.gen===g) endCall("failed","Couldn't connect. Your network may block voice calls."); }
+    };
+    return pc;
+  }
+  function wireDc(dc){
+    CALL.dc=dc;
+    dc.onmessage=function(e){ var d=String(e.data); if(d==="bye") remoteBye(); else if(d==="mute:1"||d==="mute:0"){ CALL.rmuted=d==="mute:1"; paintCall(); } };
+    dc.onopen=function(){ try{ if(CALL.muted) dc.send("mute:1"); }catch(e){} };
+  }
+  function startCall(peer,name){
+    if(CALL.st!=="idle"){ toast("You're already in a call."); return; }
+    if(!gate("Calls")) return; if(!callSupported()){ toast("Your browser can't make voice calls."); return; }
+    var g=++CALL.gen; CALL.st="calling"; CALL.dir="out"; CALL.peer=peer; CALL.name=name; CALL.id=null; CALL.msg="Starting…"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); setHead(CH.room.name,"Private message",true,true);
+    getMic().then(function(stream){
+      if(CALL.gen!==g){ stream.getTracks().forEach(function(t){ t.stop(); }); return Promise.reject({silent:1}); }
+      CALL.stream=stream; var pc=makePc(); stream.getTracks().forEach(function(t){ pc.addTrack(t,stream); });
+      wireDc(pc.createDataChannel("ctl")); return pc.createOffer();
+    }).then(function(o){ return CALL.pc.setLocalDescription(o); }).then(function(){ return gathered(CALL.pc); }).then(function(){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      return call("callStart",{peer:peer,offer:CALL.pc.localDescription.sdp});
+    }).then(function(r){
+      if(CALL.gen!==g) return;
+      if(!r||!r.ok){ cleanup(); toast(whyNot(r)); return; }
+      CALL.id=r.id; CALL.msg="Calling… they'll hear it when they have the Timmylist open"; paintCall(); ringback(); watchOut(g);
+    }).catch(function(e){ if(e&&e.silent) return; if(CALL.gen!==g) return; cleanup(); toast(e&&e.name?micErr(e):"Couldn't start the call."); });
+  }
+  function watchOut(g){
+    var t0=Date.now(); clearInterval(CALL.poll);
+    CALL.poll=setInterval(function(){
+      if(CALL.gen!==g){ clearInterval(CALL.poll); return; }
+      if(Date.now()-t0>60000){ endCall("missed","No answer."); return; }
+      call("callGet",{id:CALL.id}).then(function(r){
+        if(CALL.gen!==g||!r) return;
+        if(r.ok&&r.state==="active"&&r.answer&&CALL.st==="calling"){
+          clearInterval(CALL.poll); stopRing(); CALL.st="connecting"; CALL.msg="Connecting…"; paintCall();
+          CALL.pc.setRemoteDescription({type:"answer",sdp:r.answer}).catch(function(){ endCall("failed","Couldn't connect."); });
+          CALL.conTm=setTimeout(function(){ if(CALL.gen===g&&CALL.st!=="live") endCall("failed","Couldn't connect. Your network may block voice calls."); },20000);
+        } else if(r.ok&&r.state==="ended"){ var why=r.reason==="declined"?name0()+" declined the call.":r.reason==="missed"?"No answer.":"The call ended."; finishRemote(why); }
+      });
+    },1500);
+  }
+  function name0(){ return CALL.name||"They"; }
+  // incoming ring (found through the inbox)
+  function onIncoming(c){
+    if(!c||!c.id||CALL.ignore[c.id]) return;
+    if(CALL.st!=="idle"){ if(CALL.id!==c.id) CALL.ignore[c.id]=1; return; }
+    if(!callSupported()) return;
+    var g=++CALL.gen; CALL.st="ringing"; CALL.dir="in"; CALL.id=c.id; CALL.peer=c.from; CALL.name=c.name||"Someone"; CALL.msg="Incoming voice call"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); startRing(); notify(CALL.name,"Incoming voice call");
+    var t0=Date.now(); clearInterval(CALL.poll);
+    CALL.poll=setInterval(function(){
+      if(CALL.gen!==g||CALL.st!=="ringing"){ clearInterval(CALL.poll); return; }
+      if(Date.now()-t0>62000){ CALL.ignore[c.id]=1; cleanup(); return; }
+      call("callGet",{id:c.id}).then(function(r){ if(CALL.gen===g&&CALL.st==="ringing"&&r&&r.ok&&r.state!=="ring"){ CALL.ignore[c.id]=1; cleanup(); if(CH.open&&CH.view==="thread") poll(); } });
+    },2000);
+  }
+  function acceptCall(){
+    if(CALL.st!=="ringing") return; var g=CALL.gen, id=CALL.id; stopRing(); clearInterval(CALL.poll); CALL.st="connecting"; CALL.msg="Connecting…"; paintCall();
+    var offer;
+    getMic().then(function(stream){
+      if(CALL.gen!==g){ stream.getTracks().forEach(function(t){ t.stop(); }); return Promise.reject({silent:1}); }
+      CALL.stream=stream; return call("callGet",{id:id});
+    }).then(function(r){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      if(!r||!r.ok||r.state!=="ring"||!r.offer){ CALL.ignore[id]=1; cleanup(); toast("They hung up before you answered."); return Promise.reject({silent:1}); }
+      offer=r.offer; var pc=makePc(); CALL.stream.getTracks().forEach(function(t){ pc.addTrack(t,CALL.stream); });
+      return pc.setRemoteDescription({type:"offer",sdp:offer});
+    }).then(function(){ return CALL.pc.createAnswer(); }).then(function(a){ return CALL.pc.setLocalDescription(a); }).then(function(){ return gathered(CALL.pc); }).then(function(){
+      if(CALL.gen!==g) return Promise.reject({silent:1});
+      return call("callAnswer",{id:id,answer:CALL.pc.localDescription.sdp});
+    }).then(function(r){
+      if(CALL.gen!==g) return;
+      if(!r||!r.ok){ CALL.ignore[id]=1; cleanup(); toast(whyNot(r)); return; }
+      CALL.conTm=setTimeout(function(){ if(CALL.gen===g&&CALL.st!=="live") endCall("failed","Couldn't connect. Your network may block voice calls."); },20000);
+    }).catch(function(e){ if(e&&e.silent) return; if(CALL.gen!==g) return; var m=e&&e.name?micErr(e):"Couldn't answer the call."; call("callEnd",{id:id,reason:"failed"}); CALL.ignore[id]=1; cleanup(); toast(m); });
+  }
+  function declineCall(){ if(CALL.st!=="ringing") return; var id=CALL.id; CALL.ignore[id]=1; call("callEnd",{id:id,reason:"declined"}); cleanup(); if(CH.open&&CH.view==="thread") setTimeout(poll,600); }
+  function hangUp(){ if(CALL.st==="ringing") return declineCall(); if(CALL.st==="idle") return; endCall(CALL.st==="live"?"ended":(CALL.st==="calling"?"missed":"failed")); }
+  function endCall(reason,why){
+    if(CALL.st==="idle") return; var id=CALL.id, dur=CALL.t0?Math.round((Date.now()-CALL.t0)/1000):0;
+    try{ if(CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){}
+    if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:reason,dur:dur}); }
+    cleanup(); if(why) toast(why); if(CH.open&&CH.view==="thread") setTimeout(poll,700);
+  }
+  function remoteBye(){
+    if(CALL.st==="idle") return; var id=CALL.id, dur=CALL.t0?Math.round((Date.now()-CALL.t0)/1000):0; var nm=name0();
+    if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:"ended",dur:dur}); }
+    cleanup(); toast(nm+" ended the call."); if(CH.open&&CH.view==="thread") setTimeout(poll,700);
+  }
+  function finishRemote(why){ var id=CALL.id; if(id){ CALL.ignore[id]=1; call("callEnd",{id:id,reason:"ended"}); } cleanup(); if(why) toast(why); if(CH.open&&CH.view==="thread") setTimeout(poll,700); }
+  function cleanup(){
+    CALL.gen++; clearInterval(CALL.poll); clearInterval(CALL.tick); clearTimeout(CALL.conTm); clearTimeout(CALL.disTm); stopRing();
+    try{ if(CALL.stream) CALL.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+    try{ if(CALL.pc){ CALL.pc.onconnectionstatechange=null; CALL.pc.close(); } }catch(e){}
+    if(CALL.audio){ try{ CALL.audio.srcObject=null; CALL.audio.remove(); }catch(e){} CALL.audio=null; }
+    CALL.st="idle"; CALL.id=null; CALL.pc=null; CALL.stream=null; CALL.dc=null; CALL.t0=0; CALL.msg=""; CALL.muted=false; CALL.rmuted=false;
+    paintCall(); if(CH.open&&CH.view==="thread"&&CH.room) setHead(CH.room.name,CH.room.dm?"Private message":"Everyone signed in can see this",true,!!(CH.room.dm&&CH.room.peer&&callSupported()));
+  }
+  function toggleMute(){
+    if(!CALL.stream) return; CALL.muted=!CALL.muted; CALL.stream.getAudioTracks().forEach(function(t){ t.enabled=!CALL.muted; });
+    try{ if(CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send(CALL.muted?"mute:1":"mute:0"); }catch(e){} paintCall();
+  }
+  // ring tones (generated, no audio files)
+  var ringIv=null;
+  function startRing(){ stopRing(); var go=function(){ tone(523,0,.35,.08); tone(659,.4,.35,.08); }; go(); ringIv=setInterval(go,2200); }
+  function ringback(){ stopRing(); var go=function(){ tone(440,0,.9,.035); }; go(); ringIv=setInterval(go,3200); }
+  function stopRing(){ if(ringIv){ clearInterval(ringIv); ringIv=null; } }
+  function paintCall(){
+    var el=$("cvc"); if(!el) return;
+    if(CALL.st==="idle"){ el.hidden=true; el.innerHTML=""; document.body.classList.remove("incall"); return; }
+    document.body.classList.add("incall");
+    var st=CALL.st, label=st==="live"?mmss((Date.now()-CALL.t0)/1000)+(CALL.rmuted?" · muted":""):(CALL.msg||"Connecting…");
+    var h='<div class="cvwho">'+av(CALL.name,"","width:46px;height:46px;font-size:18px;margin:0")+'<div><b>'+esc(CALL.name)+'</b><small class="'+(st==="live"?"live":"")+'" aria-live="polite">'+esc(label)+'</small></div></div><div class="cvbtns">';
+    if(st==="ringing") h+='<button type="button" class="cvb ok" id="cvacc" aria-label="Answer call">'+svg(IC.phone,22)+'<span>Answer</span></button><button type="button" class="cvb end" id="cvdec" aria-label="Decline call">'+svg(IC.phone,22)+'<span>Decline</span></button>';
+    else h+=(CALL.stream?'<button type="button" class="cvb mute'+(CALL.muted?' on':'')+'" id="cvmute" aria-pressed="'+CALL.muted+'" aria-label="'+(CALL.muted?'Unmute':'Mute')+'">'+svg(CALL.muted?IC.micoff:IC.mic,22)+'<span>'+(CALL.muted?'Unmute':'Mute')+'</span></button>':'')+'<button type="button" class="cvb end" id="cvend" aria-label="End call">'+svg(IC.phone,22)+'<span>End</span></button>';
+    h+='</div>';
+    el.hidden=false; if(el.getAttribute("data-st")!==st||!el.firstChild||el.getAttribute("data-n")!==CALL.name||el.getAttribute("data-m")!==String(CALL.muted)){ el.innerHTML=h; el.setAttribute("data-st",st); el.setAttribute("data-n",CALL.name); el.setAttribute("data-m",String(CALL.muted)); }
+    else { var s=el.querySelector("small"); if(s){ s.textContent=label; s.className=st==="live"?"live":""; } }
+    var b;
+    if((b=$("cvacc"))) b.onclick=acceptCall; if((b=$("cvdec"))) b.onclick=declineCall; if((b=$("cvend"))) b.onclick=hangUp; if((b=$("cvmute"))) b.onclick=toggleMute;
+  }
+  window.addEventListener("beforeunload",function(){ try{ if(CALL.st!=="idle"&&CALL.dc&&CALL.dc.readyState==="open") CALL.dc.send("bye"); }catch(e){} });
 
   /* ---- start ---- */
   function boot(){
     build();
     var n=NT(); if(!n||!n.ready) return;
-    n.ready.then(function(){ paintFab(); if(signed()){ refreshInbox().then(function(){ schedule(30000); }); } });
+    n.ready.then(function(){ paintFab(); if(signed()){ refreshInbox().then(function(){ schedule(20000); }); } });
   }
   var _paint=window.paintLogin;
-  if(typeof _paint==="function") window.paintLogin=function(){ var r=_paint.apply(this,arguments); try{ paintFab(); if(signed()&&!CH.inbox){ refreshInbox().then(function(){ schedule(30000); }); } }catch(e){} return r; };
+  if(typeof _paint==="function") window.paintLogin=function(){ var r=_paint.apply(this,arguments); try{ paintFab(); if(signed()&&!CH.inbox){ refreshInbox().then(function(){ schedule(20000); }); } }catch(e){} return r; };
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
 
   /* =============================== admin: Chat pane =============================== */
@@ -18555,7 +19324,8 @@ var _sh=window.show;
   function adminRender(){
     var b=$("cmodbody"); if(!b) return;
     var h='<div class="cmrow"><div><b>Chat</b><small>Turn the whole chat on or off.</small></div><label class="cmsw"><input type="checkbox" data-cs="chat"'+(AD.set.chat?' checked':'')+'><i></i><span class="vh">Chat on</span></label></div>'+
-      '<div class="cmrow"><div><b>Photos</b><small>Let players send photos in the room and in direct messages.</small></div><label class="cmsw"><input type="checkbox" data-cs="images"'+(AD.set.images?' checked':'')+'><i></i><span class="vh">Photos on</span></label></div>';
+      '<div class="cmrow"><div><b>Photos</b><small>Let players send photos in the room and in direct messages.</small></div><label class="cmsw"><input type="checkbox" data-cs="images"'+(AD.set.images?' checked':'')+'><i></i><span class="vh">Photos on</span></label></div>'+
+      '<div class="cmrow cmchk"><div><b>Connection check</b><small>Tests sign-in, the database and chat history for your account.</small><div id="cmchkr"></div></div><button type="button" class="adm-b" id="cmchkb">Run check</button></div>';
     h+='<h3 class="cmh">Reports <span>'+AD.rep.length+'</span></h3>';
     if(!AD.rep.length) h+='<p class="note" style="margin:0 0 6px">Nothing reported. Players can report a message by tapping it.</p>';
     AD.rep.forEach(function(r){
@@ -18567,7 +19337,8 @@ var _sh=window.show;
     AD.muted.forEach(function(m){ h+='<div class="cmmu"><span><b>'+esc(m.name||m.uid)+'</b><small>'+until(m.until)+'</small></span><button type="button" class="adm-b ghost" data-un="'+esc(m.uid)+'">Unmute</button></div>'; });
     h+='<form class="cmadd" id="cmadd"><input id="cmname" placeholder="Player username" maxlength="20" autocomplete="off" aria-label="Player username"><select id="cmhrs" aria-label="How long"><option value="1">1 hour</option><option value="24" selected>24 hours</option><option value="168">7 days</option><option value="720">30 days</option></select><button type="submit" class="adm-b">Mute player</button></form>';
     if(AD.msg) h+='<p class="cmmsg">'+esc(AD.msg)+'</p>';
-    b.innerHTML=h; wireAdminBody(b);
+    var keepChk=$("cmchkr")?$("cmchkr").innerHTML:"";
+    b.innerHTML=h; if(keepChk&&$("cmchkr")) $("cmchkr").innerHTML=keepChk; wireAdminBody(b);
   }
   function adminLoad(){
     if(AD.busy) return; AD.busy=true;
@@ -18586,6 +19357,7 @@ var _sh=window.show;
       AD.set[this.getAttribute("data-cs")]=this.checked;
       adminDo("settings",{chat:AD.set.chat,images:AD.set.images},"Saved");
     };
+    var ck=$("cmchkb"); if(ck) ck.onclick=function(){ runCheck($("cmchkr")); };
     var rs=b.querySelectorAll(".cmrep");
     for(i=0;i<rs.length;i++) (function(card){
       var id=card.getAttribute("data-cr"), bs=card.querySelectorAll("[data-ca]"), j;
@@ -18604,10 +19376,10 @@ var _sh=window.show;
     clearInterval(AD.tm); AD.tm=setInterval(function(){ if(!document.getElementById("cmodbody")){ clearInterval(AD.tm); return; } if(visiblePane()&&!document.hidden) adminLoad(); },10000);
     if(visiblePane()) adminLoad();
   }
-  window.TML220={adminChat:adminHtml,wireAdmin:function(){
+  window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO};
+  },_c:CH,_v:VO,_call:CALL};
 })();
 </script>
 </body>
