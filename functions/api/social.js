@@ -1,22 +1,25 @@
-// Likes/dislikes + chat for The Timmylist (Cloudflare Pages Function, /api/social).
+// Likes/dislikes, chat and voice-call signalling for The Timmylist (Cloudflare Pages Function, /api/social).
 // Writes to Firestore with the same service account the Discord link and live wheel use, so the
 // Firestore security rules do not need to change.
 //   POST  Authorization: Bearer <Firebase ID token>   body: { a: "<action>", ... }
-//   votes                         counts for every level (+ your own votes when signed in)   (no sign-in needed)
-//   vote   { lvl, v }             v = 1 like, -1 dislike, 0 clear
-//   inbox                         your DM list, blocked list, and the room's latest message
-//   msgs   { room:"main" | peer:<uid>, since? }   messages, oldest first
-//   send   { room | peer | to:<username>, text?, img? }
-//   img    { room | peer, id }    one image (data URL)
-//   del    { room | peer, id }    delete your own message (admins can delete room messages)
+//   votes                          counts for every level (+ your own votes when signed in)   (no sign-in needed)
+//   vote   { lvl, v }              v = 1 like, -1 dislike, 0 clear
+//   diag                           step by step health check for the signed-in player
+//   inbox  { lite? }               your DM list, blocked list, the room's latest message, and an incoming call
+//   msgs   { room | peer, since?, before? }   messages, oldest first
+//   send   { room | peer | to, text?, img?, reply? }
+//   react  { room | peer, id, e, on }
+//   img    { room | peer, id }     one image (data URL)
+//   del    { room | peer, id }     delete your own message (admins can delete room messages)
 //   report { room | peer, id, why? }
-//   block  { peer, on }           block / unblock a DM partner
-//   admin only: mod (list reports + muted + settings), modDel { report }, mute { uid | name, hours }, unmute { uid },
-//               repimg { report }, dismiss { report }, settings { chat, images }
+//   block  { peer, on }
+//   callStart { peer, offer } / callGet { id } / callAnswer { id, answer } / callEnd { id, reason, dur }   voice calls (WebRTC signalling)
+//   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings
 // Secrets (already set for Discord linking): FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY
-const enc = new TextEncoder();
+const enc = new TextEncoder(), dec = new TextDecoder();
 const b64u = (bytes) => { let s = ""; bytes = new Uint8Array(bytes); for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_"); };
 const b64uStr = (str) => b64u(enc.encode(str));
+const b64uBytes = (s) => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
 const pemToDer = (pem) => { const b = atob(pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "")); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
 async function rs256(pem, data) {
   const key = await crypto.subtle.importKey("pkcs8", pemToDer(pem), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
@@ -26,7 +29,7 @@ const json = (o, c = 200) => new Response(JSON.stringify(o), { status: c, header
 const fail = (c, error, message) => { const e = new Error(error); e.http = c; e.err = error; e.msg = message; return e; };
 
 // ---- small caches that live as long as the worker instance ----
-let GTOK = { t: "", exp: 0 };
+let GTOK = { t: "", exp: 0 }, JWKS = { keys: null, exp: 0 };
 const IDC = new Map(), ADM = new Map(), NAMES = new Map(), MUTE = new Map(), RATE = new Map();
 let VC = { t: 0, v: null }, CFG = { t: 0, v: null };
 
@@ -44,12 +47,36 @@ async function googleToken(sa) {
   GTOK = { t: j.access_token, exp: now + 3300 };
   return GTOK.t;
 }
-async function verifyIdToken(idToken, apiKey) {
+// Sign-in check. First choice: verify the Firebase ID token's signature ourselves against Google's public keys
+// (needs no API key, so a key restricted to browser referrers can't break it). Fallback: ask Firebase (accounts:lookup).
+async function jwks() {
+  if (JWKS.keys && JWKS.exp > Date.now()) return JWKS.keys;
+  const r = await fetch("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com");
+  const j = await r.json();
+  if (!j || !Array.isArray(j.keys)) throw new Error("jwks");
+  JWKS = { keys: j.keys, exp: Date.now() + 3600 * 1000 };
+  return j.keys;
+}
+async function verifyJwt(token, projectId) {
+  const parts = token.split("."); if (parts.length !== 3) return null;
+  const head = JSON.parse(dec.decode(b64uBytes(parts[0]))), pay = JSON.parse(dec.decode(b64uBytes(parts[1])));
+  if (head.alg !== "RS256" || !head.kid) return null;
+  const now = Date.now() / 1000;
+  if (pay.aud !== projectId || pay.iss !== "https://securetoken.google.com/" + projectId || !pay.sub || !(pay.exp > now) || pay.iat > now + 300) return null;
+  const k = (await jwks()).find((x) => x.kid === head.kid); if (!k) return null;
+  const key = await crypto.subtle.importKey("jwk", k, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+  return (await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64uBytes(parts[2]), enc.encode(parts[0] + "." + parts[1]))) ? String(pay.sub) : null;
+}
+async function verifyIdToken(idToken, apiKey, projectId) {
   const hit = IDC.get(idToken);
   if (hit && hit.exp > Date.now()) return hit.uid;
-  const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken }) });
-  const j = await r.json();
-  const uid = j && j.users && j.users[0] ? j.users[0].localId : null;
+  let uid = null;
+  try { uid = await verifyJwt(idToken, projectId); } catch (e) { uid = null; }
+  if (!uid && apiKey) {
+    const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken }) });
+    const j = await r.json();
+    uid = j && j.users && j.users[0] ? j.users[0].localId : null;
+  }
   if (uid) { if (IDC.size > 500) IDC.clear(); IDC.set(idToken, { uid, exp: Date.now() + 5 * 60 * 1000 }); }
   return uid;
 }
@@ -121,12 +148,16 @@ async function fsList(sa, coll, max) {
   return out;
 }
 // Messages live in chat/<room>/m/<id>. Ids start with a zero padded timestamp, so ordering by document name is ordering by time.
-async function fsMsgs(sa, room, since, limit) {
-  const parent = "chat/" + room, sq = { from: [{ collectionId: "m" }], limit };
+//   since  -> newer than that id, oldest first      before -> older than that id, newest `limit`      neither -> newest `limit`
+async function fsMsgs(sa, room, since, limit, before) {
+  const parent = "chat/" + room, ref = (id) => root(sa) + "/" + parent + "/m/" + id, sq = { from: [{ collectionId: "m" }], limit };
   if (since) {
-    sq.where = { fieldFilter: { field: { fieldPath: "__name__" }, op: "GREATER_THAN", value: { referenceValue: root(sa) + "/" + parent + "/m/" + since } } };
+    sq.where = { fieldFilter: { field: { fieldPath: "__name__" }, op: "GREATER_THAN", value: { referenceValue: ref(since) } } };
     sq.orderBy = [{ field: { fieldPath: "__name__" }, direction: "ASCENDING" }];
-  } else sq.orderBy = [{ field: { fieldPath: "__name__" }, direction: "DESCENDING" }];
+  } else {
+    if (before) sq.where = { fieldFilter: { field: { fieldPath: "__name__" }, op: "LESS_THAN", value: { referenceValue: ref(before) } } };
+    sq.orderBy = [{ field: { fieldPath: "__name__" }, direction: "DESCENDING" }];
+  }
   const r = await fetch(base(sa) + enp(parent) + ":runQuery", { method: "POST", headers: await authz(sa), body: JSON.stringify({ structuredQuery: sq }) });
   if (!r.ok) throw new Error("firestore " + r.status);
   const rows = (await r.json()).filter((x) => x.document).map((x) => Object.assign(fields(x.document), { id: docId(x.document) }));
@@ -184,6 +215,8 @@ function cleanImg(s) {
   if (!s.slice(23).startsWith("/9j/")) return null; // JPEG magic bytes
   return s;
 }
+const REACT = ["up", "heart", "lol", "wow", "sad", "fire", "party", "skull"];
+const CALLTTL = 60000;
 const mkId = () => String(Date.now()).padStart(13, "0") + "-" + Math.random().toString(36).slice(2, 7);
 const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+)__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
@@ -193,17 +226,33 @@ function roomOf(uid, body) {
   if (body.peer) { if (!okUid(body.peer) || body.peer === uid) throw fail(400, "bad request"); return { key: dmKey(uid, body.peer), dm: true, peer: String(body.peer) }; }
   return { key: "main", dm: false };
 }
-const pubMsg = (m) => ({ id: m.id, k: m.k || "", t: m.t || "", from: m.from || "", name: m.name || "", text: m.del ? "" : m.text || "", img: !m.del && !!m.img, del: !!m.del, ts: m.ts || 0 });
+function pubMsg(m) {
+  const rx = {};
+  if (m.r && !m.del) for (const k in m.r) { const us = Object.keys(m.r[k] || {}).filter((u) => m.r[k][u]); if (us.length) rx[k] = us; }
+  const o = { id: m.id, k: m.k || "", from: m.from || "", name: m.name || "", text: m.del ? "" : m.text || "", img: !m.del && !!m.img, del: !!m.del, ts: m.ts || 0, rx };
+  if (m.k === "del" || m.k === "re") { o.t = m.t || ""; }
+  if (m.k === "re") { o.e = m.e || ""; o.u = m.u || ""; o.on = !!m.on; }
+  if (m.k === "call") o.dur = m.dur || 0;
+  if (m.rt && !m.del) { o.rt = m.rt; o.rn = m.rn || ""; o.rq = m.rq || ""; }
+  return o;
+}
+async function removeMsg(sa, room, id) {
+  await fsSet(sa, "chat/" + room + "/m/" + id, [[["del"], true], [["text"], ""], [["img"], false]]);
+  await fsDelete(sa, "chatimg/" + id);
+  await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "del"], [["t"], id], [["ts"], Date.now()]]);
+}
+const okSdp = (s) => typeof s === "string" && /^v=0\r?\n/.test(s) && s.length <= 14000;
+const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 
 export async function onRequestPost({ request, env }) {
   const { FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY } = env;
-  if (!FIREBASE_SERVICE_ACCOUNT || !FIREBASE_API_KEY) return json({ error: "setup", message: "Chat and likes aren't set up on this site yet." }, 500);
+  if (!FIREBASE_SERVICE_ACCOUNT) return json({ error: "setup", message: "Chat and likes aren't set up on this site yet." }, 500);
   let sa; try { sa = JSON.parse(FIREBASE_SERVICE_ACCOUNT); } catch (e) { return json({ error: "setup", message: "Chat and likes are misconfigured." }, 500); }
   let body; try { body = await request.json(); } catch (e) { return json({ error: "bad request" }, 400); }
   if (!body || typeof body !== "object") return json({ error: "bad request" }, 400);
   const a = body.a, bearer = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
   try {
-    const uid = bearer ? await verifyIdToken(bearer, FIREBASE_API_KEY) : null;
+    const uid = bearer ? await verifyIdToken(bearer, FIREBASE_API_KEY, sa.project_id) : null;
 
     // ---------- like counts: public ----------
     if (a === "votes") {
@@ -222,7 +271,18 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: true, c, mine });
     }
 
-    if (!uid) return json({ error: "auth", message: "Please sign in." }, 401);
+    if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
+
+    // ---------- health check ----------
+    if (a === "diag") {
+      const steps = [], step = async (n, f) => { try { const d = await f(); steps.push({ n, ok: true, d: d || "" }); return true; } catch (e) { steps.push({ n, ok: false, d: String((e && e.message) || e).slice(0, 120) }); return false; } };
+      steps.push({ n: "Signed in", ok: true, d: "account ..." + uid.slice(-4) });
+      await step("Profile found", async () => { const n = await userName(sa, uid); if (!n) throw new Error("no profile for this account"); return n; });
+      await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
+      await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
+      await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v221" });
+    }
 
     if (a === "vote") {
       const lvl = String(body.lvl == null ? "" : body.lvl), v = Number(body.v);
@@ -241,17 +301,17 @@ export async function onRequestPost({ request, env }) {
 
     // ---------- chat ----------
     if (a === "inbox") {
-      const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, main = await fsGet(sa, "chatmeta/main");
+      const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, main = body.lite ? null : await fsGet(sa, "chatmeta/main");
       const dms = Object.keys(idx.c || {}).map((p) => Object.assign({ peer: p }, idx.c[p])).sort((x, y) => (y.ts || 0) - (x.ts || 0)).slice(0, 60);
-      const mu = await muteState(sa, uid);
-      return json({ ok: true, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, muted: mu ? mu.until : 0, dms, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), main: main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      const mu = await muteState(sa, uid), call = idx.call && idx.call.ts > Date.now() - CALLTTL ? idx.call : null;
+      return json({ ok: true, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, muted: mu ? mu.until : 0, dms, call, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
-      const r = roomOf(uid, body), since = body.since == null || body.since === "" ? "" : String(body.since);
-      if (since && !okId(since)) return json({ error: "bad request" }, 400);
-      const rows = await fsMsgs(sa, r.key, since, since ? 100 : 60);
-      return json({ ok: true, msgs: rows.map(pubMsg) });
+      const r = roomOf(uid, body), since = body.since == null || body.since === "" ? "" : String(body.since), before = body.before == null || body.before === "" ? "" : String(body.before);
+      if ((since && !okId(since)) || (before && !okId(before))) return json({ error: "bad request" }, 400);
+      const rows = await fsMsgs(sa, r.key, since, since ? 100 : 60, before);
+      return json({ ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 });
     }
     if (a === "send") {
       if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -275,15 +335,33 @@ export async function onRequestPost({ request, env }) {
         if (mine.b && mine.b[peer]) return json({ error: "blocked", message: "You blocked this player. Unblock them first." }, 403);
         r = { key: dmKey(uid, peer), dm: true, peer, pn };
       } else r = { key: "main", dm: false };
-      const id = mkId(), ts = Date.now();
+      const ent = [[["from"], uid], [["name"], name], [["text"], text], [["img"], !!img]];
+      if (body.reply && okId(body.reply)) {
+        const t = await fsGet(sa, "chat/" + r.key + "/m/" + body.reply);
+        if (t && !t.del && !t.k) { ent.push([["rt"], body.reply], [["rn"], String(t.name || "").slice(0, 30)], [["rq"], String(t.text || (t.img ? "Photo" : "")).slice(0, 80)]); }
+      }
+      const id = mkId(), ts = Date.now(); ent.push([["ts"], ts]);
       if (img) await fsSet(sa, "chatimg/" + id, [[["room"], r.key], [["from"], uid], [["data"], img]]);
-      await fsSet(sa, "chat/" + r.key + "/m/" + id, [[["from"], uid], [["name"], name], [["text"], text], [["img"], !!img], [["ts"], ts]]);
+      await fsSet(sa, "chat/" + r.key + "/m/" + id, ent);
       const snip = (text || "Photo").slice(0, 60);
       if (r.dm) {
         await fsSet(sa, "chatidx/" + uid, [[["c", r.peer], { name: r.pn, ts, last: snip, from: uid }]]);
         await fsSet(sa, "chatidx/" + r.peer, [[["c", uid], { name, ts, last: snip, from: uid }]]);
       } else await fsSet(sa, "chatmeta/main", [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
-      return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg({ id, from: uid, name, text, img: !!img, ts }) });
+      const echo = { id, from: uid, name, text, img: !!img, ts }; ent.forEach(([p, v]) => { if (["rt", "rn", "rq"].includes(p[0])) echo[p[0]] = v; });
+      return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
+    }
+    if (a === "react") {
+      const r = roomOf(uid, body);
+      if (!okId(body.id) || !REACT.includes(body.e)) return json({ error: "bad request" }, 400);
+      if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      if (!rate(uid, "react", 20, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
+      if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
+      const on = !!body.on;
+      await fsSet(sa, "chat/" + r.key + "/m/" + body.id, [[["r", body.e, uid], on ? true : undefined]]);
+      await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "re"], [["t"], body.id], [["e"], body.e], [["u"], uid], [["on"], on], [["ts"], Date.now()]]);
+      return json({ ok: true });
     }
     if (a === "img") {
       const r = roomOf(uid, body);
@@ -297,6 +375,7 @@ export async function onRequestPost({ request, env }) {
       if (!okId(body.id)) return json({ error: "bad request" }, 400);
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del) return json({ ok: true });
+      if (m.k) return json({ error: "bad request" }, 400);
       if (m.from !== uid && !(admin && !r.dm)) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
       await removeMsg(sa, r.key, body.id);
       return json({ ok: true });
@@ -306,7 +385,7 @@ export async function onRequestPost({ request, env }) {
       if (!okId(body.id)) return json({ error: "bad request" }, 400);
       if (!rate(uid, "rep", 5, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
-      if (!m || m.del) return json({ error: "gone", message: "That message is gone." }, 404);
+      if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
       if (m.from === uid) return json({ error: "self", message: "That's your own message." }, 400);
       const rid = r.key + "__" + body.id;
       await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm]]);
@@ -315,6 +394,53 @@ export async function onRequestPost({ request, env }) {
     if (a === "block") {
       if (!okUid(body.peer) || body.peer === uid) return json({ error: "bad request" }, 400);
       await fsSet(sa, "chatidx/" + uid, [[["b", body.peer], body.on ? true : undefined]]);
+      return json({ ok: true });
+    }
+
+    // ---------- voice calls (signalling only; the audio goes player to player over WebRTC) ----------
+    if (a === "callStart") {
+      if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted, so you can't call right now." }, 403);
+      const peer = String(body.peer || "");
+      if (!okUid(peer) || peer === uid) return json({ error: "bad request" }, 400);
+      if (!okSdp(body.offer)) return json({ error: "bad request", message: "Couldn't start the call." }, 400);
+      if (!rate(uid, "call", 4, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const pn = await userName(sa, peer);
+      if (!pn) return json({ error: "nouser", message: "No player with that name." }, 404);
+      const theirs = (await fsGet(sa, "chatidx/" + peer)) || {}, mine = (await fsGet(sa, "chatidx/" + uid)) || {};
+      if ((theirs.b && theirs.b[uid]) || (mine.b && mine.b[peer])) return json({ error: "blocked", message: "You can't call this player." }, 403);
+      if (theirs.call && theirs.call.ts > Date.now() - CALLTTL) return json({ error: "busy", message: pn + " is getting another call." }, 409);
+      const id = mkId(), ts = Date.now();
+      await fsSet(sa, "calls/" + id, [[["from"], uid], [["to"], peer], [["fromName"], name], [["toName"], pn], [["offer"], body.offer], [["state"], "ring"], [["ts"], ts]]);
+      await fsSet(sa, "chatidx/" + peer, [[["call"], { id, from: uid, name, ts }]]);
+      return json({ ok: true, id });
+    }
+    if (a === "callGet" || a === "callAnswer" || a === "callEnd") {
+      if (!okId(body.id)) return json({ error: "bad request" }, 400);
+      const c = await fsGet(sa, "calls/" + body.id);
+      if (!c) return json({ ok: true, state: "ended", reason: "gone" });
+      if (c.from !== uid && c.to !== uid) return json({ error: "admin", message: "That isn't your call." }, 403);
+      const stale = c.state === "ring" && Date.now() - c.ts > CALLTTL + 15000;
+      if (a === "callGet") return json({ ok: true, state: stale ? "ended" : c.state, reason: stale ? "missed" : c.reason || "", offer: c.to === uid && c.state === "ring" ? c.offer : undefined, answer: c.from === uid ? c.answer : undefined, from: c.from, fromName: c.fromName, to: c.to, toName: c.toName });
+      if (a === "callAnswer") {
+        if (c.to !== uid || c.state !== "ring" || stale) return json({ error: "gone", message: "They hung up before you answered." }, 409);
+        if (!okSdp(body.answer)) return json({ error: "bad request" }, 400);
+        await fsSet(sa, "calls/" + body.id, [[["answer"], body.answer], [["state"], "active"], [["at"], Date.now()]]);
+        await fsSet(sa, "chatidx/" + uid, [[["call"], undefined]]);
+        return json({ ok: true });
+      }
+      if (c.state === "ended") { await fsDelete(sa, "calls/" + body.id); return json({ ok: true }); }
+      const wasRing = c.state === "ring", callee = c.to === uid;
+      let reason = ["ended", "declined", "failed", "missed"].includes(body.reason) ? body.reason : "ended";
+      if (wasRing && !callee) reason = "missed"; else if (wasRing && callee && reason !== "missed") reason = "declined";
+      const dur = reason === "ended" ? Math.min(Math.max(Math.round(Number(body.dur) || 0), 0), 86400) : 0;
+      await fsSet(sa, "calls/" + body.id, [[["state"], "ended"], [["reason"], reason]]);
+      if (wasRing) await fsSet(sa, "chatidx/" + c.to, [[["call"], undefined]]);
+      const text = reason === "ended" ? (dur > 0 ? "Voice call · " + mmss(dur) : "Voice call") : reason === "missed" ? "Missed call" : reason === "declined" ? "Call declined" : "Call couldn't connect", ts = Date.now();
+      const room = dmKey(c.from, c.to);
+      await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "call"], [["from"], c.from], [["name"], c.fromName || ""], [["text"], text], [["dur"], dur], [["ts"], ts]]);
+      await fsSet(sa, "chatidx/" + c.from, [[["c", c.to], { name: c.toName || "", ts, last: text, from: c.from }]]);
+      await fsSet(sa, "chatidx/" + c.to, [[["c", c.from], { name: c.fromName || "", ts, last: text, from: c.from }]]);
       return json({ ok: true });
     }
 
@@ -363,13 +489,6 @@ export async function onRequestPost({ request, env }) {
     return json({ error: "bad request" }, 400);
   } catch (e) {
     if (e && e.http) return json({ error: e.err, message: e.msg }, e.http);
-    return json({ error: "server", message: "Something went wrong. Please try again." }, 500);
+    return json({ error: "server", message: "Something went wrong. Please try again.", detail: String((e && e.message) || e).slice(0, 100) }, 500);
   }
-}
-
-// Deleting strips the text, drops the image, and appends a tombstone so other open chats notice.
-async function removeMsg(sa, room, id) {
-  await fsSet(sa, "chat/" + room + "/m/" + id, [[["del"], true], [["text"], ""], [["img"], false]]);
-  await fsDelete(sa, "chatimg/" + id);
-  await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "del"], [["t"], id], [["ts"], Date.now()]]);
 }

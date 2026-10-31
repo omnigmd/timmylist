@@ -9,7 +9,8 @@
 //   cmd   { uid, cmd }     admin: send a command to a player       -> { ok, seq }
 //   clear { uids }         admin: remove sessions                  -> { ok }
 // Secrets (already set for Discord linking): FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY
-const enc = new TextEncoder();
+const enc = new TextEncoder(), dec = new TextDecoder();
+const b64uBytes = (s) => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
 const b64u = (bytes) => { let s = ""; bytes = new Uint8Array(bytes); for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_"); };
 const b64uStr = (str) => b64u(enc.encode(str));
 const pemToDer = (pem) => { const b = atob(pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "")); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
@@ -20,7 +21,7 @@ async function rs256(pem, data) {
 const json = (o, c = 200) => new Response(JSON.stringify(o), { status: c, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 
 // ---- small caches that live as long as the worker instance ----
-let GTOK = { t: "", exp: 0 };
+let GTOK = { t: "", exp: 0 }, JWKS = { keys: null, exp: 0 };
 const IDC = new Map(), ADM = new Map(), NAMES = new Map();
 
 async function googleToken(sa) {
@@ -37,12 +38,35 @@ async function googleToken(sa) {
   GTOK = { t: j.access_token, exp: now + 3300 };
   return GTOK.t;
 }
-async function verifyIdToken(idToken, apiKey) {
+// Sign-in check: verify the Firebase ID token against Google's public keys (no API key needed); fall back to accounts:lookup.
+async function jwks() {
+  if (JWKS.keys && JWKS.exp > Date.now()) return JWKS.keys;
+  const r = await fetch("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com");
+  const j = await r.json();
+  if (!j || !Array.isArray(j.keys)) throw new Error("jwks");
+  JWKS = { keys: j.keys, exp: Date.now() + 3600 * 1000 };
+  return j.keys;
+}
+async function verifyJwt(token, projectId) {
+  const parts = token.split("."); if (parts.length !== 3) return null;
+  const head = JSON.parse(dec.decode(b64uBytes(parts[0]))), pay = JSON.parse(dec.decode(b64uBytes(parts[1])));
+  if (head.alg !== "RS256" || !head.kid) return null;
+  const now = Date.now() / 1000;
+  if (pay.aud !== projectId || pay.iss !== "https://securetoken.google.com/" + projectId || !pay.sub || !(pay.exp > now) || pay.iat > now + 300) return null;
+  const k = (await jwks()).find((x) => x.kid === head.kid); if (!k) return null;
+  const key = await crypto.subtle.importKey("jwk", k, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+  return (await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64uBytes(parts[2]), enc.encode(parts[0] + "." + parts[1]))) ? String(pay.sub) : null;
+}
+async function verifyIdToken(idToken, apiKey, projectId) {
   const hit = IDC.get(idToken);
   if (hit && hit.exp > Date.now()) return hit.uid;
-  const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken }) });
-  const j = await r.json();
-  const uid = j && j.users && j.users[0] ? j.users[0].localId : null;
+  let uid = null;
+  try { uid = await verifyJwt(idToken, projectId); } catch (e) { uid = null; }
+  if (!uid && apiKey) {
+    const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken }) });
+    const j = await r.json();
+    uid = j && j.users && j.users[0] ? j.users[0].localId : null;
+  }
   if (uid) { if (IDC.size > 500) IDC.clear(); IDC.set(idToken, { uid, exp: Date.now() + 5 * 60 * 1000 }); }
   return uid;
 }
@@ -112,12 +136,12 @@ const STATE_KEYS = ["name", "live", "spin", "sel", "gone", "rm", "win", "wts", "
 
 export async function onRequestPost({ request, env }) {
   const { FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY } = env;
-  if (!FIREBASE_SERVICE_ACCOUNT || !FIREBASE_API_KEY) return json({ error: "setup", message: "The live wheel isn't set up on this site yet." }, 500);
+  if (!FIREBASE_SERVICE_ACCOUNT) return json({ error: "setup", message: "The live wheel isn't set up on this site yet." }, 500);
   let sa; try { sa = JSON.parse(FIREBASE_SERVICE_ACCOUNT); } catch (e) { return json({ error: "setup", message: "The live wheel is misconfigured." }, 500); }
   let body; try { body = await request.json(); } catch (e) { return json({ error: "bad request" }, 400); }
   const bearer = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
   try {
-    const uid = bearer && (await verifyIdToken(bearer, FIREBASE_API_KEY));
+    const uid = bearer && (await verifyIdToken(bearer, FIREBASE_API_KEY, sa.project_id));
     if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
     const a = body.a, mine = "wheel/" + encodeURIComponent(uid);
 
