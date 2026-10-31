@@ -14,7 +14,9 @@
 //   report { room | peer, id, why? }
 //   block  { peer, on }
 //   callStart { peer, offer } / callGet { id } / callAnswer { id, answer } / callEnd { id, reason, dur }   voice calls (WebRTC signalling)
-//   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings
+//   ctlStop {}              a player ends any session an admin has opened on them
+//   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings, ctlList, ctlStart { uid }, ctlSend { uid, cmd }, ctlEnd { uid }
+//   inbox also takes { pr: {r,sc,th,vw} } (which page the player is on) and { ca: sessionId } (the player's tab joined a session)
 // Secrets (already set for Discord linking): FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY
 const enc = new TextEncoder(), dec = new TextDecoder();
 const b64u = (bytes) => { let s = ""; bytes = new Uint8Array(bytes); for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_"); };
@@ -208,6 +210,13 @@ function rate(uid, kind, n, ms) {
   return true;
 }
 const cleanText = (s) => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f​-‏‪-‮⁦-⁩]/g, "").replace(/\r\n?/g, "\n").replace(/\n{3,}/g, "\n\n").trim().slice(0, 500);
+function cleanCmd(c) {
+  if (!c || typeof c !== "object") return null;
+  if (c.t === "nav" && routeOk(c.to)) return { t: "nav", to: c.to };
+  if (c.t === "scroll" && ["top", "bottom", "up", "down"].includes(c.to)) return { t: "scroll", to: c.to };
+  if (c.t === "say") { const x = cleanText(c.text).slice(0, 120); if (x) return { t: "say", text: x }; }
+  return null;
+}
 const MAXIMG = 640000; // base64 characters; a Firestore document must stay under 1 MB
 function cleanImg(s) {
   s = String(s || "");
@@ -217,6 +226,12 @@ function cleanImg(s) {
 }
 const REACT = ["up", "heart", "lol", "wow", "sad", "fire", "party", "skull"];
 const CALLTTL = 60000;
+// ---- guided sessions (admin can open pages / scroll for a signed-in player who sees a banner and can stop it) ----
+const CTLTTL = 10 * 60 * 1000, ONLINE = 4 * 60 * 1000;
+const ROUTE_RE = /^(|list|lb|packs|games|clans|team|sub|wheel|level\/\d{1,12}|player\/[A-Za-z0-9_-]{3,20})$/;
+const routeOk = (r) => typeof r === "string" && r.length <= 40 && ROUTE_RE.test(r);
+const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(Number(v)) || 0));
+let PL = { t: 0, v: null }, AL = { t: 0, v: null };
 const mkId = () => String(Date.now()).padStart(13, "0") + "-" + Math.random().toString(36).slice(2, 7);
 const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+)__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
@@ -281,7 +296,7 @@ export async function onRequestPost({ request, env }) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v221" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v223" });
     }
 
     if (a === "vote") {
@@ -304,7 +319,16 @@ export async function onRequestPost({ request, env }) {
       const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, main = body.lite ? null : await fsGet(sa, "chatmeta/main");
       const dms = Object.keys(idx.c || {}).map((p) => Object.assign({ peer: p }, idx.c[p])).sort((x, y) => (y.ts || 0) - (x.ts || 0)).slice(0, 60);
       const mu = await muteState(sa, uid), call = idx.call && idx.call.ts > Date.now() - CALLTTL ? idx.call : null;
-      return json({ ok: true, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, muted: mu ? mu.until : 0, dms, call, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      const ctl = idx.ctl && idx.ctl.exp > Date.now() ? { id: idx.ctl.id, by: idx.ctl.byName || "An admin", ok: !!idx.ctl.ok, seq: idx.ctl.seq || 0, q: (idx.ctl.q || []).slice(-8) } : null;
+      const p = body.pr; let wrote = false;
+      if (p && typeof p === "object" && rate(uid, "pres", 1, ctl ? 2500 : 12000)) {
+        wrote = true;
+        await fsSet(sa, "presence/" + uid, [[["name"], name], [["r"], routeOk(p.r) ? p.r : "other"], [["sc"], clampInt(p.sc, 0, 100)], [["vw"], clampInt(p.vw, 200, 6000)], [["th"], p.th === "light" ? "light" : "dark"], [["ts"], Date.now()]]);
+      }
+      if (ctl && body.ca === ctl.id && !(idx.ctl && idx.ctl.ok) && rate(uid, "ctlack", 2, 60000)) {
+        await fsSet(sa, "chatidx/" + uid, [[["ctl", "ok"], true]]); await fsSet(sa, "presence/" + uid, [[["ctl", "ok"], true]]);
+      }
+      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, muted: mu ? mu.until : 0, dms, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -444,6 +468,15 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: true });
     }
 
+    if (a === "ctlStop") {
+      const idx = (await fsGet(sa, "chatidx/" + uid)) || {};
+      if (idx.ctl) {
+        await fsSet(sa, "chatidx/" + uid, [[["ctl"], undefined]]); await fsSet(sa, "presence/" + uid, [[["ctl"], undefined]]);
+        if (idx.ctl.id) await fsSet(sa, "ctllog/" + idx.ctl.id, [[["end"], Date.now()], [["endBy"], "player"]]);
+      }
+      return json({ ok: true });
+    }
+
     // ---------- admin only ----------
     if (!admin) return json({ error: "admin", message: "Only admins can use this." }, 403);
     if (a === "mod") {
@@ -485,6 +518,46 @@ export async function onRequestPost({ request, env }) {
       await fsSet(sa, "chatcfg/main", [[["chat"], body.chat !== false], [["images"], body.images !== false]]);
       CFG = { v: null, t: 0 };
       return json({ ok: true });
+    }
+    if (a === "ctlList") {
+      if (!PL.v || PL.t < Date.now()) {
+        const [docs, adms] = await Promise.all([fsList(sa, "presence", 400), AL.v && AL.t > Date.now() ? Promise.resolve(null) : fsList(sa, "admins", 100)]);
+        if (adms) AL = { t: Date.now() + 60000, v: new Set(adms.map((x) => x._id)) };
+        PL = { t: Date.now() + 4000, v: docs.filter((d) => d.ts && d.ts > Date.now() - ONLINE && !AL.v.has(d._id) && d._id !== uid).sort((x, y) => String(x.name).toLowerCase() < String(y.name).toLowerCase() ? -1 : 1).map((d) => ({ uid: d._id, name: d.name || "", r: typeof d.r === "string" ? d.r : "other", sc: d.sc || 0, vw: d.vw || 0, th: d.th || "dark", ts: d.ts, ctl: d.ctl && d.ctl.exp > Date.now() ? { by: d.ctl.by || "", ok: !!d.ctl.ok } : null })) };
+      }
+      return json({ ok: true, users: PL.v, now: Date.now() });
+    }
+    if (a === "ctlStart" || a === "ctlSend" || a === "ctlEnd") {
+      const t = String(body.uid || "");
+      if (!okUid(t)) return json({ error: "bad request" }, 400);
+      if (t === uid) return json({ error: "self", message: "That's you." }, 400);
+      if (!rate(uid, "ctl", 90, 10000)) return json({ error: "rate", message: "Slow down a little." }, 429);
+      if (a === "ctlStart") {
+        if (await isAdmin(sa, t)) return json({ error: "admin", message: "You can't control another admin." }, 403);
+        const pres = await fsGet(sa, "presence/" + t);
+        if (!pres || !(pres.ts > Date.now() - ONLINE)) return json({ error: "offline", message: "They aren't online right now." }, 404);
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8), exp = Date.now() + CTLTTL;
+        await fsSet(sa, "chatidx/" + t, [[["ctl"], { id, by: uid, byName: name, exp, seq: 0, q: [], ok: false }]]);
+        await fsSet(sa, "presence/" + t, [[["ctl"], { id, by: name, exp, ok: false }]]);
+        await fsSet(sa, "ctllog/" + id, [[["by"], uid], [["byName"], name], [["to"], t], [["toName"], pres.name || ""], [["start"], Date.now()]]);
+        PL = { t: 0, v: null };
+        return json({ ok: true, id });
+      }
+      const idx = (await fsGet(sa, "chatidx/" + t)) || {}, ctl = idx.ctl;
+      if (a === "ctlEnd") {
+        if (ctl) {
+          await fsSet(sa, "chatidx/" + t, [[["ctl"], undefined]]); await fsSet(sa, "presence/" + t, [[["ctl"], undefined]]);
+          if (ctl.id) await fsSet(sa, "ctllog/" + ctl.id, [[["end"], Date.now()], [["endBy"], "admin"]]);
+        }
+        PL = { t: 0, v: null };
+        return json({ ok: true });
+      }
+      if (!ctl || ctl.by !== uid || !(ctl.exp > Date.now())) return json({ error: "ended", message: "That session isn't active any more." }, 409);
+      const cmd = cleanCmd(body.cmd);
+      if (!cmd) return json({ error: "bad request", message: "That action isn't allowed." }, 400);
+      const seq = (ctl.seq || 0) + 1, q = (ctl.q || []).concat([{ n: seq, c: cmd }]).slice(-8);
+      await fsSet(sa, "chatidx/" + t, [[["ctl", "seq"], seq], [["ctl", "q"], q], [["ctl", "exp"], Date.now() + CTLTTL]]);
+      return json({ ok: true, seq });
     }
     return json({ error: "bad request" }, 400);
   } catch (e) {
