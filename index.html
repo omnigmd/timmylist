@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v227">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v228">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -6103,6 +6103,241 @@ body.incall .chfab{bottom:20px}
 
 /* settings sit above the chat drawer (their Save / Done buttons were under it) but below the call card */
 #pset.modal{z-index:94}
+/* ======================= v228: profile pictures + the call room ======================= */
+@keyframes cvRoomIn{0%{opacity:0;transform:scale(1.035)}100%{opacity:1;transform:none}}
+@keyframes cvTw{0%,100%{opacity:.08}50%{opacity:.55}}
+
+/* chat header: the face of who you are talking to */
+.chhav{flex:none;display:inline-flex;align-items:center;margin-right:2px}
+.chhav[hidden]{display:none}
+.chhav .av{margin:0}
+.chdr .chhav .chrav{width:38px;height:38px}
+.chav .av,.chrm .av{overflow:hidden}
+
+/* the small card gets a way back into the room */
+#cvc .cvx{flex:none;display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;transition:background .18s,transform .22s var(--spring)}
+#cvc .cvx:hover{background:rgba(255,255,255,.26);transform:scale(1.07)}
+#cvc .cvx:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#cvc.dock .cvx{width:34px;height:34px}
+#cvc.dock .cvwho[data-open]{cursor:pointer;border-radius:16px}
+#cvc.dock .cvwho[data-open]:focus-visible{outline:2px solid #fff;outline-offset:4px}
+@media(max-width:860px){#cvc.dock .cvexp{display:none}}
+
+/* scene layer: hidden everywhere except in the room */
+#cvc .cvfx{display:none}
+
+/* ---------- the room ---------- */
+#cvc.room{position:fixed;inset:0;left:0;top:0;right:0;bottom:0;transform:none;width:auto;max-width:none;min-width:0;height:auto;margin:0;padding:0;gap:0;display:block;border:0;border-radius:0;overflow:hidden;overscroll-behavior:contain;container-type:size;background:#050f26;color:#fff;box-shadow:none;animation:cvRoomIn .42s var(--ease) both;--s:max(calc(100cqw / 1600),calc(100cqh / 1000))}
+body.chopen #cvc.room{right:min(460px,100vw)}
+#cvc.room::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,10,28,.66),rgba(3,10,28,0) 22%,rgba(3,10,28,0) 64%,rgba(3,10,28,.78)),radial-gradient(130% 100% at 50% 46%,rgba(3,10,28,0) 56%,rgba(3,10,28,.55))}
+#cvc.room .cvfx{display:block;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:hsl(var(--h) 90% 4%)}
+#cvc.room .cvscene{position:absolute;left:50%;top:50%;width:calc(1600 * var(--s));height:calc(1000 * var(--s));transform:translate(-50%,-50%);display:block}
+#cvc.room .cvbar{display:contents}
+
+/* the two seats: placed in scene units so they always sit on their beanbags, whatever the screen */
+#cvc.room .cvseats{position:absolute;inset:0;z-index:3;pointer-events:none}
+#cvc.room .cvseat{--fs:clamp(56px,calc(150 * var(--s)),260px);position:absolute;left:calc(50% + var(--dx) * var(--s));top:calc(50% + (var(--sy) - 500) * var(--s));width:var(--fs);height:var(--fs);transform:translate(-50%,-50%);display:block;transition:transform .09s linear;animation:cvSeatIn .6s var(--spring) backwards}
+#cvc.room .cvseat.sme{--dx:-150;--sy:660}
+#cvc.room .cvseat.sthem{--dx:150;--sy:660;animation-delay:.08s}
+@keyframes cvSeatIn{0%{opacity:0;transform:translate(-50%,calc(-50% + 26px)) scale(.86)}100%{opacity:1;transform:translate(-50%,-50%)}}
+#cvc.room.spk-me .cvseat.sme{transform:translate(-50%,calc(-50% - var(--lv-me,0) * 9px))}
+#cvc.room.spk-them .cvseat.sthem{transform:translate(-50%,calc(-50% - var(--lv-them,0) * 9px))}
+#cvc.room .cvface{position:absolute;inset:0;width:auto;height:auto;display:block;border-radius:50%;background:none;box-shadow:none}
+#cvc.room .cvface.me{inset:0;width:auto;height:auto;background:none;box-shadow:none}
+#cvc.room .cvface .av,#cvc.room .cvface.me .av{font-size:calc(var(--fs) * .42)!important;box-shadow:0 0 0 4px #fff,0 0 0 10px rgba(120,185,255,.3),0 22px 44px -10px rgba(0,0,0,.7)!important}
+#cvc.room .cvface::before,#cvc.room .cvface::after{inset:-10px}
+#cvc.room .cvface::before{border-width:3px}
+#cvc.room .cvr{inset:-2px;border-width:3px}
+#cvc.room .cvbadge{width:30px;height:30px;right:-2px;top:-2px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#cvc.room .cvface.me .cvbadge{width:30px;height:30px;right:-2px;top:-2px}
+#cvc.room.wait .cvface.them .av{opacity:.62;filter:saturate(.55)}
+#cvc.room .cvseat::before{content:"";position:absolute;z-index:-1;left:50%;top:calc(var(--fs) * .6);width:calc(var(--fs) * 1.5);height:calc(var(--fs) * .6);transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(1,6,23,.8) 0,rgba(1,6,23,.58) 52%,rgba(1,6,23,0) 100%);filter:blur(3px);pointer-events:none}
+#cvc.room .cvlip{position:absolute;z-index:2;left:50%;top:calc(var(--fs) * .64);width:calc(var(--fs) * 1.22);height:calc(var(--fs) * .44);transform:translateX(-50%);border-radius:50%;pointer-events:none;box-shadow:inset 0 calc(var(--fs) * -.17) 0 0 hsl(var(--h) 88% 57%),inset 0 calc(var(--fs) * -.2) 0 0 rgba(255,255,255,.5)}
+#cvc.room.hasvid .cvlip,#cvc.room.hasvid .cvseat::before{display:none}
+#cvc.room .cvnm{z-index:3;position:absolute;left:50%;top:calc(100% + 16px);transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:calc(var(--fs) * 1.9);padding:7px 15px;border-radius:99px;background:rgba(5,14,36,.68);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);color:#fff;white-space:nowrap;box-shadow:0 10px 26px -10px rgba(0,0,0,.7)}
+#cvc.room .cvnm b{min-width:0;overflow:hidden;text-overflow:ellipsis;font:800 15px/1.2 Outfit,sans-serif}
+#cvc.room .cvnm i{flex:none;font:800 10px/1 Outfit,sans-serif;font-style:normal;letter-spacing:1.1px;text-transform:uppercase;padding:4px 8px;border-radius:99px;background:rgba(255,255,255,.2)}
+
+/* top: minimize, who and how long, connection, full screen */
+#cvc.room .cvtop{position:absolute;z-index:5;left:calc(16px + env(safe-area-inset-left,0px));right:calc(16px + env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;padding:0;pointer-events:none}
+#cvc.room .cvtop>*{pointer-events:auto}
+#cvc.room .cvx{width:46px;height:46px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgba(255,255,255,.24)}
+#cvc.room .cvx:hover{background:rgba(255,255,255,.22)}
+#cvc.room .cvwho{flex:0 1 auto;margin-right:auto;gap:0;min-width:0;max-width:calc(100cqw - 232px);padding:8px 20px 8px 18px;border-radius:22px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border:1px solid rgba(255,255,255,.22)}
+#cvc.room .cvtxt{gap:1px;min-width:0}
+#cvc.room .cvtxt b{font:900 17px/1.2 Outfit,sans-serif}
+#cvc.room .cvq{box-sizing:border-box;height:46px;padding:14px 15px 13px;border-radius:99px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.22);align-items:flex-end}
+
+/* bottom: one floating bar */
+#cvc.room .cvbtns{position:absolute;z-index:5;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 12px;max-width:calc(100% - 20px);border-radius:99px;background:rgba(5,14,36,.64);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.24);box-shadow:0 28px 70px -18px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.2)}
+#cvc.room .cvb{position:relative;flex:none;width:54px;max-width:none;height:54px;min-height:0;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center;font-size:0;gap:0;cursor:pointer;transition:background .18s,transform .24s var(--spring),box-shadow .2s}
+#cvc.room .cvb span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#cvc.room .cvb svg{width:23px;height:23px}
+#cvc.room .cvb:hover{background:rgba(255,255,255,.26);transform:translateY(-3px)}
+#cvc.room .cvb:active{transform:scale(.94)}
+#cvc.room .cvb.on,#cvc.room .cvb.shr.on{background:#fff;color:#0b2a66;border-color:#fff}
+#cvc.room .cvb.shr.on{box-shadow:0 0 0 4px rgba(255,255,255,.28)}
+#cvc.room .cvb.end{width:80px;border-radius:99px;background:#fff;color:#0b2a66;border-color:#fff}
+#cvc.room .cvb.end:hover{background:#eaf3ff}
+#cvc.room .cvb.end svg{transform:rotate(135deg)}
+#cvc.room .cvb[disabled]{opacity:.55;transform:none}
+#cvc.room .cvb:focus-visible,#cvc.room .cvx:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* a shared screen takes the middle, the two faces move to a row above it */
+#cvc.room .cvstage{position:absolute;z-index:2;left:50%;top:calc(50% + 22px);transform:translate(-50%,-50%);width:min(calc(100cqw - 36px),calc((100cqh - 270px) * 16 / 9));height:auto;aspect-ratio:16 / 9;margin:0;border-radius:22px;background:#020816;border:1px solid rgba(255,255,255,.26);box-shadow:0 40px 100px -24px #000,0 0 0 1px rgba(0,0,0,.4);animation:cvFade .35s ease both}
+@keyframes cvFade{from{opacity:0}to{opacity:1}}
+#cvc.room.hasvid::after{background:linear-gradient(180deg,rgba(3,10,28,.82),rgba(3,10,28,.66) 40%,rgba(3,10,28,.86))}
+#cvc.room #cvbig{display:none}
+#cvc.room.hasvid .cvseats{inset:auto;left:18px;right:18px;top:calc(76px + env(safe-area-inset-top,0px));height:60px;display:flex;justify-content:center;align-items:center;gap:12px}
+#cvc.room.hasvid .cvseat{--fs:52px;position:relative;left:auto;top:auto;transform:none!important;flex:none;width:auto;height:52px;display:flex;align-items:center;gap:10px;animation:none}
+#cvc.room.hasvid .cvface{position:relative;inset:auto;flex:none;width:52px;height:52px}
+#cvc.room.hasvid .cvface .av{font-size:20px!important;box-shadow:0 0 0 3px #fff,0 8px 20px -6px rgba(0,0,0,.7)!important}
+#cvc.room.hasvid .cvface::before,#cvc.room.hasvid .cvface::after{inset:-6px}
+#cvc.room.hasvid .cvbadge{width:22px;height:22px}
+#cvc.room.hasvid .cvnm{position:static;transform:none;max-width:160px;padding:6px 13px}
+#cvc.room.hasvid .cvnm b{font-size:14px}
+
+/* tablets, phones and a room squeezed next to the chat */
+@container (max-width:720px){
+  #cvc.room #cvrfs{display:none}
+  #cvc.room .cvseat.sme{--dx:-102}
+  #cvc.room .cvseat.sthem{--dx:102}
+  #cvc.room .cvwho{max-width:calc(100cqw - 150px)}
+  #cvc.room .cvtop{left:calc(10px + env(safe-area-inset-left,0px));right:calc(10px + env(safe-area-inset-right,0px));gap:8px}
+  #cvc.room .cvx{width:42px;height:42px}
+  #cvc.room .cvq{height:42px;padding:12px 12px 11px}
+  #cvc.room .cvwho{padding:7px 16px 7px 14px}
+  #cvc.room .cvtxt b{font-size:15px}
+  #cvc.room .cvbtns{gap:7px;padding:8px 10px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  #cvc.room .cvb{width:48px;height:48px}
+  #cvc.room .cvb svg{width:21px;height:21px}
+  #cvc.room .cvb.end{width:68px}
+  #cvc.room .cvnm{top:calc(100% + 12px);padding:6px 13px}
+  #cvc.room .cvnm b{font-size:14px}
+  #cvc.room .cvstage{width:min(calc(100cqw - 20px),calc((100cqh - 250px) * 16 / 9));border-radius:18px}
+  #cvc.room.hasvid .cvseats{left:10px;right:10px;top:calc(76px + env(safe-area-inset-top,0px))}
+}
+/* wide and short (a phone on its side, a thin window): the scene shrinks to fit, names move beside the faces */
+@container (min-aspect-ratio:19/10){ #cvc.room .cvfx,#cvc.room .cvseats{--s:calc(100cqh / 1000)} }
+@container (max-height:520px){
+  #cvc.room .cvbtns{bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:6px 9px;gap:6px}
+  #cvc.room .cvb{width:42px;height:42px}
+  #cvc.room .cvb.end{width:60px}
+  #cvc.room .cvb svg{width:20px;height:20px}
+  #cvc.room .cvtop{top:calc(8px + env(safe-area-inset-top,0px))}
+  #cvc.room .cvnm{top:50%;left:calc(100% + 12px);transform:translateY(-50%)}
+  #cvc.room .cvseat.sme .cvnm{left:auto;right:calc(100% + 12px)}
+  #cvc.room.hasvid .cvseats{display:none}
+  #cvc.room .cvstage{top:calc(50% + 6px);width:min(calc(100cqw - 24px),calc((100cqh - 132px) * 16 / 9))}
+}
+@container (max-width:380px){
+  #cvc.room .cvq{display:none}
+  #cvc.room .cvbtns{gap:5px;padding:7px 8px}
+  #cvc.room .cvb{width:44px;height:44px}
+  #cvc.room .cvb.end{width:62px}
+}
+@media(pointer:coarse){#cvc.room #cvrfs{display:none}}
+
+/* windows and messages opened from the room sit above it */
+body.cvroom .modal,body.cvroom #pset.modal{z-index:97}
+body.cvroom .chlb{z-index:98}
+body.cvroom .toast{z-index:99;bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+body.cvroom .chfab{display:none}
+@media(prefers-reduced-motion:reduce){#cvc.room,#cvc.room *{animation:none!important;transition:none!important}}
+
+/* the settings tab bar stays readable when the page scrolls under it */
+.pst{background:rgba(6,12,26,.94)}
+#cvc .cvscene .sc-bgA{stop-color:hsl(var(--h) 74% 17%)}
+#cvc .cvscene .sc-bgB{stop-color:hsl(var(--h) 90% 4%)}
+#cvc .cvscene .sc-scrA{stop-color:hsl(calc(var(--h) - 14) 100% 84%)}
+#cvc .cvscene .sc-scrB{stop-color:hsl(var(--h) 100% 58%)}
+#cvc .cvscene .sc-skyA{stop-color:hsl(var(--h) 86% 8%)}
+#cvc .cvscene .sc-skyB{stop-color:hsl(var(--h) 90% 36%)}
+#cvc .cvscene .sc-poolA{stop-color:hsl(var(--h) 100% 72%);stop-opacity:.5}
+#cvc .cvscene .sc-poolB{stop-color:hsl(var(--h) 100% 60%);stop-opacity:0}
+#cvc .cvscene .sc-wl{fill:hsl(var(--h) 56% 29%)}
+#cvc .cvscene .sc-wr{fill:hsl(var(--h) 60% 22%)}
+#cvc .cvscene .sc-pil{fill:hsl(var(--h) 50% 36%);opacity:.78}
+#cvc .cvscene .sc-pil-s{fill:#010617;opacity:.28}
+#cvc .cvscene .sc-base{fill:hsl(var(--h) 50% 15%)}
+#cvc .cvscene .sc-hl2{stroke:hsl(var(--h) 100% 84%);stroke-opacity:.45}
+#cvc .cvscene .sc-nw{stroke:#fff;stroke-linecap:round}
+#cvc .cvscene .sc-nb{stroke:hsl(var(--h) 100% 68%);stroke-linecap:round}
+#cvc .cvscene .sc-glow{filter:url(#csGlow);opacity:.85}
+#cvc .cvscene .sc-scrspill{fill:hsl(var(--h) 100% 70%)}
+#cvc .cvscene .sc-fl{fill:hsl(var(--h) 52% 37%)}
+#cvc .cvscene .sc-grid{stroke:hsl(var(--h) 90% 80%);opacity:.2}
+#cvc .cvscene .sc-sheen{fill:#fff;opacity:.045}
+#cvc .cvscene .sc-edge{fill:none;stroke:hsl(var(--h) 100% 84%);stroke-opacity:.5;stroke-width:3}
+#cvc .cvscene .sc-rug{fill:hsl(var(--h) 66% 38%)}
+#cvc .cvscene .sc-rug2{fill:hsl(var(--h) 76% 47%);opacity:.92}
+#cvc .cvscene .sc-rug3{fill:none;stroke:#fff;stroke-opacity:.3;stroke-width:2;stroke-dasharray:7 6}
+#cvc .cvscene .sc-patch{fill:hsl(calc(var(--h) - 10) 100% 92%);opacity:.36}
+#cvc .cvscene .sc-winf{fill:hsl(var(--h) 40% 12%)}
+#cvc .cvscene .sc-winedge{stroke:#010617;stroke-opacity:.7;stroke-width:2.5}
+#cvc .cvscene .sc-mull{stroke:hsl(var(--h) 40% 13%)}
+#cvc .cvscene .sc-winglare{fill:#fff;opacity:.05}
+#cvc .cvscene .sc-star{fill:#fff;opacity:.85}
+#cvc .cvscene .sc-moon{fill:hsl(calc(var(--h) - 18) 100% 96%)}
+#cvc .cvscene .sc-moon-g{fill:hsl(calc(var(--h) - 10) 100% 80%);opacity:.55}
+#cvc .cvscene .sc-bld{fill:hsl(var(--h) 70% 9%)}
+#cvc .cvscene .sc-bldw{fill:hsl(calc(var(--h) - 14) 100% 86%);opacity:.85}
+#cvc .cvscene .sc-sill-t{fill:hsl(var(--h) 40% 52%)}
+#cvc .cvscene .sc-sill-l{fill:hsl(var(--h) 40% 40%)}
+#cvc .cvscene .sc-sill-r{fill:hsl(var(--h) 40% 30%)}
+#cvc .cvscene .sc-desk-t{fill:hsl(var(--h) 36% 50%)}
+#cvc .cvscene .sc-desk-l{fill:hsl(var(--h) 36% 39%)}
+#cvc .cvscene .sc-desk-r{fill:hsl(var(--h) 36% 29%)}
+#cvc .cvscene .sc-kb-t{fill:hsl(var(--h) 24% 72%)}
+#cvc .cvscene .sc-kb-l{fill:hsl(var(--h) 24% 57%)}
+#cvc .cvscene .sc-kb-r{fill:hsl(var(--h) 24% 44%)}
+#cvc .cvscene .sc-pc-t{fill:hsl(var(--h) 34% 44%)}
+#cvc .cvscene .sc-pc-l{fill:hsl(var(--h) 34% 34%)}
+#cvc .cvscene .sc-pc-r{fill:hsl(var(--h) 34% 25%)}
+#cvc .cvscene .sc-con-t{fill:hsl(var(--h) 46% 41%)}
+#cvc .cvscene .sc-con-l{fill:hsl(var(--h) 46% 31%)}
+#cvc .cvscene .sc-con-r{fill:hsl(var(--h) 46% 22%)}
+#cvc .cvscene .sc-mon-t{fill:hsl(var(--h) 30% 24%)}
+#cvc .cvscene .sc-mon-l{fill:hsl(var(--h) 30% 16%)}
+#cvc .cvscene .sc-mon-r{fill:hsl(var(--h) 30% 11%)}
+#cvc .cvscene .sc-scr{fill:url(#csScr)}
+#cvc .cvscene .sc-scrglow{fill:hsl(var(--h) 100% 66%);opacity:.5}
+#cvc .cvscene .sc-deskglow{fill:hsl(var(--h) 100% 70%);opacity:.18}
+#cvc .cvscene .sc-sofa-t{fill:hsl(var(--h) 78% 58%)}
+#cvc .cvscene .sc-sofa-l{fill:hsl(var(--h) 78% 46%)}
+#cvc .cvscene .sc-sofa-r{fill:hsl(var(--h) 78% 34%)}
+#cvc .cvscene .sc-cush-t{fill:hsl(var(--h) 92% 70%)}
+#cvc .cvscene .sc-cush-l{fill:hsl(var(--h) 92% 59%)}
+#cvc .cvscene .sc-cush-r{fill:hsl(var(--h) 92% 47%)}
+#cvc .cvscene .sc-tbl-t{fill:hsl(var(--h) 40% 94%)}
+#cvc .cvscene .sc-tbl-l{fill:hsl(var(--h) 40% 79%)}
+#cvc .cvscene .sc-tbl-r{fill:hsl(var(--h) 40% 63%)}
+#cvc .cvscene .sc-cup-t{fill:hsl(var(--h) 20% 100%)}
+#cvc .cvscene .sc-cup-l{fill:hsl(var(--h) 20% 90%)}
+#cvc .cvscene .sc-cup-r{fill:hsl(var(--h) 20% 76%)}
+#cvc .cvscene .sc-hl{stroke:#fff;stroke-opacity:.34;stroke-width:1.5;stroke-linejoin:round}
+#cvc .cvscene .sc-bag-s{fill:rgba(0,0,0,.34)}
+#cvc .cvscene .sc-bag-b{fill:hsl(var(--h) 76% 36%)}
+#cvc .cvscene .sc-bag-t{fill:hsl(var(--h) 88% 56%)}
+#cvc .cvscene .sc-bag-fold{stroke:#010617;stroke-opacity:.28;stroke-width:3}
+#cvc .cvscene .sc-pot-b{fill:hsl(var(--h) 36% 86%)}
+#cvc .cvscene .sc-pot-t{fill:hsl(var(--h) 50% 16%)}
+#cvc .cvscene .sc-lf0{fill:hsl(calc(var(--h) - 26) 70% 54%)}
+#cvc .cvscene .sc-lf1{fill:hsl(calc(var(--h) - 16) 78% 44%)}
+#cvc .cvscene .sc-lf2{fill:hsl(calc(var(--h) - 6) 86% 60%)}
+#cvc .cvscene .sc-frm{fill:hsl(var(--h) 40% 40%)}
+#cvc .cvscene .sc-frm2{fill:hsl(var(--h) 66% 12%)}
+#cvc .cvscene .sc-ico{fill:hsl(var(--h) 100% 88%)}
+#cvc .cvscene .sc-trophy{fill:hsl(var(--h) 100% 92%)}
+#cvc .cvscene .sc-lamp{fill:#fff}
+#cvc .cvscene .sc-lamp.sc-glow{fill:hsl(var(--h) 100% 80%);opacity:.8}
+#cvc .cvscene .sc-lampcone{fill:hsl(var(--h) 100% 80%);opacity:.28}
+#cvc .cvscene .sc-dust{fill:#fff;opacity:.3;animation:cvTw 5s ease-in-out infinite}
+#cvc .cvscene .sc-dust:nth-of-type(5n+1){animation-delay:0s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+2){animation-delay:1.1s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+3){animation-delay:2.3s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+4){animation-delay:3.4s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+5){animation-delay:.6s}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -9980,7 +10215,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v227">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v228">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -12286,6 +12521,241 @@ body.incall .chfab{bottom:20px}
 
 /* settings sit above the chat drawer (their Save / Done buttons were under it) but below the call card */
 #pset.modal{z-index:94}
+/* ======================= v228: profile pictures + the call room ======================= */
+@keyframes cvRoomIn{0%{opacity:0;transform:scale(1.035)}100%{opacity:1;transform:none}}
+@keyframes cvTw{0%,100%{opacity:.08}50%{opacity:.55}}
+
+/* chat header: the face of who you are talking to */
+.chhav{flex:none;display:inline-flex;align-items:center;margin-right:2px}
+.chhav[hidden]{display:none}
+.chhav .av{margin:0}
+.chdr .chhav .chrav{width:38px;height:38px}
+.chav .av,.chrm .av{overflow:hidden}
+
+/* the small card gets a way back into the room */
+#cvc .cvx{flex:none;display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;transition:background .18s,transform .22s var(--spring)}
+#cvc .cvx:hover{background:rgba(255,255,255,.26);transform:scale(1.07)}
+#cvc .cvx:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#cvc.dock .cvx{width:34px;height:34px}
+#cvc.dock .cvwho[data-open]{cursor:pointer;border-radius:16px}
+#cvc.dock .cvwho[data-open]:focus-visible{outline:2px solid #fff;outline-offset:4px}
+@media(max-width:860px){#cvc.dock .cvexp{display:none}}
+
+/* scene layer: hidden everywhere except in the room */
+#cvc .cvfx{display:none}
+
+/* ---------- the room ---------- */
+#cvc.room{position:fixed;inset:0;left:0;top:0;right:0;bottom:0;transform:none;width:auto;max-width:none;min-width:0;height:auto;margin:0;padding:0;gap:0;display:block;border:0;border-radius:0;overflow:hidden;overscroll-behavior:contain;container-type:size;background:#050f26;color:#fff;box-shadow:none;animation:cvRoomIn .42s var(--ease) both;--s:max(calc(100cqw / 1600),calc(100cqh / 1000))}
+body.chopen #cvc.room{right:min(460px,100vw)}
+#cvc.room::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,10,28,.66),rgba(3,10,28,0) 22%,rgba(3,10,28,0) 64%,rgba(3,10,28,.78)),radial-gradient(130% 100% at 50% 46%,rgba(3,10,28,0) 56%,rgba(3,10,28,.55))}
+#cvc.room .cvfx{display:block;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:hsl(var(--h) 90% 4%)}
+#cvc.room .cvscene{position:absolute;left:50%;top:50%;width:calc(1600 * var(--s));height:calc(1000 * var(--s));transform:translate(-50%,-50%);display:block}
+#cvc.room .cvbar{display:contents}
+
+/* the two seats: placed in scene units so they always sit on their beanbags, whatever the screen */
+#cvc.room .cvseats{position:absolute;inset:0;z-index:3;pointer-events:none}
+#cvc.room .cvseat{--fs:clamp(56px,calc(150 * var(--s)),260px);position:absolute;left:calc(50% + var(--dx) * var(--s));top:calc(50% + (var(--sy) - 500) * var(--s));width:var(--fs);height:var(--fs);transform:translate(-50%,-50%);display:block;transition:transform .09s linear;animation:cvSeatIn .6s var(--spring) backwards}
+#cvc.room .cvseat.sme{--dx:-150;--sy:660}
+#cvc.room .cvseat.sthem{--dx:150;--sy:660;animation-delay:.08s}
+@keyframes cvSeatIn{0%{opacity:0;transform:translate(-50%,calc(-50% + 26px)) scale(.86)}100%{opacity:1;transform:translate(-50%,-50%)}}
+#cvc.room.spk-me .cvseat.sme{transform:translate(-50%,calc(-50% - var(--lv-me,0) * 9px))}
+#cvc.room.spk-them .cvseat.sthem{transform:translate(-50%,calc(-50% - var(--lv-them,0) * 9px))}
+#cvc.room .cvface{position:absolute;inset:0;width:auto;height:auto;display:block;border-radius:50%;background:none;box-shadow:none}
+#cvc.room .cvface.me{inset:0;width:auto;height:auto;background:none;box-shadow:none}
+#cvc.room .cvface .av,#cvc.room .cvface.me .av{font-size:calc(var(--fs) * .42)!important;box-shadow:0 0 0 4px #fff,0 0 0 10px rgba(120,185,255,.3),0 22px 44px -10px rgba(0,0,0,.7)!important}
+#cvc.room .cvface::before,#cvc.room .cvface::after{inset:-10px}
+#cvc.room .cvface::before{border-width:3px}
+#cvc.room .cvr{inset:-2px;border-width:3px}
+#cvc.room .cvbadge{width:30px;height:30px;right:-2px;top:-2px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#cvc.room .cvface.me .cvbadge{width:30px;height:30px;right:-2px;top:-2px}
+#cvc.room.wait .cvface.them .av{opacity:.62;filter:saturate(.55)}
+#cvc.room .cvseat::before{content:"";position:absolute;z-index:-1;left:50%;top:calc(var(--fs) * .6);width:calc(var(--fs) * 1.5);height:calc(var(--fs) * .6);transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(1,6,23,.8) 0,rgba(1,6,23,.58) 52%,rgba(1,6,23,0) 100%);filter:blur(3px);pointer-events:none}
+#cvc.room .cvlip{position:absolute;z-index:2;left:50%;top:calc(var(--fs) * .64);width:calc(var(--fs) * 1.22);height:calc(var(--fs) * .44);transform:translateX(-50%);border-radius:50%;pointer-events:none;box-shadow:inset 0 calc(var(--fs) * -.17) 0 0 hsl(var(--h) 88% 57%),inset 0 calc(var(--fs) * -.2) 0 0 rgba(255,255,255,.5)}
+#cvc.room.hasvid .cvlip,#cvc.room.hasvid .cvseat::before{display:none}
+#cvc.room .cvnm{z-index:3;position:absolute;left:50%;top:calc(100% + 16px);transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:calc(var(--fs) * 1.9);padding:7px 15px;border-radius:99px;background:rgba(5,14,36,.68);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);color:#fff;white-space:nowrap;box-shadow:0 10px 26px -10px rgba(0,0,0,.7)}
+#cvc.room .cvnm b{min-width:0;overflow:hidden;text-overflow:ellipsis;font:800 15px/1.2 Outfit,sans-serif}
+#cvc.room .cvnm i{flex:none;font:800 10px/1 Outfit,sans-serif;font-style:normal;letter-spacing:1.1px;text-transform:uppercase;padding:4px 8px;border-radius:99px;background:rgba(255,255,255,.2)}
+
+/* top: minimize, who and how long, connection, full screen */
+#cvc.room .cvtop{position:absolute;z-index:5;left:calc(16px + env(safe-area-inset-left,0px));right:calc(16px + env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;padding:0;pointer-events:none}
+#cvc.room .cvtop>*{pointer-events:auto}
+#cvc.room .cvx{width:46px;height:46px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgba(255,255,255,.24)}
+#cvc.room .cvx:hover{background:rgba(255,255,255,.22)}
+#cvc.room .cvwho{flex:0 1 auto;margin-right:auto;gap:0;min-width:0;max-width:calc(100cqw - 232px);padding:8px 20px 8px 18px;border-radius:22px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border:1px solid rgba(255,255,255,.22)}
+#cvc.room .cvtxt{gap:1px;min-width:0}
+#cvc.room .cvtxt b{font:900 17px/1.2 Outfit,sans-serif}
+#cvc.room .cvq{box-sizing:border-box;height:46px;padding:14px 15px 13px;border-radius:99px;background:rgba(5,14,36,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.22);align-items:flex-end}
+
+/* bottom: one floating bar */
+#cvc.room .cvbtns{position:absolute;z-index:5;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 12px;max-width:calc(100% - 20px);border-radius:99px;background:rgba(5,14,36,.64);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.24);box-shadow:0 28px 70px -18px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.2)}
+#cvc.room .cvb{position:relative;flex:none;width:54px;max-width:none;height:54px;min-height:0;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center;font-size:0;gap:0;cursor:pointer;transition:background .18s,transform .24s var(--spring),box-shadow .2s}
+#cvc.room .cvb span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#cvc.room .cvb svg{width:23px;height:23px}
+#cvc.room .cvb:hover{background:rgba(255,255,255,.26);transform:translateY(-3px)}
+#cvc.room .cvb:active{transform:scale(.94)}
+#cvc.room .cvb.on,#cvc.room .cvb.shr.on{background:#fff;color:#0b2a66;border-color:#fff}
+#cvc.room .cvb.shr.on{box-shadow:0 0 0 4px rgba(255,255,255,.28)}
+#cvc.room .cvb.end{width:80px;border-radius:99px;background:#fff;color:#0b2a66;border-color:#fff}
+#cvc.room .cvb.end:hover{background:#eaf3ff}
+#cvc.room .cvb.end svg{transform:rotate(135deg)}
+#cvc.room .cvb[disabled]{opacity:.55;transform:none}
+#cvc.room .cvb:focus-visible,#cvc.room .cvx:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* a shared screen takes the middle, the two faces move to a row above it */
+#cvc.room .cvstage{position:absolute;z-index:2;left:50%;top:calc(50% + 22px);transform:translate(-50%,-50%);width:min(calc(100cqw - 36px),calc((100cqh - 270px) * 16 / 9));height:auto;aspect-ratio:16 / 9;margin:0;border-radius:22px;background:#020816;border:1px solid rgba(255,255,255,.26);box-shadow:0 40px 100px -24px #000,0 0 0 1px rgba(0,0,0,.4);animation:cvFade .35s ease both}
+@keyframes cvFade{from{opacity:0}to{opacity:1}}
+#cvc.room.hasvid::after{background:linear-gradient(180deg,rgba(3,10,28,.82),rgba(3,10,28,.66) 40%,rgba(3,10,28,.86))}
+#cvc.room #cvbig{display:none}
+#cvc.room.hasvid .cvseats{inset:auto;left:18px;right:18px;top:calc(76px + env(safe-area-inset-top,0px));height:60px;display:flex;justify-content:center;align-items:center;gap:12px}
+#cvc.room.hasvid .cvseat{--fs:52px;position:relative;left:auto;top:auto;transform:none!important;flex:none;width:auto;height:52px;display:flex;align-items:center;gap:10px;animation:none}
+#cvc.room.hasvid .cvface{position:relative;inset:auto;flex:none;width:52px;height:52px}
+#cvc.room.hasvid .cvface .av{font-size:20px!important;box-shadow:0 0 0 3px #fff,0 8px 20px -6px rgba(0,0,0,.7)!important}
+#cvc.room.hasvid .cvface::before,#cvc.room.hasvid .cvface::after{inset:-6px}
+#cvc.room.hasvid .cvbadge{width:22px;height:22px}
+#cvc.room.hasvid .cvnm{position:static;transform:none;max-width:160px;padding:6px 13px}
+#cvc.room.hasvid .cvnm b{font-size:14px}
+
+/* tablets, phones and a room squeezed next to the chat */
+@container (max-width:720px){
+  #cvc.room #cvrfs{display:none}
+  #cvc.room .cvseat.sme{--dx:-102}
+  #cvc.room .cvseat.sthem{--dx:102}
+  #cvc.room .cvwho{max-width:calc(100cqw - 150px)}
+  #cvc.room .cvtop{left:calc(10px + env(safe-area-inset-left,0px));right:calc(10px + env(safe-area-inset-right,0px));gap:8px}
+  #cvc.room .cvx{width:42px;height:42px}
+  #cvc.room .cvq{height:42px;padding:12px 12px 11px}
+  #cvc.room .cvwho{padding:7px 16px 7px 14px}
+  #cvc.room .cvtxt b{font-size:15px}
+  #cvc.room .cvbtns{gap:7px;padding:8px 10px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  #cvc.room .cvb{width:48px;height:48px}
+  #cvc.room .cvb svg{width:21px;height:21px}
+  #cvc.room .cvb.end{width:68px}
+  #cvc.room .cvnm{top:calc(100% + 12px);padding:6px 13px}
+  #cvc.room .cvnm b{font-size:14px}
+  #cvc.room .cvstage{width:min(calc(100cqw - 20px),calc((100cqh - 250px) * 16 / 9));border-radius:18px}
+  #cvc.room.hasvid .cvseats{left:10px;right:10px;top:calc(76px + env(safe-area-inset-top,0px))}
+}
+/* wide and short (a phone on its side, a thin window): the scene shrinks to fit, names move beside the faces */
+@container (min-aspect-ratio:19/10){ #cvc.room .cvfx,#cvc.room .cvseats{--s:calc(100cqh / 1000)} }
+@container (max-height:520px){
+  #cvc.room .cvbtns{bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:6px 9px;gap:6px}
+  #cvc.room .cvb{width:42px;height:42px}
+  #cvc.room .cvb.end{width:60px}
+  #cvc.room .cvb svg{width:20px;height:20px}
+  #cvc.room .cvtop{top:calc(8px + env(safe-area-inset-top,0px))}
+  #cvc.room .cvnm{top:50%;left:calc(100% + 12px);transform:translateY(-50%)}
+  #cvc.room .cvseat.sme .cvnm{left:auto;right:calc(100% + 12px)}
+  #cvc.room.hasvid .cvseats{display:none}
+  #cvc.room .cvstage{top:calc(50% + 6px);width:min(calc(100cqw - 24px),calc((100cqh - 132px) * 16 / 9))}
+}
+@container (max-width:380px){
+  #cvc.room .cvq{display:none}
+  #cvc.room .cvbtns{gap:5px;padding:7px 8px}
+  #cvc.room .cvb{width:44px;height:44px}
+  #cvc.room .cvb.end{width:62px}
+}
+@media(pointer:coarse){#cvc.room #cvrfs{display:none}}
+
+/* windows and messages opened from the room sit above it */
+body.cvroom .modal,body.cvroom #pset.modal{z-index:97}
+body.cvroom .chlb{z-index:98}
+body.cvroom .toast{z-index:99;bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+body.cvroom .chfab{display:none}
+@media(prefers-reduced-motion:reduce){#cvc.room,#cvc.room *{animation:none!important;transition:none!important}}
+
+/* the settings tab bar stays readable when the page scrolls under it */
+.pst{background:rgba(6,12,26,.94)}
+#cvc .cvscene .sc-bgA{stop-color:hsl(var(--h) 74% 17%)}
+#cvc .cvscene .sc-bgB{stop-color:hsl(var(--h) 90% 4%)}
+#cvc .cvscene .sc-scrA{stop-color:hsl(calc(var(--h) - 14) 100% 84%)}
+#cvc .cvscene .sc-scrB{stop-color:hsl(var(--h) 100% 58%)}
+#cvc .cvscene .sc-skyA{stop-color:hsl(var(--h) 86% 8%)}
+#cvc .cvscene .sc-skyB{stop-color:hsl(var(--h) 90% 36%)}
+#cvc .cvscene .sc-poolA{stop-color:hsl(var(--h) 100% 72%);stop-opacity:.5}
+#cvc .cvscene .sc-poolB{stop-color:hsl(var(--h) 100% 60%);stop-opacity:0}
+#cvc .cvscene .sc-wl{fill:hsl(var(--h) 56% 29%)}
+#cvc .cvscene .sc-wr{fill:hsl(var(--h) 60% 22%)}
+#cvc .cvscene .sc-pil{fill:hsl(var(--h) 50% 36%);opacity:.78}
+#cvc .cvscene .sc-pil-s{fill:#010617;opacity:.28}
+#cvc .cvscene .sc-base{fill:hsl(var(--h) 50% 15%)}
+#cvc .cvscene .sc-hl2{stroke:hsl(var(--h) 100% 84%);stroke-opacity:.45}
+#cvc .cvscene .sc-nw{stroke:#fff;stroke-linecap:round}
+#cvc .cvscene .sc-nb{stroke:hsl(var(--h) 100% 68%);stroke-linecap:round}
+#cvc .cvscene .sc-glow{filter:url(#csGlow);opacity:.85}
+#cvc .cvscene .sc-scrspill{fill:hsl(var(--h) 100% 70%)}
+#cvc .cvscene .sc-fl{fill:hsl(var(--h) 52% 37%)}
+#cvc .cvscene .sc-grid{stroke:hsl(var(--h) 90% 80%);opacity:.2}
+#cvc .cvscene .sc-sheen{fill:#fff;opacity:.045}
+#cvc .cvscene .sc-edge{fill:none;stroke:hsl(var(--h) 100% 84%);stroke-opacity:.5;stroke-width:3}
+#cvc .cvscene .sc-rug{fill:hsl(var(--h) 66% 38%)}
+#cvc .cvscene .sc-rug2{fill:hsl(var(--h) 76% 47%);opacity:.92}
+#cvc .cvscene .sc-rug3{fill:none;stroke:#fff;stroke-opacity:.3;stroke-width:2;stroke-dasharray:7 6}
+#cvc .cvscene .sc-patch{fill:hsl(calc(var(--h) - 10) 100% 92%);opacity:.36}
+#cvc .cvscene .sc-winf{fill:hsl(var(--h) 40% 12%)}
+#cvc .cvscene .sc-winedge{stroke:#010617;stroke-opacity:.7;stroke-width:2.5}
+#cvc .cvscene .sc-mull{stroke:hsl(var(--h) 40% 13%)}
+#cvc .cvscene .sc-winglare{fill:#fff;opacity:.05}
+#cvc .cvscene .sc-star{fill:#fff;opacity:.85}
+#cvc .cvscene .sc-moon{fill:hsl(calc(var(--h) - 18) 100% 96%)}
+#cvc .cvscene .sc-moon-g{fill:hsl(calc(var(--h) - 10) 100% 80%);opacity:.55}
+#cvc .cvscene .sc-bld{fill:hsl(var(--h) 70% 9%)}
+#cvc .cvscene .sc-bldw{fill:hsl(calc(var(--h) - 14) 100% 86%);opacity:.85}
+#cvc .cvscene .sc-sill-t{fill:hsl(var(--h) 40% 52%)}
+#cvc .cvscene .sc-sill-l{fill:hsl(var(--h) 40% 40%)}
+#cvc .cvscene .sc-sill-r{fill:hsl(var(--h) 40% 30%)}
+#cvc .cvscene .sc-desk-t{fill:hsl(var(--h) 36% 50%)}
+#cvc .cvscene .sc-desk-l{fill:hsl(var(--h) 36% 39%)}
+#cvc .cvscene .sc-desk-r{fill:hsl(var(--h) 36% 29%)}
+#cvc .cvscene .sc-kb-t{fill:hsl(var(--h) 24% 72%)}
+#cvc .cvscene .sc-kb-l{fill:hsl(var(--h) 24% 57%)}
+#cvc .cvscene .sc-kb-r{fill:hsl(var(--h) 24% 44%)}
+#cvc .cvscene .sc-pc-t{fill:hsl(var(--h) 34% 44%)}
+#cvc .cvscene .sc-pc-l{fill:hsl(var(--h) 34% 34%)}
+#cvc .cvscene .sc-pc-r{fill:hsl(var(--h) 34% 25%)}
+#cvc .cvscene .sc-con-t{fill:hsl(var(--h) 46% 41%)}
+#cvc .cvscene .sc-con-l{fill:hsl(var(--h) 46% 31%)}
+#cvc .cvscene .sc-con-r{fill:hsl(var(--h) 46% 22%)}
+#cvc .cvscene .sc-mon-t{fill:hsl(var(--h) 30% 24%)}
+#cvc .cvscene .sc-mon-l{fill:hsl(var(--h) 30% 16%)}
+#cvc .cvscene .sc-mon-r{fill:hsl(var(--h) 30% 11%)}
+#cvc .cvscene .sc-scr{fill:url(#csScr)}
+#cvc .cvscene .sc-scrglow{fill:hsl(var(--h) 100% 66%);opacity:.5}
+#cvc .cvscene .sc-deskglow{fill:hsl(var(--h) 100% 70%);opacity:.18}
+#cvc .cvscene .sc-sofa-t{fill:hsl(var(--h) 78% 58%)}
+#cvc .cvscene .sc-sofa-l{fill:hsl(var(--h) 78% 46%)}
+#cvc .cvscene .sc-sofa-r{fill:hsl(var(--h) 78% 34%)}
+#cvc .cvscene .sc-cush-t{fill:hsl(var(--h) 92% 70%)}
+#cvc .cvscene .sc-cush-l{fill:hsl(var(--h) 92% 59%)}
+#cvc .cvscene .sc-cush-r{fill:hsl(var(--h) 92% 47%)}
+#cvc .cvscene .sc-tbl-t{fill:hsl(var(--h) 40% 94%)}
+#cvc .cvscene .sc-tbl-l{fill:hsl(var(--h) 40% 79%)}
+#cvc .cvscene .sc-tbl-r{fill:hsl(var(--h) 40% 63%)}
+#cvc .cvscene .sc-cup-t{fill:hsl(var(--h) 20% 100%)}
+#cvc .cvscene .sc-cup-l{fill:hsl(var(--h) 20% 90%)}
+#cvc .cvscene .sc-cup-r{fill:hsl(var(--h) 20% 76%)}
+#cvc .cvscene .sc-hl{stroke:#fff;stroke-opacity:.34;stroke-width:1.5;stroke-linejoin:round}
+#cvc .cvscene .sc-bag-s{fill:rgba(0,0,0,.34)}
+#cvc .cvscene .sc-bag-b{fill:hsl(var(--h) 76% 36%)}
+#cvc .cvscene .sc-bag-t{fill:hsl(var(--h) 88% 56%)}
+#cvc .cvscene .sc-bag-fold{stroke:#010617;stroke-opacity:.28;stroke-width:3}
+#cvc .cvscene .sc-pot-b{fill:hsl(var(--h) 36% 86%)}
+#cvc .cvscene .sc-pot-t{fill:hsl(var(--h) 50% 16%)}
+#cvc .cvscene .sc-lf0{fill:hsl(calc(var(--h) - 26) 70% 54%)}
+#cvc .cvscene .sc-lf1{fill:hsl(calc(var(--h) - 16) 78% 44%)}
+#cvc .cvscene .sc-lf2{fill:hsl(calc(var(--h) - 6) 86% 60%)}
+#cvc .cvscene .sc-frm{fill:hsl(var(--h) 40% 40%)}
+#cvc .cvscene .sc-frm2{fill:hsl(var(--h) 66% 12%)}
+#cvc .cvscene .sc-ico{fill:hsl(var(--h) 100% 88%)}
+#cvc .cvscene .sc-trophy{fill:hsl(var(--h) 100% 92%)}
+#cvc .cvscene .sc-lamp{fill:#fff}
+#cvc .cvscene .sc-lamp.sc-glow{fill:hsl(var(--h) 100% 80%);opacity:.8}
+#cvc .cvscene .sc-lampcone{fill:hsl(var(--h) 100% 80%);opacity:.28}
+#cvc .cvscene .sc-dust{fill:#fff;opacity:.3;animation:cvTw 5s ease-in-out infinite}
+#cvc .cvscene .sc-dust:nth-of-type(5n+1){animation-delay:0s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+2){animation-delay:1.1s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+3){animation-delay:2.3s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+4){animation-delay:3.4s}
+#cvc .cvscene .sc-dust:nth-of-type(5n+5){animation-delay:.6s}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -14666,7 +15136,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v227js">
+<script id="v228js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -15920,7 +16390,7 @@ var _sh=window.show;
     var f=document.createElement("button"); f.id="chfab"; f.className="chfab"; f.hidden=true; f.type="button";
     f.innerHTML=svg(IC.chat,24)+'<i class="chdot" hidden></i>'; f.onclick=openChat; document.body.appendChild(f);
     var d=document.createElement("div"); d.id="chdr"; d.className="chdr"; d.hidden=true; d.setAttribute("role","dialog"); d.setAttribute("aria-label","Chat");
-    d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
+    d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><span class="chhav" id="chhav" hidden></span><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
       '<button class="chb" id="chcallb" type="button" aria-label="Start a voice call" title="Voice call" hidden>'+svg(IC.phone,19)+'</button>'+
       '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
       '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
@@ -15953,6 +16423,7 @@ var _sh=window.show;
       if(e.key!=="Escape") return;
       if(!$("chlb").hidden){ $("chlb").hidden=true; return; }
       var cv=$("cvc"); if(cv&&cv.classList.contains("big")){ CALL.big=false; paintCall(); return; }
+      if(cv&&cv.classList.contains("room")&&!CH.open&&!document.querySelector(".modal.on")&&!document.fullscreenElement&&!document.webkitFullscreenElement){ CALL.view="dock"; paintCall(); return; }
       if(!CH.open) return;
       var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
       if(CH.sel){ CH.sel=""; renderThread(); return; }
@@ -15966,10 +16437,10 @@ var _sh=window.show;
   }
   function openChat(){
     if(!gate("Chat")) return;
-    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx();
+    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx(); if(CALL.st!=="idle") paintCall();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
   function go(v,room){
     saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
     if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.shown=false; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=DRAFTS[draftKey(room)]||""; $("chtx").style.height="auto"; updCount(); paintReply(); setTimeout(fitTx,30); }
@@ -15978,10 +16449,60 @@ var _sh=window.show;
     if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden&&!t.disabled) t.focus(); },60);
   }
   function setHead(title,sub,back,callable){
-    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable;
+    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable; hdrAv(title);
     if(callable) $("chcallb").disabled=CALL.st!=="idle";
   }
-  function pname(n){ return av(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
+  /* ---- v228: profile pictures in chat and in the call ---- */
+  // A picture is looked up the same way the rest of the site does it: by the player this account is linked to
+  // (so a friend whose account name differs from their player name still shows their face), then by the name itself.
+  var AVB={}, AVS="";
+  function avBlob(u){
+    if(!u||String(u).slice(0,5)!=="data:") return u||"";
+    if(AVB[u]) return AVB[u];
+    try{
+      var i=u.indexOf(","), bin=atob(u.slice(i+1)), n=bin.length, a=new Uint8Array(n), k;
+      for(k=0;k<n;k++) a[k]=bin.charCodeAt(k);
+      var mt=/^data:([^;,]+)/.exec(u);
+      return (AVB[u]=URL.createObjectURL(new Blob([a],{type:mt?mt[1]:"image/jpeg"})));
+    }catch(e){ return u; }
+  }
+  function avUrl(name){
+    var raw=String(name||"").trim(), n=raw.toLowerCase(), A=STATE.avatars||{}, k=n, c, p, u;
+    if(!n) return "";
+    try{ if(typeof playerKeyFor==="function"){ c=[raw,n]; for(p=0;p<c.length;p++){ var pk=String(playerKeyFor(c[p])||"").toLowerCase(); if(pk&&A[pk]){ k=pk; break; } } } }catch(e){}
+    u=A[k]||A[n];
+    if(!u||!/^(data:image\/|https?:\/\/|blob:)/i.test(u)) return "";
+    return avBlob(u);
+  }
+  function avp(name,cls,style,title){
+    var u=avUrl(name), nm=String(name||"?");
+    return '<span class="av'+(cls?" "+cls:"")+(u?" pic":"")+'" data-av="'+esc(nm)+'"'+(style?' style="'+style+'"':'')+(title?' title="'+esc(title)+'"':'')+'>'+
+      (u?'<img src="'+esc(u)+'" alt="" draggable="false">':esc(nm.charAt(0).toUpperCase()))+'</span>';
+  }
+  // pictures arrive after the page has loaded (profiles are fetched), so already drawn faces are updated in place
+  function avSig(){ var A=STATE.avatars||{}, k, n=0, t=0; for(k in A){ n++; t+=String(A[k]||"").length; } return n+":"+t; }
+  function avPaint(root){
+    if(!root) return;
+    var els=root.querySelectorAll("[data-av]"), i, e, u, im, nm;
+    for(i=0;i<els.length;i++){
+      e=els[i]; nm=e.getAttribute("data-av")||"?"; u=avUrl(nm);
+      im=e.firstElementChild&&e.firstElementChild.tagName==="IMG"?e.firstElementChild:null;
+      if(u){ if(!im||im.getAttribute("src")!==u){ e.classList.add("pic"); e.innerHTML='<img src="'+esc(u)+'" alt="" draggable="false">'; } }
+      else if(im){ e.classList.remove("pic"); e.textContent=nm.charAt(0).toUpperCase(); }
+    }
+  }
+  function avRefresh(force){
+    var s=avSig(); if(s===AVS&&!force) return; AVS=s;
+    avPaint($("chdr")); avPaint($("cvc"));
+  }
+  setInterval(function(){ if(!document.hidden) avRefresh(); },1200);
+  function hdrAv(title){
+    var h=$("chhav"); if(!h) return; var r=CH.view==="thread"?CH.room:null, t=String(title||"");
+    if(r&&r.dm&&t){ h.innerHTML=avp(t,"","width:38px;height:38px;font-size:15px;margin:0"); h.hidden=false; }
+    else if(r&&!r.dm){ h.innerHTML='<span class="chrav room">'+svg(IC.room,18)+'</span>'; h.hidden=false; }
+    else { h.hidden=true; h.innerHTML=""; }
+  }
+  function pname(n){ return avp(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
 
   /* ---- banner: connection state + health check ---- */
   function paintBanner(){
@@ -16114,7 +16635,7 @@ var _sh=window.show;
   function msgHtml(m,prev,myId){
     var mine=myId&&m.from===myId, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del&&prev.k!=="call";
     var h='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'" tabindex="0" role="group" aria-label="'+esc((mine?"You":m.name)+", "+when(m.ts))+'">';
-    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
+    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+avp(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
     h+='<div class="chbub">';
     if(!grp&&!mine&&!CH.room.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
     if(m.del) h+='<em>Message removed</em>';
@@ -16380,7 +16901,7 @@ var _sh=window.show;
   }
   /* =============================== v227: voice settings (engine) ===============================
      Everything here is per device (localStorage "tml_voice"). Nothing is sent to the server. Changes apply at once, also during a call. */
-  var VS_D={mic:"",spk:"",ns:true,ec:true,agc:true,gain:100,vol:100,ring:100,q:"auto",ptt:false,pttKey:"KeyV"};
+  var VS_D={mic:"",spk:"",ns:true,ec:true,agc:true,gain:100,vol:100,ring:100,q:"auto",ptt:false,pttKey:"KeyV",room:true};
   var Q_BPS={low:24000,mid:64000,high:128000};
   var Q_LBL={auto:"Automatic",low:"Data saver · 24 kbps",mid:"Clear · 64 kbps",high:"Studio · 128 kbps"};
   function vsClamp(n,a,b,d){ n=Math.round(+n); return isFinite(n)?Math.max(a,Math.min(b,n)):d; }
@@ -16916,6 +17437,9 @@ var _sh=window.show;
         swRow("vs-ptt","Push to talk","Your microphone stays closed until you hold the key. Works while the Timmylist tab is in front, and not while you are typing.",VS.ptt)+
         '<div class="vsr" id="vs-pttrow"'+(VS.ptt?'':' hidden')+'><span class="vst"><b>Talk key</b><small>Click the button, then press the key you want.</small></span><button type="button" class="vsbtn key" id="vs-key">'+esc(keyLabel(VS.pttKey))+'</button></div>'+
       '</section>':'')+
+      '<section class="vsc" aria-labelledby="vs-h5"><h3 id="vs-h5">'+svg(ICV.big,16)+'Call window</h3>'+
+        swRow("vs-room","Open calls full screen","Calls open as a lounge room with both of your faces. Turn this off to keep them as a small card in the corner. You can switch during a call too.",VS.room)+
+      '</section>'+
       '<div class="vsfoot"><button type="button" class="vsbtn ghost" id="vs-reset">'+svg(VI.reset,15)+'Reset to defaults</button><button type="button" class="btn" id="vs-done">Done</button></div>';
   }
   function setP(r){ r.style.setProperty("--p",((r.value-r.min)/(r.max-r.min)*100)+"%"); }
@@ -16988,6 +17512,7 @@ var _sh=window.show;
     slider("vs-ring","ring",null,ringTest);
     [["vs-ns","ns"],["vs-ec","ec"],["vs-agc","agc"]].forEach(function(p){ $v(p[0]).onchange=function(){ VS[p[1]]=this.checked; vsSave(); micSwitchSoon(); vtSoon(); }; });
     $v("vs-q").onchange=function(){ VS.q=this.value; vsSave(); tuneSend(); };
+    $v("vs-room").onchange=function(){ VS.room=this.checked; vsSave(); if(CALL.st!=="idle"&&CALL.st!=="ringing"){ CALL.view=VS.room?"room":"dock"; paintCall(); } };
     $v("vs-test").onclick=function(){ if(VT.on) vtStop(); else vtStart(); };
     $v("vs-hear").onchange=function(){ vtHear(); };
     $v("vs-tspk").onclick=spkTest; $v("vs-tring").onclick=ringTest;
@@ -17057,50 +17582,89 @@ var _sh=window.show;
       '<div class="cvtools"><span class="cvlbl" id="cvlbl"></span><em class="cvstat" id="cvvstat"></em>'+
       tb("cvpip",ICV.pip,"Picture in picture")+tb("cvbig",ICV.big,"Make bigger")+tb("cvfs",ICV.fs,"Full screen")+tb("cvhide",IC.x,"Hide their screen")+'</div></div>';
   }
+  var CVSCENE="<svg class=\"cvscene\" viewBox=\"0 0 1600 1000\" preserveAspectRatio=\"xMidYMid slice\" aria-hidden=\"true\" focusable=\"false\"><defs><radialGradient id=\"csBg\" cx=\"50%\" cy=\"46%\" r=\"52%\"><stop offset=\"0\" class=\"sc-bgA\"/><stop offset=\"1\" class=\"sc-bgB\"/></radialGradient><linearGradient id=\"csFloorG\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".14\"/><stop offset=\".55\" stop-color=\"#fff\" stop-opacity=\".02\"/><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\".18\"/></linearGradient><linearGradient id=\"csWallG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\".5\"/><stop offset=\".5\" stop-color=\"#000\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\".05\"/></linearGradient><linearGradient id=\"csWash\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".26\"/><stop offset=\".45\" stop-color=\"#9cc6ff\" stop-opacity=\".08\"/><stop offset=\"1\" stop-color=\"#9cc6ff\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"csFaceG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#010617\" stop-opacity=\".5\"/><stop offset=\".55\" stop-color=\"#010617\" stop-opacity=\".08\"/><stop offset=\"1\" stop-color=\"#010617\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"csPotG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".25\"/><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#010617\" stop-opacity=\".45\"/></linearGradient><radialGradient id=\"csBagH\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".34\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"csScr\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" class=\"sc-scrA\"/><stop offset=\"1\" class=\"sc-scrB\"/></linearGradient><linearGradient id=\"csSky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" class=\"sc-skyA\"/><stop offset=\"1\" class=\"sc-skyB\"/></linearGradient><radialGradient id=\"csPool\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" class=\"sc-poolA\"/><stop offset=\"1\" class=\"sc-poolB\"/></radialGradient><radialGradient id=\"csSpill\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".16\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><filter id=\"csGlow\" x=\"-10%\" y=\"-60%\" width=\"120%\" height=\"220%\"><feGaussianBlur stdDeviation=\"7\"/></filter><filter id=\"csB3\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"3.2\"/></filter><filter id=\"csB2\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"2.2\"/></filter><filter id=\"csB4\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"4\"/></filter><filter id=\"csB8\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"8\"/></filter><filter id=\"csB14\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"200\" width=\"1400\" height=\"760\"><feGaussianBlur stdDeviation=\"15\"/></filter><clipPath id=\"csFloorClip\"><polygon points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/></clipPath><clipPath id=\"csWallClip\"><polygon points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\"/><polygon points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\"/></clipPath></defs><rect width=\"1600\" height=\"1000\" fill=\"url(#csBg)\"/><polygon class=\"sc-wl\" points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\"/><polygon class=\"sc-wr\" points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\"/><polygon points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\" fill=\"url(#csWallG)\"/><polygon points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\" fill=\"url(#csWallG)\"/><polygon points=\"800.0,62.0 200.0,362.0 200.0,492.0 800.0,192.0\" fill=\"url(#csWash)\" opacity=\"1\"/><polygon points=\"800.0,62.0 1400.0,362.0 1400.0,492.0 800.0,192.0\" fill=\"url(#csWash)\" opacity=\"1\"/><polygon points=\"800.0,82.0 200.0,382.0 200.0,512.0 800.0,212.0\" fill=\"url(#csWash)\" opacity=\"0.55\"/><polygon points=\"800.0,82.0 1400.0,382.0 1400.0,512.0 800.0,212.0\" fill=\"url(#csWash)\" opacity=\"0.55\"/><polygon class=\"sc-pil\" points=\"909.2,354.6 930.8,365.4 930.8,103.4 909.2,92.6\"/><polygon class=\"sc-pil-s\" points=\"930.8,365.4 938.0,369.0 938.0,107.0 930.8,103.4\"/><polygon class=\"sc-pil\" points=\"690.8,354.6 669.2,365.4 669.2,103.4 690.8,92.6\"/><polygon class=\"sc-pil-s\" points=\"669.2,365.4 662.0,369.0 662.0,107.0 669.2,103.4\"/><polygon class=\"sc-pil\" points=\"1029.2,414.6 1050.8,425.4 1050.8,163.4 1029.2,152.6\"/><polygon class=\"sc-pil-s\" points=\"1050.8,425.4 1058.0,429.0 1058.0,167.0 1050.8,163.4\"/><polygon class=\"sc-pil\" points=\"570.8,414.6 549.2,425.4 549.2,163.4 570.8,152.6\"/><polygon class=\"sc-pil-s\" points=\"549.2,425.4 542.0,429.0 542.0,167.0 549.2,163.4\"/><polygon class=\"sc-pil\" points=\"1149.2,474.6 1170.8,485.4 1170.8,223.4 1149.2,212.6\"/><polygon class=\"sc-pil-s\" points=\"1170.8,485.4 1178.0,489.0 1178.0,227.0 1170.8,223.4\"/><polygon class=\"sc-pil\" points=\"450.8,474.6 429.2,485.4 429.2,223.4 450.8,212.6\"/><polygon class=\"sc-pil-s\" points=\"429.2,485.4 422.0,489.0 422.0,227.0 429.2,223.4\"/><polygon class=\"sc-pil\" points=\"1269.2,534.6 1290.8,545.4 1290.8,283.4 1269.2,272.6\"/><polygon class=\"sc-pil-s\" points=\"1290.8,545.4 1298.0,549.0 1298.0,287.0 1290.8,283.4\"/><polygon class=\"sc-pil\" points=\"330.8,534.6 309.2,545.4 309.2,283.4 330.8,272.6\"/><polygon class=\"sc-pil-s\" points=\"309.2,545.4 302.0,549.0 302.0,287.0 309.2,283.4\"/><polygon class=\"sc-base\" points=\"800.0,300.0 200.0,600.0 200.0,584.0 800.0,284.0\"/><line class=\"sc-hl2\" x1=\"800.0\" y1=\"284.0\" x2=\"200.0\" y2=\"584.0\" stroke-width=\"1.6\"/><polygon class=\"sc-base\" points=\"800.0,300.0 1400.0,600.0 1400.0,584.0 800.0,284.0\"/><line class=\"sc-hl2\" x1=\"800.0\" y1=\"284.0\" x2=\"1400.0\" y2=\"584.0\" stroke-width=\"1.6\"/><line class=\"sc-nw sc-glow\" x1=\"800.0\" y1=\"62.0\" x2=\"1400.0\" y2=\"362.0\" stroke-width=\"16\"/><line class=\"sc-nw\" x1=\"800.0\" y1=\"62.0\" x2=\"1400.0\" y2=\"362.0\" stroke-width=\"4\"/><line class=\"sc-nw sc-glow\" x1=\"800.0\" y1=\"62.0\" x2=\"200.0\" y2=\"362.0\" stroke-width=\"16\"/><line class=\"sc-nw\" x1=\"800.0\" y1=\"62.0\" x2=\"200.0\" y2=\"362.0\" stroke-width=\"4\"/><line class=\"sc-nb sc-glow\" x1=\"800.0\" y1=\"82.0\" x2=\"1400.0\" y2=\"382.0\" stroke-width=\"16\"/><line class=\"sc-nb\" x1=\"800.0\" y1=\"82.0\" x2=\"1400.0\" y2=\"382.0\" stroke-width=\"4\"/><line class=\"sc-nb sc-glow\" x1=\"800.0\" y1=\"82.0\" x2=\"200.0\" y2=\"382.0\" stroke-width=\"16\"/><line class=\"sc-nb\" x1=\"800.0\" y1=\"82.0\" x2=\"200.0\" y2=\"382.0\" stroke-width=\"4\"/><polygon class=\"sc-winf\" points=\"582.8,168.6 470.0,225.0 470.0,373.0 582.8,316.6\"/><clipPath id=\"csWinClip\"><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\"/></clipPath><g clip-path=\"url(#csWinClip)\"><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" fill=\"url(#csSky)\"/><circle class=\"sc-star\" cx=\"530.9\" cy=\"244.8\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"531.0\" cy=\"219.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"556.3\" cy=\"236.2\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"564.9\" cy=\"250.0\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"522.7\" cy=\"220.1\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"517.4\" cy=\"265.7\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"511.8\" cy=\"249.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"514.7\" cy=\"229.2\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"568.2\" cy=\"258.2\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"517.0\" cy=\"232.8\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"532.0\" cy=\"219.7\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"513.1\" cy=\"258.9\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"530.4\" cy=\"269.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"506.7\" cy=\"278.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"525.2\" cy=\"293.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"535.8\" cy=\"217.4\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"567.5\" cy=\"273.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"553.6\" cy=\"201.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"529.2\" cy=\"209.1\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"534.0\" cy=\"242.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"500.0\" cy=\"285.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"544.3\" cy=\"285.3\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"501.9\" cy=\"297.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"506.8\" cy=\"304.5\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"498.2\" cy=\"294.3\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"531.4\" cy=\"276.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"534.1\" cy=\"258.5\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"533.9\" cy=\"273.4\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"491.9\" cy=\"228.3\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"479.2\" cy=\"317.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"536.4\" cy=\"216.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"569.8\" cy=\"261.2\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"549.3\" cy=\"217.1\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"495.1\" cy=\"277.7\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"565.3\" cy=\"225.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"572.3\" cy=\"240.6\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"561.7\" cy=\"227.0\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"491.7\" cy=\"297.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"544.3\" cy=\"266.8\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"505.0\" cy=\"292.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"508.7\" cy=\"270.8\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"516.6\" cy=\"263.9\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"563.5\" cy=\"232.6\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"551.2\" cy=\"222.0\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"533.9\" cy=\"213.3\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"546.0\" cy=\"270.6\" r=\"0.7\"/><polygon class=\"sc-moon-g sc-glow\" points=\"497.2,260.6 497.4,257.8 498.1,254.9 499.1,252.2 500.4,249.9 502.0,248.0 503.6,246.8 505.3,246.4 506.9,246.6 508.2,247.6 509.2,249.3 509.9,251.5 510.1,254.2 509.9,257.0 509.2,259.9 508.2,262.5 506.9,264.9 505.3,266.7 503.6,267.9 502.0,268.4 500.4,268.1 499.1,267.1 498.1,265.4 497.4,263.2\"/><polygon class=\"sc-moon\" points=\"497.2,260.6 497.4,257.8 498.1,254.9 499.1,252.2 500.4,249.9 502.0,248.0 503.6,246.8 505.3,246.4 506.9,246.6 508.2,247.6 509.2,249.3 509.9,251.5 510.1,254.2 509.9,257.0 509.2,259.9 508.2,262.5 506.9,264.9 505.3,266.7 503.6,267.9 502.0,268.4 500.4,268.1 499.1,267.1 498.1,265.4 497.4,263.2\"/><polygon class=\"sc-bld\" points=\"573.8,309.1 565.3,313.4 565.3,287.3 573.8,283.1\"/><polygon class=\"sc-bldw\" points=\"569.7,305.0 568.0,305.8 568.0,303.4 569.7,302.5\"/><polygon class=\"sc-bldw\" points=\"567.7,295.1 566.0,296.0 566.0,293.5 567.7,292.6\"/><polygon class=\"sc-bld\" points=\"565.3,313.4 555.8,318.1 555.8,275.9 565.3,271.2\"/><polygon class=\"sc-bldw\" points=\"562.1,301.9 560.4,302.8 560.4,300.3 562.1,299.5\"/><polygon class=\"sc-bldw\" points=\"564.6,304.3 562.9,305.1 562.9,302.7 564.6,301.8\"/><polygon class=\"sc-bldw\" points=\"562.8,286.0 561.1,286.9 561.1,284.4 562.8,283.6\"/><polygon class=\"sc-bld\" points=\"555.8,318.1 548.2,321.9 548.2,289.7 555.8,285.9\"/><polygon class=\"sc-bldw\" points=\"553.1,306.5 551.4,307.4 551.4,304.9 553.1,304.0\"/><polygon class=\"sc-bldw\" points=\"555.6,299.9 553.9,300.7 553.9,298.3 555.6,297.4\"/><polygon class=\"sc-bld\" points=\"548.2,321.9 538.7,326.6 538.7,274.6 548.2,269.8\"/><polygon class=\"sc-bldw\" points=\"547.7,304.1 546.0,304.9 546.0,302.5 547.7,301.6\"/><polygon class=\"sc-bldw\" points=\"547.7,298.1 545.9,299.0 545.9,296.5 547.7,295.6\"/><polygon class=\"sc-bld\" points=\"538.7,326.6 530.2,330.9 530.2,293.7 538.7,289.4\"/><polygon class=\"sc-bldw\" points=\"537.9,295.8 536.2,296.7 536.2,294.2 537.9,293.3\"/><polygon class=\"sc-bldw\" points=\"538.2,309.0 536.5,309.9 536.5,307.4 538.2,306.6\"/><polygon class=\"sc-bldw\" points=\"533.0,298.8 531.3,299.6 531.3,297.1 533.0,296.3\"/><polygon class=\"sc-bld\" points=\"530.2,330.9 521.7,335.2 521.7,273.2 530.2,268.9\"/><polygon class=\"sc-bldw\" points=\"527.7,326.6 526.0,327.4 526.0,324.9 527.7,324.1\"/><polygon class=\"sc-bldw\" points=\"529.6,320.2 527.9,321.1 527.9,318.6 529.6,317.7\"/><polygon class=\"sc-bld\" points=\"521.7,335.2 511.2,340.4 511.2,299.5 521.7,294.2\"/><polygon class=\"sc-bldw\" points=\"515.7,319.0 514.0,319.8 514.0,317.4 515.7,316.5\"/><polygon class=\"sc-bldw\" points=\"517.0,316.4 515.3,317.3 515.3,314.8 517.0,314.0\"/><polygon class=\"sc-bldw\" points=\"519.0,328.8 517.3,329.7 517.3,327.2 519.0,326.3\"/><polygon class=\"sc-bld\" points=\"511.2,340.4 502.7,344.6 502.7,314.9 511.2,310.6\"/><polygon class=\"sc-bld\" points=\"502.7,344.6 493.2,349.4 493.2,302.3 502.7,297.5\"/><polygon class=\"sc-bldw\" points=\"498.8,313.6 497.1,314.5 497.1,312.0 498.8,311.1\"/><polygon class=\"sc-bldw\" points=\"495.6,324.7 493.9,325.5 493.9,323.1 495.6,322.2\"/><polygon class=\"sc-bld\" points=\"493.2,349.4 485.6,353.2 485.6,318.5 493.2,314.7\"/><polygon class=\"sc-bldw\" points=\"488.6,328.0 486.9,328.9 486.9,326.4 488.6,325.5\"/><polygon class=\"sc-bldw\" points=\"492.0,341.7 490.3,342.5 490.3,340.1 492.0,339.2\"/><polygon class=\"sc-bld\" points=\"485.6,353.2 479.0,356.5 479.0,306.9 485.6,303.6\"/><polygon class=\"sc-bldw\" points=\"481.4,348.7 479.7,349.6 479.7,347.1 481.4,346.3\"/><polygon class=\"sc-bldw\" points=\"481.0,317.9 479.3,318.8 479.3,316.3 481.0,315.5\"/></g><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" fill=\"none\" class=\"sc-winedge\"/><line class=\"sc-mull\" x1=\"526.4\" y1=\"208.8\" x2=\"526.4\" y2=\"332.8\" stroke-width=\"3.4\"/><line class=\"sc-mull\" x1=\"573.8\" y1=\"247.1\" x2=\"479.0\" y2=\"294.5\" stroke-width=\"3.4\"/><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" class=\"sc-winglare\"/><polygon class=\"sc-sill-r\" points=\"608.0,332.4 485.6,393.6 485.6,385.6 608.0,324.4\"/><polygon class=\"sc-sill-l\" points=\"465.2,383.4 485.6,393.6 485.6,385.6 465.2,375.4\"/><polygon points=\"608.0,332.4 485.6,393.6 485.6,385.6 608.0,324.4\" fill=\"url(#csFaceG)\"/><polygon points=\"465.2,383.4 485.6,393.6 485.6,385.6 465.2,375.4\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sill-t\" points=\"587.6,314.2 608.0,324.4 485.6,385.6 465.2,375.4\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"608.0,324.4 485.6,385.6 465.2,375.4\"/><polygon class=\"sc-frm\" points=\"980.0,176.0 1058.0,215.0 1058.0,319.0 980.0,280.0\"/><polygon class=\"sc-frm2\" points=\"987.2,191.6 1050.8,223.4 1050.8,303.4 987.2,271.6\"/><polygon class=\"sc-frm\" points=\"1100.0,236.0 1178.0,275.0 1178.0,379.0 1100.0,340.0\"/><polygon class=\"sc-frm2\" points=\"1107.2,251.6 1170.8,283.4 1170.8,363.4 1107.2,331.6\"/><polygon class=\"sc-frm\" points=\"1220.0,296.0 1298.0,335.0 1298.0,439.0 1220.0,400.0\"/><polygon class=\"sc-frm2\" points=\"1227.2,311.6 1290.8,343.4 1290.8,423.4 1227.2,391.6\"/><polygon class=\"sc-ico\" points=\"1019.0,278.4 1024.4,260.9 1039.3,267.2 1027.7,247.8 1031.6,228.8 1019.0,234.3 1006.4,216.2 1010.3,239.1 998.7,246.9 1013.6,255.5\"/><polygon class=\"sc-ico\" points=\"1125.0,278.1 1153.0,292.1 1149.2,312.6 1139.0,318.7 1128.8,302.4\"/><polygon class=\"sc-ico\" points=\"1136.5,317.4 1141.5,320.0 1141.5,332.8 1136.5,330.2\"/><polygon class=\"sc-ico\" points=\"1127.6,325.8 1150.4,337.2 1150.4,343.6 1127.6,332.2\"/><polygon class=\"sc-ico\" points=\"1232.9,381.7 1253.3,391.8 1243.1,346.1\"/><polygon class=\"sc-ico\" points=\"1248.8,389.6 1269.2,399.8 1259.0,344.7\"/><polygon class=\"sc-ico\" points=\"1264.7,397.6 1285.1,407.7 1274.9,362.0\"/><polygon points=\"987.2,191.6 1017.2,206.6 987.2,243.6\" class=\"sc-winglare\"/><polygon points=\"1107.2,251.6 1137.2,266.6 1107.2,303.6\" class=\"sc-winglare\"/><polygon points=\"1227.2,311.6 1257.2,326.6 1227.2,363.6\" class=\"sc-winglare\"/><polygon class=\"sc-fl\" points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/><polygon points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\" fill=\"url(#csFloorG)\"/><line class=\"sc-grid\" x1=\"860.0\" y1=\"330.0\" x2=\"260.0\" y2=\"630.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"740.0\" y1=\"330.0\" x2=\"1340.0\" y2=\"630.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"920.0\" y1=\"360.0\" x2=\"320.0\" y2=\"660.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"680.0\" y1=\"360.0\" x2=\"1280.0\" y2=\"660.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"980.0\" y1=\"390.0\" x2=\"380.0\" y2=\"690.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"620.0\" y1=\"390.0\" x2=\"1220.0\" y2=\"690.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1040.0\" y1=\"420.0\" x2=\"440.0\" y2=\"720.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"560.0\" y1=\"420.0\" x2=\"1160.0\" y2=\"720.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1100.0\" y1=\"450.0\" x2=\"500.0\" y2=\"750.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"500.0\" y1=\"450.0\" x2=\"1100.0\" y2=\"750.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1160.0\" y1=\"480.0\" x2=\"560.0\" y2=\"780.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"440.0\" y1=\"480.0\" x2=\"1040.0\" y2=\"780.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1220.0\" y1=\"510.0\" x2=\"620.0\" y2=\"810.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"380.0\" y1=\"510.0\" x2=\"980.0\" y2=\"810.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1280.0\" y1=\"540.0\" x2=\"680.0\" y2=\"840.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"320.0\" y1=\"540.0\" x2=\"920.0\" y2=\"840.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1340.0\" y1=\"570.0\" x2=\"740.0\" y2=\"870.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"260.0\" y1=\"570.0\" x2=\"860.0\" y2=\"870.0\" stroke-width=\"1.4\"/><g clip-path=\"url(#csFloorClip)\"><ellipse cx=\"800.0\" cy=\"610.0\" rx=\"470.0\" ry=\"200.0\" fill=\"url(#csSpill)\"/><polygon class=\"sc-sheen\" points=\"272.0,636.0 404.0,702.0 1196.0,702.0 1328.0,636.0\"/></g><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB8)\" opacity=\".5\"><polygon points=\"800.0,240.0 890.0,285.0 170.0,645.0 80.0,600.0\" fill=\"#010617\"/><polygon points=\"800.0,240.0 1520.0,600.0 1430.0,645.0 710.0,285.0\" fill=\"#010617\"/></g></g><polygon class=\"sc-edge\" points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/><polygon class=\"sc-rug\" points=\"932.0,420.0 1220.0,564.0 992.0,678.0 704.0,534.0\"/><polygon class=\"sc-rug2\" points=\"938.0,441.0 1178.0,561.0 986.0,657.0 746.0,537.0\"/><polygon class=\"sc-rug3\" points=\"935.0,430.5 1199.0,562.5 989.0,667.5 725.0,535.5\"/><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB4)\"><polygon class=\"sc-patch\" points=\"683.0,564.4 637.0,587.3 597.0,531.9 643.0,508.9\"/><polygon class=\"sc-patch\" points=\"725.4,623.2 679.4,646.2 639.4,590.8 685.4,567.8\"/><polygon class=\"sc-patch\" points=\"634.1,588.8 588.2,611.8 548.2,556.3 594.1,533.3\"/><polygon class=\"sc-patch\" points=\"676.6,647.6 630.6,670.6 590.6,615.2 636.6,592.2\"/></g></g><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB14)\" opacity=\".2\" class=\"sc-scrspill\"><polygon points=\"791.0,394.5 959.0,442.5 791.0,526.5 695.0,442.5\"/><polygon points=\"539.0,520.5 707.0,568.5 539.0,652.5 443.0,568.5\"/></g></g><ellipse class=\"sc-pool\" cx=\"650.0\" cy=\"722.0\" rx=\"235.0\" ry=\"84.0\" fill=\"url(#csPool)\"/><ellipse class=\"sc-pool\" cx=\"950.0\" cy=\"722.0\" rx=\"235.0\" ry=\"84.0\" fill=\"url(#csPool)\"/><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB14)\" opacity=\".4\" fill=\"#010617\"><ellipse cx=\"849.5\" cy=\"418.0\" rx=\"89.7\" ry=\"29.9\"/><ellipse cx=\"1357.1\" cy=\"661.6\" rx=\"81.9\" ry=\"27.3\"/><ellipse cx=\"328.1\" cy=\"657.1\" rx=\"81.9\" ry=\"27.3\"/></g><g filter=\"url(#csB14)\" opacity=\".36\" fill=\"#010617\"><ellipse cx=\"811.7\" cy=\"373.5\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 845.3,418.8 695.3,493.8 608.3,450.3 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 636.3,460.9 591.3,483.4 540.3,457.9 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 593.3,544.8 443.3,619.8 356.3,576.3 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 384.3,586.9 339.3,609.4 288.3,583.9 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1319.2,580.6 1257.4,611.5 879.4,422.5 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1180.7,593.4 1108.7,629.4 868.7,509.4 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1198.2,617.6 1171.2,631.1 931.2,511.1 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 991.9,604.5 943.9,628.5 859.9,586.5 848.0,570.0\"/><ellipse cx=\"679.9\" cy=\"548.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1201.9\" cy=\"665.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"427.9\" cy=\"638.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"661.9\" cy=\"759.5\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"961.9\" cy=\"759.5\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1329.2\" cy=\"630.9\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"300.2\" cy=\"626.4\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB8)\" opacity=\".46\" fill=\"#010617\"><ellipse cx=\"806.0\" cy=\"365.7\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 836.6,406.7 686.6,481.7 599.6,438.2 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 632.0,455.0 587.0,477.5 536.0,452.0 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 584.6,532.7 434.6,607.7 347.6,564.2 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 380.0,581.0 335.0,603.5 284.0,578.0 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1312.0,570.7 1250.2,601.6 872.2,412.6 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1176.0,586.9 1104.0,622.9 864.0,502.9 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1187.9,603.3 1160.9,616.8 920.9,496.8 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 988.1,599.2 940.1,623.2 856.1,581.2 848.0,570.0\"/><ellipse cx=\"676.1\" cy=\"543.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1198.1\" cy=\"660.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"424.1\" cy=\"633.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"658.1\" cy=\"754.2\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"958.1\" cy=\"754.2\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1324.0\" cy=\"623.7\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"295.0\" cy=\"619.2\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB3)\" opacity=\".6\" fill=\"#010617\"><ellipse cx=\"800.0\" cy=\"357.3\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 827.3,393.9 677.3,468.9 590.3,425.4 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 627.5,448.8 582.5,471.3 531.5,445.8 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 575.3,519.9 425.3,594.9 338.3,551.4 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 375.5,574.8 330.5,597.3 279.5,571.8 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1304.4,560.2 1242.6,591.1 864.6,402.1 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1171.0,579.9 1099.0,615.9 859.0,495.9 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1176.9,588.2 1149.9,601.7 909.9,481.7 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 984.0,593.6 936.0,617.6 852.0,575.6 848.0,570.0\"/><ellipse cx=\"672.0\" cy=\"537.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1194.0\" cy=\"654.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"420.0\" cy=\"627.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"654.0\" cy=\"748.6\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"954.0\" cy=\"748.6\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1318.5\" cy=\"616.1\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"289.5\" cy=\"611.6\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB2)\" opacity=\".82\" fill=\"#010617\"><ellipse cx=\"794.0\" cy=\"350.4\" rx=\"39.9\" ry=\"13.2\"/><polygon points=\"731.0,333.3 826.4,381.0 668.0,460.2 572.6,412.5\"/><polygon points=\"572.0,412.8 631.4,442.5 578.0,469.2 518.6,439.5\"/><polygon points=\"479.0,459.3 574.4,507.0 416.0,586.2 320.6,538.5\"/><polygon points=\"320.0,538.8 379.4,568.5 326.0,595.2 266.6,565.5\"/><polygon points=\"918.8,356.4 1305.2,549.6 1235.0,584.7 848.6,391.5\"/><polygon points=\"926.0,448.8 1174.4,573.0 1094.0,613.2 845.6,489.0\"/><polygon points=\"926.0,448.8 1174.4,573.0 1139.0,590.7 890.6,466.5\"/><polygon points=\"896.0,541.8 988.4,588.0 932.0,616.2 839.6,570.0\"/><ellipse cx=\"668.0\" cy=\"534.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"1190.0\" cy=\"651.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"416.0\" cy=\"624.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"650.0\" cy=\"748.0\" rx=\"137.7\" ry=\"48.0\"/><ellipse cx=\"950.0\" cy=\"748.0\" rx=\"137.7\" ry=\"48.0\"/><ellipse cx=\"1313.0\" cy=\"609.8\" rx=\"36.4\" ry=\"12.1\"/><ellipse cx=\"284.0\" cy=\"605.3\" rx=\"36.4\" ry=\"12.1\"/></g></g><g clip-path=\"url(#csWallClip)\"><g filter=\"url(#csB8)\" opacity=\".34\" fill=\"#010617\"><g transform=\"translate(40.0 -22.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(26.0)\"/></g><g transform=\"translate(-34.0 -24.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(26.0)\"/></g><g transform=\"translate(-38.0 -24.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(26.0)\"/></g></g></g><polygon class=\"sc-pot-b\" points=\"759.5,294.4 828.5,294.4 819.3,345.0 768.7,345.0\"/><polygon points=\"759.5,294.4 828.5,294.4 819.3,345.0 768.7,345.0\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"794.0\" cy=\"294.4\" rx=\"34.5\" ry=\"11.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(26.0)\"/><polygon class=\"sc-desk-r\" points=\"818.0,381.0 668.0,456.0 668.0,378.0 818.0,303.0\"/><polygon class=\"sc-desk-l\" points=\"581.0,412.5 668.0,456.0 668.0,378.0 581.0,334.5\"/><polygon points=\"818.0,381.0 668.0,456.0 668.0,378.0 818.0,303.0\" fill=\"url(#csFaceG)\"/><polygon points=\"581.0,412.5 668.0,456.0 668.0,378.0 581.0,334.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-desk-t\" points=\"731.0,259.5 818.0,303.0 668.0,378.0 581.0,334.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"818.0,303.0 668.0,378.0 581.0,334.5\"/><polygon class=\"sc-scr\" points=\"725.0,282.5 635.0,327.5 635.0,257.5 725.0,212.5\"/><polygon class=\"sc-mon-l\" points=\"626.0,323.0 635.0,327.5 635.0,257.5 626.0,253.0\"/><polygon points=\"725.0,282.5 635.0,327.5 635.0,257.5 725.0,212.5\" fill=\"url(#csFaceG)\"/><polygon points=\"626.0,323.0 635.0,327.5 635.0,257.5 626.0,253.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-mon-t\" points=\"716.0,208.0 725.0,212.5 635.0,257.5 626.0,253.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"725.0,212.5 635.0,257.5 626.0,253.0\"/><polygon class=\"sc-scrglow sc-glow\" points=\"725.6,282.8 635.6,327.8 635.6,257.8 725.6,212.8\"/><polygon class=\"sc-kb-r\" points=\"755.0,319.5 695.0,349.5 695.0,343.5 755.0,313.5\"/><polygon class=\"sc-kb-l\" points=\"662.0,333.0 695.0,349.5 695.0,343.5 662.0,327.0\"/><polygon points=\"755.0,319.5 695.0,349.5 695.0,343.5 755.0,313.5\" fill=\"url(#csFaceG)\"/><polygon points=\"662.0,333.0 695.0,349.5 695.0,343.5 662.0,327.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-kb-t\" points=\"722.0,297.0 755.0,313.5 695.0,343.5 662.0,327.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"755.0,313.5 695.0,343.5 662.0,327.0\"/><polygon class=\"sc-pc-r\" points=\"623.0,442.5 578.0,465.0 578.0,427.0 623.0,404.5\"/><polygon class=\"sc-pc-l\" points=\"527.0,439.5 578.0,465.0 578.0,427.0 527.0,401.5\"/><polygon points=\"623.0,442.5 578.0,465.0 578.0,427.0 623.0,404.5\" fill=\"url(#csFaceG)\"/><polygon points=\"527.0,439.5 578.0,465.0 578.0,427.0 527.0,401.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-pc-t\" points=\"572.0,379.0 623.0,404.5 578.0,427.0 527.0,401.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"623.0,404.5 578.0,427.0 527.0,401.5\"/><polygon class=\"sc-desk-r\" points=\"566.0,507.0 416.0,582.0 416.0,504.0 566.0,429.0\"/><polygon class=\"sc-desk-l\" points=\"329.0,538.5 416.0,582.0 416.0,504.0 329.0,460.5\"/><polygon points=\"566.0,507.0 416.0,582.0 416.0,504.0 566.0,429.0\" fill=\"url(#csFaceG)\"/><polygon points=\"329.0,538.5 416.0,582.0 416.0,504.0 329.0,460.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-desk-t\" points=\"479.0,385.5 566.0,429.0 416.0,504.0 329.0,460.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"566.0,429.0 416.0,504.0 329.0,460.5\"/><polygon class=\"sc-scr\" points=\"473.0,408.5 383.0,453.5 383.0,383.5 473.0,338.5\"/><polygon class=\"sc-mon-l\" points=\"374.0,449.0 383.0,453.5 383.0,383.5 374.0,379.0\"/><polygon points=\"473.0,408.5 383.0,453.5 383.0,383.5 473.0,338.5\" fill=\"url(#csFaceG)\"/><polygon points=\"374.0,449.0 383.0,453.5 383.0,383.5 374.0,379.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-mon-t\" points=\"464.0,334.0 473.0,338.5 383.0,383.5 374.0,379.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"473.0,338.5 383.0,383.5 374.0,379.0\"/><polygon class=\"sc-scrglow sc-glow\" points=\"473.6,408.8 383.6,453.8 383.6,383.8 473.6,338.8\"/><polygon class=\"sc-kb-r\" points=\"503.0,445.5 443.0,475.5 443.0,469.5 503.0,439.5\"/><polygon class=\"sc-kb-l\" points=\"410.0,459.0 443.0,475.5 443.0,469.5 410.0,453.0\"/><polygon points=\"503.0,445.5 443.0,475.5 443.0,469.5 503.0,439.5\" fill=\"url(#csFaceG)\"/><polygon points=\"410.0,459.0 443.0,475.5 443.0,469.5 410.0,453.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-kb-t\" points=\"470.0,423.0 503.0,439.5 443.0,469.5 410.0,453.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"503.0,439.5 443.0,469.5 410.0,453.0\"/><polygon class=\"sc-pc-r\" points=\"371.0,568.5 326.0,591.0 326.0,553.0 371.0,530.5\"/><polygon class=\"sc-pc-l\" points=\"275.0,565.5 326.0,591.0 326.0,553.0 275.0,527.5\"/><polygon points=\"371.0,568.5 326.0,591.0 326.0,553.0 371.0,530.5\" fill=\"url(#csFaceG)\"/><polygon points=\"275.0,565.5 326.0,591.0 326.0,553.0 275.0,527.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-pc-t\" points=\"320.0,505.0 371.0,530.5 326.0,553.0 275.0,527.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"371.0,530.5 326.0,553.0 275.0,527.5\"/><polygon class=\"sc-deskglow\" points=\"725.6,282.8 635.6,327.8 698.0,351.0 764.0,318.0\"/><polygon class=\"sc-deskglow\" points=\"473.6,408.8 383.6,453.8 446.0,477.0 512.0,444.0\"/><polygon class=\"sc-con-r\" points=\"1296.8,549.6 1235.0,580.5 1235.0,516.5 1296.8,485.6\"/><polygon class=\"sc-con-l\" points=\"857.0,391.5 1235.0,580.5 1235.0,516.5 857.0,327.5\"/><polygon points=\"1296.8,549.6 1235.0,580.5 1235.0,516.5 1296.8,485.6\" fill=\"url(#csFaceG)\"/><polygon points=\"857.0,391.5 1235.0,580.5 1235.0,516.5 857.0,327.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-con-t\" points=\"918.8,296.6 1296.8,485.6 1235.0,516.5 857.0,327.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1296.8,485.6 1235.0,516.5 857.0,327.5\"/><polygon class=\"sc-trophy\" points=\"1092.0,415.0 1120.0,415.0 1116.0,385.0 1096.0,385.0\"/><ellipse class=\"sc-trophy\" cx=\"1106.0\" cy=\"385.0\" rx=\"10.0\" ry=\"3.5\"/><polygon class=\"sc-trophy\" points=\"1101.0,415.0 1111.0,415.0 1111.0,421.0 1101.0,421.0\"/><polygon points=\"1092.0,415.0 1102.0,415.0 1101.0,385.0 1096.0,385.0\" fill=\"#fff\" opacity=\".3\"/><ellipse class=\"sc-lamp sc-glow\" cx=\"950.0\" cy=\"319.0\" rx=\"18.0\" ry=\"18.0\"/><ellipse class=\"sc-lamp\" cx=\"950.0\" cy=\"319.0\" rx=\"9.0\" ry=\"9.0\"/><polygon class=\"sc-lampcone sc-glow\" points=\"938.0,343.0 962.0,343.0 980.0,375.0 920.0,375.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,573.0 1094.0,609.0 1094.0,567.0 1166.0,531.0\"/><polygon class=\"sc-sofa-l\" points=\"854.0,489.0 1094.0,609.0 1094.0,567.0 854.0,447.0\"/><polygon points=\"1166.0,573.0 1094.0,609.0 1094.0,567.0 1166.0,531.0\" fill=\"url(#csFaceG)\"/><polygon points=\"854.0,489.0 1094.0,609.0 1094.0,567.0 854.0,447.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,411.0 1166.0,531.0 1094.0,567.0 854.0,447.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,531.0 1094.0,567.0 854.0,447.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,531.0 1139.0,544.5 1139.0,494.5 1166.0,481.0\"/><polygon class=\"sc-sofa-l\" points=\"899.0,424.5 1139.0,544.5 1139.0,494.5 899.0,374.5\"/><polygon points=\"1166.0,531.0 1139.0,544.5 1139.0,494.5 1166.0,481.0\" fill=\"url(#csFaceG)\"/><polygon points=\"899.0,424.5 1139.0,544.5 1139.0,494.5 899.0,374.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,361.0 1166.0,481.0 1139.0,494.5 899.0,374.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,481.0 1139.0,494.5 899.0,374.5\"/><polygon class=\"sc-sofa-r\" points=\"953.0,424.5 881.0,460.5 881.0,436.5 953.0,400.5\"/><polygon class=\"sc-sofa-l\" points=\"854.0,447.0 881.0,460.5 881.0,436.5 854.0,423.0\"/><polygon points=\"953.0,424.5 881.0,460.5 881.0,436.5 953.0,400.5\" fill=\"url(#csFaceG)\"/><polygon points=\"854.0,447.0 881.0,460.5 881.0,436.5 854.0,423.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,387.0 953.0,400.5 881.0,436.5 854.0,423.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"953.0,400.5 881.0,436.5 854.0,423.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,531.0 1094.0,567.0 1094.0,543.0 1166.0,507.0\"/><polygon class=\"sc-sofa-l\" points=\"1067.0,553.5 1094.0,567.0 1094.0,543.0 1067.0,529.5\"/><polygon points=\"1166.0,531.0 1094.0,567.0 1094.0,543.0 1166.0,507.0\" fill=\"url(#csFaceG)\"/><polygon points=\"1067.0,553.5 1094.0,567.0 1094.0,543.0 1067.0,529.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"1139.0,493.5 1166.0,507.0 1094.0,543.0 1067.0,529.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,507.0 1094.0,543.0 1067.0,529.5\"/><polygon class=\"sc-cush-r\" points=\"984.8,447.6 926.0,477.0 926.0,469.0 984.8,439.6\"/><polygon class=\"sc-cush-l\" points=\"890.0,459.0 926.0,477.0 926.0,469.0 890.0,451.0\"/><polygon points=\"984.8,447.6 926.0,477.0 926.0,469.0 984.8,439.6\" fill=\"url(#csFaceG)\"/><polygon points=\"890.0,459.0 926.0,477.0 926.0,469.0 890.0,451.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"948.8,421.6 984.8,439.6 926.0,469.0 890.0,451.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"984.8,439.6 926.0,469.0 890.0,451.0\"/><polygon class=\"sc-cush-r\" points=\"1062.8,486.6 1004.0,516.0 1004.0,508.0 1062.8,478.6\"/><polygon class=\"sc-cush-l\" points=\"968.0,498.0 1004.0,516.0 1004.0,508.0 968.0,490.0\"/><polygon points=\"1062.8,486.6 1004.0,516.0 1004.0,508.0 1062.8,478.6\" fill=\"url(#csFaceG)\"/><polygon points=\"968.0,498.0 1004.0,516.0 1004.0,508.0 968.0,490.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"1026.8,460.6 1062.8,478.6 1004.0,508.0 968.0,490.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1062.8,478.6 1004.0,508.0 968.0,490.0\"/><polygon class=\"sc-cush-r\" points=\"1104.8,507.6 1046.0,537.0 1046.0,529.0 1104.8,499.6\"/><polygon class=\"sc-cush-l\" points=\"1010.0,519.0 1046.0,537.0 1046.0,529.0 1010.0,511.0\"/><polygon points=\"1104.8,507.6 1046.0,537.0 1046.0,529.0 1104.8,499.6\" fill=\"url(#csFaceG)\"/><polygon points=\"1010.0,519.0 1046.0,537.0 1046.0,529.0 1010.0,511.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"1068.8,481.6 1104.8,499.6 1046.0,529.0 1010.0,511.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1104.8,499.6 1046.0,529.0 1010.0,511.0\"/><polygon class=\"sc-tbl-r\" points=\"980.0,588.0 932.0,612.0 932.0,578.0 980.0,554.0\"/><polygon class=\"sc-tbl-l\" points=\"848.0,570.0 932.0,612.0 932.0,578.0 848.0,536.0\"/><polygon points=\"980.0,588.0 932.0,612.0 932.0,578.0 980.0,554.0\" fill=\"url(#csFaceG)\"/><polygon points=\"848.0,570.0 932.0,612.0 932.0,578.0 848.0,536.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-tbl-t\" points=\"896.0,512.0 980.0,554.0 932.0,578.0 848.0,536.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"980.0,554.0 932.0,578.0 848.0,536.0\"/><polygon class=\"sc-cup-r\" points=\"917.0,534.5 899.0,543.5 899.0,537.5 917.0,528.5\"/><polygon class=\"sc-cup-l\" points=\"881.0,534.5 899.0,543.5 899.0,537.5 881.0,528.5\"/><polygon points=\"917.0,534.5 899.0,543.5 899.0,537.5 917.0,528.5\" fill=\"url(#csFaceG)\"/><polygon points=\"881.0,534.5 899.0,543.5 899.0,537.5 881.0,528.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cup-t\" points=\"899.0,519.5 917.0,528.5 899.0,537.5 881.0,528.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"917.0,528.5 899.0,537.5 881.0,528.5\"/><ellipse class=\"sc-bag-s\" cx=\"668.0\" cy=\"530.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"668.0\" cy=\"523.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"668.0\" cy=\"516.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"653.6\" cy=\"511.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M603.2 530.3 Q668.0 556.3 732.8 530.3\"/><ellipse class=\"sc-bag-s\" cx=\"1190.0\" cy=\"647.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"1190.0\" cy=\"640.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"1190.0\" cy=\"633.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"1175.6\" cy=\"628.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M1125.2 647.3 Q1190.0 673.3 1254.8 647.3\"/><ellipse class=\"sc-bag-s\" cx=\"416.0\" cy=\"620.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"416.0\" cy=\"613.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"416.0\" cy=\"606.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"401.6\" cy=\"601.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M351.2 620.3 Q416.0 646.3 480.8 620.3\"/><ellipse class=\"sc-bag-s\" cx=\"650.0\" cy=\"739.5\" rx=\"137.7\" ry=\"52.5\"/><ellipse class=\"sc-bag-b\" cx=\"650.0\" cy=\"727.0\" rx=\"135.0\" ry=\"55.0\"/><ellipse class=\"sc-bag-t\" cx=\"650.0\" cy=\"712.0\" rx=\"130.9\" ry=\"50.0\"/><ellipse cx=\"623.0\" cy=\"703.0\" rx=\"81.0\" ry=\"27.5\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M528.5 739.5 Q650.0 789.5 771.5 739.5\"/><ellipse class=\"sc-bag-s\" cx=\"950.0\" cy=\"739.5\" rx=\"137.7\" ry=\"52.5\"/><ellipse class=\"sc-bag-b\" cx=\"950.0\" cy=\"727.0\" rx=\"135.0\" ry=\"55.0\"/><ellipse class=\"sc-bag-t\" cx=\"950.0\" cy=\"712.0\" rx=\"130.9\" ry=\"50.0\"/><ellipse cx=\"923.0\" cy=\"703.0\" rx=\"81.0\" ry=\"27.5\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M828.5 739.5 Q950.0 789.5 1071.5 739.5\"/><polygon class=\"sc-pot-b\" points=\"1281.5,558.3 1344.5,558.3 1336.1,604.5 1289.9,604.5\"/><polygon points=\"1281.5,558.3 1344.5,558.3 1336.1,604.5 1289.9,604.5\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"1313.0\" cy=\"558.3\" rx=\"31.5\" ry=\"10.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(26.0)\"/><polygon class=\"sc-pot-b\" points=\"252.5,553.8 315.5,553.8 307.1,600.0 260.9,600.0\"/><polygon points=\"252.5,553.8 315.5,553.8 307.1,600.0 260.9,600.0\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"284.0\" cy=\"553.8\" rx=\"31.5\" ry=\"10.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(26.0)\"/><circle class=\"sc-dust\" cx=\"761\" cy=\"818\" r=\"4\"/><circle class=\"sc-dust\" cx=\"640\" cy=\"477\" r=\"3\"/><circle class=\"sc-dust\" cx=\"1094\" cy=\"747\" r=\"6\"/><circle class=\"sc-dust\" cx=\"735\" cy=\"103\" r=\"2\"/><circle class=\"sc-dust\" cx=\"498\" cy=\"550\" r=\"3\"/><circle class=\"sc-dust\" cx=\"896\" cy=\"300\" r=\"6\"/><circle class=\"sc-dust\" cx=\"146\" cy=\"154\" r=\"4\"/><circle class=\"sc-dust\" cx=\"378\" cy=\"686\" r=\"3\"/><circle class=\"sc-dust\" cx=\"443\" cy=\"158\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1458\" cy=\"137\" r=\"2\"/><circle class=\"sc-dust\" cx=\"977\" cy=\"590\" r=\"3\"/><circle class=\"sc-dust\" cx=\"1424\" cy=\"615\" r=\"2.5\"/><circle class=\"sc-dust\" cx=\"1240\" cy=\"255\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1147\" cy=\"489\" r=\"2\"/><circle class=\"sc-dust\" cx=\"364\" cy=\"269\" r=\"3\"/><circle class=\"sc-dust\" cx=\"854\" cy=\"835\" r=\"6\"/><circle class=\"sc-dust\" cx=\"956\" cy=\"675\" r=\"4\"/><circle class=\"sc-dust\" cx=\"1274\" cy=\"628\" r=\"2.5\"/><circle class=\"sc-dust\" cx=\"239\" cy=\"823\" r=\"4\"/><circle class=\"sc-dust\" cx=\"297\" cy=\"421\" r=\"2\"/><circle class=\"sc-dust\" cx=\"632\" cy=\"518\" r=\"6\"/><circle class=\"sc-dust\" cx=\"1204\" cy=\"833\" r=\"4\"/><circle class=\"sc-dust\" cx=\"564\" cy=\"865\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1102\" cy=\"727\" r=\"2\"/><circle class=\"sc-dust\" cx=\"410\" cy=\"796\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1449\" cy=\"491\" r=\"3\"/></svg>";
   var ICX={
-    sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'
+    sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+    min:'<path d="M6 9l6 6 6-6"/>'
   };
+  function fsOK(){ var d=document; return !!(d.fullscreenEnabled||d.webkitFullscreenEnabled); }
+  function roomFs(){
+    var el=$("cvc"), d=document; if(!el) return;
+    try{
+      if(d.fullscreenElement||d.webkitFullscreenElement){ exitFs(); return; }
+      var f=el.requestFullscreen||el.webkitRequestFullscreen;
+      if(f){ var r=f.call(el); if(r&&r.catch) r.catch(function(){ toast("Full screen is blocked by your browser."); }); }
+    }catch(e){}
+  }
   // the two faces: theirs (big) and yours (small, bottom right). Rings around them move with how loud each of you is.
   function facesHtml(ring){
     var meN=(CH.me&&CH.me.name)||myName()||"You", st=CALL.st, wait=ring||st==="calling"||st==="connecting";
     var h='<span class="cvfaces"><span class="cvface them">'+(wait?'<i class="cvr"></i><i class="cvr r2"></i><i class="cvr r3"></i>':'')+
-      av(CALL.name,"","margin:0")+(CALL.rmuted&&st==="live"?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,12)+'</em>':'')+'</span>';
-    if(!ring) h+='<span class="cvface me">'+av(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,10)+'</em>':'')+'</span>';
+      avp(CALL.name,"","margin:0")+(CALL.rmuted&&st==="live"?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,12)+'</em>':'')+'</span>';
+    if(!ring) h+='<span class="cvface me">'+avp(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,10)+'</em>':'')+'</span>';
     return h+'</span>';
   }
-  function barHtml(label){
+  // the room: you and them, each on a beanbag. Same two faces as the small card, just bigger.
+  function seatsHtml(){
+    var meN=(CH.me&&CH.me.name)||myName()||"You", st=CALL.st, wait=st==="calling"||st==="connecting", live=st==="live";
+    return '<div class="cvseats">'+
+      '<div class="cvseat sme"><span class="cvface me">'+avp(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,14)+'</em>':'')+'</span><span class="cvlip"></span>'+
+        '<span class="cvnm"><b>'+esc(meN)+'</b><i>you</i></span></div>'+
+      '<div class="cvseat sthem"><span class="cvface them">'+(wait?'<i class="cvr"></i><i class="cvr r2"></i><i class="cvr r3"></i>':'')+
+        avp(CALL.name,"","margin:0")+(CALL.rmuted&&live?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,14)+'</em>':'')+'</span><span class="cvlip"></span>'+
+        '<span class="cvnm"><b>'+esc(CALL.name)+'</b></span></div></div>';
+  }
+  function barHtml(label,room){
     var st=CALL.st, S=CALL.share||{}, live=st==="live", ring=st==="ringing", h;
     function tile(id,cls,ic,lab,title,extra){ return '<button type="button" class="cvb '+cls+'" id="'+id+'" aria-label="'+title+'" title="'+title+'"'+(extra||"")+'>'+svg(ic,22)+'<span>'+lab+'</span></button>'; }
     var ptt=(VS.ptt&&CALL.stream&&!ring)?'<span class="cvptt'+(PTTD?' on':'')+'" id="cvptt">'+svg(IC.mic,12)+(PTTD?'Talking…':'Hold '+esc(keyLabel(VS.pttKey))+' to talk')+'</span>':'';
-    h='<div class="cvtop"><div class="cvwho">'+facesHtml(ring)+'<div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+
-      (ring?'':'<span class="cvq" id="cvq" role="img" aria-label="Connection quality" hidden><i></i><i></i><i></i><i></i></span>')+'</div><div class="cvbtns'+(ring?' two':'')+'">';
-    if(ring) h+=tile("cvdec","end",IC.phone,"Decline","Decline call")+tile("cvacc","ok",IC.phone,"Answer","Answer call");
+    var q='<span class="cvq" id="cvq" role="img" aria-label="Connection quality" hidden><i></i><i></i><i></i><i></i></span>', btns="";
+    if(ring) btns=tile("cvdec","end",IC.phone,"Decline","Decline call")+tile("cvacc","ok",IC.phone,"Answer","Answer call");
     else {
-      if(CALL.stream) h+=tile("cvmute","mute"+(CALL.muted?" on":"")+(VS.ptt?" ptt":""),CALL.muted?IC.micoff:IC.mic,CALL.muted?"Unmute":"Mute",CALL.muted?"Unmute":"Mute",' aria-pressed="'+CALL.muted+'"');
-      if(live&&shareSupported()) h+=tile("cvshare","shr"+(S.on?" on":""),S.on?ICV.screenoff:ICV.screen,S.on?"Stop":"Share",S.on?"Stop sharing your screen":"Share your screen (up to 720p, 60 fps)",' aria-pressed="'+!!S.on+'"'+(S.busy?" disabled":""));
-      if(CALL.rshare&&CALL.vhide) h+=tile("cvshow","show",ICV.watch,"Screen","Show their screen");
-      h+=tile("cvset","set",ICX.sliders,"Voice","Voice settings: microphone, speakers, noise suppression");
-      h+=tile("cvend","end",IC.phone,"End","End call");
+      if(CALL.stream) btns+=tile("cvmute","mute"+(CALL.muted?" on":"")+(VS.ptt?" ptt":""),CALL.muted?IC.micoff:IC.mic,CALL.muted?"Unmute":"Mute",CALL.muted?"Unmute":"Mute",' aria-pressed="'+CALL.muted+'"');
+      if(live&&shareSupported()) btns+=tile("cvshare","shr"+(S.on?" on":""),S.on?ICV.screenoff:ICV.screen,S.on?"Stop":"Share",S.on?"Stop sharing your screen":"Share your screen (up to 720p, 60 fps)",' aria-pressed="'+!!S.on+'"'+(S.busy?" disabled":""));
+      if(CALL.rshare&&CALL.vhide) btns+=tile("cvshow","show",ICV.watch,"Screen","Show their screen");
+      if(room) btns+=tile("cvchat","chat"+(CH.open?" on":""),IC.chat,"Chat",CH.open?"Close the chat":"Open the chat",' aria-pressed="'+!!CH.open+'"');
+      btns+=tile("cvset","set",ICX.sliders,"Voice","Voice settings: microphone, speakers, noise suppression");
+      btns+=tile("cvend","end",IC.phone,"End","End call");
     }
-    return h+'</div>';
+    if(room){
+      return '<div class="cvtop"><button type="button" class="cvx" id="cvmin" aria-label="Minimize the call" title="Minimize the call (Esc)">'+svg(ICX.min,22)+'</button>'+
+        '<div class="cvwho"><div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+q+
+        (fsOK()?'<button type="button" class="cvx" id="cvrfs" aria-label="Full screen" title="Full screen">'+svg(ICV.fs,19)+'</button>':'')+'</div>'+
+        seatsHtml()+'<div class="cvbtns">'+btns+'</div>';
+    }
+    h='<div class="cvtop"><div class="cvwho"'+(ring?'':' data-open="1" role="button" tabindex="0" aria-label="Open the call room" title="Open the call room"')+'>'+facesHtml(ring)+'<div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+
+      (ring?'':q+'<button type="button" class="cvx cvexp" id="cvexp" aria-label="Open the call room" title="Open the call room">'+svg(ICV.big,17)+'</button>')+'</div><div class="cvbtns'+(ring?' two':'')+'">'+btns+'</div>';
+    return h;
   }
+  function narrowChat(){ var m=false; try{ m=!!(CH.open&&matchMedia("(max-width:860px)").matches); }catch(e){} return m; }
   function paintCall(){
     var el=$("cvc"); if(!el) return;
-    if(CALL.st==="idle"){ if(!el.hidden||el.firstChild||el.className!=="cvc"){ el.hidden=true; el.innerHTML=""; el.className="cvc"; el.removeAttribute("style"); } document.body.classList.remove("incall","cvdock"); CALL.vid=null; return; }
+    if(CALL.st==="idle"){ if(!el.hidden||el.firstChild||el.className!=="cvc"){ el.hidden=true; el.innerHTML=""; el.className="cvc"; el.removeAttribute("style"); } document.body.classList.remove("incall","cvdock","cvroom"); CALL.vid=null; CALL.view=""; return; }
     var st=CALL.st, ring=st==="ringing", live=st==="live", S=CALL.share||{}, rs=!!CALL.rshare, showV=rs&&!CALL.vhide&&!ring;
-    document.body.classList.add("incall"); document.body.classList.toggle("cvdock",!ring);
-    var cls="cvc "+(ring?"incoming":"dock")+(S.on?" sharing":"")+(rs?" rsharing":"")+(showV?" hasvid":"")+(showV&&CALL.big?" big":"")+(el.classList.contains("spk-me")?" spk-me":"")+(el.classList.contains("spk-them")?" spk-them":"");
+    if(!CALL.view) CALL.view=VS.room===false?"dock":"room";
+    // on a phone the chat covers the whole screen, so the room steps aside to the small strip while it is open
+    var room=!ring&&CALL.view==="room"&&!narrowChat();
+    document.body.classList.add("incall"); document.body.classList.toggle("cvdock",!ring&&!room); document.body.classList.toggle("cvroom",room);
+    var cls="cvc "+(ring?"incoming":room?"room":"dock")+(room&&(st==="calling"||st==="connecting")?" wait":"")+(S.on?" sharing":"")+(rs?" rsharing":"")+(showV?" hasvid":"")+(showV&&CALL.big&&!room?" big":"")+(el.classList.contains("spk-me")?" spk-me":"")+(el.classList.contains("spk-them")?" spk-them":"");
     if(el.className!==cls) el.className=cls;
+    el.setAttribute("role",room?"dialog":"region"); el.setAttribute("aria-label",room?"Call with "+CALL.name:"Call");
     el.hidden=false;
-    if(!$("cvbar")){ el.innerHTML=stageHtml()+'<div class="cvbar" id="cvbar"></div>'; wireStage(); }
+    if(!$("cvbar")){ el.innerHTML='<div class="cvfx" aria-hidden="true">'+CVSCENE+'</div>'+stageHtml()+'<div class="cvbar" id="cvbar"></div>'; wireStage(); }
     var label=live?mmss((Date.now()-CALL.t0)/1000)+(CALL.rmuted?" · muted":"")+(S.on&&rs?" · you both share":S.on?" · you're sharing":rs?" · "+name0()+" is sharing":"")+(CALL.q&&CALL.q.bars===1?" · weak connection":""):(CALL.msg||"Connecting…");
-    var bar=$("cvbar"), key=[st,CALL.name,CALL.muted,CALL.rmuted,!!S.on,!!S.busy,rs,!!CALL.vhide,!!CALL.stream,live&&shareSupported(),VS.ptt,PTTD,VS.pttKey].join("|");
+    var bar=$("cvbar"), key=[st,CALL.name,CALL.muted,CALL.rmuted,!!S.on,!!S.busy,rs,!!CALL.vhide,!!CALL.stream,live&&shareSupported(),VS.ptt,PTTD,VS.pttKey,room,!!CH.open].join("|");
     if(bar.getAttribute("data-k")!==key){
-      bar.innerHTML=barHtml(label); bar.setAttribute("data-k",key);
+      bar.innerHTML=barHtml(label,room); bar.setAttribute("data-k",key);
       var b; if((b=$("cvacc"))) b.onclick=acceptCall; if((b=$("cvdec"))) b.onclick=declineCall; if((b=$("cvend"))) b.onclick=hangUp; if((b=$("cvmute"))) b.onclick=toggleMute;
       if((b=$("cvshare"))) b.onclick=function(){ if(CALL.share.on) stopShare(); else startShare(); };
       if((b=$("cvshow"))) b.onclick=function(){ CALL.vhide=false; paintCall(); };
-      if((b=$("cvset"))) b.onclick=function(){ if(typeof openProfile==="function") openProfile("voice"); };
+      if((b=$("cvset"))) b.onclick=function(){ exitFs(); if(typeof openProfile==="function") openProfile("voice"); };
+      if((b=$("cvmin"))) b.onclick=function(){ exitFs(); CALL.view="dock"; paintCall(); };
+      if((b=$("cvexp"))) b.onclick=function(){ CALL.view="room"; paintCall(); };
+      if((b=bar.querySelector("[data-open]"))){ b.onclick=function(){ CALL.view="room"; paintCall(); }; b.onkeydown=function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); CALL.view="room"; paintCall(); } }; }
+      if((b=$("cvrfs"))) b.onclick=roomFs;
+      if((b=$("cvchat"))) b.onclick=function(){ exitFs(); if(CH.open) closeChat(); else openChat(); };
       paintQ();
     } else { var s=bar.querySelector("small"); if(s){ s.textContent=label; s.className=live?"live":""; } }
     // the viewer
@@ -17272,7 +17836,7 @@ var _sh=window.show;
     if(!SS.users.length) h+='<div class="chempty sm csempty"><p>Nobody is online right now.</p></div>';
     SS.users.forEach(function(u){
       var mine=u.ctl&&SS.mine[u.uid], other=u.ctl&&!mine;
-      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+av(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
+      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+avp(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
         (other?'<span class="cstag">'+esc(u.ctl.by)+' is guiding</span>':mine?'<span class="cstag live">Guiding</span>':'<button type="button" class="adm-b" data-take="1">Take control</button>')+'</div>'+(mine?ssPanel(u):'')+'</div>';
     });
     if(SS.msg) h+='<p class="cmmsg">'+esc(SS.msg)+'</p>';
@@ -17319,7 +17883,7 @@ var _sh=window.show;
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO,_call:CALL,_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
+  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
 })();
 
 /* ================= v225: living logos (light sweep + hover) ================= */
@@ -19655,7 +20219,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v227js">
+<script id="v228js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -20909,7 +21473,7 @@ var _sh=window.show;
     var f=document.createElement("button"); f.id="chfab"; f.className="chfab"; f.hidden=true; f.type="button";
     f.innerHTML=svg(IC.chat,24)+'<i class="chdot" hidden></i>'; f.onclick=openChat; document.body.appendChild(f);
     var d=document.createElement("div"); d.id="chdr"; d.className="chdr"; d.hidden=true; d.setAttribute("role","dialog"); d.setAttribute("aria-label","Chat");
-    d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
+    d.innerHTML='<div class="chh"><button class="chb" id="chback" type="button" aria-label="Back" hidden>'+svg(IC.back,20)+'</button><span class="chhav" id="chhav" hidden></span><div class="cht"><b id="chtitle">Chat</b><small id="chsub"></small></div>'+
       '<button class="chb" id="chcallb" type="button" aria-label="Start a voice call" title="Voice call" hidden>'+svg(IC.phone,19)+'</button>'+
       '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
       '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
@@ -20942,6 +21506,7 @@ var _sh=window.show;
       if(e.key!=="Escape") return;
       if(!$("chlb").hidden){ $("chlb").hidden=true; return; }
       var cv=$("cvc"); if(cv&&cv.classList.contains("big")){ CALL.big=false; paintCall(); return; }
+      if(cv&&cv.classList.contains("room")&&!CH.open&&!document.querySelector(".modal.on")&&!document.fullscreenElement&&!document.webkitFullscreenElement){ CALL.view="dock"; paintCall(); return; }
       if(!CH.open) return;
       var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
       if(CH.sel){ CH.sel=""; renderThread(); return; }
@@ -20955,10 +21520,10 @@ var _sh=window.show;
   }
   function openChat(){
     if(!gate("Chat")) return;
-    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx();
+    CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx(); if(CALL.st!=="idle") paintCall();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
   function go(v,room){
     saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
     if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.shown=false; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=DRAFTS[draftKey(room)]||""; $("chtx").style.height="auto"; updCount(); paintReply(); setTimeout(fitTx,30); }
@@ -20967,10 +21532,60 @@ var _sh=window.show;
     if(v==="thread"&&!matchMedia("(pointer:coarse)").matches) setTimeout(function(){ var t=$("chtx"); if(t&&!$("chcomp").hidden&&!t.disabled) t.focus(); },60);
   }
   function setHead(title,sub,back,callable){
-    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable;
+    $("chtitle").textContent=title; $("chsub").textContent=sub||""; $("chback").hidden=!back; $("chcallb").hidden=!callable; hdrAv(title);
     if(callable) $("chcallb").disabled=CALL.st!=="idle";
   }
-  function pname(n){ return av(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
+  /* ---- v228: profile pictures in chat and in the call ---- */
+  // A picture is looked up the same way the rest of the site does it: by the player this account is linked to
+  // (so a friend whose account name differs from their player name still shows their face), then by the name itself.
+  var AVB={}, AVS="";
+  function avBlob(u){
+    if(!u||String(u).slice(0,5)!=="data:") return u||"";
+    if(AVB[u]) return AVB[u];
+    try{
+      var i=u.indexOf(","), bin=atob(u.slice(i+1)), n=bin.length, a=new Uint8Array(n), k;
+      for(k=0;k<n;k++) a[k]=bin.charCodeAt(k);
+      var mt=/^data:([^;,]+)/.exec(u);
+      return (AVB[u]=URL.createObjectURL(new Blob([a],{type:mt?mt[1]:"image/jpeg"})));
+    }catch(e){ return u; }
+  }
+  function avUrl(name){
+    var raw=String(name||"").trim(), n=raw.toLowerCase(), A=STATE.avatars||{}, k=n, c, p, u;
+    if(!n) return "";
+    try{ if(typeof playerKeyFor==="function"){ c=[raw,n]; for(p=0;p<c.length;p++){ var pk=String(playerKeyFor(c[p])||"").toLowerCase(); if(pk&&A[pk]){ k=pk; break; } } } }catch(e){}
+    u=A[k]||A[n];
+    if(!u||!/^(data:image\/|https?:\/\/|blob:)/i.test(u)) return "";
+    return avBlob(u);
+  }
+  function avp(name,cls,style,title){
+    var u=avUrl(name), nm=String(name||"?");
+    return '<span class="av'+(cls?" "+cls:"")+(u?" pic":"")+'" data-av="'+esc(nm)+'"'+(style?' style="'+style+'"':'')+(title?' title="'+esc(title)+'"':'')+'>'+
+      (u?'<img src="'+esc(u)+'" alt="" draggable="false">':esc(nm.charAt(0).toUpperCase()))+'</span>';
+  }
+  // pictures arrive after the page has loaded (profiles are fetched), so already drawn faces are updated in place
+  function avSig(){ var A=STATE.avatars||{}, k, n=0, t=0; for(k in A){ n++; t+=String(A[k]||"").length; } return n+":"+t; }
+  function avPaint(root){
+    if(!root) return;
+    var els=root.querySelectorAll("[data-av]"), i, e, u, im, nm;
+    for(i=0;i<els.length;i++){
+      e=els[i]; nm=e.getAttribute("data-av")||"?"; u=avUrl(nm);
+      im=e.firstElementChild&&e.firstElementChild.tagName==="IMG"?e.firstElementChild:null;
+      if(u){ if(!im||im.getAttribute("src")!==u){ e.classList.add("pic"); e.innerHTML='<img src="'+esc(u)+'" alt="" draggable="false">'; } }
+      else if(im){ e.classList.remove("pic"); e.textContent=nm.charAt(0).toUpperCase(); }
+    }
+  }
+  function avRefresh(force){
+    var s=avSig(); if(s===AVS&&!force) return; AVS=s;
+    avPaint($("chdr")); avPaint($("cvc"));
+  }
+  setInterval(function(){ if(!document.hidden) avRefresh(); },1200);
+  function hdrAv(title){
+    var h=$("chhav"); if(!h) return; var r=CH.view==="thread"?CH.room:null, t=String(title||"");
+    if(r&&r.dm&&t){ h.innerHTML=avp(t,"","width:38px;height:38px;font-size:15px;margin:0"); h.hidden=false; }
+    else if(r&&!r.dm){ h.innerHTML='<span class="chrav room">'+svg(IC.room,18)+'</span>'; h.hidden=false; }
+    else { h.hidden=true; h.innerHTML=""; }
+  }
+  function pname(n){ return avp(n,"","width:40px;height:40px;font-size:15px;margin:0"); }
 
   /* ---- banner: connection state + health check ---- */
   function paintBanner(){
@@ -21103,7 +21718,7 @@ var _sh=window.show;
   function msgHtml(m,prev,myId){
     var mine=myId&&m.from===myId, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del&&prev.k!=="call";
     var h='<div class="chm'+(mine?' me':'')+(grp?' grp':'')+(m.del?' del':'')+(CH.sel===m.id?' sel':'')+'" data-cid="'+esc(m.id)+'" tabindex="0" role="group" aria-label="'+esc((mine?"You":m.name)+", "+when(m.ts))+'">';
-    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+av(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
+    if(!mine) h+=(grp?'<span class="chav gap"></span>':'<span class="chav" data-cpf="'+esc(m.name)+'">'+avp(m.name,"","width:30px;height:30px;font-size:13px;margin:0")+'</span>');
     h+='<div class="chbub">';
     if(!grp&&!mine&&!CH.room.dm) h+='<b class="chnm">'+esc(m.name)+'</b>';
     if(m.del) h+='<em>Message removed</em>';
@@ -21369,7 +21984,7 @@ var _sh=window.show;
   }
   /* =============================== v227: voice settings (engine) ===============================
      Everything here is per device (localStorage "tml_voice"). Nothing is sent to the server. Changes apply at once, also during a call. */
-  var VS_D={mic:"",spk:"",ns:true,ec:true,agc:true,gain:100,vol:100,ring:100,q:"auto",ptt:false,pttKey:"KeyV"};
+  var VS_D={mic:"",spk:"",ns:true,ec:true,agc:true,gain:100,vol:100,ring:100,q:"auto",ptt:false,pttKey:"KeyV",room:true};
   var Q_BPS={low:24000,mid:64000,high:128000};
   var Q_LBL={auto:"Automatic",low:"Data saver · 24 kbps",mid:"Clear · 64 kbps",high:"Studio · 128 kbps"};
   function vsClamp(n,a,b,d){ n=Math.round(+n); return isFinite(n)?Math.max(a,Math.min(b,n)):d; }
@@ -21905,6 +22520,9 @@ var _sh=window.show;
         swRow("vs-ptt","Push to talk","Your microphone stays closed until you hold the key. Works while the Timmylist tab is in front, and not while you are typing.",VS.ptt)+
         '<div class="vsr" id="vs-pttrow"'+(VS.ptt?'':' hidden')+'><span class="vst"><b>Talk key</b><small>Click the button, then press the key you want.</small></span><button type="button" class="vsbtn key" id="vs-key">'+esc(keyLabel(VS.pttKey))+'</button></div>'+
       '</section>':'')+
+      '<section class="vsc" aria-labelledby="vs-h5"><h3 id="vs-h5">'+svg(ICV.big,16)+'Call window</h3>'+
+        swRow("vs-room","Open calls full screen","Calls open as a lounge room with both of your faces. Turn this off to keep them as a small card in the corner. You can switch during a call too.",VS.room)+
+      '</section>'+
       '<div class="vsfoot"><button type="button" class="vsbtn ghost" id="vs-reset">'+svg(VI.reset,15)+'Reset to defaults</button><button type="button" class="btn" id="vs-done">Done</button></div>';
   }
   function setP(r){ r.style.setProperty("--p",((r.value-r.min)/(r.max-r.min)*100)+"%"); }
@@ -21977,6 +22595,7 @@ var _sh=window.show;
     slider("vs-ring","ring",null,ringTest);
     [["vs-ns","ns"],["vs-ec","ec"],["vs-agc","agc"]].forEach(function(p){ $v(p[0]).onchange=function(){ VS[p[1]]=this.checked; vsSave(); micSwitchSoon(); vtSoon(); }; });
     $v("vs-q").onchange=function(){ VS.q=this.value; vsSave(); tuneSend(); };
+    $v("vs-room").onchange=function(){ VS.room=this.checked; vsSave(); if(CALL.st!=="idle"&&CALL.st!=="ringing"){ CALL.view=VS.room?"room":"dock"; paintCall(); } };
     $v("vs-test").onclick=function(){ if(VT.on) vtStop(); else vtStart(); };
     $v("vs-hear").onchange=function(){ vtHear(); };
     $v("vs-tspk").onclick=spkTest; $v("vs-tring").onclick=ringTest;
@@ -22046,50 +22665,89 @@ var _sh=window.show;
       '<div class="cvtools"><span class="cvlbl" id="cvlbl"></span><em class="cvstat" id="cvvstat"></em>'+
       tb("cvpip",ICV.pip,"Picture in picture")+tb("cvbig",ICV.big,"Make bigger")+tb("cvfs",ICV.fs,"Full screen")+tb("cvhide",IC.x,"Hide their screen")+'</div></div>';
   }
+  var CVSCENE="<svg class=\"cvscene\" viewBox=\"0 0 1600 1000\" preserveAspectRatio=\"xMidYMid slice\" aria-hidden=\"true\" focusable=\"false\"><defs><radialGradient id=\"csBg\" cx=\"50%\" cy=\"46%\" r=\"52%\"><stop offset=\"0\" class=\"sc-bgA\"/><stop offset=\"1\" class=\"sc-bgB\"/></radialGradient><linearGradient id=\"csFloorG\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".14\"/><stop offset=\".55\" stop-color=\"#fff\" stop-opacity=\".02\"/><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\".18\"/></linearGradient><linearGradient id=\"csWallG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\".5\"/><stop offset=\".5\" stop-color=\"#000\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\".05\"/></linearGradient><linearGradient id=\"csWash\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".26\"/><stop offset=\".45\" stop-color=\"#9cc6ff\" stop-opacity=\".08\"/><stop offset=\"1\" stop-color=\"#9cc6ff\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"csFaceG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#010617\" stop-opacity=\".5\"/><stop offset=\".55\" stop-color=\"#010617\" stop-opacity=\".08\"/><stop offset=\"1\" stop-color=\"#010617\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"csPotG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".25\"/><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#010617\" stop-opacity=\".45\"/></linearGradient><radialGradient id=\"csBagH\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".34\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"csScr\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" class=\"sc-scrA\"/><stop offset=\"1\" class=\"sc-scrB\"/></linearGradient><linearGradient id=\"csSky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" class=\"sc-skyA\"/><stop offset=\"1\" class=\"sc-skyB\"/></linearGradient><radialGradient id=\"csPool\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" class=\"sc-poolA\"/><stop offset=\"1\" class=\"sc-poolB\"/></radialGradient><radialGradient id=\"csSpill\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".16\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><filter id=\"csGlow\" x=\"-10%\" y=\"-60%\" width=\"120%\" height=\"220%\"><feGaussianBlur stdDeviation=\"7\"/></filter><filter id=\"csB3\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"3.2\"/></filter><filter id=\"csB2\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"2.2\"/></filter><filter id=\"csB4\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"4\"/></filter><filter id=\"csB8\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"250\" width=\"1400\" height=\"700\"><feGaussianBlur stdDeviation=\"8\"/></filter><filter id=\"csB14\" filterUnits=\"userSpaceOnUse\" x=\"100\" y=\"200\" width=\"1400\" height=\"760\"><feGaussianBlur stdDeviation=\"15\"/></filter><clipPath id=\"csFloorClip\"><polygon points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/></clipPath><clipPath id=\"csWallClip\"><polygon points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\"/><polygon points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\"/></clipPath></defs><rect width=\"1600\" height=\"1000\" fill=\"url(#csBg)\"/><polygon class=\"sc-wl\" points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\"/><polygon class=\"sc-wr\" points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\"/><polygon points=\"800.0,300.0 200.0,600.0 200.0,338.0 800.0,38.0\" fill=\"url(#csWallG)\"/><polygon points=\"800.0,300.0 1400.0,600.0 1400.0,338.0 800.0,38.0\" fill=\"url(#csWallG)\"/><polygon points=\"800.0,62.0 200.0,362.0 200.0,492.0 800.0,192.0\" fill=\"url(#csWash)\" opacity=\"1\"/><polygon points=\"800.0,62.0 1400.0,362.0 1400.0,492.0 800.0,192.0\" fill=\"url(#csWash)\" opacity=\"1\"/><polygon points=\"800.0,82.0 200.0,382.0 200.0,512.0 800.0,212.0\" fill=\"url(#csWash)\" opacity=\"0.55\"/><polygon points=\"800.0,82.0 1400.0,382.0 1400.0,512.0 800.0,212.0\" fill=\"url(#csWash)\" opacity=\"0.55\"/><polygon class=\"sc-pil\" points=\"909.2,354.6 930.8,365.4 930.8,103.4 909.2,92.6\"/><polygon class=\"sc-pil-s\" points=\"930.8,365.4 938.0,369.0 938.0,107.0 930.8,103.4\"/><polygon class=\"sc-pil\" points=\"690.8,354.6 669.2,365.4 669.2,103.4 690.8,92.6\"/><polygon class=\"sc-pil-s\" points=\"669.2,365.4 662.0,369.0 662.0,107.0 669.2,103.4\"/><polygon class=\"sc-pil\" points=\"1029.2,414.6 1050.8,425.4 1050.8,163.4 1029.2,152.6\"/><polygon class=\"sc-pil-s\" points=\"1050.8,425.4 1058.0,429.0 1058.0,167.0 1050.8,163.4\"/><polygon class=\"sc-pil\" points=\"570.8,414.6 549.2,425.4 549.2,163.4 570.8,152.6\"/><polygon class=\"sc-pil-s\" points=\"549.2,425.4 542.0,429.0 542.0,167.0 549.2,163.4\"/><polygon class=\"sc-pil\" points=\"1149.2,474.6 1170.8,485.4 1170.8,223.4 1149.2,212.6\"/><polygon class=\"sc-pil-s\" points=\"1170.8,485.4 1178.0,489.0 1178.0,227.0 1170.8,223.4\"/><polygon class=\"sc-pil\" points=\"450.8,474.6 429.2,485.4 429.2,223.4 450.8,212.6\"/><polygon class=\"sc-pil-s\" points=\"429.2,485.4 422.0,489.0 422.0,227.0 429.2,223.4\"/><polygon class=\"sc-pil\" points=\"1269.2,534.6 1290.8,545.4 1290.8,283.4 1269.2,272.6\"/><polygon class=\"sc-pil-s\" points=\"1290.8,545.4 1298.0,549.0 1298.0,287.0 1290.8,283.4\"/><polygon class=\"sc-pil\" points=\"330.8,534.6 309.2,545.4 309.2,283.4 330.8,272.6\"/><polygon class=\"sc-pil-s\" points=\"309.2,545.4 302.0,549.0 302.0,287.0 309.2,283.4\"/><polygon class=\"sc-base\" points=\"800.0,300.0 200.0,600.0 200.0,584.0 800.0,284.0\"/><line class=\"sc-hl2\" x1=\"800.0\" y1=\"284.0\" x2=\"200.0\" y2=\"584.0\" stroke-width=\"1.6\"/><polygon class=\"sc-base\" points=\"800.0,300.0 1400.0,600.0 1400.0,584.0 800.0,284.0\"/><line class=\"sc-hl2\" x1=\"800.0\" y1=\"284.0\" x2=\"1400.0\" y2=\"584.0\" stroke-width=\"1.6\"/><line class=\"sc-nw sc-glow\" x1=\"800.0\" y1=\"62.0\" x2=\"1400.0\" y2=\"362.0\" stroke-width=\"16\"/><line class=\"sc-nw\" x1=\"800.0\" y1=\"62.0\" x2=\"1400.0\" y2=\"362.0\" stroke-width=\"4\"/><line class=\"sc-nw sc-glow\" x1=\"800.0\" y1=\"62.0\" x2=\"200.0\" y2=\"362.0\" stroke-width=\"16\"/><line class=\"sc-nw\" x1=\"800.0\" y1=\"62.0\" x2=\"200.0\" y2=\"362.0\" stroke-width=\"4\"/><line class=\"sc-nb sc-glow\" x1=\"800.0\" y1=\"82.0\" x2=\"1400.0\" y2=\"382.0\" stroke-width=\"16\"/><line class=\"sc-nb\" x1=\"800.0\" y1=\"82.0\" x2=\"1400.0\" y2=\"382.0\" stroke-width=\"4\"/><line class=\"sc-nb sc-glow\" x1=\"800.0\" y1=\"82.0\" x2=\"200.0\" y2=\"382.0\" stroke-width=\"16\"/><line class=\"sc-nb\" x1=\"800.0\" y1=\"82.0\" x2=\"200.0\" y2=\"382.0\" stroke-width=\"4\"/><polygon class=\"sc-winf\" points=\"582.8,168.6 470.0,225.0 470.0,373.0 582.8,316.6\"/><clipPath id=\"csWinClip\"><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\"/></clipPath><g clip-path=\"url(#csWinClip)\"><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" fill=\"url(#csSky)\"/><circle class=\"sc-star\" cx=\"530.9\" cy=\"244.8\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"531.0\" cy=\"219.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"556.3\" cy=\"236.2\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"564.9\" cy=\"250.0\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"522.7\" cy=\"220.1\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"517.4\" cy=\"265.7\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"511.8\" cy=\"249.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"514.7\" cy=\"229.2\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"568.2\" cy=\"258.2\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"517.0\" cy=\"232.8\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"532.0\" cy=\"219.7\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"513.1\" cy=\"258.9\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"530.4\" cy=\"269.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"506.7\" cy=\"278.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"525.2\" cy=\"293.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"535.8\" cy=\"217.4\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"567.5\" cy=\"273.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"553.6\" cy=\"201.6\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"529.2\" cy=\"209.1\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"534.0\" cy=\"242.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"500.0\" cy=\"285.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"544.3\" cy=\"285.3\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"501.9\" cy=\"297.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"506.8\" cy=\"304.5\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"498.2\" cy=\"294.3\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"531.4\" cy=\"276.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"534.1\" cy=\"258.5\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"533.9\" cy=\"273.4\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"491.9\" cy=\"228.3\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"479.2\" cy=\"317.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"536.4\" cy=\"216.4\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"569.8\" cy=\"261.2\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"549.3\" cy=\"217.1\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"495.1\" cy=\"277.7\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"565.3\" cy=\"225.6\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"572.3\" cy=\"240.6\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"561.7\" cy=\"227.0\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"491.7\" cy=\"297.1\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"544.3\" cy=\"266.8\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"505.0\" cy=\"292.5\" r=\"0.9\"/><circle class=\"sc-star\" cx=\"508.7\" cy=\"270.8\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"516.6\" cy=\"263.9\" r=\"0.7\"/><circle class=\"sc-star\" cx=\"563.5\" cy=\"232.6\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"551.2\" cy=\"222.0\" r=\"1.2\"/><circle class=\"sc-star\" cx=\"533.9\" cy=\"213.3\" r=\"1.6\"/><circle class=\"sc-star\" cx=\"546.0\" cy=\"270.6\" r=\"0.7\"/><polygon class=\"sc-moon-g sc-glow\" points=\"497.2,260.6 497.4,257.8 498.1,254.9 499.1,252.2 500.4,249.9 502.0,248.0 503.6,246.8 505.3,246.4 506.9,246.6 508.2,247.6 509.2,249.3 509.9,251.5 510.1,254.2 509.9,257.0 509.2,259.9 508.2,262.5 506.9,264.9 505.3,266.7 503.6,267.9 502.0,268.4 500.4,268.1 499.1,267.1 498.1,265.4 497.4,263.2\"/><polygon class=\"sc-moon\" points=\"497.2,260.6 497.4,257.8 498.1,254.9 499.1,252.2 500.4,249.9 502.0,248.0 503.6,246.8 505.3,246.4 506.9,246.6 508.2,247.6 509.2,249.3 509.9,251.5 510.1,254.2 509.9,257.0 509.2,259.9 508.2,262.5 506.9,264.9 505.3,266.7 503.6,267.9 502.0,268.4 500.4,268.1 499.1,267.1 498.1,265.4 497.4,263.2\"/><polygon class=\"sc-bld\" points=\"573.8,309.1 565.3,313.4 565.3,287.3 573.8,283.1\"/><polygon class=\"sc-bldw\" points=\"569.7,305.0 568.0,305.8 568.0,303.4 569.7,302.5\"/><polygon class=\"sc-bldw\" points=\"567.7,295.1 566.0,296.0 566.0,293.5 567.7,292.6\"/><polygon class=\"sc-bld\" points=\"565.3,313.4 555.8,318.1 555.8,275.9 565.3,271.2\"/><polygon class=\"sc-bldw\" points=\"562.1,301.9 560.4,302.8 560.4,300.3 562.1,299.5\"/><polygon class=\"sc-bldw\" points=\"564.6,304.3 562.9,305.1 562.9,302.7 564.6,301.8\"/><polygon class=\"sc-bldw\" points=\"562.8,286.0 561.1,286.9 561.1,284.4 562.8,283.6\"/><polygon class=\"sc-bld\" points=\"555.8,318.1 548.2,321.9 548.2,289.7 555.8,285.9\"/><polygon class=\"sc-bldw\" points=\"553.1,306.5 551.4,307.4 551.4,304.9 553.1,304.0\"/><polygon class=\"sc-bldw\" points=\"555.6,299.9 553.9,300.7 553.9,298.3 555.6,297.4\"/><polygon class=\"sc-bld\" points=\"548.2,321.9 538.7,326.6 538.7,274.6 548.2,269.8\"/><polygon class=\"sc-bldw\" points=\"547.7,304.1 546.0,304.9 546.0,302.5 547.7,301.6\"/><polygon class=\"sc-bldw\" points=\"547.7,298.1 545.9,299.0 545.9,296.5 547.7,295.6\"/><polygon class=\"sc-bld\" points=\"538.7,326.6 530.2,330.9 530.2,293.7 538.7,289.4\"/><polygon class=\"sc-bldw\" points=\"537.9,295.8 536.2,296.7 536.2,294.2 537.9,293.3\"/><polygon class=\"sc-bldw\" points=\"538.2,309.0 536.5,309.9 536.5,307.4 538.2,306.6\"/><polygon class=\"sc-bldw\" points=\"533.0,298.8 531.3,299.6 531.3,297.1 533.0,296.3\"/><polygon class=\"sc-bld\" points=\"530.2,330.9 521.7,335.2 521.7,273.2 530.2,268.9\"/><polygon class=\"sc-bldw\" points=\"527.7,326.6 526.0,327.4 526.0,324.9 527.7,324.1\"/><polygon class=\"sc-bldw\" points=\"529.6,320.2 527.9,321.1 527.9,318.6 529.6,317.7\"/><polygon class=\"sc-bld\" points=\"521.7,335.2 511.2,340.4 511.2,299.5 521.7,294.2\"/><polygon class=\"sc-bldw\" points=\"515.7,319.0 514.0,319.8 514.0,317.4 515.7,316.5\"/><polygon class=\"sc-bldw\" points=\"517.0,316.4 515.3,317.3 515.3,314.8 517.0,314.0\"/><polygon class=\"sc-bldw\" points=\"519.0,328.8 517.3,329.7 517.3,327.2 519.0,326.3\"/><polygon class=\"sc-bld\" points=\"511.2,340.4 502.7,344.6 502.7,314.9 511.2,310.6\"/><polygon class=\"sc-bld\" points=\"502.7,344.6 493.2,349.4 493.2,302.3 502.7,297.5\"/><polygon class=\"sc-bldw\" points=\"498.8,313.6 497.1,314.5 497.1,312.0 498.8,311.1\"/><polygon class=\"sc-bldw\" points=\"495.6,324.7 493.9,325.5 493.9,323.1 495.6,322.2\"/><polygon class=\"sc-bld\" points=\"493.2,349.4 485.6,353.2 485.6,318.5 493.2,314.7\"/><polygon class=\"sc-bldw\" points=\"488.6,328.0 486.9,328.9 486.9,326.4 488.6,325.5\"/><polygon class=\"sc-bldw\" points=\"492.0,341.7 490.3,342.5 490.3,340.1 492.0,339.2\"/><polygon class=\"sc-bld\" points=\"485.6,353.2 479.0,356.5 479.0,306.9 485.6,303.6\"/><polygon class=\"sc-bldw\" points=\"481.4,348.7 479.7,349.6 479.7,347.1 481.4,346.3\"/><polygon class=\"sc-bldw\" points=\"481.0,317.9 479.3,318.8 479.3,316.3 481.0,315.5\"/></g><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" fill=\"none\" class=\"sc-winedge\"/><line class=\"sc-mull\" x1=\"526.4\" y1=\"208.8\" x2=\"526.4\" y2=\"332.8\" stroke-width=\"3.4\"/><line class=\"sc-mull\" x1=\"573.8\" y1=\"247.1\" x2=\"479.0\" y2=\"294.5\" stroke-width=\"3.4\"/><polygon points=\"573.8,185.1 479.0,232.5 479.0,356.5 573.8,309.1\" class=\"sc-winglare\"/><polygon class=\"sc-sill-r\" points=\"608.0,332.4 485.6,393.6 485.6,385.6 608.0,324.4\"/><polygon class=\"sc-sill-l\" points=\"465.2,383.4 485.6,393.6 485.6,385.6 465.2,375.4\"/><polygon points=\"608.0,332.4 485.6,393.6 485.6,385.6 608.0,324.4\" fill=\"url(#csFaceG)\"/><polygon points=\"465.2,383.4 485.6,393.6 485.6,385.6 465.2,375.4\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sill-t\" points=\"587.6,314.2 608.0,324.4 485.6,385.6 465.2,375.4\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"608.0,324.4 485.6,385.6 465.2,375.4\"/><polygon class=\"sc-frm\" points=\"980.0,176.0 1058.0,215.0 1058.0,319.0 980.0,280.0\"/><polygon class=\"sc-frm2\" points=\"987.2,191.6 1050.8,223.4 1050.8,303.4 987.2,271.6\"/><polygon class=\"sc-frm\" points=\"1100.0,236.0 1178.0,275.0 1178.0,379.0 1100.0,340.0\"/><polygon class=\"sc-frm2\" points=\"1107.2,251.6 1170.8,283.4 1170.8,363.4 1107.2,331.6\"/><polygon class=\"sc-frm\" points=\"1220.0,296.0 1298.0,335.0 1298.0,439.0 1220.0,400.0\"/><polygon class=\"sc-frm2\" points=\"1227.2,311.6 1290.8,343.4 1290.8,423.4 1227.2,391.6\"/><polygon class=\"sc-ico\" points=\"1019.0,278.4 1024.4,260.9 1039.3,267.2 1027.7,247.8 1031.6,228.8 1019.0,234.3 1006.4,216.2 1010.3,239.1 998.7,246.9 1013.6,255.5\"/><polygon class=\"sc-ico\" points=\"1125.0,278.1 1153.0,292.1 1149.2,312.6 1139.0,318.7 1128.8,302.4\"/><polygon class=\"sc-ico\" points=\"1136.5,317.4 1141.5,320.0 1141.5,332.8 1136.5,330.2\"/><polygon class=\"sc-ico\" points=\"1127.6,325.8 1150.4,337.2 1150.4,343.6 1127.6,332.2\"/><polygon class=\"sc-ico\" points=\"1232.9,381.7 1253.3,391.8 1243.1,346.1\"/><polygon class=\"sc-ico\" points=\"1248.8,389.6 1269.2,399.8 1259.0,344.7\"/><polygon class=\"sc-ico\" points=\"1264.7,397.6 1285.1,407.7 1274.9,362.0\"/><polygon points=\"987.2,191.6 1017.2,206.6 987.2,243.6\" class=\"sc-winglare\"/><polygon points=\"1107.2,251.6 1137.2,266.6 1107.2,303.6\" class=\"sc-winglare\"/><polygon points=\"1227.2,311.6 1257.2,326.6 1227.2,363.6\" class=\"sc-winglare\"/><polygon class=\"sc-fl\" points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/><polygon points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\" fill=\"url(#csFloorG)\"/><line class=\"sc-grid\" x1=\"860.0\" y1=\"330.0\" x2=\"260.0\" y2=\"630.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"740.0\" y1=\"330.0\" x2=\"1340.0\" y2=\"630.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"920.0\" y1=\"360.0\" x2=\"320.0\" y2=\"660.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"680.0\" y1=\"360.0\" x2=\"1280.0\" y2=\"660.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"980.0\" y1=\"390.0\" x2=\"380.0\" y2=\"690.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"620.0\" y1=\"390.0\" x2=\"1220.0\" y2=\"690.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1040.0\" y1=\"420.0\" x2=\"440.0\" y2=\"720.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"560.0\" y1=\"420.0\" x2=\"1160.0\" y2=\"720.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1100.0\" y1=\"450.0\" x2=\"500.0\" y2=\"750.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"500.0\" y1=\"450.0\" x2=\"1100.0\" y2=\"750.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1160.0\" y1=\"480.0\" x2=\"560.0\" y2=\"780.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"440.0\" y1=\"480.0\" x2=\"1040.0\" y2=\"780.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1220.0\" y1=\"510.0\" x2=\"620.0\" y2=\"810.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"380.0\" y1=\"510.0\" x2=\"980.0\" y2=\"810.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1280.0\" y1=\"540.0\" x2=\"680.0\" y2=\"840.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"320.0\" y1=\"540.0\" x2=\"920.0\" y2=\"840.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"1340.0\" y1=\"570.0\" x2=\"740.0\" y2=\"870.0\" stroke-width=\"1.4\"/><line class=\"sc-grid\" x1=\"260.0\" y1=\"570.0\" x2=\"860.0\" y2=\"870.0\" stroke-width=\"1.4\"/><g clip-path=\"url(#csFloorClip)\"><ellipse cx=\"800.0\" cy=\"610.0\" rx=\"470.0\" ry=\"200.0\" fill=\"url(#csSpill)\"/><polygon class=\"sc-sheen\" points=\"272.0,636.0 404.0,702.0 1196.0,702.0 1328.0,636.0\"/></g><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB8)\" opacity=\".5\"><polygon points=\"800.0,240.0 890.0,285.0 170.0,645.0 80.0,600.0\" fill=\"#010617\"/><polygon points=\"800.0,240.0 1520.0,600.0 1430.0,645.0 710.0,285.0\" fill=\"#010617\"/></g></g><polygon class=\"sc-edge\" points=\"800.0,300.0 1400.0,600.0 800.0,900.0 200.0,600.0\"/><polygon class=\"sc-rug\" points=\"932.0,420.0 1220.0,564.0 992.0,678.0 704.0,534.0\"/><polygon class=\"sc-rug2\" points=\"938.0,441.0 1178.0,561.0 986.0,657.0 746.0,537.0\"/><polygon class=\"sc-rug3\" points=\"935.0,430.5 1199.0,562.5 989.0,667.5 725.0,535.5\"/><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB4)\"><polygon class=\"sc-patch\" points=\"683.0,564.4 637.0,587.3 597.0,531.9 643.0,508.9\"/><polygon class=\"sc-patch\" points=\"725.4,623.2 679.4,646.2 639.4,590.8 685.4,567.8\"/><polygon class=\"sc-patch\" points=\"634.1,588.8 588.2,611.8 548.2,556.3 594.1,533.3\"/><polygon class=\"sc-patch\" points=\"676.6,647.6 630.6,670.6 590.6,615.2 636.6,592.2\"/></g></g><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB14)\" opacity=\".2\" class=\"sc-scrspill\"><polygon points=\"791.0,394.5 959.0,442.5 791.0,526.5 695.0,442.5\"/><polygon points=\"539.0,520.5 707.0,568.5 539.0,652.5 443.0,568.5\"/></g></g><ellipse class=\"sc-pool\" cx=\"650.0\" cy=\"722.0\" rx=\"235.0\" ry=\"84.0\" fill=\"url(#csPool)\"/><ellipse class=\"sc-pool\" cx=\"950.0\" cy=\"722.0\" rx=\"235.0\" ry=\"84.0\" fill=\"url(#csPool)\"/><g clip-path=\"url(#csFloorClip)\"><g filter=\"url(#csB14)\" opacity=\".4\" fill=\"#010617\"><ellipse cx=\"849.5\" cy=\"418.0\" rx=\"89.7\" ry=\"29.9\"/><ellipse cx=\"1357.1\" cy=\"661.6\" rx=\"81.9\" ry=\"27.3\"/><ellipse cx=\"328.1\" cy=\"657.1\" rx=\"81.9\" ry=\"27.3\"/></g><g filter=\"url(#csB14)\" opacity=\".36\" fill=\"#010617\"><ellipse cx=\"811.7\" cy=\"373.5\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 845.3,418.8 695.3,493.8 608.3,450.3 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 636.3,460.9 591.3,483.4 540.3,457.9 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 593.3,544.8 443.3,619.8 356.3,576.3 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 384.3,586.9 339.3,609.4 288.3,583.9 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1319.2,580.6 1257.4,611.5 879.4,422.5 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1180.7,593.4 1108.7,629.4 868.7,509.4 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1198.2,617.6 1171.2,631.1 931.2,511.1 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 991.9,604.5 943.9,628.5 859.9,586.5 848.0,570.0\"/><ellipse cx=\"679.9\" cy=\"548.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1201.9\" cy=\"665.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"427.9\" cy=\"638.6\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"661.9\" cy=\"759.5\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"961.9\" cy=\"759.5\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1329.2\" cy=\"630.9\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"300.2\" cy=\"626.4\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB8)\" opacity=\".46\" fill=\"#010617\"><ellipse cx=\"806.0\" cy=\"365.7\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 836.6,406.7 686.6,481.7 599.6,438.2 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 632.0,455.0 587.0,477.5 536.0,452.0 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 584.6,532.7 434.6,607.7 347.6,564.2 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 380.0,581.0 335.0,603.5 284.0,578.0 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1312.0,570.7 1250.2,601.6 872.2,412.6 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1176.0,586.9 1104.0,622.9 864.0,502.9 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1187.9,603.3 1160.9,616.8 920.9,496.8 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 988.1,599.2 940.1,623.2 856.1,581.2 848.0,570.0\"/><ellipse cx=\"676.1\" cy=\"543.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1198.1\" cy=\"660.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"424.1\" cy=\"633.3\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"658.1\" cy=\"754.2\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"958.1\" cy=\"754.2\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1324.0\" cy=\"623.7\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"295.0\" cy=\"619.2\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB3)\" opacity=\".6\" fill=\"#010617\"><ellipse cx=\"800.0\" cy=\"357.3\" rx=\"41.4\" ry=\"14.4\"/><polygon points=\"731.0,337.5 818.0,381.0 827.3,393.9 677.3,468.9 590.3,425.4 581.0,412.5\"/><polygon points=\"572.0,417.0 623.0,442.5 627.5,448.8 582.5,471.3 531.5,445.8 527.0,439.5\"/><polygon points=\"479.0,463.5 566.0,507.0 575.3,519.9 425.3,594.9 338.3,551.4 329.0,538.5\"/><polygon points=\"320.0,543.0 371.0,568.5 375.5,574.8 330.5,597.3 279.5,571.8 275.0,565.5\"/><polygon points=\"918.8,360.6 1296.8,549.6 1304.4,560.2 1242.6,591.1 864.6,402.1 857.0,391.5\"/><polygon points=\"926.0,453.0 1166.0,573.0 1171.0,579.9 1099.0,615.9 859.0,495.9 854.0,489.0\"/><polygon points=\"926.0,453.0 1166.0,573.0 1176.9,588.2 1149.9,601.7 909.9,481.7 899.0,466.5\"/><polygon points=\"896.0,546.0 980.0,588.0 984.0,593.6 936.0,617.6 852.0,575.6 848.0,570.0\"/><ellipse cx=\"672.0\" cy=\"537.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"1194.0\" cy=\"654.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"420.0\" cy=\"627.7\" rx=\"76.3\" ry=\"27.0\"/><ellipse cx=\"654.0\" cy=\"748.6\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"954.0\" cy=\"748.6\" rx=\"143.1\" ry=\"52.0\"/><ellipse cx=\"1318.5\" cy=\"616.1\" rx=\"37.8\" ry=\"13.1\"/><ellipse cx=\"289.5\" cy=\"611.6\" rx=\"37.8\" ry=\"13.1\"/></g><g filter=\"url(#csB2)\" opacity=\".82\" fill=\"#010617\"><ellipse cx=\"794.0\" cy=\"350.4\" rx=\"39.9\" ry=\"13.2\"/><polygon points=\"731.0,333.3 826.4,381.0 668.0,460.2 572.6,412.5\"/><polygon points=\"572.0,412.8 631.4,442.5 578.0,469.2 518.6,439.5\"/><polygon points=\"479.0,459.3 574.4,507.0 416.0,586.2 320.6,538.5\"/><polygon points=\"320.0,538.8 379.4,568.5 326.0,595.2 266.6,565.5\"/><polygon points=\"918.8,356.4 1305.2,549.6 1235.0,584.7 848.6,391.5\"/><polygon points=\"926.0,448.8 1174.4,573.0 1094.0,613.2 845.6,489.0\"/><polygon points=\"926.0,448.8 1174.4,573.0 1139.0,590.7 890.6,466.5\"/><polygon points=\"896.0,541.8 988.4,588.0 932.0,616.2 839.6,570.0\"/><ellipse cx=\"668.0\" cy=\"534.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"1190.0\" cy=\"651.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"416.0\" cy=\"624.7\" rx=\"73.4\" ry=\"25.0\"/><ellipse cx=\"650.0\" cy=\"748.0\" rx=\"137.7\" ry=\"48.0\"/><ellipse cx=\"950.0\" cy=\"748.0\" rx=\"137.7\" ry=\"48.0\"/><ellipse cx=\"1313.0\" cy=\"609.8\" rx=\"36.4\" ry=\"12.1\"/><ellipse cx=\"284.0\" cy=\"605.3\" rx=\"36.4\" ry=\"12.1\"/></g></g><g clip-path=\"url(#csWallClip)\"><g filter=\"url(#csB8)\" opacity=\".34\" fill=\"#010617\"><g transform=\"translate(40.0 -22.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(26.0)\"/></g><g transform=\"translate(-34.0 -24.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(26.0)\"/></g><g transform=\"translate(-38.0 -24.0)\"><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(-62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(-16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(0.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(16.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(38.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(62.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-26.0)\"/><ellipse class=\"\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(26.0)\"/></g></g></g><polygon class=\"sc-pot-b\" points=\"759.5,294.4 828.5,294.4 819.3,345.0 768.7,345.0\"/><polygon points=\"759.5,294.4 828.5,294.4 819.3,345.0 768.7,345.0\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"794.0\" cy=\"294.4\" rx=\"34.5\" ry=\"11.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-62.8\" rx=\"17.2\" ry=\"62.8\" transform=\"translate(794.0 292.1) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-80.0\" rx=\"17.2\" ry=\"80.0\" transform=\"translate(794.0 292.1) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-97.2\" rx=\"17.2\" ry=\"97.2\" transform=\"translate(794.0 292.1) rotate(26.0)\"/><polygon class=\"sc-desk-r\" points=\"818.0,381.0 668.0,456.0 668.0,378.0 818.0,303.0\"/><polygon class=\"sc-desk-l\" points=\"581.0,412.5 668.0,456.0 668.0,378.0 581.0,334.5\"/><polygon points=\"818.0,381.0 668.0,456.0 668.0,378.0 818.0,303.0\" fill=\"url(#csFaceG)\"/><polygon points=\"581.0,412.5 668.0,456.0 668.0,378.0 581.0,334.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-desk-t\" points=\"731.0,259.5 818.0,303.0 668.0,378.0 581.0,334.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"818.0,303.0 668.0,378.0 581.0,334.5\"/><polygon class=\"sc-scr\" points=\"725.0,282.5 635.0,327.5 635.0,257.5 725.0,212.5\"/><polygon class=\"sc-mon-l\" points=\"626.0,323.0 635.0,327.5 635.0,257.5 626.0,253.0\"/><polygon points=\"725.0,282.5 635.0,327.5 635.0,257.5 725.0,212.5\" fill=\"url(#csFaceG)\"/><polygon points=\"626.0,323.0 635.0,327.5 635.0,257.5 626.0,253.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-mon-t\" points=\"716.0,208.0 725.0,212.5 635.0,257.5 626.0,253.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"725.0,212.5 635.0,257.5 626.0,253.0\"/><polygon class=\"sc-scrglow sc-glow\" points=\"725.6,282.8 635.6,327.8 635.6,257.8 725.6,212.8\"/><polygon class=\"sc-kb-r\" points=\"755.0,319.5 695.0,349.5 695.0,343.5 755.0,313.5\"/><polygon class=\"sc-kb-l\" points=\"662.0,333.0 695.0,349.5 695.0,343.5 662.0,327.0\"/><polygon points=\"755.0,319.5 695.0,349.5 695.0,343.5 755.0,313.5\" fill=\"url(#csFaceG)\"/><polygon points=\"662.0,333.0 695.0,349.5 695.0,343.5 662.0,327.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-kb-t\" points=\"722.0,297.0 755.0,313.5 695.0,343.5 662.0,327.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"755.0,313.5 695.0,343.5 662.0,327.0\"/><polygon class=\"sc-pc-r\" points=\"623.0,442.5 578.0,465.0 578.0,427.0 623.0,404.5\"/><polygon class=\"sc-pc-l\" points=\"527.0,439.5 578.0,465.0 578.0,427.0 527.0,401.5\"/><polygon points=\"623.0,442.5 578.0,465.0 578.0,427.0 623.0,404.5\" fill=\"url(#csFaceG)\"/><polygon points=\"527.0,439.5 578.0,465.0 578.0,427.0 527.0,401.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-pc-t\" points=\"572.0,379.0 623.0,404.5 578.0,427.0 527.0,401.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"623.0,404.5 578.0,427.0 527.0,401.5\"/><polygon class=\"sc-desk-r\" points=\"566.0,507.0 416.0,582.0 416.0,504.0 566.0,429.0\"/><polygon class=\"sc-desk-l\" points=\"329.0,538.5 416.0,582.0 416.0,504.0 329.0,460.5\"/><polygon points=\"566.0,507.0 416.0,582.0 416.0,504.0 566.0,429.0\" fill=\"url(#csFaceG)\"/><polygon points=\"329.0,538.5 416.0,582.0 416.0,504.0 329.0,460.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-desk-t\" points=\"479.0,385.5 566.0,429.0 416.0,504.0 329.0,460.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"566.0,429.0 416.0,504.0 329.0,460.5\"/><polygon class=\"sc-scr\" points=\"473.0,408.5 383.0,453.5 383.0,383.5 473.0,338.5\"/><polygon class=\"sc-mon-l\" points=\"374.0,449.0 383.0,453.5 383.0,383.5 374.0,379.0\"/><polygon points=\"473.0,408.5 383.0,453.5 383.0,383.5 473.0,338.5\" fill=\"url(#csFaceG)\"/><polygon points=\"374.0,449.0 383.0,453.5 383.0,383.5 374.0,379.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-mon-t\" points=\"464.0,334.0 473.0,338.5 383.0,383.5 374.0,379.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"473.0,338.5 383.0,383.5 374.0,379.0\"/><polygon class=\"sc-scrglow sc-glow\" points=\"473.6,408.8 383.6,453.8 383.6,383.8 473.6,338.8\"/><polygon class=\"sc-kb-r\" points=\"503.0,445.5 443.0,475.5 443.0,469.5 503.0,439.5\"/><polygon class=\"sc-kb-l\" points=\"410.0,459.0 443.0,475.5 443.0,469.5 410.0,453.0\"/><polygon points=\"503.0,445.5 443.0,475.5 443.0,469.5 503.0,439.5\" fill=\"url(#csFaceG)\"/><polygon points=\"410.0,459.0 443.0,475.5 443.0,469.5 410.0,453.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-kb-t\" points=\"470.0,423.0 503.0,439.5 443.0,469.5 410.0,453.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"503.0,439.5 443.0,469.5 410.0,453.0\"/><polygon class=\"sc-pc-r\" points=\"371.0,568.5 326.0,591.0 326.0,553.0 371.0,530.5\"/><polygon class=\"sc-pc-l\" points=\"275.0,565.5 326.0,591.0 326.0,553.0 275.0,527.5\"/><polygon points=\"371.0,568.5 326.0,591.0 326.0,553.0 371.0,530.5\" fill=\"url(#csFaceG)\"/><polygon points=\"275.0,565.5 326.0,591.0 326.0,553.0 275.0,527.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-pc-t\" points=\"320.0,505.0 371.0,530.5 326.0,553.0 275.0,527.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"371.0,530.5 326.0,553.0 275.0,527.5\"/><polygon class=\"sc-deskglow\" points=\"725.6,282.8 635.6,327.8 698.0,351.0 764.0,318.0\"/><polygon class=\"sc-deskglow\" points=\"473.6,408.8 383.6,453.8 446.0,477.0 512.0,444.0\"/><polygon class=\"sc-con-r\" points=\"1296.8,549.6 1235.0,580.5 1235.0,516.5 1296.8,485.6\"/><polygon class=\"sc-con-l\" points=\"857.0,391.5 1235.0,580.5 1235.0,516.5 857.0,327.5\"/><polygon points=\"1296.8,549.6 1235.0,580.5 1235.0,516.5 1296.8,485.6\" fill=\"url(#csFaceG)\"/><polygon points=\"857.0,391.5 1235.0,580.5 1235.0,516.5 857.0,327.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-con-t\" points=\"918.8,296.6 1296.8,485.6 1235.0,516.5 857.0,327.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1296.8,485.6 1235.0,516.5 857.0,327.5\"/><polygon class=\"sc-trophy\" points=\"1092.0,415.0 1120.0,415.0 1116.0,385.0 1096.0,385.0\"/><ellipse class=\"sc-trophy\" cx=\"1106.0\" cy=\"385.0\" rx=\"10.0\" ry=\"3.5\"/><polygon class=\"sc-trophy\" points=\"1101.0,415.0 1111.0,415.0 1111.0,421.0 1101.0,421.0\"/><polygon points=\"1092.0,415.0 1102.0,415.0 1101.0,385.0 1096.0,385.0\" fill=\"#fff\" opacity=\".3\"/><ellipse class=\"sc-lamp sc-glow\" cx=\"950.0\" cy=\"319.0\" rx=\"18.0\" ry=\"18.0\"/><ellipse class=\"sc-lamp\" cx=\"950.0\" cy=\"319.0\" rx=\"9.0\" ry=\"9.0\"/><polygon class=\"sc-lampcone sc-glow\" points=\"938.0,343.0 962.0,343.0 980.0,375.0 920.0,375.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,573.0 1094.0,609.0 1094.0,567.0 1166.0,531.0\"/><polygon class=\"sc-sofa-l\" points=\"854.0,489.0 1094.0,609.0 1094.0,567.0 854.0,447.0\"/><polygon points=\"1166.0,573.0 1094.0,609.0 1094.0,567.0 1166.0,531.0\" fill=\"url(#csFaceG)\"/><polygon points=\"854.0,489.0 1094.0,609.0 1094.0,567.0 854.0,447.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,411.0 1166.0,531.0 1094.0,567.0 854.0,447.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,531.0 1094.0,567.0 854.0,447.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,531.0 1139.0,544.5 1139.0,494.5 1166.0,481.0\"/><polygon class=\"sc-sofa-l\" points=\"899.0,424.5 1139.0,544.5 1139.0,494.5 899.0,374.5\"/><polygon points=\"1166.0,531.0 1139.0,544.5 1139.0,494.5 1166.0,481.0\" fill=\"url(#csFaceG)\"/><polygon points=\"899.0,424.5 1139.0,544.5 1139.0,494.5 899.0,374.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,361.0 1166.0,481.0 1139.0,494.5 899.0,374.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,481.0 1139.0,494.5 899.0,374.5\"/><polygon class=\"sc-sofa-r\" points=\"953.0,424.5 881.0,460.5 881.0,436.5 953.0,400.5\"/><polygon class=\"sc-sofa-l\" points=\"854.0,447.0 881.0,460.5 881.0,436.5 854.0,423.0\"/><polygon points=\"953.0,424.5 881.0,460.5 881.0,436.5 953.0,400.5\" fill=\"url(#csFaceG)\"/><polygon points=\"854.0,447.0 881.0,460.5 881.0,436.5 854.0,423.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"926.0,387.0 953.0,400.5 881.0,436.5 854.0,423.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"953.0,400.5 881.0,436.5 854.0,423.0\"/><polygon class=\"sc-sofa-r\" points=\"1166.0,531.0 1094.0,567.0 1094.0,543.0 1166.0,507.0\"/><polygon class=\"sc-sofa-l\" points=\"1067.0,553.5 1094.0,567.0 1094.0,543.0 1067.0,529.5\"/><polygon points=\"1166.0,531.0 1094.0,567.0 1094.0,543.0 1166.0,507.0\" fill=\"url(#csFaceG)\"/><polygon points=\"1067.0,553.5 1094.0,567.0 1094.0,543.0 1067.0,529.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-sofa-t\" points=\"1139.0,493.5 1166.0,507.0 1094.0,543.0 1067.0,529.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1166.0,507.0 1094.0,543.0 1067.0,529.5\"/><polygon class=\"sc-cush-r\" points=\"984.8,447.6 926.0,477.0 926.0,469.0 984.8,439.6\"/><polygon class=\"sc-cush-l\" points=\"890.0,459.0 926.0,477.0 926.0,469.0 890.0,451.0\"/><polygon points=\"984.8,447.6 926.0,477.0 926.0,469.0 984.8,439.6\" fill=\"url(#csFaceG)\"/><polygon points=\"890.0,459.0 926.0,477.0 926.0,469.0 890.0,451.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"948.8,421.6 984.8,439.6 926.0,469.0 890.0,451.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"984.8,439.6 926.0,469.0 890.0,451.0\"/><polygon class=\"sc-cush-r\" points=\"1062.8,486.6 1004.0,516.0 1004.0,508.0 1062.8,478.6\"/><polygon class=\"sc-cush-l\" points=\"968.0,498.0 1004.0,516.0 1004.0,508.0 968.0,490.0\"/><polygon points=\"1062.8,486.6 1004.0,516.0 1004.0,508.0 1062.8,478.6\" fill=\"url(#csFaceG)\"/><polygon points=\"968.0,498.0 1004.0,516.0 1004.0,508.0 968.0,490.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"1026.8,460.6 1062.8,478.6 1004.0,508.0 968.0,490.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1062.8,478.6 1004.0,508.0 968.0,490.0\"/><polygon class=\"sc-cush-r\" points=\"1104.8,507.6 1046.0,537.0 1046.0,529.0 1104.8,499.6\"/><polygon class=\"sc-cush-l\" points=\"1010.0,519.0 1046.0,537.0 1046.0,529.0 1010.0,511.0\"/><polygon points=\"1104.8,507.6 1046.0,537.0 1046.0,529.0 1104.8,499.6\" fill=\"url(#csFaceG)\"/><polygon points=\"1010.0,519.0 1046.0,537.0 1046.0,529.0 1010.0,511.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cush-t\" points=\"1068.8,481.6 1104.8,499.6 1046.0,529.0 1010.0,511.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"1104.8,499.6 1046.0,529.0 1010.0,511.0\"/><polygon class=\"sc-tbl-r\" points=\"980.0,588.0 932.0,612.0 932.0,578.0 980.0,554.0\"/><polygon class=\"sc-tbl-l\" points=\"848.0,570.0 932.0,612.0 932.0,578.0 848.0,536.0\"/><polygon points=\"980.0,588.0 932.0,612.0 932.0,578.0 980.0,554.0\" fill=\"url(#csFaceG)\"/><polygon points=\"848.0,570.0 932.0,612.0 932.0,578.0 848.0,536.0\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-tbl-t\" points=\"896.0,512.0 980.0,554.0 932.0,578.0 848.0,536.0\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"980.0,554.0 932.0,578.0 848.0,536.0\"/><polygon class=\"sc-cup-r\" points=\"917.0,534.5 899.0,543.5 899.0,537.5 917.0,528.5\"/><polygon class=\"sc-cup-l\" points=\"881.0,534.5 899.0,543.5 899.0,537.5 881.0,528.5\"/><polygon points=\"917.0,534.5 899.0,543.5 899.0,537.5 917.0,528.5\" fill=\"url(#csFaceG)\"/><polygon points=\"881.0,534.5 899.0,543.5 899.0,537.5 881.0,528.5\" fill=\"url(#csFaceG)\"/><polygon class=\"sc-cup-t\" points=\"899.0,519.5 917.0,528.5 899.0,537.5 881.0,528.5\"/><polyline class=\"sc-hl\" fill=\"none\" points=\"917.0,528.5 899.0,537.5 881.0,528.5\"/><ellipse class=\"sc-bag-s\" cx=\"668.0\" cy=\"530.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"668.0\" cy=\"523.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"668.0\" cy=\"516.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"653.6\" cy=\"511.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M603.2 530.3 Q668.0 556.3 732.8 530.3\"/><ellipse class=\"sc-bag-s\" cx=\"1190.0\" cy=\"647.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"1190.0\" cy=\"640.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"1190.0\" cy=\"633.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"1175.6\" cy=\"628.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M1125.2 647.3 Q1190.0 673.3 1254.8 647.3\"/><ellipse class=\"sc-bag-s\" cx=\"416.0\" cy=\"620.3\" rx=\"73.4\" ry=\"27.3\"/><ellipse class=\"sc-bag-b\" cx=\"416.0\" cy=\"613.8\" rx=\"72.0\" ry=\"28.6\"/><ellipse class=\"sc-bag-t\" cx=\"416.0\" cy=\"606.0\" rx=\"69.8\" ry=\"26.0\"/><ellipse cx=\"401.6\" cy=\"601.3\" rx=\"43.2\" ry=\"14.3\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M351.2 620.3 Q416.0 646.3 480.8 620.3\"/><ellipse class=\"sc-bag-s\" cx=\"650.0\" cy=\"739.5\" rx=\"137.7\" ry=\"52.5\"/><ellipse class=\"sc-bag-b\" cx=\"650.0\" cy=\"727.0\" rx=\"135.0\" ry=\"55.0\"/><ellipse class=\"sc-bag-t\" cx=\"650.0\" cy=\"712.0\" rx=\"130.9\" ry=\"50.0\"/><ellipse cx=\"623.0\" cy=\"703.0\" rx=\"81.0\" ry=\"27.5\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M528.5 739.5 Q650.0 789.5 771.5 739.5\"/><ellipse class=\"sc-bag-s\" cx=\"950.0\" cy=\"739.5\" rx=\"137.7\" ry=\"52.5\"/><ellipse class=\"sc-bag-b\" cx=\"950.0\" cy=\"727.0\" rx=\"135.0\" ry=\"55.0\"/><ellipse class=\"sc-bag-t\" cx=\"950.0\" cy=\"712.0\" rx=\"130.9\" ry=\"50.0\"/><ellipse cx=\"923.0\" cy=\"703.0\" rx=\"81.0\" ry=\"27.5\" fill=\"url(#csBagH)\"/><path class=\"sc-bag-fold\" fill=\"none\" d=\"M828.5 739.5 Q950.0 789.5 1071.5 739.5\"/><polygon class=\"sc-pot-b\" points=\"1281.5,558.3 1344.5,558.3 1336.1,604.5 1289.9,604.5\"/><polygon points=\"1281.5,558.3 1344.5,558.3 1336.1,604.5 1289.9,604.5\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"1313.0\" cy=\"558.3\" rx=\"31.5\" ry=\"10.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(1313.0 556.2) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(1313.0 556.2) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(1313.0 556.2) rotate(26.0)\"/><polygon class=\"sc-pot-b\" points=\"252.5,553.8 315.5,553.8 307.1,600.0 260.9,600.0\"/><polygon points=\"252.5,553.8 315.5,553.8 307.1,600.0 260.9,600.0\" fill=\"url(#csPotG)\"/><ellipse class=\"sc-pot-t\" cx=\"284.0\" cy=\"553.8\" rx=\"31.5\" ry=\"10.5\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(-62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-38.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(-16.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(0.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(16.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(38.0)\"/><ellipse class=\"sc-lf0\" cx=\"0\" cy=\"-49.9\" rx=\"15.8\" ry=\"49.9\" transform=\"translate(284.0 551.7) rotate(62.0)\"/><ellipse class=\"sc-lf1\" cx=\"0\" cy=\"-63.5\" rx=\"15.8\" ry=\"63.5\" transform=\"translate(284.0 551.7) rotate(-26.0)\"/><ellipse class=\"sc-lf2\" cx=\"0\" cy=\"-77.2\" rx=\"15.8\" ry=\"77.2\" transform=\"translate(284.0 551.7) rotate(26.0)\"/><circle class=\"sc-dust\" cx=\"761\" cy=\"818\" r=\"4\"/><circle class=\"sc-dust\" cx=\"640\" cy=\"477\" r=\"3\"/><circle class=\"sc-dust\" cx=\"1094\" cy=\"747\" r=\"6\"/><circle class=\"sc-dust\" cx=\"735\" cy=\"103\" r=\"2\"/><circle class=\"sc-dust\" cx=\"498\" cy=\"550\" r=\"3\"/><circle class=\"sc-dust\" cx=\"896\" cy=\"300\" r=\"6\"/><circle class=\"sc-dust\" cx=\"146\" cy=\"154\" r=\"4\"/><circle class=\"sc-dust\" cx=\"378\" cy=\"686\" r=\"3\"/><circle class=\"sc-dust\" cx=\"443\" cy=\"158\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1458\" cy=\"137\" r=\"2\"/><circle class=\"sc-dust\" cx=\"977\" cy=\"590\" r=\"3\"/><circle class=\"sc-dust\" cx=\"1424\" cy=\"615\" r=\"2.5\"/><circle class=\"sc-dust\" cx=\"1240\" cy=\"255\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1147\" cy=\"489\" r=\"2\"/><circle class=\"sc-dust\" cx=\"364\" cy=\"269\" r=\"3\"/><circle class=\"sc-dust\" cx=\"854\" cy=\"835\" r=\"6\"/><circle class=\"sc-dust\" cx=\"956\" cy=\"675\" r=\"4\"/><circle class=\"sc-dust\" cx=\"1274\" cy=\"628\" r=\"2.5\"/><circle class=\"sc-dust\" cx=\"239\" cy=\"823\" r=\"4\"/><circle class=\"sc-dust\" cx=\"297\" cy=\"421\" r=\"2\"/><circle class=\"sc-dust\" cx=\"632\" cy=\"518\" r=\"6\"/><circle class=\"sc-dust\" cx=\"1204\" cy=\"833\" r=\"4\"/><circle class=\"sc-dust\" cx=\"564\" cy=\"865\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1102\" cy=\"727\" r=\"2\"/><circle class=\"sc-dust\" cx=\"410\" cy=\"796\" r=\"2\"/><circle class=\"sc-dust\" cx=\"1449\" cy=\"491\" r=\"3\"/></svg>";
   var ICX={
-    sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'
+    sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+    min:'<path d="M6 9l6 6 6-6"/>'
   };
+  function fsOK(){ var d=document; return !!(d.fullscreenEnabled||d.webkitFullscreenEnabled); }
+  function roomFs(){
+    var el=$("cvc"), d=document; if(!el) return;
+    try{
+      if(d.fullscreenElement||d.webkitFullscreenElement){ exitFs(); return; }
+      var f=el.requestFullscreen||el.webkitRequestFullscreen;
+      if(f){ var r=f.call(el); if(r&&r.catch) r.catch(function(){ toast("Full screen is blocked by your browser."); }); }
+    }catch(e){}
+  }
   // the two faces: theirs (big) and yours (small, bottom right). Rings around them move with how loud each of you is.
   function facesHtml(ring){
     var meN=(CH.me&&CH.me.name)||myName()||"You", st=CALL.st, wait=ring||st==="calling"||st==="connecting";
     var h='<span class="cvfaces"><span class="cvface them">'+(wait?'<i class="cvr"></i><i class="cvr r2"></i><i class="cvr r3"></i>':'')+
-      av(CALL.name,"","margin:0")+(CALL.rmuted&&st==="live"?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,12)+'</em>':'')+'</span>';
-    if(!ring) h+='<span class="cvface me">'+av(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,10)+'</em>':'')+'</span>';
+      avp(CALL.name,"","margin:0")+(CALL.rmuted&&st==="live"?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,12)+'</em>':'')+'</span>';
+    if(!ring) h+='<span class="cvface me">'+avp(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,10)+'</em>':'')+'</span>';
     return h+'</span>';
   }
-  function barHtml(label){
+  // the room: you and them, each on a beanbag. Same two faces as the small card, just bigger.
+  function seatsHtml(){
+    var meN=(CH.me&&CH.me.name)||myName()||"You", st=CALL.st, wait=st==="calling"||st==="connecting", live=st==="live";
+    return '<div class="cvseats">'+
+      '<div class="cvseat sme"><span class="cvface me">'+avp(meN,"","margin:0")+(CALL.muted?'<em class="cvbadge" title="You are muted">'+svg(IC.micoff,14)+'</em>':'')+'</span><span class="cvlip"></span>'+
+        '<span class="cvnm"><b>'+esc(meN)+'</b><i>you</i></span></div>'+
+      '<div class="cvseat sthem"><span class="cvface them">'+(wait?'<i class="cvr"></i><i class="cvr r2"></i><i class="cvr r3"></i>':'')+
+        avp(CALL.name,"","margin:0")+(CALL.rmuted&&live?'<em class="cvbadge" title="'+esc(name0())+' is muted">'+svg(IC.micoff,14)+'</em>':'')+'</span><span class="cvlip"></span>'+
+        '<span class="cvnm"><b>'+esc(CALL.name)+'</b></span></div></div>';
+  }
+  function barHtml(label,room){
     var st=CALL.st, S=CALL.share||{}, live=st==="live", ring=st==="ringing", h;
     function tile(id,cls,ic,lab,title,extra){ return '<button type="button" class="cvb '+cls+'" id="'+id+'" aria-label="'+title+'" title="'+title+'"'+(extra||"")+'>'+svg(ic,22)+'<span>'+lab+'</span></button>'; }
     var ptt=(VS.ptt&&CALL.stream&&!ring)?'<span class="cvptt'+(PTTD?' on':'')+'" id="cvptt">'+svg(IC.mic,12)+(PTTD?'Talking…':'Hold '+esc(keyLabel(VS.pttKey))+' to talk')+'</span>':'';
-    h='<div class="cvtop"><div class="cvwho">'+facesHtml(ring)+'<div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+
-      (ring?'':'<span class="cvq" id="cvq" role="img" aria-label="Connection quality" hidden><i></i><i></i><i></i><i></i></span>')+'</div><div class="cvbtns'+(ring?' two':'')+'">';
-    if(ring) h+=tile("cvdec","end",IC.phone,"Decline","Decline call")+tile("cvacc","ok",IC.phone,"Answer","Answer call");
+    var q='<span class="cvq" id="cvq" role="img" aria-label="Connection quality" hidden><i></i><i></i><i></i><i></i></span>', btns="";
+    if(ring) btns=tile("cvdec","end",IC.phone,"Decline","Decline call")+tile("cvacc","ok",IC.phone,"Answer","Answer call");
     else {
-      if(CALL.stream) h+=tile("cvmute","mute"+(CALL.muted?" on":"")+(VS.ptt?" ptt":""),CALL.muted?IC.micoff:IC.mic,CALL.muted?"Unmute":"Mute",CALL.muted?"Unmute":"Mute",' aria-pressed="'+CALL.muted+'"');
-      if(live&&shareSupported()) h+=tile("cvshare","shr"+(S.on?" on":""),S.on?ICV.screenoff:ICV.screen,S.on?"Stop":"Share",S.on?"Stop sharing your screen":"Share your screen (up to 720p, 60 fps)",' aria-pressed="'+!!S.on+'"'+(S.busy?" disabled":""));
-      if(CALL.rshare&&CALL.vhide) h+=tile("cvshow","show",ICV.watch,"Screen","Show their screen");
-      h+=tile("cvset","set",ICX.sliders,"Voice","Voice settings: microphone, speakers, noise suppression");
-      h+=tile("cvend","end",IC.phone,"End","End call");
+      if(CALL.stream) btns+=tile("cvmute","mute"+(CALL.muted?" on":"")+(VS.ptt?" ptt":""),CALL.muted?IC.micoff:IC.mic,CALL.muted?"Unmute":"Mute",CALL.muted?"Unmute":"Mute",' aria-pressed="'+CALL.muted+'"');
+      if(live&&shareSupported()) btns+=tile("cvshare","shr"+(S.on?" on":""),S.on?ICV.screenoff:ICV.screen,S.on?"Stop":"Share",S.on?"Stop sharing your screen":"Share your screen (up to 720p, 60 fps)",' aria-pressed="'+!!S.on+'"'+(S.busy?" disabled":""));
+      if(CALL.rshare&&CALL.vhide) btns+=tile("cvshow","show",ICV.watch,"Screen","Show their screen");
+      if(room) btns+=tile("cvchat","chat"+(CH.open?" on":""),IC.chat,"Chat",CH.open?"Close the chat":"Open the chat",' aria-pressed="'+!!CH.open+'"');
+      btns+=tile("cvset","set",ICX.sliders,"Voice","Voice settings: microphone, speakers, noise suppression");
+      btns+=tile("cvend","end",IC.phone,"End","End call");
     }
-    return h+'</div>';
+    if(room){
+      return '<div class="cvtop"><button type="button" class="cvx" id="cvmin" aria-label="Minimize the call" title="Minimize the call (Esc)">'+svg(ICX.min,22)+'</button>'+
+        '<div class="cvwho"><div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+q+
+        (fsOK()?'<button type="button" class="cvx" id="cvrfs" aria-label="Full screen" title="Full screen">'+svg(ICV.fs,19)+'</button>':'')+'</div>'+
+        seatsHtml()+'<div class="cvbtns">'+btns+'</div>';
+    }
+    h='<div class="cvtop"><div class="cvwho"'+(ring?'':' data-open="1" role="button" tabindex="0" aria-label="Open the call room" title="Open the call room"')+'>'+facesHtml(ring)+'<div class="cvtxt"><b>'+esc(CALL.name)+'</b><small class="'+(live?"live":"")+'" aria-live="polite">'+esc(label)+'</small><em class="cvstat" id="cvstat"></em>'+ptt+'</div></div>'+
+      (ring?'':q+'<button type="button" class="cvx cvexp" id="cvexp" aria-label="Open the call room" title="Open the call room">'+svg(ICV.big,17)+'</button>')+'</div><div class="cvbtns'+(ring?' two':'')+'">'+btns+'</div>';
+    return h;
   }
+  function narrowChat(){ var m=false; try{ m=!!(CH.open&&matchMedia("(max-width:860px)").matches); }catch(e){} return m; }
   function paintCall(){
     var el=$("cvc"); if(!el) return;
-    if(CALL.st==="idle"){ if(!el.hidden||el.firstChild||el.className!=="cvc"){ el.hidden=true; el.innerHTML=""; el.className="cvc"; el.removeAttribute("style"); } document.body.classList.remove("incall","cvdock"); CALL.vid=null; return; }
+    if(CALL.st==="idle"){ if(!el.hidden||el.firstChild||el.className!=="cvc"){ el.hidden=true; el.innerHTML=""; el.className="cvc"; el.removeAttribute("style"); } document.body.classList.remove("incall","cvdock","cvroom"); CALL.vid=null; CALL.view=""; return; }
     var st=CALL.st, ring=st==="ringing", live=st==="live", S=CALL.share||{}, rs=!!CALL.rshare, showV=rs&&!CALL.vhide&&!ring;
-    document.body.classList.add("incall"); document.body.classList.toggle("cvdock",!ring);
-    var cls="cvc "+(ring?"incoming":"dock")+(S.on?" sharing":"")+(rs?" rsharing":"")+(showV?" hasvid":"")+(showV&&CALL.big?" big":"")+(el.classList.contains("spk-me")?" spk-me":"")+(el.classList.contains("spk-them")?" spk-them":"");
+    if(!CALL.view) CALL.view=VS.room===false?"dock":"room";
+    // on a phone the chat covers the whole screen, so the room steps aside to the small strip while it is open
+    var room=!ring&&CALL.view==="room"&&!narrowChat();
+    document.body.classList.add("incall"); document.body.classList.toggle("cvdock",!ring&&!room); document.body.classList.toggle("cvroom",room);
+    var cls="cvc "+(ring?"incoming":room?"room":"dock")+(room&&(st==="calling"||st==="connecting")?" wait":"")+(S.on?" sharing":"")+(rs?" rsharing":"")+(showV?" hasvid":"")+(showV&&CALL.big&&!room?" big":"")+(el.classList.contains("spk-me")?" spk-me":"")+(el.classList.contains("spk-them")?" spk-them":"");
     if(el.className!==cls) el.className=cls;
+    el.setAttribute("role",room?"dialog":"region"); el.setAttribute("aria-label",room?"Call with "+CALL.name:"Call");
     el.hidden=false;
-    if(!$("cvbar")){ el.innerHTML=stageHtml()+'<div class="cvbar" id="cvbar"></div>'; wireStage(); }
+    if(!$("cvbar")){ el.innerHTML='<div class="cvfx" aria-hidden="true">'+CVSCENE+'</div>'+stageHtml()+'<div class="cvbar" id="cvbar"></div>'; wireStage(); }
     var label=live?mmss((Date.now()-CALL.t0)/1000)+(CALL.rmuted?" · muted":"")+(S.on&&rs?" · you both share":S.on?" · you're sharing":rs?" · "+name0()+" is sharing":"")+(CALL.q&&CALL.q.bars===1?" · weak connection":""):(CALL.msg||"Connecting…");
-    var bar=$("cvbar"), key=[st,CALL.name,CALL.muted,CALL.rmuted,!!S.on,!!S.busy,rs,!!CALL.vhide,!!CALL.stream,live&&shareSupported(),VS.ptt,PTTD,VS.pttKey].join("|");
+    var bar=$("cvbar"), key=[st,CALL.name,CALL.muted,CALL.rmuted,!!S.on,!!S.busy,rs,!!CALL.vhide,!!CALL.stream,live&&shareSupported(),VS.ptt,PTTD,VS.pttKey,room,!!CH.open].join("|");
     if(bar.getAttribute("data-k")!==key){
-      bar.innerHTML=barHtml(label); bar.setAttribute("data-k",key);
+      bar.innerHTML=barHtml(label,room); bar.setAttribute("data-k",key);
       var b; if((b=$("cvacc"))) b.onclick=acceptCall; if((b=$("cvdec"))) b.onclick=declineCall; if((b=$("cvend"))) b.onclick=hangUp; if((b=$("cvmute"))) b.onclick=toggleMute;
       if((b=$("cvshare"))) b.onclick=function(){ if(CALL.share.on) stopShare(); else startShare(); };
       if((b=$("cvshow"))) b.onclick=function(){ CALL.vhide=false; paintCall(); };
-      if((b=$("cvset"))) b.onclick=function(){ if(typeof openProfile==="function") openProfile("voice"); };
+      if((b=$("cvset"))) b.onclick=function(){ exitFs(); if(typeof openProfile==="function") openProfile("voice"); };
+      if((b=$("cvmin"))) b.onclick=function(){ exitFs(); CALL.view="dock"; paintCall(); };
+      if((b=$("cvexp"))) b.onclick=function(){ CALL.view="room"; paintCall(); };
+      if((b=bar.querySelector("[data-open]"))){ b.onclick=function(){ CALL.view="room"; paintCall(); }; b.onkeydown=function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); CALL.view="room"; paintCall(); } }; }
+      if((b=$("cvrfs"))) b.onclick=roomFs;
+      if((b=$("cvchat"))) b.onclick=function(){ exitFs(); if(CH.open) closeChat(); else openChat(); };
       paintQ();
     } else { var s=bar.querySelector("small"); if(s){ s.textContent=label; s.className=live?"live":""; } }
     // the viewer
@@ -22261,7 +22919,7 @@ var _sh=window.show;
     if(!SS.users.length) h+='<div class="chempty sm csempty"><p>Nobody is online right now.</p></div>';
     SS.users.forEach(function(u){
       var mine=u.ctl&&SS.mine[u.uid], other=u.ctl&&!mine;
-      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+av(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
+      h+='<div class="csu'+(mine?' on':'')+'" data-u="'+esc(u.uid)+'"><div class="cshead"><span class="csav">'+avp(u.name,"","width:38px;height:38px;font-size:15px;margin:0")+'</span><div class="csw"><b>'+esc(u.name)+'</b><small data-st>'+esc(stText(u))+'</small></div>'+
         (other?'<span class="cstag">'+esc(u.ctl.by)+' is guiding</span>':mine?'<span class="cstag live">Guiding</span>':'<button type="button" class="adm-b" data-take="1">Take control</button>')+'</div>'+(mine?ssPanel(u):'')+'</div>';
     });
     if(SS.msg) h+='<p class="cmmsg">'+esc(SS.msg)+'</p>';
@@ -22308,7 +22966,7 @@ var _sh=window.show;
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO,_call:CALL,_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
+  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
 })();
 
 /* ================= v225: living logos (light sweep + hover) ================= */
