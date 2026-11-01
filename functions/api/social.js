@@ -151,19 +151,30 @@ async function fsList(sa, coll, max) {
 }
 // Messages live in chat/<room>/m/<id>. Ids start with a zero padded timestamp, so ordering by document name is ordering by time.
 //   since  -> newer than that id, oldest first      before -> older than that id, newest `limit`      neither -> newest `limit`
+// "Newest first" reads order by `ts` (every message and marker has one) and NOT by document name: descending __name__ needs a
+// custom Firestore index and answers 400 (FAILED_PRECONDITION) on this project, while ascending __name__ and descending `ts` are
+// covered by the automatic single-field indexes.
+async function fsFail(r) {
+  let st = "";
+  try { const j = await r.json(), e = Array.isArray(j) ? (j[0] && j[0].error) : j && j.error; st = (e && e.status) || ""; } catch (e) {}
+  return new Error("firestore " + r.status + (st ? " " + st : ""));
+}
 async function fsMsgs(sa, room, since, limit, before) {
   const parent = "chat/" + room, ref = (id) => root(sa) + "/" + parent + "/m/" + id, sq = { from: [{ collectionId: "m" }], limit };
   if (since) {
     sq.where = { fieldFilter: { field: { fieldPath: "__name__" }, op: "GREATER_THAN", value: { referenceValue: ref(since) } } };
     sq.orderBy = [{ field: { fieldPath: "__name__" }, direction: "ASCENDING" }];
   } else {
-    if (before) sq.where = { fieldFilter: { field: { fieldPath: "__name__" }, op: "LESS_THAN", value: { referenceValue: ref(before) } } };
-    sq.orderBy = [{ field: { fieldPath: "__name__" }, direction: "DESCENDING" }];
+    if (before) { sq.where = { fieldFilter: { field: { fieldPath: "ts" }, op: "LESS_THAN_OR_EQUAL", value: { integerValue: String(Number(String(before).slice(0, 13)) + 50) } } }; sq.limit = limit + 25; }
+    sq.orderBy = [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }];
   }
   const r = await fetch(base(sa) + enp(parent) + ":runQuery", { method: "POST", headers: await authz(sa), body: JSON.stringify({ structuredQuery: sq }) });
-  if (!r.ok) throw new Error("firestore " + r.status);
-  const rows = (await r.json()).filter((x) => x.document).map((x) => Object.assign(fields(x.document), { id: docId(x.document) }));
-  return since ? rows : rows.reverse();
+  if (!r.ok) throw await fsFail(r);
+  let rows = (await r.json()).filter((x) => x.document).map((x) => Object.assign(fields(x.document), { id: docId(x.document) }));
+  if (since) return rows;
+  if (before) rows = rows.filter((m) => m.id < before);
+  rows.sort((x, y) => (x.id < y.id ? 1 : x.id > y.id ? -1 : 0));   // newest first
+  return rows.slice(0, limit).reverse();                              // oldest first
 }
 
 async function isAdmin(sa, uid) {
