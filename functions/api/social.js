@@ -7,7 +7,7 @@
 //   diag                           step by step health check for the signed-in player
 //   inbox  { lite? }               your DM list, blocked list, the room's latest message, and an incoming call
 //   msgs   { room | peer, since?, before? }   messages, oldest first
-//   send   { room | peer | to, text?, img?, reply? }
+//   send   { room | peer | to, text?, img?, gif?, gw?, gh?, reply? }   img = a JPEG or GIF data URL; gif = a link to a GIF on Giphy or Tenor
 //   react  { room | peer, id, e, on }
 //   img    { room | peer, id }     one image (data URL)
 //   del    { room | peer, id }     delete your own message (admins can delete room messages)
@@ -231,10 +231,20 @@ function cleanCmd(c) {
 const MAXIMG = 640000; // base64 characters; a Firestore document must stay under 1 MB
 function cleanImg(s) {
   s = String(s || "");
-  if (!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s) || s.length > MAXIMG) return null;
-  if (!s.slice(23).startsWith("/9j/")) return null; // JPEG magic bytes
-  return s;
+  if (s.length > MAXIMG) return null;
+  if (/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s)) return s.slice(23).startsWith("/9j/") ? s : null; // JPEG magic bytes
+  if (/^data:image\/gif;base64,[A-Za-z0-9+/=]+$/.test(s)) return /^R0lGOD[dl]h/.test(s.slice(22)) ? s : null; // "GIF87a" / "GIF89a"
+  return null;
 }
+// A GIF that lives on someone else's server (the picker): only https links on the GIF services' own picture servers, nothing else.
+const GIFHOST = /^(media\d*|i)\.giphy\.com$|^(media\d*|c)\.tenor\.com$/;
+function cleanGif(u) {
+  u = String(u || "");
+  if (u.length > 300 || !/^https:\/\/[a-z0-9.-]+\/[A-Za-z0-9\/._~%+=@:,-]*(\?[A-Za-z0-9._~%+=&,-]*)?$/.test(u)) return null;
+  if (!GIFHOST.test(u.slice(8).split("/")[0]) || /\.\./.test(u.split("?")[0])) return null;
+  return u;
+}
+const cleanDim = (n) => { n = Math.round(Number(n)); return n >= 16 && n <= 2000 ? n : 0; };
 const REACT = ["up", "heart", "lol", "wow", "sad", "fire", "party", "skull"];
 const CALLTTL = 60000;
 // ---- guided sessions (admin can open pages / scroll for a signed-in player who sees a banner and can stop it) ----
@@ -256,6 +266,7 @@ function pubMsg(m) {
   const rx = {};
   if (m.r && !m.del) for (const k in m.r) { const us = Object.keys(m.r[k] || {}).filter((u) => m.r[k][u]); if (us.length) rx[k] = us; }
   const o = { id: m.id, k: m.k || "", from: m.from || "", name: m.name || "", text: m.del ? "" : m.text || "", img: !m.del && !!m.img, del: !!m.del, ts: m.ts || 0, rx };
+  if (m.gif && !m.del && cleanGif(m.gif)) { o.gif = m.gif; if (cleanDim(m.gw) && cleanDim(m.gh)) { o.gw = cleanDim(m.gw); o.gh = cleanDim(m.gh); } }
   if (m.k === "del" || m.k === "re") { o.t = m.t || ""; }
   if (m.k === "re") { o.e = m.e || ""; o.u = m.u || ""; o.on = !!m.on; }
   if (m.k === "call") o.dur = m.dur || 0;
@@ -263,7 +274,7 @@ function pubMsg(m) {
   return o;
 }
 async function removeMsg(sa, room, id) {
-  await fsSet(sa, "chat/" + room + "/m/" + id, [[["del"], true], [["text"], ""], [["img"], false]]);
+  await fsSet(sa, "chat/" + room + "/m/" + id, [[["del"], true], [["text"], ""], [["img"], false], [["gif"], ""]]);
   await fsDelete(sa, "chatimg/" + id);
   await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "del"], [["t"], id], [["ts"], Date.now()]]);
 }
@@ -352,11 +363,13 @@ export async function onRequestPost({ request, env }) {
       if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
       const mu = await muteState(sa, uid);
       if (mu) return json({ error: "muted", message: "You're muted until " + new Date(mu.until).toUTCString().replace(" GMT", " UTC") + "." }, 403);
-      const text = cleanText(body.text), img = body.img ? cleanImg(body.img) : null;
+      const text = cleanText(body.text), img = body.img ? cleanImg(body.img) : null, gif = body.gif ? cleanGif(body.gif) : null;
       if (body.img && !img) return json({ error: "image", message: "That image can't be used. Try a different one." }, 400);
-      if (img && !cfg.images) return json({ error: "noimg", message: "Images are turned off right now." }, 403);
-      if (!text && !img) return json({ error: "empty", message: "Type a message first." }, 400);
-      if (!rate(uid, "msg", 6, 10000) || (img && !rate(uid, "img", 1, 8000))) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (body.gif && !gif) return json({ error: "gif", message: "That GIF can't be used. Try a different one." }, 400);
+      if (img && gif) return json({ error: "image", message: "Send a picture or a GIF, not both in one message." }, 400);
+      if ((img || gif) && !cfg.images) return json({ error: "noimg", message: "Images are turned off right now." }, 403);
+      if (!text && !img && !gif) return json({ error: "empty", message: "Type a message first." }, 400);
+      if (!rate(uid, "msg", 6, 10000) || (img && !rate(uid, "img", 1, 8000)) || (gif && !rate(uid, "gif", 1, 2500))) return json({ error: "slow", message: "Slow down a little." }, 429);
       let r;
       if (body.peer || body.to) {
         const peer = body.peer ? String(body.peer) : await uidOf(sa, body.to);
@@ -373,17 +386,19 @@ export async function onRequestPost({ request, env }) {
       const ent = [[["from"], uid], [["name"], name], [["text"], text], [["img"], !!img]];
       if (body.reply && okId(body.reply)) {
         const t = await fsGet(sa, "chat/" + r.key + "/m/" + body.reply);
-        if (t && !t.del && !t.k) { ent.push([["rt"], body.reply], [["rn"], String(t.name || "").slice(0, 30)], [["rq"], String(t.text || (t.img ? "Photo" : "")).slice(0, 80)]); }
+        if (t && !t.del && !t.k) { ent.push([["rt"], body.reply], [["rn"], String(t.name || "").slice(0, 30)], [["rq"], String(t.text || (t.gif ? "GIF" : t.img ? "Photo" : "")).slice(0, 80)]); }
       }
       const id = mkId(), ts = Date.now(); ent.push([["ts"], ts]);
+      const gw = cleanDim(body.gw), gh = cleanDim(body.gh);
+      if (gif) { ent.push([["gif"], gif]); if (gw && gh) ent.push([["gw"], gw], [["gh"], gh]); }
       if (img) await fsSet(sa, "chatimg/" + id, [[["room"], r.key], [["from"], uid], [["data"], img]]);
       await fsSet(sa, "chat/" + r.key + "/m/" + id, ent);
-      const snip = (text || "Photo").slice(0, 60);
+      const snip = (text || (gif ? "GIF" : "Photo")).slice(0, 60);
       if (r.dm) {
         await fsSet(sa, "chatidx/" + uid, [[["c", r.peer], { name: r.pn, ts, last: snip, from: uid }]]);
         await fsSet(sa, "chatidx/" + r.peer, [[["c", uid], { name, ts, last: snip, from: uid }]]);
       } else await fsSet(sa, "chatmeta/main", [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
-      const echo = { id, from: uid, name, text, img: !!img, ts }; ent.forEach(([p, v]) => { if (["rt", "rn", "rq"].includes(p[0])) echo[p[0]] = v; });
+      const echo = { id, from: uid, name, text, img: !!img, ts }; ent.forEach(([p, v]) => { if (["rt", "rn", "rq", "gif", "gw", "gh"].includes(p[0])) echo[p[0]] = v; });
       return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
     }
     if (a === "react") {
@@ -423,7 +438,7 @@ export async function onRequestPost({ request, env }) {
       if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
       if (m.from === uid) return json({ error: "self", message: "That's your own message." }, 400);
       const rid = r.key + "__" + body.id;
-      await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm]]);
+      await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm]]);
       return json({ ok: true });
     }
     if (a === "block") {
