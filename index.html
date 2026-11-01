@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v229">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v230">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -6364,6 +6364,68 @@ body.cvroom .chfab{display:none}
 .cvc.dock,.cvc.incoming{background:linear-gradient(160deg,hsl(var(--h) 72% 17% / .96),hsl(var(--h) 84% 8% / .97));-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid hsl(var(--h) 100% 86% / .24);box-shadow:0 30px 70px -22px #000,0 0 0 1px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16)}
 .cvc.dock .cvwho .av,.cvc.incoming .cvface .av{box-shadow:0 0 0 2px rgba(255,255,255,.55),0 8px 20px -6px rgba(0,0,0,.7)!important}
 .cvc.incoming{padding:26px 22px 20px}
+
+/* ======================= v230: GIFs in chat (white + blue only) ======================= */
+@keyframes gifShim230{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes gifPop230{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.chgifp[hidden]{display:none!important}
+
+/* the message bar now holds four buttons: let the row shrink to the screen instead of pushing past its edge */
+.chdr .chcomp{grid-template-columns:minmax(0,1fr)}
+.chdr .chrow{min-width:0}
+
+/* ---- the GIF button in the message bar: three letters in a tiny rounded tag ---- */
+.chdr .chgifb{flex:none}
+.chdr .chgifb span{display:block;padding:3px 5px 2px;border:1.7px solid currentColor;border-radius:7px;font:900 10px/1 Outfit,sans-serif;letter-spacing:.06em}
+.chdr .chgifb[aria-expanded="true"]{background:hsl(var(--h) 100% 62% / .26);color:#fff}
+:root[data-theme="light"] .chdr .chgifb[aria-expanded="true"]{background:hsl(var(--h) 100% 55% / .16);color:var(--acc2)}
+
+/* ---- the picker ---- */
+.chdr .chgifp{display:flex;flex-direction:column;height:min(372px,48vh);margin:0 0 8px;border-radius:22px;overflow:hidden;border:1px solid hsl(var(--h) 100% 80% / .24);transform-origin:bottom left;animation:gifPop230 .18s var(--ease) both}
+:root:not([data-theme="light"]) .chdr .chgifp{background:linear-gradient(180deg,hsl(var(--h) 64% 11% / .98),hsl(var(--h) 76% 6% / .98));box-shadow:0 22px 50px -22px #000,inset 0 1px 0 rgba(255,255,255,.07)}
+:root[data-theme="light"] .chdr .chgifp{background:#fff;border-color:hsl(var(--h) 80% 50% / .26);box-shadow:0 22px 44px -26px hsl(var(--h) 80% 30% / .6)}
+.chgifh{flex:none;padding:10px 10px 8px}
+.chdr .chgifp .chgifs{width:100%;height:42px;padding:0 16px;border-radius:99px!important;font:600 15px/1 Inter,system-ui,sans-serif;color:inherit;outline:none!important;-webkit-appearance:none;appearance:none;transition:border-color .16s,box-shadow .2s,background .16s}
+.chdr .chgifp .chgifs:focus,.chdr .chgifp .chgifs:focus-visible{outline:none!important;border-radius:99px!important}
+.chgifs::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:16px;width:16px;border-radius:50%;background:currentColor;opacity:.4;cursor:pointer;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center/70% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center/70% no-repeat}
+:root:not([data-theme="light"]) .chgifs{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff}
+:root:not([data-theme="light"]) .chgifs::placeholder{color:rgba(255,255,255,.52)}
+:root:not([data-theme="light"]) .chgifs:focus{background:rgba(255,255,255,.11);border-color:hsl(var(--h) 100% 76% / .85);box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .2)}
+:root[data-theme="light"] .chgifs{background:hsl(var(--h) 100% 97%);border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66}
+:root[data-theme="light"] .chgifs:focus{background:#fff;border-color:var(--acc2);box-shadow:0 0 0 4px hsl(var(--h) 100% 55% / .16)}
+.chgifg{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 10px 6px;scrollbar-width:thin}
+.chgifcols{display:flex;gap:6px;align-items:flex-start}
+.chgifc{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.chgifi{position:relative;display:block;width:100%;padding:0;border:0;border-radius:13px;overflow:hidden;cursor:pointer;background:linear-gradient(135deg,hsl(var(--h) 70% 24%),hsl(var(--h) 80% 15%));transition:transform .16s var(--ease),box-shadow .16s}
+:root[data-theme="light"] .chgifi{background:linear-gradient(135deg,hsl(var(--h) 100% 90%),hsl(var(--h) 100% 82%))}
+.chgifi img{display:block;width:100%;height:100%;object-fit:cover}
+.chgifi:hover,.chgifi:focus-visible{z-index:1;transform:scale(1.03);box-shadow:0 0 0 2.5px hsl(var(--h) 100% 70%),0 14px 26px -12px rgba(0,0,0,.7);outline:none}
+.chgifi:active{transform:scale(.97)}
+.chgifst{padding:12px 6px 10px;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
+.chgifst:empty{padding:0}
+.chgifst button{display:inline-block;margin-left:8px;padding:6px 14px;border-radius:99px;border:0;background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 96% 48%));color:#fff;font:800 12px/1 Outfit,sans-serif;cursor:pointer}
+.chgifst.load{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0}
+.chgifst.load i{display:block;height:98px;border-radius:13px;background:linear-gradient(100deg,hsl(var(--h) 60% 16%) 30%,hsl(var(--h) 80% 28%) 50%,hsl(var(--h) 60% 16%) 70%);background-size:200% 100%;animation:gifShim230 1.3s linear infinite}
+.chgifst.load i:nth-child(2){height:130px}.chgifst.load i:nth-child(3){height:120px}.chgifst.load i:nth-child(4){height:92px}
+:root[data-theme="light"] .chgifst.load i{background:linear-gradient(100deg,hsl(var(--h) 100% 93%) 30%,hsl(var(--h) 100% 86%) 50%,hsl(var(--h) 100% 93%) 70%);background-size:200% 100%}
+.chgiff{flex:none;padding:7px 12px 10px;text-align:center;font:800 9.5px/1 Outfit,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border-top:1px solid rgba(255,255,255,.07)}
+:root[data-theme="light"] .chgiff{border-top-color:hsl(var(--h) 80% 50% / .12)}
+
+/* ---- a GIF in a message ---- */
+.chdr .chgif{position:relative;min-width:120px;max-width:100%;background:hsl(var(--h) 60% 12%)}
+:root[data-theme="light"] .chdr .chgif{background:hsl(var(--h) 100% 94%)}
+.chdr .chgif img{width:100%;height:100%;max-height:300px;object-fit:contain}
+.chdr .chgif[style] img{max-height:none}
+.chdr .chgtag{position:absolute;left:9px;top:9px;z-index:2;padding:4px 7px 3px;border-radius:8px;font:900 10px/1 Outfit,sans-serif;letter-spacing:.09em;color:#fff;background:rgba(5,14,38,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);pointer-events:none}
+.chdr .chgst{display:block;width:100%;height:100%;max-height:300px;object-fit:contain;cursor:pointer}
+.chdr .chgif.still{cursor:pointer}
+.chdr .chgplay{position:absolute;left:50%;top:50%;z-index:2;width:56px;height:56px;margin:-28px 0 0 -28px;display:grid;place-items:center;padding:0 0 0 3px;border-radius:50%;border:2px solid rgba(255,255,255,.85);background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 96% 46%));color:#fff;cursor:pointer;box-shadow:0 0 0 6px hsl(var(--h) 100% 60% / .22),0 14px 28px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .18s var(--spring),box-shadow .16s}
+.chdr .chgplay:hover{transform:scale(1.08);box-shadow:0 0 0 9px hsl(var(--h) 100% 60% / .28),0 16px 30px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.4)}
+.chdr .chgplay:focus-visible{outline:2.5px solid #fff;outline-offset:2px}
+.chdr .chgplay svg{fill:currentColor;stroke:none}
+.chdr .chgif:hover img{transform:none}
+
+@media(prefers-reduced-motion:reduce){.chdr .chgifp{animation:none}.chgifst.load i{animation:none}.chgifi,.chdr .chgplay{transition:none}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -10241,7 +10303,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v229">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v230">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -12808,6 +12870,68 @@ body.cvroom .chfab{display:none}
 .cvc.dock,.cvc.incoming{background:linear-gradient(160deg,hsl(var(--h) 72% 17% / .96),hsl(var(--h) 84% 8% / .97));-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid hsl(var(--h) 100% 86% / .24);box-shadow:0 30px 70px -22px #000,0 0 0 1px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16)}
 .cvc.dock .cvwho .av,.cvc.incoming .cvface .av{box-shadow:0 0 0 2px rgba(255,255,255,.55),0 8px 20px -6px rgba(0,0,0,.7)!important}
 .cvc.incoming{padding:26px 22px 20px}
+
+/* ======================= v230: GIFs in chat (white + blue only) ======================= */
+@keyframes gifShim230{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes gifPop230{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.chgifp[hidden]{display:none!important}
+
+/* the message bar now holds four buttons: let the row shrink to the screen instead of pushing past its edge */
+.chdr .chcomp{grid-template-columns:minmax(0,1fr)}
+.chdr .chrow{min-width:0}
+
+/* ---- the GIF button in the message bar: three letters in a tiny rounded tag ---- */
+.chdr .chgifb{flex:none}
+.chdr .chgifb span{display:block;padding:3px 5px 2px;border:1.7px solid currentColor;border-radius:7px;font:900 10px/1 Outfit,sans-serif;letter-spacing:.06em}
+.chdr .chgifb[aria-expanded="true"]{background:hsl(var(--h) 100% 62% / .26);color:#fff}
+:root[data-theme="light"] .chdr .chgifb[aria-expanded="true"]{background:hsl(var(--h) 100% 55% / .16);color:var(--acc2)}
+
+/* ---- the picker ---- */
+.chdr .chgifp{display:flex;flex-direction:column;height:min(372px,48vh);margin:0 0 8px;border-radius:22px;overflow:hidden;border:1px solid hsl(var(--h) 100% 80% / .24);transform-origin:bottom left;animation:gifPop230 .18s var(--ease) both}
+:root:not([data-theme="light"]) .chdr .chgifp{background:linear-gradient(180deg,hsl(var(--h) 64% 11% / .98),hsl(var(--h) 76% 6% / .98));box-shadow:0 22px 50px -22px #000,inset 0 1px 0 rgba(255,255,255,.07)}
+:root[data-theme="light"] .chdr .chgifp{background:#fff;border-color:hsl(var(--h) 80% 50% / .26);box-shadow:0 22px 44px -26px hsl(var(--h) 80% 30% / .6)}
+.chgifh{flex:none;padding:10px 10px 8px}
+.chdr .chgifp .chgifs{width:100%;height:42px;padding:0 16px;border-radius:99px!important;font:600 15px/1 Inter,system-ui,sans-serif;color:inherit;outline:none!important;-webkit-appearance:none;appearance:none;transition:border-color .16s,box-shadow .2s,background .16s}
+.chdr .chgifp .chgifs:focus,.chdr .chgifp .chgifs:focus-visible{outline:none!important;border-radius:99px!important}
+.chgifs::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:16px;width:16px;border-radius:50%;background:currentColor;opacity:.4;cursor:pointer;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center/70% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center/70% no-repeat}
+:root:not([data-theme="light"]) .chgifs{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff}
+:root:not([data-theme="light"]) .chgifs::placeholder{color:rgba(255,255,255,.52)}
+:root:not([data-theme="light"]) .chgifs:focus{background:rgba(255,255,255,.11);border-color:hsl(var(--h) 100% 76% / .85);box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .2)}
+:root[data-theme="light"] .chgifs{background:hsl(var(--h) 100% 97%);border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66}
+:root[data-theme="light"] .chgifs:focus{background:#fff;border-color:var(--acc2);box-shadow:0 0 0 4px hsl(var(--h) 100% 55% / .16)}
+.chgifg{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 10px 6px;scrollbar-width:thin}
+.chgifcols{display:flex;gap:6px;align-items:flex-start}
+.chgifc{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.chgifi{position:relative;display:block;width:100%;padding:0;border:0;border-radius:13px;overflow:hidden;cursor:pointer;background:linear-gradient(135deg,hsl(var(--h) 70% 24%),hsl(var(--h) 80% 15%));transition:transform .16s var(--ease),box-shadow .16s}
+:root[data-theme="light"] .chgifi{background:linear-gradient(135deg,hsl(var(--h) 100% 90%),hsl(var(--h) 100% 82%))}
+.chgifi img{display:block;width:100%;height:100%;object-fit:cover}
+.chgifi:hover,.chgifi:focus-visible{z-index:1;transform:scale(1.03);box-shadow:0 0 0 2.5px hsl(var(--h) 100% 70%),0 14px 26px -12px rgba(0,0,0,.7);outline:none}
+.chgifi:active{transform:scale(.97)}
+.chgifst{padding:12px 6px 10px;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
+.chgifst:empty{padding:0}
+.chgifst button{display:inline-block;margin-left:8px;padding:6px 14px;border-radius:99px;border:0;background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 96% 48%));color:#fff;font:800 12px/1 Outfit,sans-serif;cursor:pointer}
+.chgifst.load{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0}
+.chgifst.load i{display:block;height:98px;border-radius:13px;background:linear-gradient(100deg,hsl(var(--h) 60% 16%) 30%,hsl(var(--h) 80% 28%) 50%,hsl(var(--h) 60% 16%) 70%);background-size:200% 100%;animation:gifShim230 1.3s linear infinite}
+.chgifst.load i:nth-child(2){height:130px}.chgifst.load i:nth-child(3){height:120px}.chgifst.load i:nth-child(4){height:92px}
+:root[data-theme="light"] .chgifst.load i{background:linear-gradient(100deg,hsl(var(--h) 100% 93%) 30%,hsl(var(--h) 100% 86%) 50%,hsl(var(--h) 100% 93%) 70%);background-size:200% 100%}
+.chgiff{flex:none;padding:7px 12px 10px;text-align:center;font:800 9.5px/1 Outfit,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border-top:1px solid rgba(255,255,255,.07)}
+:root[data-theme="light"] .chgiff{border-top-color:hsl(var(--h) 80% 50% / .12)}
+
+/* ---- a GIF in a message ---- */
+.chdr .chgif{position:relative;min-width:120px;max-width:100%;background:hsl(var(--h) 60% 12%)}
+:root[data-theme="light"] .chdr .chgif{background:hsl(var(--h) 100% 94%)}
+.chdr .chgif img{width:100%;height:100%;max-height:300px;object-fit:contain}
+.chdr .chgif[style] img{max-height:none}
+.chdr .chgtag{position:absolute;left:9px;top:9px;z-index:2;padding:4px 7px 3px;border-radius:8px;font:900 10px/1 Outfit,sans-serif;letter-spacing:.09em;color:#fff;background:rgba(5,14,38,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);pointer-events:none}
+.chdr .chgst{display:block;width:100%;height:100%;max-height:300px;object-fit:contain;cursor:pointer}
+.chdr .chgif.still{cursor:pointer}
+.chdr .chgplay{position:absolute;left:50%;top:50%;z-index:2;width:56px;height:56px;margin:-28px 0 0 -28px;display:grid;place-items:center;padding:0 0 0 3px;border-radius:50%;border:2px solid rgba(255,255,255,.85);background:linear-gradient(180deg,hsl(var(--h) 100% 62%),hsl(var(--h) 96% 46%));color:#fff;cursor:pointer;box-shadow:0 0 0 6px hsl(var(--h) 100% 60% / .22),0 14px 28px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .18s var(--spring),box-shadow .16s}
+.chdr .chgplay:hover{transform:scale(1.08);box-shadow:0 0 0 9px hsl(var(--h) 100% 60% / .28),0 16px 30px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.4)}
+.chdr .chgplay:focus-visible{outline:2.5px solid #fff;outline-offset:2px}
+.chdr .chgplay svg{fill:currentColor;stroke:none}
+.chdr .chgif:hover img{transform:none}
+
+@media(prefers-reduced-motion:reduce){.chdr .chgifp{animation:none}.chgifst.load i{animation:none}.chgifi,.chdr .chgplay{transition:none}}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -15188,7 +15312,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v229js">
+<script id="v230js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -16555,8 +16679,8 @@ var _sh=window.show;
       '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
       '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
       '<div class="chbody" id="chbody" role="log" aria-live="polite"></div><button class="chnew" id="chnew" type="button" hidden>New messages &darr;</button><button class="chdown" id="chdown" type="button" hidden aria-label="Jump to the latest messages">'+svg(IC.down,18)+'</button>'+
-      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div>'+
-      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button>'+
+      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div><div class="chgifp" id="chgifp" role="dialog" aria-label="Choose a GIF" hidden></div>'+
+      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button><button class="chb chgifb" id="chgif" type="button" aria-label="Find a GIF" aria-haspopup="dialog" aria-expanded="false" hidden><span aria-hidden="true">GIF</span></button>'+
       '<textarea id="chtx" rows="1" maxlength="500" placeholder="Write a message" aria-label="Message"></textarea><button class="chsend" id="chsend" type="submit" aria-label="Send">'+svg(IC.send,18)+'</button></div>'+
       '<span class="chcnt" id="chcnt" hidden aria-live="polite"></span><input type="file" id="chfile" accept="image/*" hidden></form>';
     document.body.appendChild(d);
@@ -16569,6 +16693,7 @@ var _sh=window.show;
     $("chnew").onclick=function(){ scrollEnd(); }; $("chdown").onclick=function(){ scrollEnd(); };
     $("chatt").onclick=function(){ $("chfile").click(); };
     $("chsm").onclick=function(e){ e.stopPropagation(); toggleEmoji(); };
+    $("chgif").onclick=function(e){ e.stopPropagation(); toggleGif(); };
     $("chfile").onchange=function(){ var f=this.files&&this.files[0]; this.value=""; if(f) attach(f); };
     $("chcomp").onsubmit=function(e){ e.preventDefault(); sendNow(); };
     var tx=$("chtx");
@@ -16578,14 +16703,15 @@ var _sh=window.show;
     d.addEventListener("dragover",function(e){ if(CH.view==="thread") e.preventDefault(); });
     d.addEventListener("drop",function(e){ if(CH.view!=="thread") return; var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f&&f.type.indexOf("image/")===0){ e.preventDefault(); attach(f); } });
     $("chbody").addEventListener("scroll",function(){ var b=$("chbody"); CH.stick=b.scrollHeight-b.scrollTop-b.clientHeight<90; if(CH.stick) $("chnew").hidden=true; var dn=$("chdown"); if(dn) dn.hidden=CH.stick||b.scrollHeight-b.clientHeight<200; });
-    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
+    $("chbody").addEventListener("load",function(e){ if(e.target&&e.target.tagName==="IMG"&&CH.stick&&CH.view==="thread"){ var b=$("chbody"); b.scrollTop=b.scrollHeight; } },true);
+    document.addEventListener("click",function(e){ var gp=$("chgifp"); if(gp&&!gp.hidden&&!gp.contains(e.target)&&!(e.target.closest&&e.target.closest("#chgif"))) closeGif(); var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
     document.addEventListener("keydown",function(e){
       if(e.key!=="Escape") return;
       if(!$("chlb").hidden){ $("chlb").hidden=true; return; }
       var cv=$("cvc"); if(cv&&cv.classList.contains("big")){ CALL.big=false; paintCall(); return; }
       if(cv&&cv.classList.contains("room")&&!CH.open&&!document.querySelector(".modal.on")&&!document.fullscreenElement&&!document.webkitFullscreenElement){ CALL.view="dock"; paintCall(); return; }
       if(!CH.open) return;
-      var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
+      var gpp=$("chgifp"); if(gpp&&!gpp.hidden){ closeGif(true); return; } var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
       if(CH.sel){ CH.sel=""; renderThread(); return; }
       closeChat();
     });
@@ -16600,9 +16726,9 @@ var _sh=window.show;
     CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx(); if(CALL.st!=="idle") paintCall();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; closeGif(); document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
   function go(v,room){
-    saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
+    saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true; closeGif();
     if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.shown=false; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=DRAFTS[draftKey(room)]||""; $("chtx").style.height="auto"; updCount(); paintReply(); setTimeout(fitTx,30); }
     if(v==="thread") loadThread();
     render();
@@ -16769,7 +16895,7 @@ var _sh=window.show;
     if(mutedNow){ tx.disabled=true; tx.placeholder="You're muted for now"; }
     else if(blocked){ tx.disabled=true; tx.placeholder="You blocked this player"; }
     else { tx.disabled=false; tx.placeholder=r.dm?"Message "+r.name:"Write a message"; }
-    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled;
+    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled; paintGifBtn();
     var items=[], lastDay="", prev=null, me=CH.me, myId=me&&me.uid;
     if(CH.more) items.push(["more",'<button class="chmore" id="chmoreb" type="button">'+svg(IC.load,14)+' Load earlier messages</button>']);
     var list=CH.msgs.filter(function(m){ return m.k!=="del"&&m.k!=="re"; });
@@ -16780,7 +16906,7 @@ var _sh=window.show;
     });
     var pends=CH.pendMsgs.filter(function(p){ return sameRoom(p.room,r); });
     pends.forEach(function(p){
-      items.push(["p:"+p.tmp,'<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>':'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
+      items.push(["p:"+p.tmp,'<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?(/^data:image\/gif/.test(p.img)?gifBox("p:"+p.tmp,p.img,0,0,"",1):'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>'):'')+(p.gif?gifBox("p:"+p.tmp,p.gif,p.gw,p.gh,"",1):'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
         '<time>'+(p.state==="failed"?'Not sent':'Sending…')+'</time></div>'+(p.state==="failed"?'<div class="chact"><button type="button" data-cpend="retry" data-ptmp="'+esc(p.tmp)+'">'+svg(IC.retry,15)+' Try again</button><button type="button" data-cpend="drop" data-ptmp="'+esc(p.tmp)+'" class="warn">'+svg(IC.trash,15)+' Discard</button></div>':'')+'</div>']);
     });
     if(CH.err&&!pends.length) items.push(["note",'<div class="chnote bad">'+esc(CH.err)+'</div>']);
@@ -16801,7 +16927,9 @@ var _sh=window.show;
     if(m.del) h+='<em>Message removed</em>';
     else {
       if(m.rt) h+='<div class="chq" data-cq="'+esc(m.rt)+'"><b>'+esc(m.rn||"Someone")+'</b><span>'+esc(m.rq||"")+'</span></div>';
-      if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.img&&/^data:image\/gif/.test(CH.imgs[m.id]||"")) h+=gifBox(m.id,CH.imgs[m.id],0,0,' data-img="'+esc(m.id)+'"');
+      else if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.gif&&gifOk(m.gif)) h+=gifBox(m.id,m.gif,m.gw,m.gh,' data-gif="'+esc(m.id)+'"');
       if(m.text) h+='<p>'+rich(m.text)+'</p>';
     }
     h+='<time>'+when(m.ts)+'</time></div>';
@@ -16826,6 +16954,7 @@ var _sh=window.show;
     for(i=0;i<ms.length;i++) ms[i].onclick=function(e){
       var id=this.getAttribute("data-cid"), t=e.target;
       if(t.closest&&(t.closest(".chact")||t.closest(".chrx")||t.closest("a"))) return;
+      var gb=t.closest&&t.closest(".chgif.still"); if(gb){ var gid=gb.getAttribute("data-gif")||gb.getAttribute("data-img"); if(gid){ gifPlay(gid); return; } }
       if(t.closest&&t.closest(".chimg img")){ var lb=$("chlb"); lb.querySelector("img").src=t.src; lb.hidden=false; return; }
       var q=t.closest&&t.closest("[data-cq]"); if(q){ jumpTo(q.getAttribute("data-cq")); return; }
       CH.sel=CH.sel===id?"":id; renderThread(); if(CH.sel) revealSel();
@@ -16835,7 +16964,7 @@ var _sh=window.show;
     var rx=body.querySelectorAll(".chrxb"); for(i=0;i<rx.length;i++) rx[i].onclick=function(e){ e.stopPropagation(); react(this.getAttribute("data-cid"),this.getAttribute("data-crx")); };
     var pb=body.querySelectorAll("[data-cpend]"); for(i=0;i<pb.length;i++) pb[i].onclick=function(){ var tmp=this.getAttribute("data-ptmp"), k=this.getAttribute("data-cpend"); if(k==="drop"){ CH.pendMsgs=CH.pendMsgs.filter(function(p){ return p.tmp!==tmp; }); renderThread(); } else retry(tmp); };
     var mb=$("chmoreb"); if(mb) mb.onclick=loadEarlier;
-    fillImages();
+    fillImages(); freezeGifs(body);
   }
   function jumpTo(id){ var el=$("chbody").querySelector('.chm[data-cid="'+id+'"]'); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.add("flash"); setTimeout(function(){ el.classList.remove("flash"); },1400); } else toast("That message is further back. Load earlier messages."); }
   function act(b){
@@ -16844,14 +16973,14 @@ var _sh=window.show;
     if(k==="prof"){ var nm=b.getAttribute("data-cn"); closeChat(); try{ show("player",nm); }catch(e){} return; }
     if(k==="react"){ var kk=b.getAttribute("data-ck"); CH.sel=""; react(id,kk); return; }
     CH.sel="";
-    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
+    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.gif?"GIF":m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
     if(k==="copy"&&m){ try{ navigator.clipboard.writeText(m.text).then(function(){ toast("Copied"); },function(){ toast("Copy blocked by browser"); }); }catch(e){ toast("Copy blocked by browser"); } renderThread(); return; }
     renderThread();
     if(k==="del") call("del",Object.assign({id:id},key)).then(function(x){ if(x&&x.ok){ markDel(id); renderThread(); poll(); } else toast(whyNot(x)); });
     if(k==="rep") call("report",Object.assign({id:id},key)).then(function(x){ toast(x&&x.ok?"Reported. Thanks, an admin will take a look.":whyNot(x)); });
     if(k==="mute") call("mute",{uid:b.getAttribute("data-cuid"),hours:24}).then(function(x){ toast(x&&x.ok?"Muted for 24 hours":whyNot(x)); });
   }
-  function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; } }); delete CH.imgs[id]; }
+  function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; m.gif=""; } }); delete CH.imgs[id]; }
   function react(id,k){
     var m=findMsg(id), me=CH.me; if(!m||!me) return;
     var arr=(m.rx&&m.rx[k])||[], has=arr.indexOf(me.uid)>=0, on=!has;
@@ -16870,7 +16999,7 @@ var _sh=window.show;
   }
   function toggleEmoji(){
     var p=$("chemo"); if(!p.hidden){ p.hidden=true; return; }
-    p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
+    closeGif(); p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
     var bs=p.querySelectorAll("button"), i; for(i=0;i<bs.length;i++) bs[i].onclick=function(ev){ ev.stopPropagation(); var t=$("chtx"), s=t.selectionStart==null?t.value.length:t.selectionStart, e=t.selectionEnd==null?s:t.selectionEnd; t.value=t.value.slice(0,s)+this.textContent+t.value.slice(e); var c=s+this.textContent.length; t.focus(); try{ t.setSelectionRange(c,c); }catch(x){} };
   }
   function toggleMenu(){
@@ -16902,15 +17031,15 @@ var _sh=window.show;
     while(imgBusy<3&&imgQ.length){
       (function(id){
         imgBusy++; var r=CH.room, key=r&&r.dm?{peer:r.peer}:{}; if(r&&r.dm&&!r.peer){ imgBusy--; delete CH.imgs[id]; return; }
-        call("img",Object.assign({id:id},key)).then(function(x){ imgBusy--; if(x&&x.ok&&/^data:image\/jpeg;base64,/.test(x.data)) CH.imgs[id]=x.data; else CH.imgs[id]="x"; if(CH.open&&CH.view==="thread") renderThread(); pump(); });
+        call("img",Object.assign({id:id},key)).then(function(x){ imgBusy--; if(x&&x.ok&&/^data:image\/(jpeg|gif);base64,/.test(x.data)) CH.imgs[id]=x.data; else CH.imgs[id]="x"; if(CH.open&&CH.view==="thread") renderThread(); pump(); });
       })(imgQ.shift());
     }
   }
   function attach(file){
     if(!file||file.type.indexOf("image/")!==0){ toast("Pick a photo"); return; }
     if(CH.inbox&&CH.inbox.images===false){ toast("Photos are turned off right now."); return; }
-    squeeze(file,function(url){
-      if(!url){ toast("Couldn't use that photo"); return; }
+    squeeze(file,function(url,why){
+      if(!url){ toast(why==="big"?"That GIF is too big (about 450 KB is the most)"+(gifReady()?". Try the GIF button instead.":". Try a smaller one."):why==="bad"&&file.type==="image/gif"?"Couldn't use that GIF":"Couldn't use that photo"); return; }
       CH.pend=url; var p=$("chprev"); p.hidden=false; p.innerHTML='<img src="'+url+'" alt="Photo to send"><button type="button" aria-label="Remove photo">'+svg(IC.x,14)+'</button>';
       p.querySelector("button").onclick=function(){ CH.pend=null; p.hidden=true; p.innerHTML=""; };
       $("chtx").focus();
@@ -16919,6 +17048,8 @@ var _sh=window.show;
   function squeeze(file,cb){
     var fr=new FileReader();
     fr.onerror=function(){ cb(null); };
+    // a GIF is sent exactly as it is (squeezing it onto a canvas would freeze it into one still picture)
+    if(file.type==="image/gif"){ fr.onload=function(){ var u=String(fr.result||""); if(!/^data:image\/gif;base64,R0lGOD[dl]h/.test(u)) return cb(null,"bad"); if(u.length>GIFMAX) return cb(null,"big"); var gi=new Image(); gi.onload=function(){ cb(u); }; gi.onerror=function(){ cb(null,"bad"); }; gi.src=u; }; fr.readAsDataURL(file); return; }
     fr.onload=function(){
       var im=new Image();
       im.onerror=function(){ cb(null); };
@@ -16938,6 +17069,96 @@ var _sh=window.show;
     fr.readAsDataURL(file);
   }
 
+  /* ---- v230: GIFs ----
+     Two ways to send one:
+       1. Attach a .gif file (button, paste or drag in). It is sent exactly as it is, so it keeps moving. About 450 KB at most.
+       2. Press GIF and pick one from Giphy. That sends only a link to Giphy's own picture server; the chat never keeps a copy.
+     The server only accepts links on the GIF services' own picture hosts, and the page checks the same rule before it shows one. */
+  var GIPHY_KEY="";    // a free key from developers.giphy.com goes here. Until there is one, the GIF button stays hidden.
+  var GIFMAX=620000, GF={q:"",items:[],off:0,busy:false,err:false,done:false,seq:0,tm:0,hs:[0,0],drawn:0};
+  CH.gifOn={};
+  function gifOk(u){ u=String(u||""); return u.length<=300&&/^https:\/\/((media\d*|i)\.giphy\.com|(media\d*|c)\.tenor\.com)\/[A-Za-z0-9\/._~%+=@:,-]*(\?[A-Za-z0-9._~%+=&,-]*)?$/.test(u)&&u.split("?")[0].indexOf("..")<0; }
+  function gifReady(){ return !!GIPHY_KEY&&!(CH.inbox&&CH.inbox.images===false); }
+  function motionOK(){ try{ return !matchMedia("(prefers-reduced-motion:reduce)").matches; }catch(e){ return true; } }
+  // how big a GIF is drawn in a message: the picture's own proportions, at most 280 wide and 300 tall
+  function gifSize(w,h){ w=+w; h=+h; if(!(w>=16&&h>=16)) return ""; var s=Math.min(1,280/w,300/h), W=Math.max(120,Math.round(w*s)); return "width:"+W+"px;aspect-ratio:"+Math.round(w)+" / "+Math.round(h)+";"; }
+  // one GIF in a message. People who asked their device for less motion get a still picture with a play button first.
+  function gifBox(id,src,w,h,attr,force){
+    var still=!force&&!motionOK()&&!CH.gifOn[id], sz=gifSize(w,h);
+    return '<div class="chimg chgif'+(still?' still':'')+'"'+attr+(sz?' style="'+sz+'"':'')+'><img src="'+esc(src)+'" alt="GIF" decoding="async"'+(still?' data-st="1"':' loading="lazy"')+'><span class="chgtag">GIF</span>'+
+      (still?'<button type="button" class="chgplay" data-gplay="'+esc(id)+'" aria-label="Play GIF">'+svg('<path d="M8 5.5v13l11-6.5z"/>',20)+'</button>':'')+'</div>';
+  }
+  // stills: draw the first picture onto a canvas in place of the moving one
+  function freezeGifs(root){
+    var im=root.querySelectorAll(".chgif.still img[data-st]"), i;
+    for(i=0;i<im.length;i++) (function(img){
+      if(img.__fz) return; img.__fz=1;
+      function go(){ try{ var c=document.createElement("canvas"); c.width=img.naturalWidth||1; c.height=img.naturalHeight||1; c.getContext("2d").drawImage(img,0,0); c.className="chgst"; c.setAttribute("role","img"); c.setAttribute("aria-label","GIF, paused"); img.parentNode.replaceChild(c,img); }catch(e){} }
+      if(img.complete&&img.naturalWidth) go(); else img.addEventListener("load",go,{once:true});
+    })(im[i]);
+  }
+  function gifPlay(id){ CH.gifOn[id]=1; renderThread(); }
+  // ---- the picker ----
+  function paintGifBtn(){ var b=$("chgif"); if(!b) return; var off=$("chtx").disabled; b.hidden=!gifReady(); b.disabled=off; if(off||!gifReady()) closeGif(); }
+  function closeGif(focus){ var p=$("chgifp"); if(!p||p.hidden) return; p.hidden=true; GF.seq++; clearTimeout(GF.tm); GF.busy=false; var b=$("chgif"); if(b) b.setAttribute("aria-expanded","false"); if(focus&&b&&!b.hidden){ try{ b.focus(); }catch(e){} } }
+  function toggleGif(){
+    var p=$("chgifp"); if(!p||!gifReady()) return;
+    if(!p.hidden){ closeGif(true); return; }
+    $("chemo").hidden=true; $("chgif").setAttribute("aria-expanded","true");
+    p.innerHTML='<div class="chgifh"><input type="search" class="chgifs" id="chgifs" placeholder="Search GIFs" aria-label="Search GIFs" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60" enterkeyhint="search"></div>'+
+      '<div class="chgifg" id="chgifg"><div class="chgifcols"><div class="chgifc"></div><div class="chgifc"></div></div><div class="chgifst" id="chgifst" aria-live="polite"></div></div><div class="chgiff">Powered by GIPHY</div>';
+    p.hidden=false; var si=$("chgifs"), g=$("chgifg"); si.value=GF.q;
+    si.oninput=function(){ clearTimeout(GF.tm); GF.tm=setTimeout(function(){ gifSearch(si.value); },380); };
+    si.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); clearTimeout(GF.tm); gifSearch(si.value); } };
+    g.onscroll=function(){ if(g.scrollHeight-g.scrollTop-g.clientHeight<200) gifMore(); };
+    g.onclick=function(e){ var t=e.target, b=t.closest&&t.closest(".chgifi"); if(b){ e.stopPropagation(); gifSend(GF.items[+b.getAttribute("data-gi")]); return; } if(t.closest&&t.closest("#chgifr")){ e.stopPropagation(); gifSearch(GF.q); } };
+    GF.drawn=0; GF.hs=[0,0]; gifPaint();
+    if(!GF.items.length) gifSearch(GF.q);
+    try{ si.focus({preventScroll:true}); }catch(e){}
+  }
+  function gifSearch(q){ q=String(q||"").trim().slice(0,60); GF.q=q; GF.items=[]; GF.off=0; GF.done=false; GF.err=false; GF.seq++; GF.drawn=0; GF.hs=[0,0]; GF.busy=false; var g=$("chgifg"); if(g) g.scrollTop=0; gifPaint(); gifMore(); }
+  function gifNorm(x){
+    var im=(x&&x.images)||{}, th=im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=im.downsized_medium||im.downsized||im.fixed_height||im.fixed_width;
+    if(!th||!big||!th.url||!big.url) return null;
+    var u=String(big.url).split("?")[0], tu=String(th.url).split("?")[0];
+    if(!gifOk(u)||!gifOk(tu)) return null;
+    var tw=+th.width||200, thh=+th.height||150;
+    return {id:String(x.id||u),title:String(x.title||"GIF").replace(/\s+/g," ").slice(0,80)||"GIF",thumb:tu,url:u,w:+big.width||tw,h:+big.height||thh,tw:tw,th:thh};
+  }
+  function gifMore(){
+    if(GF.busy||GF.done||!GIPHY_KEY) return;
+    var seq=GF.seq; GF.busy=true; gifPaint();
+    var url="https://api.giphy.com/v1/gifs/"+(GF.q?"search":"trending")+"?api_key="+encodeURIComponent(GIPHY_KEY)+"&limit=24&offset="+GF.off+"&rating=pg&bundle=messaging_non_clips"+(GF.q?"&lang=en&q="+encodeURIComponent(GF.q):"");
+    fetch(url).then(function(r){ if(!r.ok) throw new Error("http "+r.status); return r.json(); }).then(function(j){
+      if(seq!==GF.seq) return;
+      var d=(j&&j.data)||[]; d.forEach(function(x){ var it=gifNorm(x); if(it&&!GF.items.some(function(y){ return y.id===it.id; })) GF.items.push(it); });
+      GF.off+=d.length; var tot=j&&j.pagination&&+j.pagination.total_count; GF.done=!d.length||GF.off>=Math.min(tot||1e9,120);
+      GF.busy=false; gifPaint();
+    }).catch(function(){ if(seq!==GF.seq) return; GF.busy=false; GF.err=true; GF.done=true; gifPaint(); });
+  }
+  // new pictures are added to the shorter of the two columns, so the grid stays even and nothing already shown moves
+  function gifPaint(){
+    var g=$("chgifg"); if(!g) return; var cs=g.querySelectorAll(".chgifc"), st=$("chgifst"), c0=[], c1=[];
+    if(!GF.drawn){ cs[0].innerHTML=""; cs[1].innerHTML=""; GF.hs=[0,0]; }
+    for(var i=GF.drawn;i<GF.items.length;i++){
+      var it=GF.items[i], c=GF.hs[0]<=GF.hs[1]?0:1;
+      (c?c1:c0).push('<button type="button" class="chgifi" data-gi="'+i+'" aria-label="Send GIF: '+esc(it.title)+'" style="aspect-ratio:'+it.tw+' / '+it.th+'"><img src="'+esc(it.thumb)+'" alt="" loading="lazy" decoding="async"></button>');
+      GF.hs[c]+=it.th/it.tw;
+    }
+    GF.drawn=GF.items.length;
+    if(c0.length) cs[0].insertAdjacentHTML("beforeend",c0.join("")); if(c1.length) cs[1].insertAdjacentHTML("beforeend",c1.join(""));
+    st.className="chgifst"+(GF.busy&&!GF.items.length?" load":"");
+    st.innerHTML=GF.err?'<span>Couldn\'t load GIFs. Check your connection.</span><button type="button" id="chgifr">Try again</button>':
+      GF.busy?(GF.items.length?'<span>Loading…</span>':'<i></i><i></i><i></i><i></i>'):(!GF.items.length?'<span>'+(GF.q?'No GIFs found for “'+esc(GF.q)+'”.':'Nothing to show right now.')+'</span>':"");
+  }
+  // a picked GIF is sent on its own straight away, and whatever you were typing stays where it is
+  function gifSend(it){
+    if(!it||!gifOk(it.url)) return; var tx=$("chtx"); if(tx.disabled){ toast("You can't send messages here right now."); return; }
+    var p={tmp:"t"+(++tmpN),text:"",img:null,gif:it.url,gw:it.w,gh:it.h,reply:CH.reply?CH.reply.id:null,state:"sending",room:CH.room};
+    CH.reply=null; paintReply(); closeGif(); CH.pendMsgs.push(p); CH.stick=true; renderThread(); deliver(p); if(LS.get("tml_chat_snd","1")==="1") sfx("sent");
+    try{ tx.focus({preventScroll:true}); }catch(e){}
+  }
+
   /* ---- sending, receiving, polling ---- */
   function keyOf(){ var r=CH.room; return r.dm?(r.peer?{peer:r.peer}:{to:r.to||r.name}):{}; }
   var tmpN=0;
@@ -16951,11 +17172,11 @@ var _sh=window.show;
   function deliver(p){
     p.state="sending";
     var key=p.room.dm?(p.room.peer?{peer:p.room.peer}:{to:p.room.to||p.room.name}):{};
-    call("send",Object.assign({text:p.text,img:p.img||undefined,reply:p.reply||undefined},key)).then(function(r){
+    call("send",Object.assign({text:p.text,img:p.img||undefined,gif:p.gif||undefined,gw:p.gw||undefined,gh:p.gh||undefined,reply:p.reply||undefined},key)).then(function(r){
       if(r&&r.ok){
         CH.pendMsgs=CH.pendMsgs.filter(function(x){ return x!==p; });
         if(r.peer&&p.room.dm&&!p.room.peer) p.room.peer=r.peer;
-        if(sameRoom(CH.room,p.room)){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
+        if(sameRoom(CH.room,p.room)){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; if(r.msg.gif||(p.img&&/^data:image\/gif/.test(p.img))) CH.gifOn[r.msg.id]=1; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
         refreshInbox(); schedule(2500);
       } else {
         p.state="failed"; p.err=whyNot(r); CH.err=p.err; sfx("fail"); if(r&&r.error==="muted") refreshInbox();
@@ -17929,7 +18150,7 @@ var _sh=window.show;
     if(!AD.rep.length) h+='<p class="note" style="margin:0 0 6px">Nothing reported. Players can report a message by tapping it.</p>';
     AD.rep.forEach(function(r){
       h+='<div class="cmrep" data-cr="'+esc(r.id)+'"><div class="cmwho"><span>'+esc(r.byName||"Someone")+' reported <b>'+esc(r.fromName||"a player")+'</b></span><small>'+(r.dm?'Private message':'Timmylist Room')+' &middot; '+agoLong(r.ts)+(r.why?' &middot; &ldquo;'+esc(r.why)+'&rdquo;':'')+'</small></div>'+
-        '<blockquote>'+(r.text?esc(r.text).replace(/\n/g,"<br>"):'<em>No text</em>')+'</blockquote>'+(r.img?'<div class="cmimg" data-ri="'+esc(r.id)+'"><button type="button" class="adm-b" data-ca="view">View photo</button></div>':'')+
+        '<blockquote>'+(r.text?esc(r.text).replace(/\n/g,"<br>"):'<em>No text</em>')+'</blockquote>'+(r.gif&&gifOk(r.gif)?'<div class="cmimg"><img src="'+esc(r.gif)+'" alt="Reported GIF" style="max-width:100%;max-height:260px;border-radius:12px"></div>':'')+(r.img?'<div class="cmimg" data-ri="'+esc(r.id)+'"><button type="button" class="adm-b" data-ca="view">View photo</button></div>':'')+
         '<div class="cmbtns"><button type="button" class="adm-b warn" data-ca="del">Delete message</button><button type="button" class="adm-b" data-ca="mute">Delete + mute 24h</button><button type="button" class="adm-b ghost" data-ca="dismiss">Dismiss</button></div></div>';
     });
     h+='<h3 class="cmh">Muted players <span>'+AD.muted.length+'</span></h3>';
@@ -18052,7 +18273,7 @@ var _sh=window.show;
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
+  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_gif:{setKey:function(k){ GIPHY_KEY=k; paintGifBtn(); },GF:GF,gifOk:gifOk,gifNorm:gifNorm,close:closeGif},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
 })();
 
 /* ================= v225: living logos (light sweep + hover) ================= */
@@ -20388,7 +20609,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v229js">
+<script id="v230js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -21755,8 +21976,8 @@ var _sh=window.show;
       '<button class="chb" id="chmore" type="button" aria-label="More" aria-haspopup="menu">'+svg(IC.dots,20)+'</button><button class="chb" id="chx" type="button" aria-label="Close chat">'+svg(IC.x,20)+'</button></div>'+
       '<div class="chmenu" id="chmenu" role="menu" hidden></div><div class="chbanner" id="chbanner" hidden></div>'+
       '<div class="chbody" id="chbody" role="log" aria-live="polite"></div><button class="chnew" id="chnew" type="button" hidden>New messages &darr;</button><button class="chdown" id="chdown" type="button" hidden aria-label="Jump to the latest messages">'+svg(IC.down,18)+'</button>'+
-      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div>'+
-      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button>'+
+      '<form class="chcomp" id="chcomp" hidden autocomplete="off"><div class="chrbar" id="chrbar" hidden></div><div class="chprev" id="chprev" hidden></div><div class="chemo" id="chemo" hidden></div><div class="chgifp" id="chgifp" role="dialog" aria-label="Choose a GIF" hidden></div>'+
+      '<div class="chrow"><button class="chb" id="chatt" type="button" aria-label="Attach a photo">'+svg(IC.img,20)+'</button><button class="chb" id="chsm" type="button" aria-label="Emoji">'+svg(IC.smile,20)+'</button><button class="chb chgifb" id="chgif" type="button" aria-label="Find a GIF" aria-haspopup="dialog" aria-expanded="false" hidden><span aria-hidden="true">GIF</span></button>'+
       '<textarea id="chtx" rows="1" maxlength="500" placeholder="Write a message" aria-label="Message"></textarea><button class="chsend" id="chsend" type="submit" aria-label="Send">'+svg(IC.send,18)+'</button></div>'+
       '<span class="chcnt" id="chcnt" hidden aria-live="polite"></span><input type="file" id="chfile" accept="image/*" hidden></form>';
     document.body.appendChild(d);
@@ -21769,6 +21990,7 @@ var _sh=window.show;
     $("chnew").onclick=function(){ scrollEnd(); }; $("chdown").onclick=function(){ scrollEnd(); };
     $("chatt").onclick=function(){ $("chfile").click(); };
     $("chsm").onclick=function(e){ e.stopPropagation(); toggleEmoji(); };
+    $("chgif").onclick=function(e){ e.stopPropagation(); toggleGif(); };
     $("chfile").onchange=function(){ var f=this.files&&this.files[0]; this.value=""; if(f) attach(f); };
     $("chcomp").onsubmit=function(e){ e.preventDefault(); sendNow(); };
     var tx=$("chtx");
@@ -21778,14 +22000,15 @@ var _sh=window.show;
     d.addEventListener("dragover",function(e){ if(CH.view==="thread") e.preventDefault(); });
     d.addEventListener("drop",function(e){ if(CH.view!=="thread") return; var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f&&f.type.indexOf("image/")===0){ e.preventDefault(); attach(f); } });
     $("chbody").addEventListener("scroll",function(){ var b=$("chbody"); CH.stick=b.scrollHeight-b.scrollTop-b.clientHeight<90; if(CH.stick) $("chnew").hidden=true; var dn=$("chdown"); if(dn) dn.hidden=CH.stick||b.scrollHeight-b.clientHeight<200; });
-    document.addEventListener("click",function(e){ var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
+    $("chbody").addEventListener("load",function(e){ if(e.target&&e.target.tagName==="IMG"&&CH.stick&&CH.view==="thread"){ var b=$("chbody"); b.scrollTop=b.scrollHeight; } },true);
+    document.addEventListener("click",function(e){ var gp=$("chgifp"); if(gp&&!gp.hidden&&!gp.contains(e.target)&&!(e.target.closest&&e.target.closest("#chgif"))) closeGif(); var m=$("chmenu"); if(m&&!m.hidden&&!m.contains(e.target)) m.hidden=true; var em=$("chemo"); if(em&&!em.hidden&&!em.contains(e.target)&&e.target.id!=="chsm"&&!(e.target.closest&&e.target.closest("#chsm"))) em.hidden=true; });
     document.addEventListener("keydown",function(e){
       if(e.key!=="Escape") return;
       if(!$("chlb").hidden){ $("chlb").hidden=true; return; }
       var cv=$("cvc"); if(cv&&cv.classList.contains("big")){ CALL.big=false; paintCall(); return; }
       if(cv&&cv.classList.contains("room")&&!CH.open&&!document.querySelector(".modal.on")&&!document.fullscreenElement&&!document.webkitFullscreenElement){ CALL.view="dock"; paintCall(); return; }
       if(!CH.open) return;
-      var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
+      var gpp=$("chgifp"); if(gpp&&!gpp.hidden){ closeGif(true); return; } var em=$("chemo"), mn=$("chmenu"); if(em&&!em.hidden){ em.hidden=true; return; } if(mn&&!mn.hidden){ mn.hidden=true; return; }
       if(CH.sel){ CH.sel=""; renderThread(); return; }
       closeChat();
     });
@@ -21800,9 +22023,9 @@ var _sh=window.show;
     CH.open=true; $("chdr").hidden=false; document.body.classList.add("chopen"); $("chfab").setAttribute("aria-expanded","true"); actx(); if(CALL.st!=="idle") paintCall();
     go(CH.view==="thread"&&CH.room?"thread":"list"); refreshInbox(); schedule(200);
   }
-  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
+  function closeChat(){ CH.open=false; $("chdr").hidden=true; $("chmenu").hidden=true; $("chemo").hidden=true; closeGif(); document.body.classList.remove("chopen"); $("chfab").setAttribute("aria-expanded","false"); try{ $("chfab").focus(); }catch(e){} schedule(1000); if(CALL.st!=="idle") paintCall(); }
   function go(v,room){
-    saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true;
+    saveDraft(); CH.view=v; $("chmenu").hidden=true; $("chemo").hidden=true; closeGif();
     if(room){ CH.room=room; CH.msgs=[]; CH.ids={}; CH.last=""; CH.more=false; CH.pend=null; CH.shown=false; CH.reply=null; CH.stick=true; CH.sel=""; CH.err=""; $("chprev").hidden=true; $("chtx").value=DRAFTS[draftKey(room)]||""; $("chtx").style.height="auto"; updCount(); paintReply(); setTimeout(fitTx,30); }
     if(v==="thread") loadThread();
     render();
@@ -21969,7 +22192,7 @@ var _sh=window.show;
     if(mutedNow){ tx.disabled=true; tx.placeholder="You're muted for now"; }
     else if(blocked){ tx.disabled=true; tx.placeholder="You blocked this player"; }
     else { tx.disabled=false; tx.placeholder=r.dm?"Message "+r.name:"Write a message"; }
-    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled;
+    $("chsend").disabled=tx.disabled; $("chatt").hidden=ib.images===false; $("chatt").disabled=tx.disabled; $("chsm").disabled=tx.disabled; paintGifBtn();
     var items=[], lastDay="", prev=null, me=CH.me, myId=me&&me.uid;
     if(CH.more) items.push(["more",'<button class="chmore" id="chmoreb" type="button">'+svg(IC.load,14)+' Load earlier messages</button>']);
     var list=CH.msgs.filter(function(m){ return m.k!=="del"&&m.k!=="re"; });
@@ -21980,7 +22203,7 @@ var _sh=window.show;
     });
     var pends=CH.pendMsgs.filter(function(p){ return sameRoom(p.room,r); });
     pends.forEach(function(p){
-      items.push(["p:"+p.tmp,'<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>':'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
+      items.push(["p:"+p.tmp,'<div class="chm me pend'+(p.state==="failed"?' fail':'')+'" data-ptmp="'+esc(p.tmp)+'"><div class="chbub">'+(p.img?(/^data:image\/gif/.test(p.img)?gifBox("p:"+p.tmp,p.img,0,0,"",1):'<div class="chimg"><img src="'+p.img+'" alt="Photo"></div>'):'')+(p.gif?gifBox("p:"+p.tmp,p.gif,p.gw,p.gh,"",1):'')+(p.text?'<p>'+rich(p.text)+'</p>':'')+
         '<time>'+(p.state==="failed"?'Not sent':'Sending…')+'</time></div>'+(p.state==="failed"?'<div class="chact"><button type="button" data-cpend="retry" data-ptmp="'+esc(p.tmp)+'">'+svg(IC.retry,15)+' Try again</button><button type="button" data-cpend="drop" data-ptmp="'+esc(p.tmp)+'" class="warn">'+svg(IC.trash,15)+' Discard</button></div>':'')+'</div>']);
     });
     if(CH.err&&!pends.length) items.push(["note",'<div class="chnote bad">'+esc(CH.err)+'</div>']);
@@ -22001,7 +22224,9 @@ var _sh=window.show;
     if(m.del) h+='<em>Message removed</em>';
     else {
       if(m.rt) h+='<div class="chq" data-cq="'+esc(m.rt)+'"><b>'+esc(m.rn||"Someone")+'</b><span>'+esc(m.rq||"")+'</span></div>';
-      if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.img&&/^data:image\/gif/.test(CH.imgs[m.id]||"")) h+=gifBox(m.id,CH.imgs[m.id],0,0,' data-img="'+esc(m.id)+'"');
+      else if(m.img) h+='<div class="chimg" data-img="'+esc(m.id)+'">'+(CH.imgs[m.id]&&CH.imgs[m.id]!=="x"?'<img src="'+CH.imgs[m.id]+'" alt="Photo">':'<span class="chimgph">'+(CH.imgs[m.id]==="x"?'Photo unavailable':'Loading photo')+'</span>')+'</div>';
+      if(m.gif&&gifOk(m.gif)) h+=gifBox(m.id,m.gif,m.gw,m.gh,' data-gif="'+esc(m.id)+'"');
       if(m.text) h+='<p>'+rich(m.text)+'</p>';
     }
     h+='<time>'+when(m.ts)+'</time></div>';
@@ -22026,6 +22251,7 @@ var _sh=window.show;
     for(i=0;i<ms.length;i++) ms[i].onclick=function(e){
       var id=this.getAttribute("data-cid"), t=e.target;
       if(t.closest&&(t.closest(".chact")||t.closest(".chrx")||t.closest("a"))) return;
+      var gb=t.closest&&t.closest(".chgif.still"); if(gb){ var gid=gb.getAttribute("data-gif")||gb.getAttribute("data-img"); if(gid){ gifPlay(gid); return; } }
       if(t.closest&&t.closest(".chimg img")){ var lb=$("chlb"); lb.querySelector("img").src=t.src; lb.hidden=false; return; }
       var q=t.closest&&t.closest("[data-cq]"); if(q){ jumpTo(q.getAttribute("data-cq")); return; }
       CH.sel=CH.sel===id?"":id; renderThread(); if(CH.sel) revealSel();
@@ -22035,7 +22261,7 @@ var _sh=window.show;
     var rx=body.querySelectorAll(".chrxb"); for(i=0;i<rx.length;i++) rx[i].onclick=function(e){ e.stopPropagation(); react(this.getAttribute("data-cid"),this.getAttribute("data-crx")); };
     var pb=body.querySelectorAll("[data-cpend]"); for(i=0;i<pb.length;i++) pb[i].onclick=function(){ var tmp=this.getAttribute("data-ptmp"), k=this.getAttribute("data-cpend"); if(k==="drop"){ CH.pendMsgs=CH.pendMsgs.filter(function(p){ return p.tmp!==tmp; }); renderThread(); } else retry(tmp); };
     var mb=$("chmoreb"); if(mb) mb.onclick=loadEarlier;
-    fillImages();
+    fillImages(); freezeGifs(body);
   }
   function jumpTo(id){ var el=$("chbody").querySelector('.chm[data-cid="'+id+'"]'); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.add("flash"); setTimeout(function(){ el.classList.remove("flash"); },1400); } else toast("That message is further back. Load earlier messages."); }
   function act(b){
@@ -22044,14 +22270,14 @@ var _sh=window.show;
     if(k==="prof"){ var nm=b.getAttribute("data-cn"); closeChat(); try{ show("player",nm); }catch(e){} return; }
     if(k==="react"){ var kk=b.getAttribute("data-ck"); CH.sel=""; react(id,kk); return; }
     CH.sel="";
-    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
+    if(k==="reply"&&m){ CH.reply={id:m.id,name:m.name,text:m.text||(m.gif?"GIF":m.img?"Photo":"")}; paintReply(); renderThread(); var t=$("chtx"); if(t&&!t.disabled) t.focus(); return; }
     if(k==="copy"&&m){ try{ navigator.clipboard.writeText(m.text).then(function(){ toast("Copied"); },function(){ toast("Copy blocked by browser"); }); }catch(e){ toast("Copy blocked by browser"); } renderThread(); return; }
     renderThread();
     if(k==="del") call("del",Object.assign({id:id},key)).then(function(x){ if(x&&x.ok){ markDel(id); renderThread(); poll(); } else toast(whyNot(x)); });
     if(k==="rep") call("report",Object.assign({id:id},key)).then(function(x){ toast(x&&x.ok?"Reported. Thanks, an admin will take a look.":whyNot(x)); });
     if(k==="mute") call("mute",{uid:b.getAttribute("data-cuid"),hours:24}).then(function(x){ toast(x&&x.ok?"Muted for 24 hours":whyNot(x)); });
   }
-  function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; } }); delete CH.imgs[id]; }
+  function markDel(id){ CH.msgs.forEach(function(m){ if(m.id===id){ m.del=true; m.text=""; m.img=false; m.gif=""; } }); delete CH.imgs[id]; }
   function react(id,k){
     var m=findMsg(id), me=CH.me; if(!m||!me) return;
     var arr=(m.rx&&m.rx[k])||[], has=arr.indexOf(me.uid)>=0, on=!has;
@@ -22070,7 +22296,7 @@ var _sh=window.show;
   }
   function toggleEmoji(){
     var p=$("chemo"); if(!p.hidden){ p.hidden=true; return; }
-    p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
+    closeGif(); p.innerHTML=EMO.map(function(e){ return '<button type="button" aria-label="'+e+'">'+e+'</button>'; }).join(""); p.hidden=false;
     var bs=p.querySelectorAll("button"), i; for(i=0;i<bs.length;i++) bs[i].onclick=function(ev){ ev.stopPropagation(); var t=$("chtx"), s=t.selectionStart==null?t.value.length:t.selectionStart, e=t.selectionEnd==null?s:t.selectionEnd; t.value=t.value.slice(0,s)+this.textContent+t.value.slice(e); var c=s+this.textContent.length; t.focus(); try{ t.setSelectionRange(c,c); }catch(x){} };
   }
   function toggleMenu(){
@@ -22102,15 +22328,15 @@ var _sh=window.show;
     while(imgBusy<3&&imgQ.length){
       (function(id){
         imgBusy++; var r=CH.room, key=r&&r.dm?{peer:r.peer}:{}; if(r&&r.dm&&!r.peer){ imgBusy--; delete CH.imgs[id]; return; }
-        call("img",Object.assign({id:id},key)).then(function(x){ imgBusy--; if(x&&x.ok&&/^data:image\/jpeg;base64,/.test(x.data)) CH.imgs[id]=x.data; else CH.imgs[id]="x"; if(CH.open&&CH.view==="thread") renderThread(); pump(); });
+        call("img",Object.assign({id:id},key)).then(function(x){ imgBusy--; if(x&&x.ok&&/^data:image\/(jpeg|gif);base64,/.test(x.data)) CH.imgs[id]=x.data; else CH.imgs[id]="x"; if(CH.open&&CH.view==="thread") renderThread(); pump(); });
       })(imgQ.shift());
     }
   }
   function attach(file){
     if(!file||file.type.indexOf("image/")!==0){ toast("Pick a photo"); return; }
     if(CH.inbox&&CH.inbox.images===false){ toast("Photos are turned off right now."); return; }
-    squeeze(file,function(url){
-      if(!url){ toast("Couldn't use that photo"); return; }
+    squeeze(file,function(url,why){
+      if(!url){ toast(why==="big"?"That GIF is too big (about 450 KB is the most)"+(gifReady()?". Try the GIF button instead.":". Try a smaller one."):why==="bad"&&file.type==="image/gif"?"Couldn't use that GIF":"Couldn't use that photo"); return; }
       CH.pend=url; var p=$("chprev"); p.hidden=false; p.innerHTML='<img src="'+url+'" alt="Photo to send"><button type="button" aria-label="Remove photo">'+svg(IC.x,14)+'</button>';
       p.querySelector("button").onclick=function(){ CH.pend=null; p.hidden=true; p.innerHTML=""; };
       $("chtx").focus();
@@ -22119,6 +22345,8 @@ var _sh=window.show;
   function squeeze(file,cb){
     var fr=new FileReader();
     fr.onerror=function(){ cb(null); };
+    // a GIF is sent exactly as it is (squeezing it onto a canvas would freeze it into one still picture)
+    if(file.type==="image/gif"){ fr.onload=function(){ var u=String(fr.result||""); if(!/^data:image\/gif;base64,R0lGOD[dl]h/.test(u)) return cb(null,"bad"); if(u.length>GIFMAX) return cb(null,"big"); var gi=new Image(); gi.onload=function(){ cb(u); }; gi.onerror=function(){ cb(null,"bad"); }; gi.src=u; }; fr.readAsDataURL(file); return; }
     fr.onload=function(){
       var im=new Image();
       im.onerror=function(){ cb(null); };
@@ -22138,6 +22366,96 @@ var _sh=window.show;
     fr.readAsDataURL(file);
   }
 
+  /* ---- v230: GIFs ----
+     Two ways to send one:
+       1. Attach a .gif file (button, paste or drag in). It is sent exactly as it is, so it keeps moving. About 450 KB at most.
+       2. Press GIF and pick one from Giphy. That sends only a link to Giphy's own picture server; the chat never keeps a copy.
+     The server only accepts links on the GIF services' own picture hosts, and the page checks the same rule before it shows one. */
+  var GIPHY_KEY="";    // a free key from developers.giphy.com goes here. Until there is one, the GIF button stays hidden.
+  var GIFMAX=620000, GF={q:"",items:[],off:0,busy:false,err:false,done:false,seq:0,tm:0,hs:[0,0],drawn:0};
+  CH.gifOn={};
+  function gifOk(u){ u=String(u||""); return u.length<=300&&/^https:\/\/((media\d*|i)\.giphy\.com|(media\d*|c)\.tenor\.com)\/[A-Za-z0-9\/._~%+=@:,-]*(\?[A-Za-z0-9._~%+=&,-]*)?$/.test(u)&&u.split("?")[0].indexOf("..")<0; }
+  function gifReady(){ return !!GIPHY_KEY&&!(CH.inbox&&CH.inbox.images===false); }
+  function motionOK(){ try{ return !matchMedia("(prefers-reduced-motion:reduce)").matches; }catch(e){ return true; } }
+  // how big a GIF is drawn in a message: the picture's own proportions, at most 280 wide and 300 tall
+  function gifSize(w,h){ w=+w; h=+h; if(!(w>=16&&h>=16)) return ""; var s=Math.min(1,280/w,300/h), W=Math.max(120,Math.round(w*s)); return "width:"+W+"px;aspect-ratio:"+Math.round(w)+" / "+Math.round(h)+";"; }
+  // one GIF in a message. People who asked their device for less motion get a still picture with a play button first.
+  function gifBox(id,src,w,h,attr,force){
+    var still=!force&&!motionOK()&&!CH.gifOn[id], sz=gifSize(w,h);
+    return '<div class="chimg chgif'+(still?' still':'')+'"'+attr+(sz?' style="'+sz+'"':'')+'><img src="'+esc(src)+'" alt="GIF" decoding="async"'+(still?' data-st="1"':' loading="lazy"')+'><span class="chgtag">GIF</span>'+
+      (still?'<button type="button" class="chgplay" data-gplay="'+esc(id)+'" aria-label="Play GIF">'+svg('<path d="M8 5.5v13l11-6.5z"/>',20)+'</button>':'')+'</div>';
+  }
+  // stills: draw the first picture onto a canvas in place of the moving one
+  function freezeGifs(root){
+    var im=root.querySelectorAll(".chgif.still img[data-st]"), i;
+    for(i=0;i<im.length;i++) (function(img){
+      if(img.__fz) return; img.__fz=1;
+      function go(){ try{ var c=document.createElement("canvas"); c.width=img.naturalWidth||1; c.height=img.naturalHeight||1; c.getContext("2d").drawImage(img,0,0); c.className="chgst"; c.setAttribute("role","img"); c.setAttribute("aria-label","GIF, paused"); img.parentNode.replaceChild(c,img); }catch(e){} }
+      if(img.complete&&img.naturalWidth) go(); else img.addEventListener("load",go,{once:true});
+    })(im[i]);
+  }
+  function gifPlay(id){ CH.gifOn[id]=1; renderThread(); }
+  // ---- the picker ----
+  function paintGifBtn(){ var b=$("chgif"); if(!b) return; var off=$("chtx").disabled; b.hidden=!gifReady(); b.disabled=off; if(off||!gifReady()) closeGif(); }
+  function closeGif(focus){ var p=$("chgifp"); if(!p||p.hidden) return; p.hidden=true; GF.seq++; clearTimeout(GF.tm); GF.busy=false; var b=$("chgif"); if(b) b.setAttribute("aria-expanded","false"); if(focus&&b&&!b.hidden){ try{ b.focus(); }catch(e){} } }
+  function toggleGif(){
+    var p=$("chgifp"); if(!p||!gifReady()) return;
+    if(!p.hidden){ closeGif(true); return; }
+    $("chemo").hidden=true; $("chgif").setAttribute("aria-expanded","true");
+    p.innerHTML='<div class="chgifh"><input type="search" class="chgifs" id="chgifs" placeholder="Search GIFs" aria-label="Search GIFs" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60" enterkeyhint="search"></div>'+
+      '<div class="chgifg" id="chgifg"><div class="chgifcols"><div class="chgifc"></div><div class="chgifc"></div></div><div class="chgifst" id="chgifst" aria-live="polite"></div></div><div class="chgiff">Powered by GIPHY</div>';
+    p.hidden=false; var si=$("chgifs"), g=$("chgifg"); si.value=GF.q;
+    si.oninput=function(){ clearTimeout(GF.tm); GF.tm=setTimeout(function(){ gifSearch(si.value); },380); };
+    si.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); clearTimeout(GF.tm); gifSearch(si.value); } };
+    g.onscroll=function(){ if(g.scrollHeight-g.scrollTop-g.clientHeight<200) gifMore(); };
+    g.onclick=function(e){ var t=e.target, b=t.closest&&t.closest(".chgifi"); if(b){ e.stopPropagation(); gifSend(GF.items[+b.getAttribute("data-gi")]); return; } if(t.closest&&t.closest("#chgifr")){ e.stopPropagation(); gifSearch(GF.q); } };
+    GF.drawn=0; GF.hs=[0,0]; gifPaint();
+    if(!GF.items.length) gifSearch(GF.q);
+    try{ si.focus({preventScroll:true}); }catch(e){}
+  }
+  function gifSearch(q){ q=String(q||"").trim().slice(0,60); GF.q=q; GF.items=[]; GF.off=0; GF.done=false; GF.err=false; GF.seq++; GF.drawn=0; GF.hs=[0,0]; GF.busy=false; var g=$("chgifg"); if(g) g.scrollTop=0; gifPaint(); gifMore(); }
+  function gifNorm(x){
+    var im=(x&&x.images)||{}, th=im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=im.downsized_medium||im.downsized||im.fixed_height||im.fixed_width;
+    if(!th||!big||!th.url||!big.url) return null;
+    var u=String(big.url).split("?")[0], tu=String(th.url).split("?")[0];
+    if(!gifOk(u)||!gifOk(tu)) return null;
+    var tw=+th.width||200, thh=+th.height||150;
+    return {id:String(x.id||u),title:String(x.title||"GIF").replace(/\s+/g," ").slice(0,80)||"GIF",thumb:tu,url:u,w:+big.width||tw,h:+big.height||thh,tw:tw,th:thh};
+  }
+  function gifMore(){
+    if(GF.busy||GF.done||!GIPHY_KEY) return;
+    var seq=GF.seq; GF.busy=true; gifPaint();
+    var url="https://api.giphy.com/v1/gifs/"+(GF.q?"search":"trending")+"?api_key="+encodeURIComponent(GIPHY_KEY)+"&limit=24&offset="+GF.off+"&rating=pg&bundle=messaging_non_clips"+(GF.q?"&lang=en&q="+encodeURIComponent(GF.q):"");
+    fetch(url).then(function(r){ if(!r.ok) throw new Error("http "+r.status); return r.json(); }).then(function(j){
+      if(seq!==GF.seq) return;
+      var d=(j&&j.data)||[]; d.forEach(function(x){ var it=gifNorm(x); if(it&&!GF.items.some(function(y){ return y.id===it.id; })) GF.items.push(it); });
+      GF.off+=d.length; var tot=j&&j.pagination&&+j.pagination.total_count; GF.done=!d.length||GF.off>=Math.min(tot||1e9,120);
+      GF.busy=false; gifPaint();
+    }).catch(function(){ if(seq!==GF.seq) return; GF.busy=false; GF.err=true; GF.done=true; gifPaint(); });
+  }
+  // new pictures are added to the shorter of the two columns, so the grid stays even and nothing already shown moves
+  function gifPaint(){
+    var g=$("chgifg"); if(!g) return; var cs=g.querySelectorAll(".chgifc"), st=$("chgifst"), c0=[], c1=[];
+    if(!GF.drawn){ cs[0].innerHTML=""; cs[1].innerHTML=""; GF.hs=[0,0]; }
+    for(var i=GF.drawn;i<GF.items.length;i++){
+      var it=GF.items[i], c=GF.hs[0]<=GF.hs[1]?0:1;
+      (c?c1:c0).push('<button type="button" class="chgifi" data-gi="'+i+'" aria-label="Send GIF: '+esc(it.title)+'" style="aspect-ratio:'+it.tw+' / '+it.th+'"><img src="'+esc(it.thumb)+'" alt="" loading="lazy" decoding="async"></button>');
+      GF.hs[c]+=it.th/it.tw;
+    }
+    GF.drawn=GF.items.length;
+    if(c0.length) cs[0].insertAdjacentHTML("beforeend",c0.join("")); if(c1.length) cs[1].insertAdjacentHTML("beforeend",c1.join(""));
+    st.className="chgifst"+(GF.busy&&!GF.items.length?" load":"");
+    st.innerHTML=GF.err?'<span>Couldn\'t load GIFs. Check your connection.</span><button type="button" id="chgifr">Try again</button>':
+      GF.busy?(GF.items.length?'<span>Loading…</span>':'<i></i><i></i><i></i><i></i>'):(!GF.items.length?'<span>'+(GF.q?'No GIFs found for “'+esc(GF.q)+'”.':'Nothing to show right now.')+'</span>':"");
+  }
+  // a picked GIF is sent on its own straight away, and whatever you were typing stays where it is
+  function gifSend(it){
+    if(!it||!gifOk(it.url)) return; var tx=$("chtx"); if(tx.disabled){ toast("You can't send messages here right now."); return; }
+    var p={tmp:"t"+(++tmpN),text:"",img:null,gif:it.url,gw:it.w,gh:it.h,reply:CH.reply?CH.reply.id:null,state:"sending",room:CH.room};
+    CH.reply=null; paintReply(); closeGif(); CH.pendMsgs.push(p); CH.stick=true; renderThread(); deliver(p); if(LS.get("tml_chat_snd","1")==="1") sfx("sent");
+    try{ tx.focus({preventScroll:true}); }catch(e){}
+  }
+
   /* ---- sending, receiving, polling ---- */
   function keyOf(){ var r=CH.room; return r.dm?(r.peer?{peer:r.peer}:{to:r.to||r.name}):{}; }
   var tmpN=0;
@@ -22151,11 +22469,11 @@ var _sh=window.show;
   function deliver(p){
     p.state="sending";
     var key=p.room.dm?(p.room.peer?{peer:p.room.peer}:{to:p.room.to||p.room.name}):{};
-    call("send",Object.assign({text:p.text,img:p.img||undefined,reply:p.reply||undefined},key)).then(function(r){
+    call("send",Object.assign({text:p.text,img:p.img||undefined,gif:p.gif||undefined,gw:p.gw||undefined,gh:p.gh||undefined,reply:p.reply||undefined},key)).then(function(r){
       if(r&&r.ok){
         CH.pendMsgs=CH.pendMsgs.filter(function(x){ return x!==p; });
         if(r.peer&&p.room.dm&&!p.room.peer) p.room.peer=r.peer;
-        if(sameRoom(CH.room,p.room)){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
+        if(sameRoom(CH.room,p.room)){ if(r.msg.img&&p.img) CH.imgs[r.msg.id]=p.img; if(r.msg.gif||(p.img&&/^data:image\/gif/.test(p.img))) CH.gifOn[r.msg.id]=1; addMsgs([r.msg]); CH.err=""; CH.stick=true; if(CH.view==="thread") renderThread(); }
         refreshInbox(); schedule(2500);
       } else {
         p.state="failed"; p.err=whyNot(r); CH.err=p.err; sfx("fail"); if(r&&r.error==="muted") refreshInbox();
@@ -23129,7 +23447,7 @@ var _sh=window.show;
     if(!AD.rep.length) h+='<p class="note" style="margin:0 0 6px">Nothing reported. Players can report a message by tapping it.</p>';
     AD.rep.forEach(function(r){
       h+='<div class="cmrep" data-cr="'+esc(r.id)+'"><div class="cmwho"><span>'+esc(r.byName||"Someone")+' reported <b>'+esc(r.fromName||"a player")+'</b></span><small>'+(r.dm?'Private message':'Timmylist Room')+' &middot; '+agoLong(r.ts)+(r.why?' &middot; &ldquo;'+esc(r.why)+'&rdquo;':'')+'</small></div>'+
-        '<blockquote>'+(r.text?esc(r.text).replace(/\n/g,"<br>"):'<em>No text</em>')+'</blockquote>'+(r.img?'<div class="cmimg" data-ri="'+esc(r.id)+'"><button type="button" class="adm-b" data-ca="view">View photo</button></div>':'')+
+        '<blockquote>'+(r.text?esc(r.text).replace(/\n/g,"<br>"):'<em>No text</em>')+'</blockquote>'+(r.gif&&gifOk(r.gif)?'<div class="cmimg"><img src="'+esc(r.gif)+'" alt="Reported GIF" style="max-width:100%;max-height:260px;border-radius:12px"></div>':'')+(r.img?'<div class="cmimg" data-ri="'+esc(r.id)+'"><button type="button" class="adm-b" data-ca="view">View photo</button></div>':'')+
         '<div class="cmbtns"><button type="button" class="adm-b warn" data-ca="del">Delete message</button><button type="button" class="adm-b" data-ca="mute">Delete + mute 24h</button><button type="button" class="adm-b ghost" data-ca="dismiss">Dismiss</button></div></div>';
     });
     h+='<h3 class="cmh">Muted players <span>'+AD.muted.length+'</span></h3>';
@@ -23252,7 +23570,7 @@ var _sh=window.show;
   window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
-  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
+  },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_gif:{setKey:function(k){ GIPHY_KEY=k; paintGifBtn(); },GF:GF,gifOk:gifOk,gifNorm:gifNorm,close:closeGif},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
 })();
 
 /* ================= v225: living logos (light sweep + hover) ================= */
