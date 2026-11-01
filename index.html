@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v230">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v231">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -6426,6 +6426,307 @@ body.cvroom .chfab{display:none}
 .chdr .chgif:hover img{transform:none}
 
 @media(prefers-reduced-motion:reduce){.chdr .chgifp{animation:none}.chgifst.load i{animation:none}.chgifi,.chdr .chgplay{transition:none}}
+
+/* ======================= v231: chat polish — frosted glass, crisp depth, white + blue only =======================
+   Looks only. No layout, wording or behaviour changes. */
+
+/* ---------- the panel: deep blue night with soft light in two corners ---------- */
+:root:not([data-theme="light"]) .chdr{
+  background:
+    radial-gradient(86% 36% at 100% 0,hsl(var(--h) 100% 58% / .28),transparent 70%),
+    radial-gradient(74% 34% at 0 100%,hsl(var(--h) 100% 52% / .17),transparent 74%),
+    linear-gradient(180deg,hsl(var(--h) 72% 9.5%),hsl(var(--h) 84% 4%));
+  border-left:1px solid hsl(var(--h) 100% 90% / .2);
+  box-shadow:-1px 0 0 rgba(0,0,0,.55),-54px 0 110px -34px rgba(0,0,0,.96),inset 1px 0 0 rgba(255,255,255,.045)}
+:root[data-theme="light"] .chdr{
+  background:
+    radial-gradient(86% 36% at 100% 0,hsl(var(--h) 100% 66% / .2),transparent 70%),
+    radial-gradient(74% 34% at 0 100%,hsl(var(--h) 100% 70% / .16),transparent 74%),
+    linear-gradient(180deg,#fbfdff,hsl(var(--h) 100% 96%));
+  border-left:1px solid hsl(var(--h) 80% 50% / .22);
+  box-shadow:-54px 0 100px -38px hsl(var(--h) 80% 30% / .5)}
+
+/* a faint pattern of little game shapes behind the messages (triangles, squares, circles, crosses) */
+.chdr .chbody{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='176' viewBox='0 0 176 176' fill='none' stroke='%237fb2ff' stroke-opacity='.11' stroke-width='1.7' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M24 44l9-16 9 16z'/%3E%3Crect x='112' y='22' width='15' height='15' rx='3.5' transform='rotate(14 119 29)'/%3E%3Ccircle cx='64' cy='118' r='7'/%3E%3Cpath d='M140 106v14M133 113h14'/%3E%3Cpath d='M100 158l7-12 7 12z'/%3E%3Crect x='14' y='134' width='11' height='11' rx='3' transform='rotate(-12 19 139)'/%3E%3Ccircle cx='156' cy='62' r='4'/%3E%3Cpath d='M70 20v10M65 25h10'/%3E%3C/svg%3E");
+  background-size:176px 176px;background-attachment:local;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 12px),transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 12px),transparent 100%);
+  scrollbar-width:thin}
+:root[data-theme="light"] .chdr .chbody{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='176' viewBox='0 0 176 176' fill='none' stroke='%231f66e8' stroke-opacity='.085' stroke-width='1.7' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M24 44l9-16 9 16z'/%3E%3Crect x='112' y='22' width='15' height='15' rx='3.5' transform='rotate(14 119 29)'/%3E%3Ccircle cx='64' cy='118' r='7'/%3E%3Cpath d='M140 106v14M133 113h14'/%3E%3Cpath d='M100 158l7-12 7 12z'/%3E%3Crect x='14' y='134' width='11' height='11' rx='3' transform='rotate(-12 19 139)'/%3E%3Ccircle cx='156' cy='62' r='4'/%3E%3Cpath d='M70 20v10M65 25h10'/%3E%3C/svg%3E")}
+.chdr .chbody::-webkit-scrollbar{width:8px}
+.chdr .chbody::-webkit-scrollbar-track{background:transparent}
+.chdr .chbody::-webkit-scrollbar-thumb{border-radius:99px;border:2px solid transparent;background:hsl(var(--h) 100% 74% / .34);background-clip:padding-box}
+.chdr .chbody::-webkit-scrollbar-thumb:hover{background:hsl(var(--h) 100% 78% / .6);background-clip:padding-box}
+:root[data-theme="light"] .chdr .chbody::-webkit-scrollbar-thumb{background:hsl(var(--h) 90% 48% / .3);background-clip:padding-box}
+
+/* ---------- header: frosted glass ---------- */
+:root:not([data-theme="light"]) .chdr .chh{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 34% / .46),hsl(var(--h) 84% 14% / .52) 72%,hsl(var(--h) 84% 8% / .42));
+  -webkit-backdrop-filter:blur(22px) saturate(1.7);backdrop-filter:blur(22px) saturate(1.7);
+  border-bottom:1px solid hsl(var(--h) 100% 90% / .17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 30px -26px #000}
+:root[data-theme="light"] .chdr .chh{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),hsl(var(--h) 100% 97% / .92));
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
+  border-bottom:1px solid hsl(var(--h) 80% 50% / .16);
+  box-shadow:0 18px 28px -26px hsl(var(--h) 80% 30% / .55)}
+.chdr .cht b{letter-spacing:-.018em}
+:root:not([data-theme="light"]) .chdr .cht b{color:#fff}
+:root:not([data-theme="light"]) .chdr .cht small{color:hsl(var(--h) 100% 88% / .76)}
+:root[data-theme="light"] .chdr .cht b{color:#0b2a66}
+:root[data-theme="light"] .chdr .cht small{color:hsl(var(--h) 40% 34% / .85)}
+.chdr .chhav .av,.chdr .chhav .chrav{
+  box-shadow:0 0 0 2px rgba(255,255,255,.94),0 0 0 4.5px hsl(var(--h) 100% 62% / .3),0 10px 18px -8px rgba(0,0,0,.7)}
+:root[data-theme="light"] .chdr .chhav .av,:root[data-theme="light"] .chdr .chhav .chrav{
+  box-shadow:0 0 0 2px #fff,0 0 0 4.5px hsl(var(--h) 100% 55% / .32),0 10px 18px -8px hsl(var(--h) 80% 30% / .55)}
+.chdr .chb{transition:background .18s,box-shadow .18s,transform .2s var(--spring),color .18s}
+.chdr .chb:hover{background:hsl(var(--h) 100% 74% / .17);box-shadow:inset 0 0 0 1px hsl(var(--h) 100% 90% / .22)}
+:root[data-theme="light"] .chdr .chb:hover{background:hsl(var(--h) 90% 94%);box-shadow:inset 0 0 0 1px hsl(var(--h) 80% 50% / .22)}
+.chdr #chcallb{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 63%),hsl(var(--h) 98% 45%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 88% / .55),0 9px 16px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}
+.chdr #chcallb:hover{background:linear-gradient(160deg,hsl(var(--h) 100% 68%),hsl(var(--h) 98% 49%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .7),0 12px 20px -8px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.55)}
+
+/* ---------- faces: glossy blue discs with a white letter ---------- */
+.chdr .av:not(.pic){
+  background-image:linear-gradient(150deg,rgba(255,255,255,.38),rgba(255,255,255,0) 54%),linear-gradient(150deg,hsl(var(--h) 100% 63%),hsl(var(--h) 96% 41%));
+  color:#fff;font-weight:900;text-shadow:0 1px 2px rgba(0,30,120,.5)}
+.chdr .chrav.room{
+  background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,0) 54%),linear-gradient(150deg,hsl(var(--h) 100% 63%),hsl(var(--h) 96% 40%));
+  box-shadow:0 0 0 2px hsl(var(--h) 100% 92% / .34),0 10px 16px -8px hsl(var(--h) 100% 45% / .9),inset 0 1px 0 rgba(255,255,255,.4)}
+.chdr .chav .av{box-shadow:0 0 0 2px hsl(var(--h) 100% 90% / .4),0 6px 12px -6px rgba(0,0,0,.7)}
+.chdr .chrm .av,.chdr .chrav:not(.room){box-shadow:0 0 0 2px hsl(var(--h) 100% 92% / .3),0 8px 14px -8px rgba(0,0,0,.75)}
+:root[data-theme="light"] .chdr .chav .av{box-shadow:0 0 0 2px #fff,0 0 0 3.5px hsl(var(--h) 100% 55% / .3),0 6px 12px -6px hsl(var(--h) 80% 30% / .5)}
+:root[data-theme="light"] .chdr .chrm .av,:root[data-theme="light"] .chdr .chrav:not(.room){box-shadow:0 0 0 2px #fff,0 0 0 3.5px hsl(var(--h) 100% 55% / .26),0 8px 14px -8px hsl(var(--h) 80% 30% / .5)}
+
+/* ---------- the list: glass cards ---------- */
+:root:not([data-theme="light"]) .chdr .chrm{
+  background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 24px -18px #000}
+:root:not([data-theme="light"]) .chdr .chrm:hover{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .22),hsl(var(--h) 100% 60% / .09));
+  border-color:hsl(var(--h) 100% 90% / .42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 28px -18px hsl(var(--h) 100% 50% / .7)}
+:root:not([data-theme="light"]) .chdr .chrm.un{
+  background:linear-gradient(90deg,hsl(var(--h) 100% 64% / .3),hsl(var(--h) 100% 60% / .07));
+  border-color:hsl(var(--h) 100% 88% / .46)}
+:root[data-theme="light"] .chdr .chrm{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.5%));
+  border:1px solid hsl(var(--h) 80% 50% / .16);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .06),0 12px 24px -18px hsl(var(--h) 80% 30% / .55)}
+:root[data-theme="light"] .chdr .chrm:hover{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 93%));
+  border-color:hsl(var(--h) 80% 50% / .36);
+  box-shadow:0 16px 28px -18px hsl(var(--h) 90% 45% / .6)}
+.chdr .chrt b{letter-spacing:-.01em}
+:root:not([data-theme="light"]) .chdr .chrt b{color:#fff}
+:root:not([data-theme="light"]) .chdr .chrt small{color:hsl(var(--h) 45% 86% / .72)}
+:root[data-theme="light"] .chdr .chrt b{color:#0b2a66}
+:root[data-theme="light"] .chdr .chrt small{color:hsl(var(--h) 30% 36% / .85)}
+.chdr .chrr{font:800 11px/1 Outfit,sans-serif;letter-spacing:.05em;font-variant-numeric:tabular-nums}
+:root:not([data-theme="light"]) .chdr .chrr{color:hsl(var(--h) 100% 88% / .68)}
+:root[data-theme="light"] .chdr .chrr{color:hsl(var(--h) 40% 38% / .8)}
+.chdr .chud{box-shadow:0 0 0 3px hsl(var(--h) 100% 62% / .3),0 0 12px hsl(var(--h) 100% 62% / .7);background:#fff}
+:root[data-theme="light"] .chdr .chud{background:hsl(var(--h) 100% 50%);box-shadow:0 0 0 3px hsl(var(--h) 100% 55% / .22),0 0 10px hsl(var(--h) 100% 55% / .5)}
+.chdr .chsec{font:800 10.5px/1 Outfit,sans-serif;letter-spacing:.2em}
+:root:not([data-theme="light"]) .chdr .chsec{color:hsl(var(--h) 100% 88% / .6)}
+:root[data-theme="light"] .chdr .chsec{color:hsl(var(--h) 40% 36% / .8)}
+:root:not([data-theme="light"]) .chdr .chnewb{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .26),hsl(var(--h) 100% 60% / .12));
+  border:1px solid hsl(var(--h) 100% 90% / .38);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 18px -12px hsl(var(--h) 100% 50% / .8)}
+:root:not([data-theme="light"]) .chdr .chnewb:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 74% / .36),hsl(var(--h) 100% 62% / .18))}
+:root[data-theme="light"] .chdr .chnewb{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));
+  border:1px solid hsl(var(--h) 80% 50% / .34);color:#0b2a66;
+  box-shadow:0 10px 18px -14px hsl(var(--h) 90% 45% / .7)}
+.chdr .chfoot{max-width:300px;margin-left:auto;margin-right:auto;font-weight:500;line-height:1.55;text-wrap:balance}
+:root:not([data-theme="light"]) .chdr .chfoot{color:hsl(var(--h) 45% 86% / .55)}
+:root[data-theme="light"] .chdr .chfoot{color:hsl(var(--h) 30% 40% / .72)}
+
+/* ---------- day chips: solid, so an older one can never show through a newer one ---------- */
+:root:not([data-theme="light"]) .chdr .chday span{
+  background:linear-gradient(180deg,hsl(var(--h) 60% 20%),hsl(var(--h) 64% 14%));
+  border:1px solid hsl(var(--h) 100% 90% / .24);color:hsl(var(--h) 100% 94%);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px -10px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chday span{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%));
+  border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66;
+  box-shadow:0 10px 18px -12px hsl(var(--h) 80% 30% / .55)}
+.chdr .chday span{display:inline-block;min-width:124px;box-sizing:border-box;text-align:center;font:800 10.5px/1 Outfit,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+:root:not([data-theme="light"]) .chdr .chsys{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .16),hsl(var(--h) 100% 60% / .07));
+  border:1px solid hsl(var(--h) 100% 90% / .22);color:hsl(var(--h) 100% 94%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+
+/* ---------- bubbles ---------- */
+.chdr .chbub{font-weight:500;text-wrap:pretty;transition:box-shadow .2s,border-color .2s}
+.chdr .chbub p{text-wrap:pretty}
+:root:not([data-theme="light"]) .chdr .chbub{
+  background:linear-gradient(180deg,hsl(var(--h) 52% 21% / .97),hsl(var(--h) 58% 14.5% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .14);color:hsl(var(--h) 100% 98%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.4),0 14px 22px -14px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chbub{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.6%));
+  border:1px solid hsl(var(--h) 80% 50% / .17);color:#0b2a66;
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 12px 22px -16px hsl(var(--h) 80% 30% / .55)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub,:root[data-theme="light"] .chdr .chm.me .chbub{
+  background:linear-gradient(158deg,hsl(var(--h) 100% 63%) 0%,hsl(var(--h) 98% 51%) 50%,hsl(var(--h) 100% 43%) 100%);
+  border:1px solid hsl(var(--h) 100% 88% / .55);color:#fff;
+  text-shadow:0 1px 0 hsl(var(--h) 100% 26% / .32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 hsl(var(--h) 100% 30% / .22),0 1px 2px hsl(var(--h) 100% 30% / .28),0 12px 20px -10px hsl(var(--h) 100% 46% / .75)}
+.chdr .chm.me .chbub time,.chdr .chbub time{text-shadow:none;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+:root:not([data-theme="light"]) .chdr .chbub time{color:hsl(var(--h) 100% 90%);opacity:.6}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub time{color:#fff;opacity:.82}
+:root[data-theme="light"] .chdr .chbub time{color:hsl(var(--h) 40% 34%);opacity:.8}
+:root[data-theme="light"] .chdr .chm.me .chbub time{color:#fff;opacity:.88}
+:root:not([data-theme="light"]) .chdr .chnm{color:hsl(var(--h) 100% 82%);letter-spacing:.01em}
+:root[data-theme="light"] .chdr .chnm{color:hsl(var(--h) 100% 38%)}
+.chdr .chbub a{text-decoration-thickness:1.5px;text-underline-offset:3px;text-decoration-color:currentColor}
+:root:not([data-theme="light"]) .chdr .chbub a{color:hsl(var(--h) 100% 86%)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub a{color:#fff}
+:root[data-theme="light"] .chdr .chbub a{color:hsl(var(--h) 100% 38%)}
+:root[data-theme="light"] .chdr .chm.me .chbub a{color:#fff}
+/* picked / keyboard-focused message: a clean white ring with a soft blue halo */
+:root:not([data-theme="light"]) .chdr .chm.sel .chbub,:root:not([data-theme="light"]) .chdr .chm:focus-visible .chbub{
+  box-shadow:0 0 0 2px #fff,0 0 0 6px hsl(var(--h) 100% 60% / .38),0 16px 28px -14px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chm.sel .chbub,:root[data-theme="light"] .chdr .chm:focus-visible .chbub{
+  box-shadow:0 0 0 2px #fff,0 0 0 4.5px var(--acc2),0 0 0 8px hsl(var(--h) 100% 55% / .18),0 16px 28px -14px hsl(var(--h) 80% 30% / .55)}
+:root:not([data-theme="light"]) .chdr .chm.del .chbub{background:transparent;box-shadow:none;border:1px dashed hsl(var(--h) 100% 88% / .3)}
+:root[data-theme="light"] .chdr .chm.del .chbub{background:transparent;box-shadow:none;border:1px dashed hsl(var(--h) 80% 50% / .36)}
+:root:not([data-theme="light"]) .chdr .chm.fail .chbub{background:hsl(var(--h) 48% 17%);border:1px dashed hsl(var(--h) 100% 92% / .8);box-shadow:none}
+:root[data-theme="light"] .chdr .chm.fail .chbub{background:hsl(var(--h) 100% 96%);border:1px dashed var(--acc2);box-shadow:none;color:#0b2a66}
+
+/* reply quote inside a bubble */
+:root:not([data-theme="light"]) .chdr .chq{background:rgba(1,8,26,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);border-left-color:hsl(var(--h) 100% 80%)}
+:root:not([data-theme="light"]) .chdr .chq b{color:#fff}
+:root:not([data-theme="light"]) .chdr .chm.me .chq{background:rgba(0,20,100,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);border-left-color:#fff}
+:root[data-theme="light"] .chdr .chq{background:hsl(var(--h) 100% 96%);box-shadow:inset 0 0 0 1px hsl(var(--h) 80% 50% / .14);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chdr .chq b{color:#0b2a66}
+:root[data-theme="light"] .chdr .chm.me .chq{background:rgba(0,20,100,.22);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);border-left-color:#fff}
+:root[data-theme="light"] .chdr .chm.me .chq b{color:#fff}
+
+/* photos in messages */
+.chdr .chimg{border-radius:16px;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 14px 24px -14px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chimg{box-shadow:0 0 0 1px hsl(var(--h) 80% 50% / .2),0 14px 24px -14px hsl(var(--h) 80% 30% / .6)}
+
+/* reactions: small glass pills */
+:root:not([data-theme="light"]) .chdr .chrxb{
+  background:linear-gradient(180deg,hsl(var(--h) 55% 22%),hsl(var(--h) 60% 15%));
+  border:1px solid hsl(var(--h) 100% 90% / .2);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 8px 14px -10px #000}
+:root[data-theme="light"] .chdr .chrxb{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%));
+  border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66;
+  box-shadow:0 8px 14px -10px hsl(var(--h) 80% 30% / .6)}
+.chdr .chrxb.on,:root[data-theme="light"] .chdr .chrxb.on,:root:not([data-theme="light"]) .chdr .chrxb.on{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 63%),hsl(var(--h) 98% 46%));color:#fff;
+  border:1px solid hsl(var(--h) 100% 90% / .55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 14px -8px hsl(var(--h) 100% 46% / .85)}
+
+/* the small buttons under a picked message, and the reaction picker */
+:root:not([data-theme="light"]) .chdr .chact button{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .2),hsl(var(--h) 100% 60% / .09));
+  border:1px solid hsl(var(--h) 100% 90% / .3);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+:root:not([data-theme="light"]) .chdr .chact button:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 74% / .32),hsl(var(--h) 100% 62% / .16))}
+:root[data-theme="light"] .chdr .chact button{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 95%));
+  border:1px solid hsl(var(--h) 80% 50% / .3);color:#0b2a66;
+  box-shadow:0 8px 14px -12px hsl(var(--h) 80% 30% / .7)}
+:root[data-theme="light"] .chdr .chact button:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 91%))}
+:root:not([data-theme="light"]) .chdr .chpick{
+  background:linear-gradient(180deg,hsl(var(--h) 60% 18% / .97),hsl(var(--h) 66% 11% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 18px 32px -16px #000}
+:root[data-theme="light"] .chdr .chpick{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 97%));
+  border:1px solid hsl(var(--h) 80% 50% / .28);
+  box-shadow:0 18px 32px -18px hsl(var(--h) 80% 30% / .6)}
+
+/* the three-dot menu */
+:root:not([data-theme="light"]) .chdr .chmenu{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 17% / .98),hsl(var(--h) 70% 10% / .98));
+  border:1px solid hsl(var(--h) 100% 90% / .26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 34px 60px -22px #000}
+:root:not([data-theme="light"]) .chdr .chmenu button:hover{background:hsl(var(--h) 100% 72% / .2)}
+:root[data-theme="light"] .chdr .chmenu{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98%));border:1px solid hsl(var(--h) 80% 50% / .26)}
+.chdr .chmenu button svg{color:hsl(var(--h) 100% 78%)}
+:root[data-theme="light"] .chdr .chmenu button svg{color:var(--acc2)}
+
+/* ---------- the message bar ---------- */
+:root:not([data-theme="light"]) .chdr .chcomp{background:linear-gradient(180deg,transparent,hsl(var(--h) 84% 4% / .92) 36%)}
+:root[data-theme="light"] .chdr .chcomp{background:linear-gradient(180deg,transparent,hsl(var(--h) 100% 97% / .96) 36%);border-top:0}
+:root:not([data-theme="light"]) .chdr .chrow{
+  background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
+  border:1px solid rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 20px 36px -24px #000}
+:root:not([data-theme="light"]) .chdr .chrow:focus-within{
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.07));
+  border-color:hsl(var(--h) 100% 78% / .9);
+  box-shadow:0 0 0 3px hsl(var(--h) 100% 60% / .26),inset 0 1px 0 rgba(255,255,255,.12),0 20px 36px -24px #000}
+:root[data-theme="light"] .chdr .chrow{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.5%));
+  border:1px solid hsl(var(--h) 80% 50% / .3);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+:root[data-theme="light"] .chdr .chrow:focus-within{border-color:var(--acc2);box-shadow:0 0 0 3px hsl(var(--h) 100% 55% / .2),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+:root:not([data-theme="light"]) .chdr .chrow .chb{color:hsl(var(--h) 100% 92% / .86)}
+:root:not([data-theme="light"]) .chdr .chrow .chb:hover{color:#fff}
+:root[data-theme="light"] .chdr .chrow .chb{color:hsl(var(--h) 60% 30% / .9)}
+:root[data-theme="light"] .chdr .chrow .chb:hover{color:var(--acc2)}
+.chdr .chrow textarea{font-weight:500}
+:root:not([data-theme="light"]) .chdr .chrow textarea{color:#fff}
+.chdr .chsend{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 64%),hsl(var(--h) 98% 45%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .5),0 10px 18px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}
+.chdr .chsend:not(:disabled):hover{box-shadow:0 0 0 1px hsl(var(--h) 100% 92% / .7),0 14px 22px -8px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.55)}
+.chdr .chsend:disabled{filter:saturate(.55) brightness(.85);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+:root:not([data-theme="light"]) .chdr .chemo{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 15% / .98),hsl(var(--h) 70% 9% / .98));
+  border:1px solid hsl(var(--h) 100% 90% / .24);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 24px 40px -22px #000}
+:root[data-theme="light"] .chdr .chemo{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 97%));border:1px solid hsl(var(--h) 80% 50% / .26);box-shadow:0 24px 40px -24px hsl(var(--h) 80% 30% / .6)}
+.chdr .chemo button{transition:transform .14s var(--spring),background .14s}
+.chdr .chemo button:hover{transform:scale(1.18);background:hsl(var(--h) 100% 70% / .2)}
+:root[data-theme="light"] .chdr .chemo button:hover{background:hsl(var(--h) 100% 90%)}
+:root:not([data-theme="light"]) .chdr .chrbar{background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .18),hsl(var(--h) 100% 60% / .08));border:1px solid hsl(var(--h) 100% 90% / .24)}
+:root[data-theme="light"] .chdr .chrbar{background:hsl(var(--h) 100% 96%);border:1px solid hsl(var(--h) 80% 50% / .24)}
+.chdr .chprev img{border-color:hsl(var(--h) 100% 90% / .4);box-shadow:0 12px 20px -12px rgba(0,0,0,.85)}
+
+/* ---------- jump buttons ---------- */
+:root:not([data-theme="light"]) .chdr .chnew{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));color:#0b2a66;
+  box-shadow:0 0 0 1px rgba(255,255,255,.6),0 16px 28px -10px rgba(0,0,0,.8)}
+:root[data-theme="light"] .chdr .chnew{background:linear-gradient(160deg,hsl(var(--h) 100% 58%),hsl(var(--h) 98% 42%));color:#fff;box-shadow:0 0 0 1px hsl(var(--h) 100% 88% / .6),0 16px 26px -10px hsl(var(--h) 100% 42% / .8)}
+:root:not([data-theme="light"]) .chdr .chdown{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 22% / .97),hsl(var(--h) 66% 13% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 26px -10px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chdown{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%))}
+
+/* ---------- the round chat button ---------- */
+.chfab{
+  border:1px solid hsl(var(--h) 100% 90% / .55);
+  background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,0) 52%),linear-gradient(150deg,hsl(var(--h) 100% 62%),hsl(var(--h) 98% 42%));
+  box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .16),0 18px 30px -12px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.55)}
+.chfab:hover{box-shadow:0 0 0 7px hsl(var(--h) 100% 60% / .2),0 22px 34px -12px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.6)}
+.chdot{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));box-shadow:0 0 0 2px hsl(var(--h) 100% 50%),0 6px 12px -2px rgba(0,0,0,.5)}
+:root[data-theme="light"] .chdot{background:linear-gradient(180deg,hsl(var(--h) 100% 30%),#0b2a66);box-shadow:0 0 0 2px #fff,0 6px 12px -2px hsl(var(--h) 80% 20% / .6)}
+
+/* ---------- notes, empty states, banner ---------- */
+:root:not([data-theme="light"]) .chdr .chbanner{background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .2),hsl(var(--h) 100% 60% / .09));border-bottom:1px solid hsl(var(--h) 100% 90% / .22)}
+:root:not([data-theme="light"]) .chdr .chemi{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 14px 24px -14px hsl(var(--h) 100% 50% / .8)}
+.chdr .chempty{text-wrap:balance}
+
+@media(prefers-reduced-motion:reduce){.chdr .chb,.chdr .chbub,.chdr .chemo button{transition:none}}
+
+/* the reaction picker and message buttons float above the sticky day chip */
+.chdr .chpick,.chdr .chact{position:relative;z-index:3}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -10303,7 +10604,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v230">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v231">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -12932,6 +13233,307 @@ body.cvroom .chfab{display:none}
 .chdr .chgif:hover img{transform:none}
 
 @media(prefers-reduced-motion:reduce){.chdr .chgifp{animation:none}.chgifst.load i{animation:none}.chgifi,.chdr .chgplay{transition:none}}
+
+/* ======================= v231: chat polish — frosted glass, crisp depth, white + blue only =======================
+   Looks only. No layout, wording or behaviour changes. */
+
+/* ---------- the panel: deep blue night with soft light in two corners ---------- */
+:root:not([data-theme="light"]) .chdr{
+  background:
+    radial-gradient(86% 36% at 100% 0,hsl(var(--h) 100% 58% / .28),transparent 70%),
+    radial-gradient(74% 34% at 0 100%,hsl(var(--h) 100% 52% / .17),transparent 74%),
+    linear-gradient(180deg,hsl(var(--h) 72% 9.5%),hsl(var(--h) 84% 4%));
+  border-left:1px solid hsl(var(--h) 100% 90% / .2);
+  box-shadow:-1px 0 0 rgba(0,0,0,.55),-54px 0 110px -34px rgba(0,0,0,.96),inset 1px 0 0 rgba(255,255,255,.045)}
+:root[data-theme="light"] .chdr{
+  background:
+    radial-gradient(86% 36% at 100% 0,hsl(var(--h) 100% 66% / .2),transparent 70%),
+    radial-gradient(74% 34% at 0 100%,hsl(var(--h) 100% 70% / .16),transparent 74%),
+    linear-gradient(180deg,#fbfdff,hsl(var(--h) 100% 96%));
+  border-left:1px solid hsl(var(--h) 80% 50% / .22);
+  box-shadow:-54px 0 100px -38px hsl(var(--h) 80% 30% / .5)}
+
+/* a faint pattern of little game shapes behind the messages (triangles, squares, circles, crosses) */
+.chdr .chbody{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='176' viewBox='0 0 176 176' fill='none' stroke='%237fb2ff' stroke-opacity='.11' stroke-width='1.7' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M24 44l9-16 9 16z'/%3E%3Crect x='112' y='22' width='15' height='15' rx='3.5' transform='rotate(14 119 29)'/%3E%3Ccircle cx='64' cy='118' r='7'/%3E%3Cpath d='M140 106v14M133 113h14'/%3E%3Cpath d='M100 158l7-12 7 12z'/%3E%3Crect x='14' y='134' width='11' height='11' rx='3' transform='rotate(-12 19 139)'/%3E%3Ccircle cx='156' cy='62' r='4'/%3E%3Cpath d='M70 20v10M65 25h10'/%3E%3C/svg%3E");
+  background-size:176px 176px;background-attachment:local;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 12px),transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 12px),transparent 100%);
+  scrollbar-width:thin}
+:root[data-theme="light"] .chdr .chbody{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='176' viewBox='0 0 176 176' fill='none' stroke='%231f66e8' stroke-opacity='.085' stroke-width='1.7' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M24 44l9-16 9 16z'/%3E%3Crect x='112' y='22' width='15' height='15' rx='3.5' transform='rotate(14 119 29)'/%3E%3Ccircle cx='64' cy='118' r='7'/%3E%3Cpath d='M140 106v14M133 113h14'/%3E%3Cpath d='M100 158l7-12 7 12z'/%3E%3Crect x='14' y='134' width='11' height='11' rx='3' transform='rotate(-12 19 139)'/%3E%3Ccircle cx='156' cy='62' r='4'/%3E%3Cpath d='M70 20v10M65 25h10'/%3E%3C/svg%3E")}
+.chdr .chbody::-webkit-scrollbar{width:8px}
+.chdr .chbody::-webkit-scrollbar-track{background:transparent}
+.chdr .chbody::-webkit-scrollbar-thumb{border-radius:99px;border:2px solid transparent;background:hsl(var(--h) 100% 74% / .34);background-clip:padding-box}
+.chdr .chbody::-webkit-scrollbar-thumb:hover{background:hsl(var(--h) 100% 78% / .6);background-clip:padding-box}
+:root[data-theme="light"] .chdr .chbody::-webkit-scrollbar-thumb{background:hsl(var(--h) 90% 48% / .3);background-clip:padding-box}
+
+/* ---------- header: frosted glass ---------- */
+:root:not([data-theme="light"]) .chdr .chh{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 34% / .46),hsl(var(--h) 84% 14% / .52) 72%,hsl(var(--h) 84% 8% / .42));
+  -webkit-backdrop-filter:blur(22px) saturate(1.7);backdrop-filter:blur(22px) saturate(1.7);
+  border-bottom:1px solid hsl(var(--h) 100% 90% / .17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 30px -26px #000}
+:root[data-theme="light"] .chdr .chh{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),hsl(var(--h) 100% 97% / .92));
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
+  border-bottom:1px solid hsl(var(--h) 80% 50% / .16);
+  box-shadow:0 18px 28px -26px hsl(var(--h) 80% 30% / .55)}
+.chdr .cht b{letter-spacing:-.018em}
+:root:not([data-theme="light"]) .chdr .cht b{color:#fff}
+:root:not([data-theme="light"]) .chdr .cht small{color:hsl(var(--h) 100% 88% / .76)}
+:root[data-theme="light"] .chdr .cht b{color:#0b2a66}
+:root[data-theme="light"] .chdr .cht small{color:hsl(var(--h) 40% 34% / .85)}
+.chdr .chhav .av,.chdr .chhav .chrav{
+  box-shadow:0 0 0 2px rgba(255,255,255,.94),0 0 0 4.5px hsl(var(--h) 100% 62% / .3),0 10px 18px -8px rgba(0,0,0,.7)}
+:root[data-theme="light"] .chdr .chhav .av,:root[data-theme="light"] .chdr .chhav .chrav{
+  box-shadow:0 0 0 2px #fff,0 0 0 4.5px hsl(var(--h) 100% 55% / .32),0 10px 18px -8px hsl(var(--h) 80% 30% / .55)}
+.chdr .chb{transition:background .18s,box-shadow .18s,transform .2s var(--spring),color .18s}
+.chdr .chb:hover{background:hsl(var(--h) 100% 74% / .17);box-shadow:inset 0 0 0 1px hsl(var(--h) 100% 90% / .22)}
+:root[data-theme="light"] .chdr .chb:hover{background:hsl(var(--h) 90% 94%);box-shadow:inset 0 0 0 1px hsl(var(--h) 80% 50% / .22)}
+.chdr #chcallb{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 63%),hsl(var(--h) 98% 45%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 88% / .55),0 9px 16px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}
+.chdr #chcallb:hover{background:linear-gradient(160deg,hsl(var(--h) 100% 68%),hsl(var(--h) 98% 49%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .7),0 12px 20px -8px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.55)}
+
+/* ---------- faces: glossy blue discs with a white letter ---------- */
+.chdr .av:not(.pic){
+  background-image:linear-gradient(150deg,rgba(255,255,255,.38),rgba(255,255,255,0) 54%),linear-gradient(150deg,hsl(var(--h) 100% 63%),hsl(var(--h) 96% 41%));
+  color:#fff;font-weight:900;text-shadow:0 1px 2px rgba(0,30,120,.5)}
+.chdr .chrav.room{
+  background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,0) 54%),linear-gradient(150deg,hsl(var(--h) 100% 63%),hsl(var(--h) 96% 40%));
+  box-shadow:0 0 0 2px hsl(var(--h) 100% 92% / .34),0 10px 16px -8px hsl(var(--h) 100% 45% / .9),inset 0 1px 0 rgba(255,255,255,.4)}
+.chdr .chav .av{box-shadow:0 0 0 2px hsl(var(--h) 100% 90% / .4),0 6px 12px -6px rgba(0,0,0,.7)}
+.chdr .chrm .av,.chdr .chrav:not(.room){box-shadow:0 0 0 2px hsl(var(--h) 100% 92% / .3),0 8px 14px -8px rgba(0,0,0,.75)}
+:root[data-theme="light"] .chdr .chav .av{box-shadow:0 0 0 2px #fff,0 0 0 3.5px hsl(var(--h) 100% 55% / .3),0 6px 12px -6px hsl(var(--h) 80% 30% / .5)}
+:root[data-theme="light"] .chdr .chrm .av,:root[data-theme="light"] .chdr .chrav:not(.room){box-shadow:0 0 0 2px #fff,0 0 0 3.5px hsl(var(--h) 100% 55% / .26),0 8px 14px -8px hsl(var(--h) 80% 30% / .5)}
+
+/* ---------- the list: glass cards ---------- */
+:root:not([data-theme="light"]) .chdr .chrm{
+  background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 24px -18px #000}
+:root:not([data-theme="light"]) .chdr .chrm:hover{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .22),hsl(var(--h) 100% 60% / .09));
+  border-color:hsl(var(--h) 100% 90% / .42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 28px -18px hsl(var(--h) 100% 50% / .7)}
+:root:not([data-theme="light"]) .chdr .chrm.un{
+  background:linear-gradient(90deg,hsl(var(--h) 100% 64% / .3),hsl(var(--h) 100% 60% / .07));
+  border-color:hsl(var(--h) 100% 88% / .46)}
+:root[data-theme="light"] .chdr .chrm{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.5%));
+  border:1px solid hsl(var(--h) 80% 50% / .16);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .06),0 12px 24px -18px hsl(var(--h) 80% 30% / .55)}
+:root[data-theme="light"] .chdr .chrm:hover{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 93%));
+  border-color:hsl(var(--h) 80% 50% / .36);
+  box-shadow:0 16px 28px -18px hsl(var(--h) 90% 45% / .6)}
+.chdr .chrt b{letter-spacing:-.01em}
+:root:not([data-theme="light"]) .chdr .chrt b{color:#fff}
+:root:not([data-theme="light"]) .chdr .chrt small{color:hsl(var(--h) 45% 86% / .72)}
+:root[data-theme="light"] .chdr .chrt b{color:#0b2a66}
+:root[data-theme="light"] .chdr .chrt small{color:hsl(var(--h) 30% 36% / .85)}
+.chdr .chrr{font:800 11px/1 Outfit,sans-serif;letter-spacing:.05em;font-variant-numeric:tabular-nums}
+:root:not([data-theme="light"]) .chdr .chrr{color:hsl(var(--h) 100% 88% / .68)}
+:root[data-theme="light"] .chdr .chrr{color:hsl(var(--h) 40% 38% / .8)}
+.chdr .chud{box-shadow:0 0 0 3px hsl(var(--h) 100% 62% / .3),0 0 12px hsl(var(--h) 100% 62% / .7);background:#fff}
+:root[data-theme="light"] .chdr .chud{background:hsl(var(--h) 100% 50%);box-shadow:0 0 0 3px hsl(var(--h) 100% 55% / .22),0 0 10px hsl(var(--h) 100% 55% / .5)}
+.chdr .chsec{font:800 10.5px/1 Outfit,sans-serif;letter-spacing:.2em}
+:root:not([data-theme="light"]) .chdr .chsec{color:hsl(var(--h) 100% 88% / .6)}
+:root[data-theme="light"] .chdr .chsec{color:hsl(var(--h) 40% 36% / .8)}
+:root:not([data-theme="light"]) .chdr .chnewb{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .26),hsl(var(--h) 100% 60% / .12));
+  border:1px solid hsl(var(--h) 100% 90% / .38);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 18px -12px hsl(var(--h) 100% 50% / .8)}
+:root:not([data-theme="light"]) .chdr .chnewb:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 74% / .36),hsl(var(--h) 100% 62% / .18))}
+:root[data-theme="light"] .chdr .chnewb{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));
+  border:1px solid hsl(var(--h) 80% 50% / .34);color:#0b2a66;
+  box-shadow:0 10px 18px -14px hsl(var(--h) 90% 45% / .7)}
+.chdr .chfoot{max-width:300px;margin-left:auto;margin-right:auto;font-weight:500;line-height:1.55;text-wrap:balance}
+:root:not([data-theme="light"]) .chdr .chfoot{color:hsl(var(--h) 45% 86% / .55)}
+:root[data-theme="light"] .chdr .chfoot{color:hsl(var(--h) 30% 40% / .72)}
+
+/* ---------- day chips: solid, so an older one can never show through a newer one ---------- */
+:root:not([data-theme="light"]) .chdr .chday span{
+  background:linear-gradient(180deg,hsl(var(--h) 60% 20%),hsl(var(--h) 64% 14%));
+  border:1px solid hsl(var(--h) 100% 90% / .24);color:hsl(var(--h) 100% 94%);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px -10px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chday span{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%));
+  border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66;
+  box-shadow:0 10px 18px -12px hsl(var(--h) 80% 30% / .55)}
+.chdr .chday span{display:inline-block;min-width:124px;box-sizing:border-box;text-align:center;font:800 10.5px/1 Outfit,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+:root:not([data-theme="light"]) .chdr .chsys{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .16),hsl(var(--h) 100% 60% / .07));
+  border:1px solid hsl(var(--h) 100% 90% / .22);color:hsl(var(--h) 100% 94%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+
+/* ---------- bubbles ---------- */
+.chdr .chbub{font-weight:500;text-wrap:pretty;transition:box-shadow .2s,border-color .2s}
+.chdr .chbub p{text-wrap:pretty}
+:root:not([data-theme="light"]) .chdr .chbub{
+  background:linear-gradient(180deg,hsl(var(--h) 52% 21% / .97),hsl(var(--h) 58% 14.5% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .14);color:hsl(var(--h) 100% 98%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.4),0 14px 22px -14px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chbub{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.6%));
+  border:1px solid hsl(var(--h) 80% 50% / .17);color:#0b2a66;
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 12px 22px -16px hsl(var(--h) 80% 30% / .55)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub,:root[data-theme="light"] .chdr .chm.me .chbub{
+  background:linear-gradient(158deg,hsl(var(--h) 100% 63%) 0%,hsl(var(--h) 98% 51%) 50%,hsl(var(--h) 100% 43%) 100%);
+  border:1px solid hsl(var(--h) 100% 88% / .55);color:#fff;
+  text-shadow:0 1px 0 hsl(var(--h) 100% 26% / .32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 hsl(var(--h) 100% 30% / .22),0 1px 2px hsl(var(--h) 100% 30% / .28),0 12px 20px -10px hsl(var(--h) 100% 46% / .75)}
+.chdr .chm.me .chbub time,.chdr .chbub time{text-shadow:none;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+:root:not([data-theme="light"]) .chdr .chbub time{color:hsl(var(--h) 100% 90%);opacity:.6}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub time{color:#fff;opacity:.82}
+:root[data-theme="light"] .chdr .chbub time{color:hsl(var(--h) 40% 34%);opacity:.8}
+:root[data-theme="light"] .chdr .chm.me .chbub time{color:#fff;opacity:.88}
+:root:not([data-theme="light"]) .chdr .chnm{color:hsl(var(--h) 100% 82%);letter-spacing:.01em}
+:root[data-theme="light"] .chdr .chnm{color:hsl(var(--h) 100% 38%)}
+.chdr .chbub a{text-decoration-thickness:1.5px;text-underline-offset:3px;text-decoration-color:currentColor}
+:root:not([data-theme="light"]) .chdr .chbub a{color:hsl(var(--h) 100% 86%)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub a{color:#fff}
+:root[data-theme="light"] .chdr .chbub a{color:hsl(var(--h) 100% 38%)}
+:root[data-theme="light"] .chdr .chm.me .chbub a{color:#fff}
+/* picked / keyboard-focused message: a clean white ring with a soft blue halo */
+:root:not([data-theme="light"]) .chdr .chm.sel .chbub,:root:not([data-theme="light"]) .chdr .chm:focus-visible .chbub{
+  box-shadow:0 0 0 2px #fff,0 0 0 6px hsl(var(--h) 100% 60% / .38),0 16px 28px -14px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chm.sel .chbub,:root[data-theme="light"] .chdr .chm:focus-visible .chbub{
+  box-shadow:0 0 0 2px #fff,0 0 0 4.5px var(--acc2),0 0 0 8px hsl(var(--h) 100% 55% / .18),0 16px 28px -14px hsl(var(--h) 80% 30% / .55)}
+:root:not([data-theme="light"]) .chdr .chm.del .chbub{background:transparent;box-shadow:none;border:1px dashed hsl(var(--h) 100% 88% / .3)}
+:root[data-theme="light"] .chdr .chm.del .chbub{background:transparent;box-shadow:none;border:1px dashed hsl(var(--h) 80% 50% / .36)}
+:root:not([data-theme="light"]) .chdr .chm.fail .chbub{background:hsl(var(--h) 48% 17%);border:1px dashed hsl(var(--h) 100% 92% / .8);box-shadow:none}
+:root[data-theme="light"] .chdr .chm.fail .chbub{background:hsl(var(--h) 100% 96%);border:1px dashed var(--acc2);box-shadow:none;color:#0b2a66}
+
+/* reply quote inside a bubble */
+:root:not([data-theme="light"]) .chdr .chq{background:rgba(1,8,26,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);border-left-color:hsl(var(--h) 100% 80%)}
+:root:not([data-theme="light"]) .chdr .chq b{color:#fff}
+:root:not([data-theme="light"]) .chdr .chm.me .chq{background:rgba(0,20,100,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);border-left-color:#fff}
+:root[data-theme="light"] .chdr .chq{background:hsl(var(--h) 100% 96%);box-shadow:inset 0 0 0 1px hsl(var(--h) 80% 50% / .14);border-left-color:var(--acc2)}
+:root[data-theme="light"] .chdr .chq b{color:#0b2a66}
+:root[data-theme="light"] .chdr .chm.me .chq{background:rgba(0,20,100,.22);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);border-left-color:#fff}
+:root[data-theme="light"] .chdr .chm.me .chq b{color:#fff}
+
+/* photos in messages */
+.chdr .chimg{border-radius:16px;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 14px 24px -14px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chimg{box-shadow:0 0 0 1px hsl(var(--h) 80% 50% / .2),0 14px 24px -14px hsl(var(--h) 80% 30% / .6)}
+
+/* reactions: small glass pills */
+:root:not([data-theme="light"]) .chdr .chrxb{
+  background:linear-gradient(180deg,hsl(var(--h) 55% 22%),hsl(var(--h) 60% 15%));
+  border:1px solid hsl(var(--h) 100% 90% / .2);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 8px 14px -10px #000}
+:root[data-theme="light"] .chdr .chrxb{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%));
+  border:1px solid hsl(var(--h) 80% 50% / .26);color:#0b2a66;
+  box-shadow:0 8px 14px -10px hsl(var(--h) 80% 30% / .6)}
+.chdr .chrxb.on,:root[data-theme="light"] .chdr .chrxb.on,:root:not([data-theme="light"]) .chdr .chrxb.on{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 63%),hsl(var(--h) 98% 46%));color:#fff;
+  border:1px solid hsl(var(--h) 100% 90% / .55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 14px -8px hsl(var(--h) 100% 46% / .85)}
+
+/* the small buttons under a picked message, and the reaction picker */
+:root:not([data-theme="light"]) .chdr .chact button{
+  background:linear-gradient(180deg,hsl(var(--h) 100% 72% / .2),hsl(var(--h) 100% 60% / .09));
+  border:1px solid hsl(var(--h) 100% 90% / .3);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+:root:not([data-theme="light"]) .chdr .chact button:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 74% / .32),hsl(var(--h) 100% 62% / .16))}
+:root[data-theme="light"] .chdr .chact button{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 95%));
+  border:1px solid hsl(var(--h) 80% 50% / .3);color:#0b2a66;
+  box-shadow:0 8px 14px -12px hsl(var(--h) 80% 30% / .7)}
+:root[data-theme="light"] .chdr .chact button:hover{background:linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 91%))}
+:root:not([data-theme="light"]) .chdr .chpick{
+  background:linear-gradient(180deg,hsl(var(--h) 60% 18% / .97),hsl(var(--h) 66% 11% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 18px 32px -16px #000}
+:root[data-theme="light"] .chdr .chpick{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 97%));
+  border:1px solid hsl(var(--h) 80% 50% / .28);
+  box-shadow:0 18px 32px -18px hsl(var(--h) 80% 30% / .6)}
+
+/* the three-dot menu */
+:root:not([data-theme="light"]) .chdr .chmenu{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 17% / .98),hsl(var(--h) 70% 10% / .98));
+  border:1px solid hsl(var(--h) 100% 90% / .26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 34px 60px -22px #000}
+:root:not([data-theme="light"]) .chdr .chmenu button:hover{background:hsl(var(--h) 100% 72% / .2)}
+:root[data-theme="light"] .chdr .chmenu{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98%));border:1px solid hsl(var(--h) 80% 50% / .26)}
+.chdr .chmenu button svg{color:hsl(var(--h) 100% 78%)}
+:root[data-theme="light"] .chdr .chmenu button svg{color:var(--acc2)}
+
+/* ---------- the message bar ---------- */
+:root:not([data-theme="light"]) .chdr .chcomp{background:linear-gradient(180deg,transparent,hsl(var(--h) 84% 4% / .92) 36%)}
+:root[data-theme="light"] .chdr .chcomp{background:linear-gradient(180deg,transparent,hsl(var(--h) 100% 97% / .96) 36%);border-top:0}
+:root:not([data-theme="light"]) .chdr .chrow{
+  background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
+  border:1px solid rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 20px 36px -24px #000}
+:root:not([data-theme="light"]) .chdr .chrow:focus-within{
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.07));
+  border-color:hsl(var(--h) 100% 78% / .9);
+  box-shadow:0 0 0 3px hsl(var(--h) 100% 60% / .26),inset 0 1px 0 rgba(255,255,255,.12),0 20px 36px -24px #000}
+:root[data-theme="light"] .chdr .chrow{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.5%));
+  border:1px solid hsl(var(--h) 80% 50% / .3);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+:root[data-theme="light"] .chdr .chrow:focus-within{border-color:var(--acc2);box-shadow:0 0 0 3px hsl(var(--h) 100% 55% / .2),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+:root:not([data-theme="light"]) .chdr .chrow .chb{color:hsl(var(--h) 100% 92% / .86)}
+:root:not([data-theme="light"]) .chdr .chrow .chb:hover{color:#fff}
+:root[data-theme="light"] .chdr .chrow .chb{color:hsl(var(--h) 60% 30% / .9)}
+:root[data-theme="light"] .chdr .chrow .chb:hover{color:var(--acc2)}
+.chdr .chrow textarea{font-weight:500}
+:root:not([data-theme="light"]) .chdr .chrow textarea{color:#fff}
+.chdr .chsend{
+  background:linear-gradient(160deg,hsl(var(--h) 100% 64%),hsl(var(--h) 98% 45%));
+  box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .5),0 10px 18px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}
+.chdr .chsend:not(:disabled):hover{box-shadow:0 0 0 1px hsl(var(--h) 100% 92% / .7),0 14px 22px -8px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.55)}
+.chdr .chsend:disabled{filter:saturate(.55) brightness(.85);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+:root:not([data-theme="light"]) .chdr .chemo{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 15% / .98),hsl(var(--h) 70% 9% / .98));
+  border:1px solid hsl(var(--h) 100% 90% / .24);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 24px 40px -22px #000}
+:root[data-theme="light"] .chdr .chemo{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 97%));border:1px solid hsl(var(--h) 80% 50% / .26);box-shadow:0 24px 40px -24px hsl(var(--h) 80% 30% / .6)}
+.chdr .chemo button{transition:transform .14s var(--spring),background .14s}
+.chdr .chemo button:hover{transform:scale(1.18);background:hsl(var(--h) 100% 70% / .2)}
+:root[data-theme="light"] .chdr .chemo button:hover{background:hsl(var(--h) 100% 90%)}
+:root:not([data-theme="light"]) .chdr .chrbar{background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .18),hsl(var(--h) 100% 60% / .08));border:1px solid hsl(var(--h) 100% 90% / .24)}
+:root[data-theme="light"] .chdr .chrbar{background:hsl(var(--h) 100% 96%);border:1px solid hsl(var(--h) 80% 50% / .24)}
+.chdr .chprev img{border-color:hsl(var(--h) 100% 90% / .4);box-shadow:0 12px 20px -12px rgba(0,0,0,.85)}
+
+/* ---------- jump buttons ---------- */
+:root:not([data-theme="light"]) .chdr .chnew{
+  background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));color:#0b2a66;
+  box-shadow:0 0 0 1px rgba(255,255,255,.6),0 16px 28px -10px rgba(0,0,0,.8)}
+:root[data-theme="light"] .chdr .chnew{background:linear-gradient(160deg,hsl(var(--h) 100% 58%),hsl(var(--h) 98% 42%));color:#fff;box-shadow:0 0 0 1px hsl(var(--h) 100% 88% / .6),0 16px 26px -10px hsl(var(--h) 100% 42% / .8)}
+:root:not([data-theme="light"]) .chdr .chdown{
+  background:linear-gradient(180deg,hsl(var(--h) 62% 22% / .97),hsl(var(--h) 66% 13% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 26px -10px rgba(0,0,0,.9)}
+:root[data-theme="light"] .chdr .chdown{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 96%))}
+
+/* ---------- the round chat button ---------- */
+.chfab{
+  border:1px solid hsl(var(--h) 100% 90% / .55);
+  background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,0) 52%),linear-gradient(150deg,hsl(var(--h) 100% 62%),hsl(var(--h) 98% 42%));
+  box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .16),0 18px 30px -12px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.55)}
+.chfab:hover{box-shadow:0 0 0 7px hsl(var(--h) 100% 60% / .2),0 22px 34px -12px hsl(var(--h) 100% 45% / 1),inset 0 1px 0 rgba(255,255,255,.6)}
+.chdot{background:linear-gradient(180deg,#fff,hsl(var(--h) 100% 94%));box-shadow:0 0 0 2px hsl(var(--h) 100% 50%),0 6px 12px -2px rgba(0,0,0,.5)}
+:root[data-theme="light"] .chdot{background:linear-gradient(180deg,hsl(var(--h) 100% 30%),#0b2a66);box-shadow:0 0 0 2px #fff,0 6px 12px -2px hsl(var(--h) 80% 20% / .6)}
+
+/* ---------- notes, empty states, banner ---------- */
+:root:not([data-theme="light"]) .chdr .chbanner{background:linear-gradient(180deg,hsl(var(--h) 100% 70% / .2),hsl(var(--h) 100% 60% / .09));border-bottom:1px solid hsl(var(--h) 100% 90% / .22)}
+:root:not([data-theme="light"]) .chdr .chemi{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 14px 24px -14px hsl(var(--h) 100% 50% / .8)}
+.chdr .chempty{text-wrap:balance}
+
+@media(prefers-reduced-motion:reduce){.chdr .chb,.chdr .chbub,.chdr .chemo button{transition:none}}
+
+/* the reaction picker and message buttons float above the sticky day chip */
+.chdr .chpick,.chdr .chact{position:relative;z-index:3}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -15312,7 +15914,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v230js">
+<script id="v231js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -17074,7 +17676,7 @@ var _sh=window.show;
        1. Attach a .gif file (button, paste or drag in). It is sent exactly as it is, so it keeps moving. About 450 KB at most.
        2. Press GIF and pick one from Giphy. That sends only a link to Giphy's own picture server; the chat never keeps a copy.
      The server only accepts links on the GIF services' own picture hosts, and the page checks the same rule before it shows one. */
-  var GIPHY_KEY="";    // a free key from developers.giphy.com goes here. Until there is one, the GIF button stays hidden.
+  var GIPHY_KEY="38OdgVRslcnuuuURMzJ5kK0liDi6ByBV";    // the site's free GIPHY key. It is public by design (it sits in the page). Empty = the GIF button stays hidden.
   var GIFMAX=620000, GF={q:"",items:[],off:0,busy:false,err:false,done:false,seq:0,tm:0,hs:[0,0],drawn:0};
   CH.gifOn={};
   function gifOk(u){ u=String(u||""); return u.length<=300&&/^https:\/\/((media\d*|i)\.giphy\.com|(media\d*|c)\.tenor\.com)\/[A-Za-z0-9\/._~%+=@:,-]*(\?[A-Za-z0-9._~%+=&,-]*)?$/.test(u)&&u.split("?")[0].indexOf("..")<0; }
@@ -17118,7 +17720,12 @@ var _sh=window.show;
   }
   function gifSearch(q){ q=String(q||"").trim().slice(0,60); GF.q=q; GF.items=[]; GF.off=0; GF.done=false; GF.err=false; GF.seq++; GF.drawn=0; GF.hs=[0,0]; GF.busy=false; var g=$("chgifg"); if(g) g.scrollTop=0; gifPaint(); gifMore(); }
   function gifNorm(x){
-    var im=(x&&x.images)||{}, th=im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=im.downsized_medium||im.downsized||im.fixed_height||im.fixed_width;
+    // thumbnails: the sharper 200px "downsampled" copy (about half the bytes of the 100px "small" one).
+    // what gets sent: the best copy that is 700 KB or less, else the smallest one there is.
+    var im=(x&&x.images)||{}, th=im.fixed_width_downsampled||im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=null, small=null, k, c, sz,
+        order=["downsized_medium","downsized","fixed_height","fixed_height_downsampled","fixed_width","fixed_width_downsampled"];
+    for(k=0;k<order.length;k++){ c=im[order[k]]; if(!c||!c.url) continue; sz=+c.size||0; if(!small||(sz&&(!(+small.size)||sz<+small.size))) small=c; if(!big&&sz<=700000) big=c; }
+    big=big||small;
     if(!th||!big||!th.url||!big.url) return null;
     var u=String(big.url).split("?")[0], tu=String(th.url).split("?")[0];
     if(!gifOk(u)||!gifOk(tu)) return null;
@@ -20609,7 +21216,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v230js">
+<script id="v231js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -22371,7 +22978,7 @@ var _sh=window.show;
        1. Attach a .gif file (button, paste or drag in). It is sent exactly as it is, so it keeps moving. About 450 KB at most.
        2. Press GIF and pick one from Giphy. That sends only a link to Giphy's own picture server; the chat never keeps a copy.
      The server only accepts links on the GIF services' own picture hosts, and the page checks the same rule before it shows one. */
-  var GIPHY_KEY="";    // a free key from developers.giphy.com goes here. Until there is one, the GIF button stays hidden.
+  var GIPHY_KEY="38OdgVRslcnuuuURMzJ5kK0liDi6ByBV";    // the site's free GIPHY key. It is public by design (it sits in the page). Empty = the GIF button stays hidden.
   var GIFMAX=620000, GF={q:"",items:[],off:0,busy:false,err:false,done:false,seq:0,tm:0,hs:[0,0],drawn:0};
   CH.gifOn={};
   function gifOk(u){ u=String(u||""); return u.length<=300&&/^https:\/\/((media\d*|i)\.giphy\.com|(media\d*|c)\.tenor\.com)\/[A-Za-z0-9\/._~%+=@:,-]*(\?[A-Za-z0-9._~%+=&,-]*)?$/.test(u)&&u.split("?")[0].indexOf("..")<0; }
@@ -22415,7 +23022,12 @@ var _sh=window.show;
   }
   function gifSearch(q){ q=String(q||"").trim().slice(0,60); GF.q=q; GF.items=[]; GF.off=0; GF.done=false; GF.err=false; GF.seq++; GF.drawn=0; GF.hs=[0,0]; GF.busy=false; var g=$("chgifg"); if(g) g.scrollTop=0; gifPaint(); gifMore(); }
   function gifNorm(x){
-    var im=(x&&x.images)||{}, th=im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=im.downsized_medium||im.downsized||im.fixed_height||im.fixed_width;
+    // thumbnails: the sharper 200px "downsampled" copy (about half the bytes of the 100px "small" one).
+    // what gets sent: the best copy that is 700 KB or less, else the smallest one there is.
+    var im=(x&&x.images)||{}, th=im.fixed_width_downsampled||im.fixed_width_small||im.fixed_width||im.fixed_height||im.downsized, big=null, small=null, k, c, sz,
+        order=["downsized_medium","downsized","fixed_height","fixed_height_downsampled","fixed_width","fixed_width_downsampled"];
+    for(k=0;k<order.length;k++){ c=im[order[k]]; if(!c||!c.url) continue; sz=+c.size||0; if(!small||(sz&&(!(+small.size)||sz<+small.size))) small=c; if(!big&&sz<=700000) big=c; }
+    big=big||small;
     if(!th||!big||!th.url||!big.url) return null;
     var u=String(big.url).split("?")[0], tu=String(th.url).split("?")[0];
     if(!gifOk(u)||!gifOk(tu)) return null;
