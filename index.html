@@ -3797,7 +3797,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v232">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v233">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -6966,6 +6966,296 @@ body.cvroom .chfab{display:none}
 @media(prefers-reduced-motion:reduce){
   .chdr *,.chfab,.chshare{animation:none!important;transition:none!important}
 }
+/* ============================================================================
+   v233: the background, much more alive. White and blue only (follows the theme colour).
+   Seven thin layers inside #bgx, all moved with transform/opacity only (cheap for the GPU):
+     aurora glow (a1)  northern-lights curtains (a2)  floor bloom (a3)  soft bokeh orbs (bk)
+     light rays from the top (rays)  two layers of floating game shapes (g1, g2)
+     a glow that follows the mouse (cur)  and fine film grain (grain).
+   ============================================================================ */
+.bgx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:strict}
+.bgx i{position:absolute;display:block;pointer-events:none}
+
+/* ---- aurora glow: two big soft lights that slowly trade places ---- */
+.bgx .a1{left:-30%;top:-28%;width:160%;height:78%;transform:rotate(-7deg);will-change:transform,opacity;
+  background:
+    radial-gradient(46% 52% at 22% 44%,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 56% / .66),transparent 70%),
+    radial-gradient(38% 46% at 78% 38%,hsl(calc(var(--h) - 12) calc(var(--sat)*100%) 72% / .44),transparent 70%),
+    radial-gradient(30% 34% at 52% 70%,hsl(calc(var(--h) + 10) calc(var(--sat)*100%) 50% / .26),transparent 72%);
+  animation:bgxA1 34s ease-in-out infinite alternate}
+@keyframes bgxA1{0%{transform:translate3d(-3%,0,0) rotate(-7deg) scale(1);opacity:.85}100%{transform:translate3d(4%,4%,0) rotate(-3deg) scale(1.1);opacity:1}}
+
+/* ---- northern-lights curtains: soft vertical streaks that sway and breathe ---- */
+.bgx .a2{left:-12%;right:-12%;top:-6%;height:70%;opacity:.9;will-change:transform,opacity;transform-origin:50% 0;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 22px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 66% / .15) 34px,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 84% / .3) 44px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 66% / .12) 56px,transparent 78px 112px),
+    repeating-linear-gradient(90deg,transparent 0 70px,hsl(calc(var(--h) + 6) calc(var(--sat)*100%) 60% / .1) 96px,transparent 150px 211px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.72) 28%,transparent 86%),linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.72) 28%,transparent 86%),linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask-composite:intersect;
+  animation:bgxA2 22s ease-in-out infinite alternate}
+@keyframes bgxA2{0%{transform:translate3d(-2%,0,0) skewX(-3deg) scaleY(.94);opacity:.55}50%{opacity:1}100%{transform:translate3d(2%,0,0) skewX(4deg) scaleY(1.06);opacity:.8}}
+
+/* ---- a bloom rising off the floor ---- */
+.bgx .a3{left:-10%;right:-10%;bottom:-18%;height:58%;will-change:transform,opacity;
+  background:
+    radial-gradient(60% 56% at 50% 100%,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 56% / .5),transparent 72%),
+    radial-gradient(28% 36% at 12% 100%,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 70% / .3),transparent 74%),
+    radial-gradient(26% 34% at 90% 100%,hsl(calc(var(--h) + 8) calc(var(--sat)*100%) 66% / .28),transparent 74%);
+  animation:bgxA3 14s ease-in-out infinite alternate}
+@keyframes bgxA3{0%{transform:scale(1,.92);opacity:.7}100%{transform:scale(1.06,1.08);opacity:1}}
+
+/* ---- bokeh: big soft orbs, nearly still ---- */
+.bgx .bk{border-radius:50%;will-change:transform;opacity:.6}
+.bgx .b1{width:46vmax;height:46vmax;left:-14vmax;top:22%;background:radial-gradient(closest-side,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 62% / .22),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 60% / .06) 62%,transparent 72%);animation:bgxB1 60s ease-in-out infinite alternate}
+.bgx .b2{width:38vmax;height:38vmax;right:-12vmax;top:-10vmax;background:radial-gradient(closest-side,hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 76% / .2),hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 70% / .05) 62%,transparent 72%);animation:bgxB2 72s ease-in-out infinite alternate}
+.bgx .b3{width:30vmax;height:30vmax;right:6%;bottom:-8vmax;background:radial-gradient(closest-side,hsl(calc(var(--h) + 8) calc(var(--sat)*100%) 66% / .2),transparent 70%);animation:bgxB1 80s ease-in-out infinite alternate-reverse}
+@keyframes bgxB1{to{transform:translate3d(7vmax,-5vmax,0) scale(1.14)}}
+@keyframes bgxB2{to{transform:translate3d(-8vmax,7vmax,0) scale(1.1)}}
+
+/* ---- light rays fanning down from the top centre ---- */
+.bgx .rays{left:50%;top:-72vmax;width:144vmax;height:144vmax;margin-left:-72vmax;will-change:transform;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 5deg,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 86% / .075) 6.2deg 7deg,transparent 9deg 15deg),
+    repeating-conic-gradient(from 3deg at 50% 50%,transparent 0 8deg,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 76% / .05) 9.5deg 10.5deg,transparent 12deg 24deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 0,rgba(0,0,0,.65) 34%,transparent 70%);mask-image:radial-gradient(closest-side,#000 0,rgba(0,0,0,.65) 34%,transparent 70%);
+  animation:bgxRays 52s ease-in-out infinite alternate}
+@keyframes bgxRays{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+
+/* ---- floating game shapes (triangles, blocks, rings, diamonds…), two depths, drifting up ---- */
+.bgx .geo{left:0;right:0;top:0;will-change:transform}
+.bgx .g1{height:calc(100% + 600px);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600' fill='none' stroke='%23cfe4ff' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate%2892 84%29 rotate%2812%29' opacity='0.55' stroke-width='1.6' d='M0 -21.1 L18.4 12.2 L-18.4 12.2 Z'/%3E%3Crect transform='translate%28420 62%29 rotate%2818%29' opacity='0.42' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' x='-13.0' y='-13.0' width='26' height='26' rx='4.2'/%3E%3Cg transform='translate%28520 230%29 rotate%280%29' opacity='0.5' stroke-width='1.5'%3E%3Ccircle r='19.0'/%3E%3Ccircle r='9.5'/%3E%3C/g%3E%3Cpath transform='translate%28210 190%29 rotate%280%29' opacity='0.5' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -13.6 L9.9 0 L0 13.6 L-9.9 0 Z'/%3E%3Cpath transform='translate%28330 310%29 rotate%2845%29' opacity='0.5' stroke-width='1.6' d='M-9.0 0H9.0M0 -9.0V9.0'/%3E%3Ccircle transform='translate%2870 330%29 rotate%280%29' opacity='0.45' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='8.0'/%3E%3Cpath transform='translate%28470 420%29 rotate%28-8%29' opacity='0.55' stroke-width='1.6' d='M-15.0 12.6 L0 -15.0 L15.0 12.6 Z'/%3E%3Crect transform='translate%28150 440%29 rotate%28-14%29' opacity='0.35' stroke-width='1.5' x='-20.0' y='-20.0' width='40' height='40' rx='6.4'/%3E%3Cpath transform='translate%28300 520%29 rotate%28180%29' opacity='0.45' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -14.9 L13.0 8.6 L-13.0 8.6 Z'/%3E%3Cpath transform='translate%28560 540%29 rotate%280%29' opacity='0.45' stroke-width='1.6' d='M-8.0 0H8.0M0 -8.0V8.0'/%3E%3Ccircle transform='translate%28380 170%29 rotate%280%29' opacity='0.6' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='5.0'/%3E%3Cpath transform='translate%2860 540%29 rotate%2812%29' opacity='0.4' stroke-width='1.5' d='M0 -17.4 L12.6 0 L0 17.4 L-12.6 0 Z'/%3E%3Crect transform='translate%28250 60%29 rotate%2840%29' opacity='0.6' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' x='-6.0' y='-6.0' width='12' height='12' rx='1.9'/%3E%3Cg transform='translate%28250 330%29 rotate%280%29' opacity='0.35' stroke-width='1.4'%3E%3Ccircle r='11.0'/%3E%3Ccircle r='5.5'/%3E%3C/g%3E%3Cpath transform='translate%28560 110%29 rotate%28-20%29' opacity='0.4' stroke-width='1.5' d='M0 -11.2 L9.7 6.5 L-9.7 6.5 Z'/%3E%3Ccircle transform='translate%28160 270%29 rotate%280%29' opacity='0.55' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='4.0'/%3E%3C/svg%3E");background-size:600px 600px;opacity:.55;animation:bgxUp1 120s linear infinite}
+.bgx .g2{height:calc(100% + 900px);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900' fill='none' stroke='%23cfe4ff' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate%28150 170%29 rotate%280%29' opacity='0.34' stroke-width='2'%3E%3Ccircle r='60.0'/%3E%3Ccircle r='30.0'/%3E%3C/g%3E%3Crect transform='translate%28560 130%29 rotate%2822%29' opacity='0.26' stroke-width='2' x='-48.0' y='-48.0' width='96' height='96' rx='15.4'/%3E%3Cpath transform='translate%28360 420%29 rotate%288%29' opacity='0.28' stroke-width='2' d='M0 -68.2 L59.4 39.6 L-59.4 39.6 Z'/%3E%3Cpath transform='translate%28720 560%29 rotate%280%29' opacity='0.3' stroke-width='2' d='M0 -55.8 L40.5 0 L0 55.8 L-40.5 0 Z'/%3E%3Ccircle transform='translate%28130 620%29 rotate%280%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' r='35.0'/%3E%3Cpath transform='translate%28810 260%29 rotate%28-10%29' opacity='0.3' stroke-width='2' d='M-42.0 35.3 L0 -42.0 L42.0 35.3 Z'/%3E%3Cpath transform='translate%28500 780%29 rotate%2845%29' opacity='0.3' stroke-width='2' d='M-30.0 0H30.0M0 -30.0V30.0'/%3E%3Crect transform='translate%28270 820%29 rotate%28-16%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' x='-32.0' y='-32.0' width='64' height='64' rx='10.2'/%3E%3Cg transform='translate%28700 820%29 rotate%280%29' opacity='0.24' stroke-width='2'%3E%3Ccircle r='38.0'/%3E%3Ccircle r='19.0'/%3E%3C/g%3E%3Cpath transform='translate%28880 700%29 rotate%28170%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -31.0 L27.0 18.0 L-27.0 18.0 Z'/%3E%3C/svg%3E");background-size:900px 900px;opacity:.5;animation:bgxUp2 190s linear infinite}
+@keyframes bgxUp1{to{transform:translate3d(0,-600px,0)}}
+@keyframes bgxUp2{to{transform:translate3d(0,-900px,0)}}
+.bgx .geo{-webkit-mask-image:radial-gradient(ellipse 120% 100% at 50% 40%,#000 30%,rgba(0,0,0,.35) 100%);mask-image:radial-gradient(ellipse 120% 100% at 50% 40%,#000 30%,rgba(0,0,0,.35) 100%)}
+
+/* ---- a glow that follows the mouse (only on devices with a mouse) ---- */
+.bgx .cur{left:0;top:0;width:96vmin;height:96vmin;margin:-48vmin 0 0 -48vmin;opacity:0;transition:opacity .9s ease;will-change:transform;
+  transform:translate3d(var(--mx,50vw),var(--my,34vh),0);
+  background:radial-gradient(closest-side,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .28),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 62% / .1) 46%,transparent 72%)}
+.bgx.live .cur{opacity:1}
+
+/* ---- rim lights down both edges of the screen, breathing slowly ---- */
+.bgx::before,.bgx::after{content:"";position:absolute;top:0;bottom:0;width:min(24vw,340px);pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 66%,transparent);mask-image:linear-gradient(180deg,transparent,#000 18%,#000 66%,transparent);animation:bgxRim 11s ease-in-out infinite alternate;will-change:opacity}
+.bgx::before{left:0;background:linear-gradient(90deg,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 58% / .36),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 60% / .1) 40%,transparent)}
+.bgx::after{right:0;background:linear-gradient(270deg,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 66% / .3),hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 66% / .09) 40%,transparent);animation-delay:-5s}
+@keyframes bgxRim{0%{opacity:.55}100%{opacity:1}}
+:root[data-theme="light"] .bgx::before{background:linear-gradient(90deg,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 70% / .5),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 76% / .14) 42%,transparent)}
+:root[data-theme="light"] .bgx::after{background:linear-gradient(270deg,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 74% / .46),hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 80% / .12) 42%,transparent)}
+
+/* ---- fine film grain: breaks up banding and gives the glow some depth ---- */
+.bgx .grain{inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");background-size:180px 180px;opacity:.055;mix-blend-mode:normal}
+
+/* ======================= light theme: the same scene, but sunlit glass ======================= */
+:root[data-theme="light"] .bgx .a1{background:
+    radial-gradient(46% 52% at 22% 44%,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 66% / .55),transparent 70%),
+    radial-gradient(40% 46% at 78% 36%,hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 78% / .5),transparent 70%),
+    radial-gradient(34% 38% at 50% 72%,rgba(255,255,255,.7),transparent 72%)}
+:root[data-theme="light"] .bgx .a2{opacity:.8;background:
+    repeating-linear-gradient(90deg,transparent 0 22px,rgba(255,255,255,.55) 34px,hsl(calc(var(--h) - 4) calc(var(--sat)*100%) 80% / .6) 44px,rgba(255,255,255,.4) 56px,transparent 78px 112px),
+    repeating-linear-gradient(90deg,transparent 0 70px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .22) 96px,transparent 150px 211px)}
+:root[data-theme="light"] .bgx .a3{background:
+    radial-gradient(60% 56% at 50% 100%,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 62% / .5),transparent 72%),
+    radial-gradient(28% 36% at 12% 100%,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 74% / .4),transparent 74%),
+    radial-gradient(26% 34% at 90% 100%,hsl(calc(var(--h) + 6) calc(var(--sat)*100%) 70% / .36),transparent 74%)}
+:root[data-theme="light"] .bgx .bk{opacity:.95}
+:root[data-theme="light"] .bgx .b1{background:radial-gradient(closest-side,rgba(255,255,255,.95),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 82% / .3) 64%,transparent 72%)}
+:root[data-theme="light"] .bgx .b2{background:radial-gradient(closest-side,rgba(255,255,255,.9),hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 84% / .3) 64%,transparent 72%)}
+:root[data-theme="light"] .bgx .b3{background:radial-gradient(closest-side,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 70% / .4),transparent 70%)}
+:root[data-theme="light"] .bgx .rays{background:
+    repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 5deg,rgba(255,255,255,.8) 6.2deg 7deg,transparent 9deg 15deg),
+    repeating-conic-gradient(from 3deg at 50% 50%,transparent 0 8deg,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .13) 9.5deg 10.5deg,transparent 12deg 24deg)}
+:root[data-theme="light"] .bgx .g1{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600' fill='none' stroke='%232f6df0' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate%2892 84%29 rotate%2812%29' opacity='0.55' stroke-width='1.6' d='M0 -21.1 L18.4 12.2 L-18.4 12.2 Z'/%3E%3Crect transform='translate%28420 62%29 rotate%2818%29' opacity='0.42' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' x='-13.0' y='-13.0' width='26' height='26' rx='4.2'/%3E%3Cg transform='translate%28520 230%29 rotate%280%29' opacity='0.5' stroke-width='1.5'%3E%3Ccircle r='19.0'/%3E%3Ccircle r='9.5'/%3E%3C/g%3E%3Cpath transform='translate%28210 190%29 rotate%280%29' opacity='0.5' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' d='M0 -13.6 L9.9 0 L0 13.6 L-9.9 0 Z'/%3E%3Cpath transform='translate%28330 310%29 rotate%2845%29' opacity='0.5' stroke-width='1.6' d='M-9.0 0H9.0M0 -9.0V9.0'/%3E%3Ccircle transform='translate%2870 330%29 rotate%280%29' opacity='0.45' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='8.0'/%3E%3Cpath transform='translate%28470 420%29 rotate%28-8%29' opacity='0.55' stroke-width='1.6' d='M-15.0 12.6 L0 -15.0 L15.0 12.6 Z'/%3E%3Crect transform='translate%28150 440%29 rotate%28-14%29' opacity='0.35' stroke-width='1.5' x='-20.0' y='-20.0' width='40' height='40' rx='6.4'/%3E%3Cpath transform='translate%28300 520%29 rotate%28180%29' opacity='0.45' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' d='M0 -14.9 L13.0 8.6 L-13.0 8.6 Z'/%3E%3Cpath transform='translate%28560 540%29 rotate%280%29' opacity='0.45' stroke-width='1.6' d='M-8.0 0H8.0M0 -8.0V8.0'/%3E%3Ccircle transform='translate%28380 170%29 rotate%280%29' opacity='0.6' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='5.0'/%3E%3Cpath transform='translate%2860 540%29 rotate%2812%29' opacity='0.4' stroke-width='1.5' d='M0 -17.4 L12.6 0 L0 17.4 L-12.6 0 Z'/%3E%3Crect transform='translate%28250 60%29 rotate%2840%29' opacity='0.6' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' x='-6.0' y='-6.0' width='12' height='12' rx='1.9'/%3E%3Cg transform='translate%28250 330%29 rotate%280%29' opacity='0.35' stroke-width='1.4'%3E%3Ccircle r='11.0'/%3E%3Ccircle r='5.5'/%3E%3C/g%3E%3Cpath transform='translate%28560 110%29 rotate%28-20%29' opacity='0.4' stroke-width='1.5' d='M0 -11.2 L9.7 6.5 L-9.7 6.5 Z'/%3E%3Ccircle transform='translate%28160 270%29 rotate%280%29' opacity='0.55' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='4.0'/%3E%3C/svg%3E");opacity:.7}
+:root[data-theme="light"] .bgx .g2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900' fill='none' stroke='%232f6df0' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate%28150 170%29 rotate%280%29' opacity='0.34' stroke-width='2'%3E%3Ccircle r='60.0'/%3E%3Ccircle r='30.0'/%3E%3C/g%3E%3Crect transform='translate%28560 130%29 rotate%2822%29' opacity='0.26' stroke-width='2' x='-48.0' y='-48.0' width='96' height='96' rx='15.4'/%3E%3Cpath transform='translate%28360 420%29 rotate%288%29' opacity='0.28' stroke-width='2' d='M0 -68.2 L59.4 39.6 L-59.4 39.6 Z'/%3E%3Cpath transform='translate%28720 560%29 rotate%280%29' opacity='0.3' stroke-width='2' d='M0 -55.8 L40.5 0 L0 55.8 L-40.5 0 Z'/%3E%3Ccircle transform='translate%28130 620%29 rotate%280%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' r='35.0'/%3E%3Cpath transform='translate%28810 260%29 rotate%28-10%29' opacity='0.3' stroke-width='2' d='M-42.0 35.3 L0 -42.0 L42.0 35.3 Z'/%3E%3Cpath transform='translate%28500 780%29 rotate%2845%29' opacity='0.3' stroke-width='2' d='M-30.0 0H30.0M0 -30.0V30.0'/%3E%3Crect transform='translate%28270 820%29 rotate%28-16%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' x='-32.0' y='-32.0' width='64' height='64' rx='10.2'/%3E%3Cg transform='translate%28700 820%29 rotate%280%29' opacity='0.24' stroke-width='2'%3E%3Ccircle r='38.0'/%3E%3Ccircle r='19.0'/%3E%3C/g%3E%3Cpath transform='translate%28880 700%29 rotate%28170%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' d='M0 -31.0 L27.0 18.0 L-27.0 18.0 Z'/%3E%3C/svg%3E");opacity:.65}
+:root[data-theme="light"] .bgx .cur{background:radial-gradient(closest-side,rgba(255,255,255,.95),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 72% / .26) 48%,transparent 72%)}
+:root[data-theme="light"] .bgx .grain{opacity:.07;filter:invert(1)}
+
+/* ---- phones: fewer layers, no mouse glow, calmer motion ---- */
+@media(max-width:640px){
+  .bgx .g2,.bgx .b2,.bgx .cur{display:none}
+  .bgx .a2{height:54%}
+  .bgx .rays{top:-60vmax;width:120vmax;height:120vmax;margin-left:-60vmax}
+  .bgx .g1{animation-duration:170s}
+}
+@media(prefers-reduced-motion:reduce){
+  .bgx i{animation:none!important;transition:none!important}
+}
+@media print{.bgx{display:none}}
+
+/* ======================= glass cards: let the new background glow through ======================= */
+:root:not([data-theme="light"]) .panel{
+  background-color:rgba(8,20,40,.56)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.8)!important;backdrop-filter:blur(22px) saturate(1.8)!important;
+  box-shadow:inset 0 1px 0 rgba(214,232,255,.14),inset 0 0 0 1px rgba(255,255,255,.025),0 22px 54px -22px rgba(1,6,16,.8),0 30px 70px -40px hsl(var(--h) 100% 52% / .55)!important}
+:root[data-theme="light"] .panel{
+  background-image:linear-gradient(180deg,rgba(255,255,255,.86),hsl(var(--h) 100% 98% / .66))!important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.7)!important;backdrop-filter:blur(22px) saturate(1.7)!important;
+  box-shadow:inset 0 1px 0 #fff,0 18px 46px -22px hsl(var(--h) 80% 38% / .34),0 34px 70px -42px hsl(var(--h) 100% 50% / .5)!important}
+/* ============================================================================
+   v233: the chat, made to glow. Looks only (no layout, wording or behaviour changes). White and blue only.
+   A living aurora behind the messages, a light that sweeps the header, bubbles with a real gloss,
+   a ring of light around the message bar, a glowing chat button, glass menus.
+   ============================================================================ */
+
+/* ---------- the panel: a slow aurora lives behind everything ---------- */
+.chdr{isolation:isolate}
+.chdr::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background:
+    radial-gradient(56% 32% at 88% 4%,hsl(var(--h) 100% 66% / .66),transparent 70%),
+    radial-gradient(64% 36% at 6% 98%,hsl(var(--h) 100% 58% / .52),transparent 72%),
+    radial-gradient(42% 26% at 60% 52%,hsl(var(--h) 100% 72% / .2),transparent 72%),
+    radial-gradient(46% 28% at 10% 24%,hsl(calc(var(--h) - 10) 100% 70% / .24),transparent 72%),
+    radial-gradient(30% 20% at 92% 70%,hsl(calc(var(--h) + 8) 100% 66% / .22),transparent 72%);
+  background-size:130% 130%;background-position:0 0;animation:chAur 22s ease-in-out infinite alternate}
+.chdr::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(112deg,transparent 34%,hsl(var(--h) 100% 84% / .1) 46%,rgba(255,255,255,.14) 50%,hsl(var(--h) 100% 84% / .1) 54%,transparent 66%);
+  background-size:320% 100%;background-position:130% 0;animation:chBeam 14s ease-in-out infinite}
+@keyframes chBeam{0%{background-position:130% 0}70%,100%{background-position:-30% 0}}
+@keyframes chAur{0%{background-position:0 0}100%{background-position:100% 100%}}
+:root[data-theme="light"] .chdr::before{
+  background:
+    radial-gradient(56% 32% at 88% 4%,hsl(var(--h) 100% 68% / .5),transparent 70%),
+    radial-gradient(64% 36% at 6% 98%,hsl(var(--h) 100% 70% / .46),transparent 72%),
+    radial-gradient(42% 26% at 60% 52%,rgba(255,255,255,.95),transparent 72%),
+    radial-gradient(46% 28% at 10% 24%,hsl(calc(var(--h) - 8) 100% 80% / .5),transparent 72%),
+    radial-gradient(30% 20% at 92% 70%,hsl(calc(var(--h) + 6) 100% 78% / .4),transparent 72%);
+  background-size:130% 130%}
+:root[data-theme="light"] .chdr::after{background-image:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.35) 46%,rgba(255,255,255,.7) 50%,rgba(255,255,255,.35) 54%,transparent 66%)}
+
+/* the little game shapes behind the messages are a bit softer so the aurora can show */
+.chdr .chbody{background-color:transparent}
+
+/* ---------- header: a light that sweeps along its lower edge ---------- */
+.chdr .chh::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,hsl(var(--h) 100% 80% / .55) 38%,#fff 50%,hsl(var(--h) 100% 80% / .55) 62%,transparent);
+  background-size:42% 100%;background-repeat:no-repeat;background-position:-60% 0;opacity:.9;
+  animation:chSweep 6s cubic-bezier(.45,.05,.3,1) infinite}
+@keyframes chSweep{0%{background-position:-60% 0}62%,100%{background-position:170% 0}}
+:root[data-theme="light"] .chdr .chh::after{background-image:linear-gradient(90deg,transparent,hsl(var(--h) 100% 60% / .5) 38%,hsl(var(--h) 100% 48%) 50%,hsl(var(--h) 100% 60% / .5) 62%,transparent)}
+:root:not([data-theme="light"]) .chdr .cht b{background:linear-gradient(180deg,#fff 30%,hsl(var(--h) 100% 84%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 2px 10px hsl(var(--h) 100% 60% / .55))}
+:root[data-theme="light"] .chdr .cht b{background:linear-gradient(180deg,#0b2a66 20%,hsl(var(--h) 100% 40%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+/* the face next to the title breathes */
+.chdr .chhav .chrav.room,.chdr .chhav .av{animation:chBreathe 4.2s ease-in-out infinite}
+@keyframes chBreathe{0%,100%{box-shadow:0 0 0 2px rgba(255,255,255,.94),0 0 0 4.5px hsl(var(--h) 100% 62% / .3),0 10px 18px -8px rgba(0,0,0,.7)}50%{box-shadow:0 0 0 2px rgba(255,255,255,.98),0 0 0 8px hsl(var(--h) 100% 62% / .16),0 0 26px 2px hsl(var(--h) 100% 62% / .5)}}
+:root[data-theme="light"] .chdr .chhav .chrav.room,:root[data-theme="light"] .chdr .chhav .av{animation-name:chBreatheL}
+@keyframes chBreatheL{0%,100%{box-shadow:0 0 0 2px #fff,0 0 0 4.5px hsl(var(--h) 100% 55% / .32),0 10px 18px -8px hsl(var(--h) 80% 30% / .55)}50%{box-shadow:0 0 0 2px #fff,0 0 0 8px hsl(var(--h) 100% 55% / .16),0 0 24px 2px hsl(var(--h) 100% 55% / .4)}}
+
+/* ---------- the chat list: glass cards with a sheen that crosses on hover ---------- */
+:root:not([data-theme="light"]) .chdr .chrm{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.1) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 28px -14px hsl(var(--h) 100% 60% / .3),0 14px 26px -18px #000;
+  transition:background-position .7s cubic-bezier(.2,.7,.2,1),transform .25s var(--spring),border-color .2s,box-shadow .25s}
+:root:not([data-theme="light"]) .chdr .chrm:hover{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.16) 50%,transparent 62%) 160% 0/260% 100% no-repeat,linear-gradient(180deg,hsl(var(--h) 100% 72% / .26),hsl(var(--h) 100% 60% / .1));
+  border-color:hsl(var(--h) 100% 90% / .5);transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 30px -12px hsl(var(--h) 100% 66% / .5),0 18px 32px -16px hsl(var(--h) 100% 50% / .8)}
+:root:not([data-theme="light"]) .chdr .chrm.un{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.12) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(90deg,hsl(var(--h) 100% 64% / .34),hsl(var(--h) 100% 60% / .08));
+  border-color:hsl(var(--h) 100% 88% / .52)}
+:root[data-theme="light"] .chdr .chrm{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.9) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(180deg,#fff,hsl(var(--h) 100% 97.5%));
+  transition:background-position .7s cubic-bezier(.2,.7,.2,1),transform .25s var(--spring),border-color .2s,box-shadow .25s}
+:root[data-theme="light"] .chdr .chrm:hover{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) 160% 0/260% 100% no-repeat,linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 92%));
+  transform:translateY(-1px)}
+
+/* ---------- bubbles: a real gloss, with light that sits in the corner ---------- */
+:root:not([data-theme="light"]) .chdr .chbub{
+  background:
+    radial-gradient(130% 90% at 0 0,rgba(214,232,255,.13),transparent 52%),
+    linear-gradient(180deg,hsl(var(--h) 56% 23% / .97),hsl(var(--h) 62% 14.5% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 24px -18px hsl(var(--h) 100% 60% / .35),0 1px 2px rgba(0,0,0,.45),0 16px 26px -14px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chbub{
+  background:
+    radial-gradient(130% 90% at 0 0,hsl(var(--h) 100% 96%),transparent 54%),
+    linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.4%));
+  border:1px solid hsl(var(--h) 80% 50% / .19);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 14px 26px -16px hsl(var(--h) 80% 30% / .6)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub,:root[data-theme="light"] .chdr .chm.me .chbub{
+  background:
+    radial-gradient(90% 60% at 10% 0,rgba(255,255,255,.5),transparent 58%),
+    radial-gradient(70% 60% at 100% 100%,hsl(var(--h) 100% 78% / .32),transparent 70%),
+    linear-gradient(158deg,hsl(var(--h) 100% 68%) 0%,hsl(var(--h) 98% 53%) 48%,hsl(var(--h) 100% 42%) 100%);
+  border:1px solid hsl(var(--h) 100% 90% / .62);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 hsl(var(--h) 100% 30% / .24),0 1px 2px hsl(var(--h) 100% 30% / .3),0 18px 32px -12px hsl(var(--h) 100% 50% / .95),0 0 34px -8px hsl(var(--h) 100% 62% / .55)}
+:root[data-theme="light"] .chdr .chm.me .chbub{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 hsl(var(--h) 100% 30% / .24),0 1px 2px hsl(var(--h) 100% 30% / .3),0 18px 30px -12px hsl(var(--h) 100% 48% / .8)}
+/* a message that mentions you gets a soft halo */
+:root:not([data-theme="light"]) .chdr .chm.mn .chbub{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px hsl(var(--h) 100% 78% / .5),0 0 30px -4px hsl(var(--h) 100% 62% / .55),0 16px 26px -14px rgba(0,0,0,.95)}
+/* new messages arrive with a little spring */
+.chdr .chm.chin{animation:chMsgIn233 .42s var(--spring) both}
+@keyframes chMsgIn233{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+
+/* ---------- reactions ---------- */
+:root:not([data-theme="light"]) .chdr .chrxb{background:linear-gradient(180deg,hsl(var(--h) 58% 25%),hsl(var(--h) 62% 16%));border-color:hsl(var(--h) 100% 90% / .26);transition:transform .18s var(--spring),box-shadow .2s}
+.chdr .chrxb:hover{transform:translateY(-2px) scale(1.06)}
+.chdr .chrxb.on,:root[data-theme="light"] .chdr .chrxb.on,:root:not([data-theme="light"]) .chdr .chrxb.on{
+  background:radial-gradient(100% 80% at 20% 0,rgba(255,255,255,.4),transparent 60%),linear-gradient(160deg,hsl(var(--h) 100% 66%),hsl(var(--h) 98% 46%));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 16px -6px hsl(var(--h) 100% 46% / .9),0 0 18px -4px hsl(var(--h) 100% 62% / .6)}
+
+/* ---------- the message bar: a ring of light travels around it while you write ---------- */
+@property --chang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.chdr .chrow{position:relative}
+.chdr .chrow::before{content:"";position:absolute;inset:-1.5px;border-radius:inherit;padding:2px;pointer-events:none;opacity:0;transition:opacity .35s ease;
+  background:conic-gradient(from var(--chang),transparent 0 52%,hsl(var(--h) 100% 66%) 70%,#fff 82%,hsl(var(--h) 100% 70%) 90%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:chRing 3.4s linear infinite;animation-play-state:paused}
+.chdr .chrow:focus-within::before{opacity:1;animation-play-state:running}
+@keyframes chRing{to{--chang:360deg}}
+:root[data-theme="light"] .chdr .chrow::before{background:conic-gradient(from var(--chang),transparent 0 52%,hsl(var(--h) 100% 62%) 70%,hsl(var(--h) 100% 46%) 82%,hsl(var(--h) 100% 66%) 90%,transparent 100%)}
+:root:not([data-theme="light"]) .chdr .chrow{background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6)}
+:root:not([data-theme="light"]) .chdr .chrow:focus-within{border-color:hsl(var(--h) 100% 78% / .5);box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .16),0 0 40px -8px hsl(var(--h) 100% 60% / .5),inset 0 1px 0 rgba(255,255,255,.14),0 20px 36px -24px #000}
+:root[data-theme="light"] .chdr .chrow:focus-within{border-color:hsl(var(--h) 100% 55% / .5);box-shadow:0 0 0 4px hsl(var(--h) 100% 55% / .14),0 0 36px -10px hsl(var(--h) 100% 55% / .5),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+/* the send button wakes up when there is something to send */
+.chdr .chsend:not(:disabled){animation:chSendGlow 2.6s ease-in-out infinite}
+@keyframes chSendGlow{0%,100%{box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .5),0 10px 18px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}50%{box-shadow:0 0 0 1px hsl(var(--h) 100% 92% / .7),0 12px 26px -6px hsl(var(--h) 100% 50% / 1),0 0 26px -2px hsl(var(--h) 100% 66% / .7),inset 0 1px 0 rgba(255,255,255,.6)}}
+.chdr .chsend:not(:disabled):active{transform:scale(.9)}
+
+/* ---------- menus, pickers and popups: glass with a lit top edge ---------- */
+:root:not([data-theme="light"]) .chdr .chmenu,:root:not([data-theme="light"]) .chdr .chpick,:root:not([data-theme="light"]) .chdr .chemo,:root:not([data-theme="light"]) .chdr .chment{
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);
+  border-color:hsl(var(--h) 100% 90% / .32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 1px rgba(0,0,0,.25),0 30px 56px -22px #000,0 0 44px -18px hsl(var(--h) 100% 60% / .5)}
+:root[data-theme="light"] .chdr .chmenu,:root[data-theme="light"] .chdr .chpick,:root[data-theme="light"] .chdr .chemo,:root[data-theme="light"] .chdr .chment{
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);
+  box-shadow:inset 0 1px 0 #fff,0 28px 50px -22px hsl(var(--h) 80% 30% / .6),0 0 40px -20px hsl(var(--h) 100% 55% / .5)}
+.chdr .chpick button{transition:transform .16s var(--spring),background .16s}
+.chdr .chpick button:hover{transform:translateY(-3px) scale(1.2)}
+
+/* ---------- cards inside messages ---------- */
+:root:not([data-theme="light"]) .chdr .chlv{background:radial-gradient(120% 140% at 0 0,hsl(var(--h) 100% 74% / .3),transparent 60%),linear-gradient(135deg,hsl(var(--h) 100% 60% / .26),hsl(var(--h) 100% 48% / .1));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 14px 26px -16px hsl(var(--h) 100% 50% / .75)}
+.chdr .chlvr{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 10px 18px -8px hsl(var(--h) 100% 45% / .9),0 0 22px -4px hsl(var(--h) 100% 62% / .5)}
+:root:not([data-theme="light"]) .chdr .chyt{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 14px 26px -16px #000,0 0 30px -14px hsl(var(--h) 100% 55% / .5)}
+/* the pinned strip and the day chip pick up the same lit edge */
+:root:not([data-theme="light"]) .chdr .chpin{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 24px -16px #000,0 0 36px -16px hsl(var(--h) 100% 60% / .55)}
+
+/* ---------- the round chat button: a ring of light turns around it ---------- */
+.chfab{overflow:visible}
+.chfab::before{content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;padding:2px;
+  background:conic-gradient(from var(--chang),transparent 0 40%,hsl(var(--h) 100% 78% / .9) 66%,#fff 80%,transparent 96%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:chRing 5s linear infinite;opacity:.85}
+.chfab::after{content:"";position:absolute;inset:-2px;border-radius:50%;pointer-events:none;border:2px solid hsl(var(--h) 100% 70% / .5);animation:chPing 3.4s ease-out infinite;opacity:0}
+@keyframes chPing{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(1.5);opacity:0}}
+:root[data-theme="light"] .chfab::before{background:conic-gradient(from var(--chang),transparent 0 40%,hsl(var(--h) 100% 60% / .9) 66%,hsl(var(--h) 100% 45%) 80%,transparent 96%)}
+:root[data-theme="light"] .chfab::after{border-color:hsl(var(--h) 100% 55% / .5)}
+
+/* ---------- empty states and the small helpers ---------- */
+:root:not([data-theme="light"]) .chdr .chemi{background:radial-gradient(100% 100% at 30% 0,hsl(var(--h) 100% 78% / .4),transparent 70%),linear-gradient(160deg,hsl(var(--h) 100% 62% / .32),hsl(var(--h) 100% 46% / .14));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 14px 28px -14px hsl(var(--h) 100% 50% / .9),0 0 34px -8px hsl(var(--h) 100% 62% / .5)}
+
+@media(max-width:640px){
+  .chdr::before{animation-duration:30s}
+  .chdr .chm.chin{animation-duration:.34s}
+}
+@media(prefers-reduced-motion:reduce){
+  .chdr::before,.chdr::after,.chdr .chh::after,.chdr .chhav .chrav.room,.chdr .chhav .av,.chdr .chrow::before,.chdr .chsend:not(:disabled),.chfab::before,.chfab::after,.chdr .chm.chin{animation:none!important}
+  .chdr .chrm{transition:none!important}
+}
+
+/* list rows only fade in when the list opens, not on every background refresh */
+.chdr .chrm.chre{animation:none}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -10843,7 +11133,7 @@ header:after{content:"";position:absolute;left:8%;right:8%;bottom:-1px;height:1p
 }
 @media(prefers-reduced-motion:reduce){#app .lhead .mstat,#app #rows .row,#app #rows .row .pts,#app .fbar .chip{transition:none!important}}
 </style>
-<style id="v232">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
+<style id="v233">/* ================= v203: packs, games, team, legacy/pending, chart, countries, changelog filters (white + blue only) ================= */
 #app{--ease:cubic-bezier(.2,.8,.2,1)}
 @keyframes v203rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #app .gback{margin:0 0 14px}
@@ -14012,6 +14302,296 @@ body.cvroom .chfab{display:none}
 @media(prefers-reduced-motion:reduce){
   .chdr *,.chfab,.chshare{animation:none!important;transition:none!important}
 }
+/* ============================================================================
+   v233: the background, much more alive. White and blue only (follows the theme colour).
+   Seven thin layers inside #bgx, all moved with transform/opacity only (cheap for the GPU):
+     aurora glow (a1)  northern-lights curtains (a2)  floor bloom (a3)  soft bokeh orbs (bk)
+     light rays from the top (rays)  two layers of floating game shapes (g1, g2)
+     a glow that follows the mouse (cur)  and fine film grain (grain).
+   ============================================================================ */
+.bgx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:strict}
+.bgx i{position:absolute;display:block;pointer-events:none}
+
+/* ---- aurora glow: two big soft lights that slowly trade places ---- */
+.bgx .a1{left:-30%;top:-28%;width:160%;height:78%;transform:rotate(-7deg);will-change:transform,opacity;
+  background:
+    radial-gradient(46% 52% at 22% 44%,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 56% / .66),transparent 70%),
+    radial-gradient(38% 46% at 78% 38%,hsl(calc(var(--h) - 12) calc(var(--sat)*100%) 72% / .44),transparent 70%),
+    radial-gradient(30% 34% at 52% 70%,hsl(calc(var(--h) + 10) calc(var(--sat)*100%) 50% / .26),transparent 72%);
+  animation:bgxA1 34s ease-in-out infinite alternate}
+@keyframes bgxA1{0%{transform:translate3d(-3%,0,0) rotate(-7deg) scale(1);opacity:.85}100%{transform:translate3d(4%,4%,0) rotate(-3deg) scale(1.1);opacity:1}}
+
+/* ---- northern-lights curtains: soft vertical streaks that sway and breathe ---- */
+.bgx .a2{left:-12%;right:-12%;top:-6%;height:70%;opacity:.9;will-change:transform,opacity;transform-origin:50% 0;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 22px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 66% / .15) 34px,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 84% / .3) 44px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 66% / .12) 56px,transparent 78px 112px),
+    repeating-linear-gradient(90deg,transparent 0 70px,hsl(calc(var(--h) + 6) calc(var(--sat)*100%) 60% / .1) 96px,transparent 150px 211px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.72) 28%,transparent 86%),linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.72) 28%,transparent 86%),linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask-composite:intersect;
+  animation:bgxA2 22s ease-in-out infinite alternate}
+@keyframes bgxA2{0%{transform:translate3d(-2%,0,0) skewX(-3deg) scaleY(.94);opacity:.55}50%{opacity:1}100%{transform:translate3d(2%,0,0) skewX(4deg) scaleY(1.06);opacity:.8}}
+
+/* ---- a bloom rising off the floor ---- */
+.bgx .a3{left:-10%;right:-10%;bottom:-18%;height:58%;will-change:transform,opacity;
+  background:
+    radial-gradient(60% 56% at 50% 100%,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 56% / .5),transparent 72%),
+    radial-gradient(28% 36% at 12% 100%,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 70% / .3),transparent 74%),
+    radial-gradient(26% 34% at 90% 100%,hsl(calc(var(--h) + 8) calc(var(--sat)*100%) 66% / .28),transparent 74%);
+  animation:bgxA3 14s ease-in-out infinite alternate}
+@keyframes bgxA3{0%{transform:scale(1,.92);opacity:.7}100%{transform:scale(1.06,1.08);opacity:1}}
+
+/* ---- bokeh: big soft orbs, nearly still ---- */
+.bgx .bk{border-radius:50%;will-change:transform;opacity:.6}
+.bgx .b1{width:46vmax;height:46vmax;left:-14vmax;top:22%;background:radial-gradient(closest-side,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 62% / .22),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 60% / .06) 62%,transparent 72%);animation:bgxB1 60s ease-in-out infinite alternate}
+.bgx .b2{width:38vmax;height:38vmax;right:-12vmax;top:-10vmax;background:radial-gradient(closest-side,hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 76% / .2),hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 70% / .05) 62%,transparent 72%);animation:bgxB2 72s ease-in-out infinite alternate}
+.bgx .b3{width:30vmax;height:30vmax;right:6%;bottom:-8vmax;background:radial-gradient(closest-side,hsl(calc(var(--h) + 8) calc(var(--sat)*100%) 66% / .2),transparent 70%);animation:bgxB1 80s ease-in-out infinite alternate-reverse}
+@keyframes bgxB1{to{transform:translate3d(7vmax,-5vmax,0) scale(1.14)}}
+@keyframes bgxB2{to{transform:translate3d(-8vmax,7vmax,0) scale(1.1)}}
+
+/* ---- light rays fanning down from the top centre ---- */
+.bgx .rays{left:50%;top:-72vmax;width:144vmax;height:144vmax;margin-left:-72vmax;will-change:transform;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 5deg,hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 86% / .075) 6.2deg 7deg,transparent 9deg 15deg),
+    repeating-conic-gradient(from 3deg at 50% 50%,transparent 0 8deg,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 76% / .05) 9.5deg 10.5deg,transparent 12deg 24deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 0,rgba(0,0,0,.65) 34%,transparent 70%);mask-image:radial-gradient(closest-side,#000 0,rgba(0,0,0,.65) 34%,transparent 70%);
+  animation:bgxRays 52s ease-in-out infinite alternate}
+@keyframes bgxRays{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+
+/* ---- floating game shapes (triangles, blocks, rings, diamonds…), two depths, drifting up ---- */
+.bgx .geo{left:0;right:0;top:0;will-change:transform}
+.bgx .g1{height:calc(100% + 600px);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600' fill='none' stroke='%23cfe4ff' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate%2892 84%29 rotate%2812%29' opacity='0.55' stroke-width='1.6' d='M0 -21.1 L18.4 12.2 L-18.4 12.2 Z'/%3E%3Crect transform='translate%28420 62%29 rotate%2818%29' opacity='0.42' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' x='-13.0' y='-13.0' width='26' height='26' rx='4.2'/%3E%3Cg transform='translate%28520 230%29 rotate%280%29' opacity='0.5' stroke-width='1.5'%3E%3Ccircle r='19.0'/%3E%3Ccircle r='9.5'/%3E%3C/g%3E%3Cpath transform='translate%28210 190%29 rotate%280%29' opacity='0.5' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -13.6 L9.9 0 L0 13.6 L-9.9 0 Z'/%3E%3Cpath transform='translate%28330 310%29 rotate%2845%29' opacity='0.5' stroke-width='1.6' d='M-9.0 0H9.0M0 -9.0V9.0'/%3E%3Ccircle transform='translate%2870 330%29 rotate%280%29' opacity='0.45' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='8.0'/%3E%3Cpath transform='translate%28470 420%29 rotate%28-8%29' opacity='0.55' stroke-width='1.6' d='M-15.0 12.6 L0 -15.0 L15.0 12.6 Z'/%3E%3Crect transform='translate%28150 440%29 rotate%28-14%29' opacity='0.35' stroke-width='1.5' x='-20.0' y='-20.0' width='40' height='40' rx='6.4'/%3E%3Cpath transform='translate%28300 520%29 rotate%28180%29' opacity='0.45' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -14.9 L13.0 8.6 L-13.0 8.6 Z'/%3E%3Cpath transform='translate%28560 540%29 rotate%280%29' opacity='0.45' stroke-width='1.6' d='M-8.0 0H8.0M0 -8.0V8.0'/%3E%3Ccircle transform='translate%28380 170%29 rotate%280%29' opacity='0.6' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='5.0'/%3E%3Cpath transform='translate%2860 540%29 rotate%2812%29' opacity='0.4' stroke-width='1.5' d='M0 -17.4 L12.6 0 L0 17.4 L-12.6 0 Z'/%3E%3Crect transform='translate%28250 60%29 rotate%2840%29' opacity='0.6' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' x='-6.0' y='-6.0' width='12' height='12' rx='1.9'/%3E%3Cg transform='translate%28250 330%29 rotate%280%29' opacity='0.35' stroke-width='1.4'%3E%3Ccircle r='11.0'/%3E%3Ccircle r='5.5'/%3E%3C/g%3E%3Cpath transform='translate%28560 110%29 rotate%28-20%29' opacity='0.4' stroke-width='1.5' d='M0 -11.2 L9.7 6.5 L-9.7 6.5 Z'/%3E%3Ccircle transform='translate%28160 270%29 rotate%280%29' opacity='0.55' stroke-width='1.5' fill='%23cfe4ff' fill-opacity='0.14' r='4.0'/%3E%3C/svg%3E");background-size:600px 600px;opacity:.55;animation:bgxUp1 120s linear infinite}
+.bgx .g2{height:calc(100% + 900px);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900' fill='none' stroke='%23cfe4ff' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate%28150 170%29 rotate%280%29' opacity='0.34' stroke-width='2'%3E%3Ccircle r='60.0'/%3E%3Ccircle r='30.0'/%3E%3C/g%3E%3Crect transform='translate%28560 130%29 rotate%2822%29' opacity='0.26' stroke-width='2' x='-48.0' y='-48.0' width='96' height='96' rx='15.4'/%3E%3Cpath transform='translate%28360 420%29 rotate%288%29' opacity='0.28' stroke-width='2' d='M0 -68.2 L59.4 39.6 L-59.4 39.6 Z'/%3E%3Cpath transform='translate%28720 560%29 rotate%280%29' opacity='0.3' stroke-width='2' d='M0 -55.8 L40.5 0 L0 55.8 L-40.5 0 Z'/%3E%3Ccircle transform='translate%28130 620%29 rotate%280%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' r='35.0'/%3E%3Cpath transform='translate%28810 260%29 rotate%28-10%29' opacity='0.3' stroke-width='2' d='M-42.0 35.3 L0 -42.0 L42.0 35.3 Z'/%3E%3Cpath transform='translate%28500 780%29 rotate%2845%29' opacity='0.3' stroke-width='2' d='M-30.0 0H30.0M0 -30.0V30.0'/%3E%3Crect transform='translate%28270 820%29 rotate%28-16%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' x='-32.0' y='-32.0' width='64' height='64' rx='10.2'/%3E%3Cg transform='translate%28700 820%29 rotate%280%29' opacity='0.24' stroke-width='2'%3E%3Ccircle r='38.0'/%3E%3Ccircle r='19.0'/%3E%3C/g%3E%3Cpath transform='translate%28880 700%29 rotate%28170%29' opacity='0.26' stroke-width='2' fill='%23cfe4ff' fill-opacity='0.14' d='M0 -31.0 L27.0 18.0 L-27.0 18.0 Z'/%3E%3C/svg%3E");background-size:900px 900px;opacity:.5;animation:bgxUp2 190s linear infinite}
+@keyframes bgxUp1{to{transform:translate3d(0,-600px,0)}}
+@keyframes bgxUp2{to{transform:translate3d(0,-900px,0)}}
+.bgx .geo{-webkit-mask-image:radial-gradient(ellipse 120% 100% at 50% 40%,#000 30%,rgba(0,0,0,.35) 100%);mask-image:radial-gradient(ellipse 120% 100% at 50% 40%,#000 30%,rgba(0,0,0,.35) 100%)}
+
+/* ---- a glow that follows the mouse (only on devices with a mouse) ---- */
+.bgx .cur{left:0;top:0;width:96vmin;height:96vmin;margin:-48vmin 0 0 -48vmin;opacity:0;transition:opacity .9s ease;will-change:transform;
+  transform:translate3d(var(--mx,50vw),var(--my,34vh),0);
+  background:radial-gradient(closest-side,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .28),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 62% / .1) 46%,transparent 72%)}
+.bgx.live .cur{opacity:1}
+
+/* ---- rim lights down both edges of the screen, breathing slowly ---- */
+.bgx::before,.bgx::after{content:"";position:absolute;top:0;bottom:0;width:min(24vw,340px);pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 66%,transparent);mask-image:linear-gradient(180deg,transparent,#000 18%,#000 66%,transparent);animation:bgxRim 11s ease-in-out infinite alternate;will-change:opacity}
+.bgx::before{left:0;background:linear-gradient(90deg,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 58% / .36),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 60% / .1) 40%,transparent)}
+.bgx::after{right:0;background:linear-gradient(270deg,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 66% / .3),hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 66% / .09) 40%,transparent);animation-delay:-5s}
+@keyframes bgxRim{0%{opacity:.55}100%{opacity:1}}
+:root[data-theme="light"] .bgx::before{background:linear-gradient(90deg,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 70% / .5),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 76% / .14) 42%,transparent)}
+:root[data-theme="light"] .bgx::after{background:linear-gradient(270deg,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 74% / .46),hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 80% / .12) 42%,transparent)}
+
+/* ---- fine film grain: breaks up banding and gives the glow some depth ---- */
+.bgx .grain{inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");background-size:180px 180px;opacity:.055;mix-blend-mode:normal}
+
+/* ======================= light theme: the same scene, but sunlit glass ======================= */
+:root[data-theme="light"] .bgx .a1{background:
+    radial-gradient(46% 52% at 22% 44%,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 66% / .55),transparent 70%),
+    radial-gradient(40% 46% at 78% 36%,hsl(calc(var(--h) - 10) calc(var(--sat)*100%) 78% / .5),transparent 70%),
+    radial-gradient(34% 38% at 50% 72%,rgba(255,255,255,.7),transparent 72%)}
+:root[data-theme="light"] .bgx .a2{opacity:.8;background:
+    repeating-linear-gradient(90deg,transparent 0 22px,rgba(255,255,255,.55) 34px,hsl(calc(var(--h) - 4) calc(var(--sat)*100%) 80% / .6) 44px,rgba(255,255,255,.4) 56px,transparent 78px 112px),
+    repeating-linear-gradient(90deg,transparent 0 70px,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .22) 96px,transparent 150px 211px)}
+:root[data-theme="light"] .bgx .a3{background:
+    radial-gradient(60% 56% at 50% 100%,hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 62% / .5),transparent 72%),
+    radial-gradient(28% 36% at 12% 100%,hsl(calc(var(--h) - 6) calc(var(--sat)*100%) 74% / .4),transparent 74%),
+    radial-gradient(26% 34% at 90% 100%,hsl(calc(var(--h) + 6) calc(var(--sat)*100%) 70% / .36),transparent 74%)}
+:root[data-theme="light"] .bgx .bk{opacity:.95}
+:root[data-theme="light"] .bgx .b1{background:radial-gradient(closest-side,rgba(255,255,255,.95),hsl(calc(var(--h) + 0) calc(var(--sat)*100%) 82% / .3) 64%,transparent 72%)}
+:root[data-theme="light"] .bgx .b2{background:radial-gradient(closest-side,rgba(255,255,255,.9),hsl(calc(var(--h) - 8) calc(var(--sat)*100%) 84% / .3) 64%,transparent 72%)}
+:root[data-theme="light"] .bgx .b3{background:radial-gradient(closest-side,hsl(calc(var(--h) + 4) calc(var(--sat)*100%) 70% / .4),transparent 70%)}
+:root[data-theme="light"] .bgx .rays{background:
+    repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 5deg,rgba(255,255,255,.8) 6.2deg 7deg,transparent 9deg 15deg),
+    repeating-conic-gradient(from 3deg at 50% 50%,transparent 0 8deg,hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 70% / .13) 9.5deg 10.5deg,transparent 12deg 24deg)}
+:root[data-theme="light"] .bgx .g1{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600' fill='none' stroke='%232f6df0' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate%2892 84%29 rotate%2812%29' opacity='0.55' stroke-width='1.6' d='M0 -21.1 L18.4 12.2 L-18.4 12.2 Z'/%3E%3Crect transform='translate%28420 62%29 rotate%2818%29' opacity='0.42' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' x='-13.0' y='-13.0' width='26' height='26' rx='4.2'/%3E%3Cg transform='translate%28520 230%29 rotate%280%29' opacity='0.5' stroke-width='1.5'%3E%3Ccircle r='19.0'/%3E%3Ccircle r='9.5'/%3E%3C/g%3E%3Cpath transform='translate%28210 190%29 rotate%280%29' opacity='0.5' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' d='M0 -13.6 L9.9 0 L0 13.6 L-9.9 0 Z'/%3E%3Cpath transform='translate%28330 310%29 rotate%2845%29' opacity='0.5' stroke-width='1.6' d='M-9.0 0H9.0M0 -9.0V9.0'/%3E%3Ccircle transform='translate%2870 330%29 rotate%280%29' opacity='0.45' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='8.0'/%3E%3Cpath transform='translate%28470 420%29 rotate%28-8%29' opacity='0.55' stroke-width='1.6' d='M-15.0 12.6 L0 -15.0 L15.0 12.6 Z'/%3E%3Crect transform='translate%28150 440%29 rotate%28-14%29' opacity='0.35' stroke-width='1.5' x='-20.0' y='-20.0' width='40' height='40' rx='6.4'/%3E%3Cpath transform='translate%28300 520%29 rotate%28180%29' opacity='0.45' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' d='M0 -14.9 L13.0 8.6 L-13.0 8.6 Z'/%3E%3Cpath transform='translate%28560 540%29 rotate%280%29' opacity='0.45' stroke-width='1.6' d='M-8.0 0H8.0M0 -8.0V8.0'/%3E%3Ccircle transform='translate%28380 170%29 rotate%280%29' opacity='0.6' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='5.0'/%3E%3Cpath transform='translate%2860 540%29 rotate%2812%29' opacity='0.4' stroke-width='1.5' d='M0 -17.4 L12.6 0 L0 17.4 L-12.6 0 Z'/%3E%3Crect transform='translate%28250 60%29 rotate%2840%29' opacity='0.6' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' x='-6.0' y='-6.0' width='12' height='12' rx='1.9'/%3E%3Cg transform='translate%28250 330%29 rotate%280%29' opacity='0.35' stroke-width='1.4'%3E%3Ccircle r='11.0'/%3E%3Ccircle r='5.5'/%3E%3C/g%3E%3Cpath transform='translate%28560 110%29 rotate%28-20%29' opacity='0.4' stroke-width='1.5' d='M0 -11.2 L9.7 6.5 L-9.7 6.5 Z'/%3E%3Ccircle transform='translate%28160 270%29 rotate%280%29' opacity='0.55' stroke-width='1.5' fill='%232f6df0' fill-opacity='0.12' r='4.0'/%3E%3C/svg%3E");opacity:.7}
+:root[data-theme="light"] .bgx .g2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900' fill='none' stroke='%232f6df0' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate%28150 170%29 rotate%280%29' opacity='0.34' stroke-width='2'%3E%3Ccircle r='60.0'/%3E%3Ccircle r='30.0'/%3E%3C/g%3E%3Crect transform='translate%28560 130%29 rotate%2822%29' opacity='0.26' stroke-width='2' x='-48.0' y='-48.0' width='96' height='96' rx='15.4'/%3E%3Cpath transform='translate%28360 420%29 rotate%288%29' opacity='0.28' stroke-width='2' d='M0 -68.2 L59.4 39.6 L-59.4 39.6 Z'/%3E%3Cpath transform='translate%28720 560%29 rotate%280%29' opacity='0.3' stroke-width='2' d='M0 -55.8 L40.5 0 L0 55.8 L-40.5 0 Z'/%3E%3Ccircle transform='translate%28130 620%29 rotate%280%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' r='35.0'/%3E%3Cpath transform='translate%28810 260%29 rotate%28-10%29' opacity='0.3' stroke-width='2' d='M-42.0 35.3 L0 -42.0 L42.0 35.3 Z'/%3E%3Cpath transform='translate%28500 780%29 rotate%2845%29' opacity='0.3' stroke-width='2' d='M-30.0 0H30.0M0 -30.0V30.0'/%3E%3Crect transform='translate%28270 820%29 rotate%28-16%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' x='-32.0' y='-32.0' width='64' height='64' rx='10.2'/%3E%3Cg transform='translate%28700 820%29 rotate%280%29' opacity='0.24' stroke-width='2'%3E%3Ccircle r='38.0'/%3E%3Ccircle r='19.0'/%3E%3C/g%3E%3Cpath transform='translate%28880 700%29 rotate%28170%29' opacity='0.26' stroke-width='2' fill='%232f6df0' fill-opacity='0.12' d='M0 -31.0 L27.0 18.0 L-27.0 18.0 Z'/%3E%3C/svg%3E");opacity:.65}
+:root[data-theme="light"] .bgx .cur{background:radial-gradient(closest-side,rgba(255,255,255,.95),hsl(calc(var(--h) + 2) calc(var(--sat)*100%) 72% / .26) 48%,transparent 72%)}
+:root[data-theme="light"] .bgx .grain{opacity:.07;filter:invert(1)}
+
+/* ---- phones: fewer layers, no mouse glow, calmer motion ---- */
+@media(max-width:640px){
+  .bgx .g2,.bgx .b2,.bgx .cur{display:none}
+  .bgx .a2{height:54%}
+  .bgx .rays{top:-60vmax;width:120vmax;height:120vmax;margin-left:-60vmax}
+  .bgx .g1{animation-duration:170s}
+}
+@media(prefers-reduced-motion:reduce){
+  .bgx i{animation:none!important;transition:none!important}
+}
+@media print{.bgx{display:none}}
+
+/* ======================= glass cards: let the new background glow through ======================= */
+:root:not([data-theme="light"]) .panel{
+  background-color:rgba(8,20,40,.56)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.8)!important;backdrop-filter:blur(22px) saturate(1.8)!important;
+  box-shadow:inset 0 1px 0 rgba(214,232,255,.14),inset 0 0 0 1px rgba(255,255,255,.025),0 22px 54px -22px rgba(1,6,16,.8),0 30px 70px -40px hsl(var(--h) 100% 52% / .55)!important}
+:root[data-theme="light"] .panel{
+  background-image:linear-gradient(180deg,rgba(255,255,255,.86),hsl(var(--h) 100% 98% / .66))!important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.7)!important;backdrop-filter:blur(22px) saturate(1.7)!important;
+  box-shadow:inset 0 1px 0 #fff,0 18px 46px -22px hsl(var(--h) 80% 38% / .34),0 34px 70px -42px hsl(var(--h) 100% 50% / .5)!important}
+/* ============================================================================
+   v233: the chat, made to glow. Looks only (no layout, wording or behaviour changes). White and blue only.
+   A living aurora behind the messages, a light that sweeps the header, bubbles with a real gloss,
+   a ring of light around the message bar, a glowing chat button, glass menus.
+   ============================================================================ */
+
+/* ---------- the panel: a slow aurora lives behind everything ---------- */
+.chdr{isolation:isolate}
+.chdr::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background:
+    radial-gradient(56% 32% at 88% 4%,hsl(var(--h) 100% 66% / .66),transparent 70%),
+    radial-gradient(64% 36% at 6% 98%,hsl(var(--h) 100% 58% / .52),transparent 72%),
+    radial-gradient(42% 26% at 60% 52%,hsl(var(--h) 100% 72% / .2),transparent 72%),
+    radial-gradient(46% 28% at 10% 24%,hsl(calc(var(--h) - 10) 100% 70% / .24),transparent 72%),
+    radial-gradient(30% 20% at 92% 70%,hsl(calc(var(--h) + 8) 100% 66% / .22),transparent 72%);
+  background-size:130% 130%;background-position:0 0;animation:chAur 22s ease-in-out infinite alternate}
+.chdr::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(112deg,transparent 34%,hsl(var(--h) 100% 84% / .1) 46%,rgba(255,255,255,.14) 50%,hsl(var(--h) 100% 84% / .1) 54%,transparent 66%);
+  background-size:320% 100%;background-position:130% 0;animation:chBeam 14s ease-in-out infinite}
+@keyframes chBeam{0%{background-position:130% 0}70%,100%{background-position:-30% 0}}
+@keyframes chAur{0%{background-position:0 0}100%{background-position:100% 100%}}
+:root[data-theme="light"] .chdr::before{
+  background:
+    radial-gradient(56% 32% at 88% 4%,hsl(var(--h) 100% 68% / .5),transparent 70%),
+    radial-gradient(64% 36% at 6% 98%,hsl(var(--h) 100% 70% / .46),transparent 72%),
+    radial-gradient(42% 26% at 60% 52%,rgba(255,255,255,.95),transparent 72%),
+    radial-gradient(46% 28% at 10% 24%,hsl(calc(var(--h) - 8) 100% 80% / .5),transparent 72%),
+    radial-gradient(30% 20% at 92% 70%,hsl(calc(var(--h) + 6) 100% 78% / .4),transparent 72%);
+  background-size:130% 130%}
+:root[data-theme="light"] .chdr::after{background-image:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.35) 46%,rgba(255,255,255,.7) 50%,rgba(255,255,255,.35) 54%,transparent 66%)}
+
+/* the little game shapes behind the messages are a bit softer so the aurora can show */
+.chdr .chbody{background-color:transparent}
+
+/* ---------- header: a light that sweeps along its lower edge ---------- */
+.chdr .chh::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,hsl(var(--h) 100% 80% / .55) 38%,#fff 50%,hsl(var(--h) 100% 80% / .55) 62%,transparent);
+  background-size:42% 100%;background-repeat:no-repeat;background-position:-60% 0;opacity:.9;
+  animation:chSweep 6s cubic-bezier(.45,.05,.3,1) infinite}
+@keyframes chSweep{0%{background-position:-60% 0}62%,100%{background-position:170% 0}}
+:root[data-theme="light"] .chdr .chh::after{background-image:linear-gradient(90deg,transparent,hsl(var(--h) 100% 60% / .5) 38%,hsl(var(--h) 100% 48%) 50%,hsl(var(--h) 100% 60% / .5) 62%,transparent)}
+:root:not([data-theme="light"]) .chdr .cht b{background:linear-gradient(180deg,#fff 30%,hsl(var(--h) 100% 84%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 2px 10px hsl(var(--h) 100% 60% / .55))}
+:root[data-theme="light"] .chdr .cht b{background:linear-gradient(180deg,#0b2a66 20%,hsl(var(--h) 100% 40%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+/* the face next to the title breathes */
+.chdr .chhav .chrav.room,.chdr .chhav .av{animation:chBreathe 4.2s ease-in-out infinite}
+@keyframes chBreathe{0%,100%{box-shadow:0 0 0 2px rgba(255,255,255,.94),0 0 0 4.5px hsl(var(--h) 100% 62% / .3),0 10px 18px -8px rgba(0,0,0,.7)}50%{box-shadow:0 0 0 2px rgba(255,255,255,.98),0 0 0 8px hsl(var(--h) 100% 62% / .16),0 0 26px 2px hsl(var(--h) 100% 62% / .5)}}
+:root[data-theme="light"] .chdr .chhav .chrav.room,:root[data-theme="light"] .chdr .chhav .av{animation-name:chBreatheL}
+@keyframes chBreatheL{0%,100%{box-shadow:0 0 0 2px #fff,0 0 0 4.5px hsl(var(--h) 100% 55% / .32),0 10px 18px -8px hsl(var(--h) 80% 30% / .55)}50%{box-shadow:0 0 0 2px #fff,0 0 0 8px hsl(var(--h) 100% 55% / .16),0 0 24px 2px hsl(var(--h) 100% 55% / .4)}}
+
+/* ---------- the chat list: glass cards with a sheen that crosses on hover ---------- */
+:root:not([data-theme="light"]) .chdr .chrm{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.1) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 28px -14px hsl(var(--h) 100% 60% / .3),0 14px 26px -18px #000;
+  transition:background-position .7s cubic-bezier(.2,.7,.2,1),transform .25s var(--spring),border-color .2s,box-shadow .25s}
+:root:not([data-theme="light"]) .chdr .chrm:hover{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.16) 50%,transparent 62%) 160% 0/260% 100% no-repeat,linear-gradient(180deg,hsl(var(--h) 100% 72% / .26),hsl(var(--h) 100% 60% / .1));
+  border-color:hsl(var(--h) 100% 90% / .5);transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 30px -12px hsl(var(--h) 100% 66% / .5),0 18px 32px -16px hsl(var(--h) 100% 50% / .8)}
+:root:not([data-theme="light"]) .chdr .chrm.un{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.12) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(90deg,hsl(var(--h) 100% 64% / .34),hsl(var(--h) 100% 60% / .08));
+  border-color:hsl(var(--h) 100% 88% / .52)}
+:root[data-theme="light"] .chdr .chrm{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.9) 50%,transparent 62%) -140% 0/260% 100% no-repeat,linear-gradient(180deg,#fff,hsl(var(--h) 100% 97.5%));
+  transition:background-position .7s cubic-bezier(.2,.7,.2,1),transform .25s var(--spring),border-color .2s,box-shadow .25s}
+:root[data-theme="light"] .chdr .chrm:hover{
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) 160% 0/260% 100% no-repeat,linear-gradient(180deg,hsl(var(--h) 100% 97%),hsl(var(--h) 100% 92%));
+  transform:translateY(-1px)}
+
+/* ---------- bubbles: a real gloss, with light that sits in the corner ---------- */
+:root:not([data-theme="light"]) .chdr .chbub{
+  background:
+    radial-gradient(130% 90% at 0 0,rgba(214,232,255,.13),transparent 52%),
+    linear-gradient(180deg,hsl(var(--h) 56% 23% / .97),hsl(var(--h) 62% 14.5% / .97));
+  border:1px solid hsl(var(--h) 100% 90% / .17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 24px -18px hsl(var(--h) 100% 60% / .35),0 1px 2px rgba(0,0,0,.45),0 16px 26px -14px rgba(0,0,0,.95)}
+:root[data-theme="light"] .chdr .chbub{
+  background:
+    radial-gradient(130% 90% at 0 0,hsl(var(--h) 100% 96%),transparent 54%),
+    linear-gradient(180deg,#fff,hsl(var(--h) 100% 98.4%));
+  border:1px solid hsl(var(--h) 80% 50% / .19);
+  box-shadow:0 1px 2px hsl(var(--h) 80% 30% / .08),0 14px 26px -16px hsl(var(--h) 80% 30% / .6)}
+:root:not([data-theme="light"]) .chdr .chm.me .chbub,:root[data-theme="light"] .chdr .chm.me .chbub{
+  background:
+    radial-gradient(90% 60% at 10% 0,rgba(255,255,255,.5),transparent 58%),
+    radial-gradient(70% 60% at 100% 100%,hsl(var(--h) 100% 78% / .32),transparent 70%),
+    linear-gradient(158deg,hsl(var(--h) 100% 68%) 0%,hsl(var(--h) 98% 53%) 48%,hsl(var(--h) 100% 42%) 100%);
+  border:1px solid hsl(var(--h) 100% 90% / .62);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 hsl(var(--h) 100% 30% / .24),0 1px 2px hsl(var(--h) 100% 30% / .3),0 18px 32px -12px hsl(var(--h) 100% 50% / .95),0 0 34px -8px hsl(var(--h) 100% 62% / .55)}
+:root[data-theme="light"] .chdr .chm.me .chbub{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 hsl(var(--h) 100% 30% / .24),0 1px 2px hsl(var(--h) 100% 30% / .3),0 18px 30px -12px hsl(var(--h) 100% 48% / .8)}
+/* a message that mentions you gets a soft halo */
+:root:not([data-theme="light"]) .chdr .chm.mn .chbub{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px hsl(var(--h) 100% 78% / .5),0 0 30px -4px hsl(var(--h) 100% 62% / .55),0 16px 26px -14px rgba(0,0,0,.95)}
+/* new messages arrive with a little spring */
+.chdr .chm.chin{animation:chMsgIn233 .42s var(--spring) both}
+@keyframes chMsgIn233{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+
+/* ---------- reactions ---------- */
+:root:not([data-theme="light"]) .chdr .chrxb{background:linear-gradient(180deg,hsl(var(--h) 58% 25%),hsl(var(--h) 62% 16%));border-color:hsl(var(--h) 100% 90% / .26);transition:transform .18s var(--spring),box-shadow .2s}
+.chdr .chrxb:hover{transform:translateY(-2px) scale(1.06)}
+.chdr .chrxb.on,:root[data-theme="light"] .chdr .chrxb.on,:root:not([data-theme="light"]) .chdr .chrxb.on{
+  background:radial-gradient(100% 80% at 20% 0,rgba(255,255,255,.4),transparent 60%),linear-gradient(160deg,hsl(var(--h) 100% 66%),hsl(var(--h) 98% 46%));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 16px -6px hsl(var(--h) 100% 46% / .9),0 0 18px -4px hsl(var(--h) 100% 62% / .6)}
+
+/* ---------- the message bar: a ring of light travels around it while you write ---------- */
+@property --chang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.chdr .chrow{position:relative}
+.chdr .chrow::before{content:"";position:absolute;inset:-1.5px;border-radius:inherit;padding:2px;pointer-events:none;opacity:0;transition:opacity .35s ease;
+  background:conic-gradient(from var(--chang),transparent 0 52%,hsl(var(--h) 100% 66%) 70%,#fff 82%,hsl(var(--h) 100% 70%) 90%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:chRing 3.4s linear infinite;animation-play-state:paused}
+.chdr .chrow:focus-within::before{opacity:1;animation-play-state:running}
+@keyframes chRing{to{--chang:360deg}}
+:root[data-theme="light"] .chdr .chrow::before{background:conic-gradient(from var(--chang),transparent 0 52%,hsl(var(--h) 100% 62%) 70%,hsl(var(--h) 100% 46%) 82%,hsl(var(--h) 100% 66%) 90%,transparent 100%)}
+:root:not([data-theme="light"]) .chdr .chrow{background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6)}
+:root:not([data-theme="light"]) .chdr .chrow:focus-within{border-color:hsl(var(--h) 100% 78% / .5);box-shadow:0 0 0 4px hsl(var(--h) 100% 60% / .16),0 0 40px -8px hsl(var(--h) 100% 60% / .5),inset 0 1px 0 rgba(255,255,255,.14),0 20px 36px -24px #000}
+:root[data-theme="light"] .chdr .chrow:focus-within{border-color:hsl(var(--h) 100% 55% / .5);box-shadow:0 0 0 4px hsl(var(--h) 100% 55% / .14),0 0 36px -10px hsl(var(--h) 100% 55% / .5),0 16px 28px -20px hsl(var(--h) 80% 30% / .6)}
+/* the send button wakes up when there is something to send */
+.chdr .chsend:not(:disabled){animation:chSendGlow 2.6s ease-in-out infinite}
+@keyframes chSendGlow{0%,100%{box-shadow:0 0 0 1px hsl(var(--h) 100% 90% / .5),0 10px 18px -8px hsl(var(--h) 100% 45% / .95),inset 0 1px 0 rgba(255,255,255,.5)}50%{box-shadow:0 0 0 1px hsl(var(--h) 100% 92% / .7),0 12px 26px -6px hsl(var(--h) 100% 50% / 1),0 0 26px -2px hsl(var(--h) 100% 66% / .7),inset 0 1px 0 rgba(255,255,255,.6)}}
+.chdr .chsend:not(:disabled):active{transform:scale(.9)}
+
+/* ---------- menus, pickers and popups: glass with a lit top edge ---------- */
+:root:not([data-theme="light"]) .chdr .chmenu,:root:not([data-theme="light"]) .chdr .chpick,:root:not([data-theme="light"]) .chdr .chemo,:root:not([data-theme="light"]) .chdr .chment{
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);
+  border-color:hsl(var(--h) 100% 90% / .32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 1px rgba(0,0,0,.25),0 30px 56px -22px #000,0 0 44px -18px hsl(var(--h) 100% 60% / .5)}
+:root[data-theme="light"] .chdr .chmenu,:root[data-theme="light"] .chdr .chpick,:root[data-theme="light"] .chdr .chemo,:root[data-theme="light"] .chdr .chment{
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);
+  box-shadow:inset 0 1px 0 #fff,0 28px 50px -22px hsl(var(--h) 80% 30% / .6),0 0 40px -20px hsl(var(--h) 100% 55% / .5)}
+.chdr .chpick button{transition:transform .16s var(--spring),background .16s}
+.chdr .chpick button:hover{transform:translateY(-3px) scale(1.2)}
+
+/* ---------- cards inside messages ---------- */
+:root:not([data-theme="light"]) .chdr .chlv{background:radial-gradient(120% 140% at 0 0,hsl(var(--h) 100% 74% / .3),transparent 60%),linear-gradient(135deg,hsl(var(--h) 100% 60% / .26),hsl(var(--h) 100% 48% / .1));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 14px 26px -16px hsl(var(--h) 100% 50% / .75)}
+.chdr .chlvr{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 10px 18px -8px hsl(var(--h) 100% 45% / .9),0 0 22px -4px hsl(var(--h) 100% 62% / .5)}
+:root:not([data-theme="light"]) .chdr .chyt{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 14px 26px -16px #000,0 0 30px -14px hsl(var(--h) 100% 55% / .5)}
+/* the pinned strip and the day chip pick up the same lit edge */
+:root:not([data-theme="light"]) .chdr .chpin{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 24px -16px #000,0 0 36px -16px hsl(var(--h) 100% 60% / .55)}
+
+/* ---------- the round chat button: a ring of light turns around it ---------- */
+.chfab{overflow:visible}
+.chfab::before{content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;padding:2px;
+  background:conic-gradient(from var(--chang),transparent 0 40%,hsl(var(--h) 100% 78% / .9) 66%,#fff 80%,transparent 96%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:chRing 5s linear infinite;opacity:.85}
+.chfab::after{content:"";position:absolute;inset:-2px;border-radius:50%;pointer-events:none;border:2px solid hsl(var(--h) 100% 70% / .5);animation:chPing 3.4s ease-out infinite;opacity:0}
+@keyframes chPing{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(1.5);opacity:0}}
+:root[data-theme="light"] .chfab::before{background:conic-gradient(from var(--chang),transparent 0 40%,hsl(var(--h) 100% 60% / .9) 66%,hsl(var(--h) 100% 45%) 80%,transparent 96%)}
+:root[data-theme="light"] .chfab::after{border-color:hsl(var(--h) 100% 55% / .5)}
+
+/* ---------- empty states and the small helpers ---------- */
+:root:not([data-theme="light"]) .chdr .chemi{background:radial-gradient(100% 100% at 30% 0,hsl(var(--h) 100% 78% / .4),transparent 70%),linear-gradient(160deg,hsl(var(--h) 100% 62% / .32),hsl(var(--h) 100% 46% / .14));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 14px 28px -14px hsl(var(--h) 100% 50% / .9),0 0 34px -8px hsl(var(--h) 100% 62% / .5)}
+
+@media(max-width:640px){
+  .chdr::before{animation-duration:30s}
+  .chdr .chm.chin{animation-duration:.34s}
+}
+@media(prefers-reduced-motion:reduce){
+  .chdr::before,.chdr::after,.chdr .chh::after,.chdr .chhav .chrav.room,.chdr .chhav .av,.chdr .chrow::before,.chdr .chsend:not(:disabled),.chfab::before,.chfab::after,.chdr .chm.chin{animation:none!important}
+  .chdr .chrm{transition:none!important}
+}
+
+/* list rows only fade in when the list opens, not on every background refresh */
+.chdr .chrm.chre{animation:none}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -16392,7 +16972,7 @@ var _sh=window.show;
   },3500);
 })();
 <\/script>
-<script id="v232js">
+<script id="v233js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -17925,6 +18505,8 @@ var _sh=window.show;
         '<span class="chrr">'+ago(d.ts)+(un?'<i class="chud"></i>':'')+'</span></button>';
     });
     h+='<p class="chfoot">Be kind. Direct messages are private &mdash; admins only see a message if someone reports it.</p>';
+    var again=!!body.querySelector('[data-cr="main"]'); if(again&&CH.listH===h) return; CH.listH=h;
+    if(again) h=h.replace(/class="chrm/g,'class="chrm chre');
     body.innerHTML=h;
     body.querySelector('[data-cr="main"]').onclick=function(){ go("thread",{dm:false,name:"Timmylist Room"}); };
     var cb=body.querySelector("[data-cc]"); if(cb) cb.onclick=function(){ var c=(CH.inbox||{}).clan; if(c) go("thread",{dm:false,clan:c.id,tag:c.tag,name:c.name}); };
@@ -19752,6 +20334,25 @@ var _sh=window.show;
   function later(){ if(q) return; q=true; requestAnimationFrame(function(){ q=false; scan(document); }); }
   scan(document);
   try{ new MutationObserver(later).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+})();
+
+/* ---- v233: the living background (layers are styled in the CSS; this only adds them and follows the mouse) ---- */
+(function(){
+  if(document.getElementById("bgx")||!document.body) return;
+  var d=document.createElement("div"); d.id="bgx"; d.className="bgx"; d.setAttribute("aria-hidden","true");
+  d.innerHTML='<i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="bk b1"></i><i class="bk b2"></i><i class="bk b3"></i><i class="rays"></i><i class="geo g1"></i><i class="geo g2"></i><i class="cur"></i><i class="grain"></i>';
+  document.body.insertBefore(d,document.body.firstChild);
+  try{
+    if(window.matchMedia&&matchMedia("(pointer:fine)").matches){
+      var raf=0,x=0,y=0;
+      addEventListener("pointermove",function(e){
+        x=e.clientX; y=e.clientY;
+        if(raf) return;
+        raf=requestAnimationFrame(function(){ raf=0; d.style.setProperty("--mx",x+"px"); d.style.setProperty("--my",y+"px"); if(d.className.indexOf("live")<0) d.className="bgx live"; });
+      },{passive:true});
+      document.documentElement.addEventListener("mouseleave",function(){ d.className="bgx"; });
+    }
+  }catch(e){}
 })();
 <\/script>
 </body>
@@ -22058,7 +22659,7 @@ var _sh=window.show;
   },3500);
 })();
 </script>
-<script id="v232js">
+<script id="v233js">
 // ================= v203: packs, games, team, legacy + pending, rank chart, countries tab, changelog filters =================
 (function(){
   if(typeof STATE==="undefined"||typeof show!=="function"||typeof route!=="function") return;
@@ -23591,6 +24192,8 @@ var _sh=window.show;
         '<span class="chrr">'+ago(d.ts)+(un?'<i class="chud"></i>':'')+'</span></button>';
     });
     h+='<p class="chfoot">Be kind. Direct messages are private &mdash; admins only see a message if someone reports it.</p>';
+    var again=!!body.querySelector('[data-cr="main"]'); if(again&&CH.listH===h) return; CH.listH=h;
+    if(again) h=h.replace(/class="chrm/g,'class="chrm chre');
     body.innerHTML=h;
     body.querySelector('[data-cr="main"]').onclick=function(){ go("thread",{dm:false,name:"Timmylist Room"}); };
     var cb=body.querySelector("[data-cc]"); if(cb) cb.onclick=function(){ var c=(CH.inbox||{}).clan; if(c) go("thread",{dm:false,clan:c.id,tag:c.tag,name:c.name}); };
@@ -25418,6 +26021,25 @@ var _sh=window.show;
   function later(){ if(q) return; q=true; requestAnimationFrame(function(){ q=false; scan(document); }); }
   scan(document);
   try{ new MutationObserver(later).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+})();
+
+/* ---- v233: the living background (layers are styled in the CSS; this only adds them and follows the mouse) ---- */
+(function(){
+  if(document.getElementById("bgx")||!document.body) return;
+  var d=document.createElement("div"); d.id="bgx"; d.className="bgx"; d.setAttribute("aria-hidden","true");
+  d.innerHTML='<i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="bk b1"></i><i class="bk b2"></i><i class="bk b3"></i><i class="rays"></i><i class="geo g1"></i><i class="geo g2"></i><i class="cur"></i><i class="grain"></i>';
+  document.body.insertBefore(d,document.body.firstChild);
+  try{
+    if(window.matchMedia&&matchMedia("(pointer:fine)").matches){
+      var raf=0,x=0,y=0;
+      addEventListener("pointermove",function(e){
+        x=e.clientX; y=e.clientY;
+        if(raf) return;
+        raf=requestAnimationFrame(function(){ raf=0; d.style.setProperty("--mx",x+"px"); d.style.setProperty("--my",y+"px"); if(d.className.indexOf("live")<0) d.className="bgx live"; });
+      },{passive:true});
+      document.documentElement.addEventListener("mouseleave",function(){ d.className="bgx"; });
+    }
+  }catch(e){}
 })();
 </script>
 </body>
