@@ -8,7 +8,13 @@
 //   inbox  { lite? }               your DM list, blocked list, the room's latest message, and an incoming call
 //   msgs   { room | peer, since?, before? }   messages, oldest first
 //   send   { room | peer | to, text?, img?, gif?, gw?, gh?, reply? }   img = a JPEG or GIF data URL; gif = a link to a GIF on Giphy or Tenor
-//   react  { room | peer, id, e, on }
+//   react  { room | peer | clan, id, e, on }   (16 reactions)
+//   edit   { room | peer | clan, id, text }    change your own text message (15 minutes)
+//   pin    { room | clan, id, on }             admins (and a clan's leader) pin one message in a room
+//   search { room | peer | clan, q }           look through the latest 300 messages of one chat
+//   purge  { uid | name, room | clan, hours }  admin: remove everything one player wrote recently
+//   room, DM and clan chats take { clan: "<clan id>" } for a clan's own room (members and admins only)
+//   msgs in a DM also takes { seen: <id>, typ: 1 } and answers { st: { typ, seen } } (typing + read receipts)
 //   img    { room | peer, id }     one image (data URL)
 //   del    { room | peer, id }     delete your own message (admins can delete room messages)
 //   report { room | peer, id, why? }
@@ -208,7 +214,7 @@ async function muteState(sa, uid) {
 async function settings(sa) {
   if (CFG.v && CFG.t > Date.now()) return CFG.v;
   const d = (await fsGet(sa, "chatcfg/main")) || {};
-  CFG = { v: { chat: d.chat !== false, images: d.images !== false }, t: Date.now() + 15 * 1000 };
+  CFG = { v: { chat: d.chat !== false, images: d.images !== false, slow: SLOWS.includes(d.slow) ? d.slow : 0 }, t: Date.now() + 15 * 1000 };
   return CFG.v;
 }
 
@@ -245,7 +251,11 @@ function cleanGif(u) {
   return u;
 }
 const cleanDim = (n) => { n = Math.round(Number(n)); return n >= 16 && n <= 2000 ? n : 0; };
-const REACT = ["up", "heart", "lol", "wow", "sad", "fire", "party", "skull"];
+const REACT = ["up", "heart", "lol", "wow", "sad", "fire", "party", "skull", "clap", "eyes", "hundred", "pray", "think", "down", "star", "crown"];
+const SLOWS = [0, 5, 10, 30, 60];
+const EDITWIN = 15 * 60 * 1000;
+// account name -> player name, the same two links the site itself uses
+const LINKS = { omnicost: "Omnicost", peedinmynockets: "zZephyrGMD" };
 const CALLTTL = 60000;
 // ---- guided sessions (admin can open pages / scroll for a signed-in player who sees a banner and can stop it) ----
 const CTLTTL = 10 * 60 * 1000, ONLINE = 4 * 60 * 1000;
@@ -258,6 +268,39 @@ const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+)__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okUid = (s) => /^[A-Za-z0-9_-]{6,128}$/.test(String(s || ""));
 const dmKey = (a, b) => "dm_" + [a, b].sort().join("_");
+// Clans are saved by the site in approved/cfg_clans. A player belongs to a clan when their account name (or the player it is linked to) is on its member list.
+const slugOf = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "pack";
+let CL = { t: 0, v: null };
+async function clans(sa) {
+  if (CL.v && CL.t > Date.now()) return CL.v;
+  const d = (await fsGet(sa, "approved/cfg_clans")) || {}, arr = Array.isArray(d.clans) ? d.clans : [], seen = {}, ids = {}, out = [];
+  for (const k of arr) {
+    if (!k || typeof k !== "object") continue;
+    let id = String(k.id || slugOf(k.tag || k.name)); while (ids[id]) id += "-x"; ids[id] = 1;
+    const members = new Set();
+    for (const m of Array.isArray(k.members) ? k.members : []) { const l = String(m).toLowerCase(); if (!l || seen[l]) continue; seen[l] = 1; members.add(l); }
+    const tag = String(k.tag || "").slice(0, 5);
+    if (!tag || !members.size || !/^[a-z0-9-]{1,40}$/.test(id)) continue;
+    out.push({ id, tag, name: String(k.name || tag).slice(0, 40), leader: String(k.leader || "").toLowerCase(), members });
+  }
+  CL = { v: out, t: Date.now() + 45 * 1000 };
+  return out;
+}
+const playerOf = (name) => { const n = String(name || "").toLowerCase(); return String(LINKS[n] || n).toLowerCase(); };
+async function clanOfName(sa, name) { const n = String(name || "").toLowerCase(), p = playerOf(name); return (await clans(sa)).find((c) => c.members.has(p) || c.members.has(n)) || null; }
+const isLeader = (clan, name) => !!clan && !!clan.leader && (clan.leader === String(name || "").toLowerCase() || clan.leader === playerOf(name));
+async function roomFor(sa, uid, name, admin, body) {
+  if (body.clan != null && body.clan !== "") {
+    const id = String(body.clan);
+    if (!/^[a-z0-9-]{1,40}$/.test(id)) throw fail(400, "bad request");
+    const clan = (await clans(sa)).find((c) => c.id === id);
+    if (!clan) throw fail(404, "noclan", "That clan chat isn't available.");
+    if (!admin) { const mine = await clanOfName(sa, name); if (!mine || mine.id !== id) throw fail(403, "clan", "Only members of this clan can use its chat."); }
+    return { key: "clan_" + id, dm: false, clan };
+  }
+  return roomOf(uid, body);
+}
+const metaPath = (key) => (key === "main" ? "chatmeta/main" : key.startsWith("clan_") ? "chatmeta/" + key : "");
 function roomOf(uid, body) {
   if (body.peer) { if (!okUid(body.peer) || body.peer === uid) throw fail(400, "bad request"); return { key: dmKey(uid, body.peer), dm: true, peer: String(body.peer) }; }
   return { key: "main", dm: false };
@@ -270,6 +313,9 @@ function pubMsg(m) {
   if (m.k === "del" || m.k === "re") { o.t = m.t || ""; }
   if (m.k === "re") { o.e = m.e || ""; o.u = m.u || ""; o.on = !!m.on; }
   if (m.k === "call") o.dur = m.dur || 0;
+  if (m.ed && !m.del && !m.k) o.ed = m.ed;
+  if (m.k === "ed") { o.t = m.t || ""; o.ed = m.ts || 0; }
+  if (m.k === "pin") { o.t = m.t || ""; o.on = !!m.on; o.snip = m.snip || ""; o.pn = m.pn || ""; o.pby = m.pby || ""; }
   if (m.rt && !m.del) { o.rt = m.rt; o.rn = m.rn || ""; o.rq = m.rq || ""; }
   return o;
 }
@@ -277,6 +323,15 @@ async function removeMsg(sa, room, id) {
   await fsSet(sa, "chat/" + room + "/m/" + id, [[["del"], true], [["text"], ""], [["img"], false], [["gif"], ""]]);
   await fsDelete(sa, "chatimg/" + id);
   await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "del"], [["t"], id], [["ts"], Date.now()]]);
+}
+// when the pinned message is removed the pin goes with it
+async function unpinIf(sa, room, ids) {
+  const mp = metaPath(room); if (!mp) return;
+  const meta = await fsGet(sa, mp);
+  if (meta && meta.pin && ids.includes(meta.pin.id)) {
+    await fsSet(sa, mp, [[["pin"], undefined]]);
+    await fsSet(sa, "chat/" + room + "/m/" + mkId(), [[["k"], "pin"], [["t"], ""], [["on"], false], [["ts"], Date.now()]]);
+  }
 }
 const okSdp = (s) => typeof s === "string" && /^v=0\r?\n/.test(s) && s.length <= 14000;
 const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
@@ -318,7 +373,7 @@ export async function onRequestPost({ request, env }) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v223" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v232" });
     }
 
     if (a === "vote") {
@@ -350,14 +405,29 @@ export async function onRequestPost({ request, env }) {
       if (ctl && body.ca === ctl.id && !(idx.ctl && idx.ctl.ok) && rate(uid, "ctlack", 2, 60000)) {
         await fsSet(sa, "chatidx/" + uid, [[["ctl", "ok"], true]]); await fsSet(sa, "presence/" + uid, [[["ctl", "ok"], true]]);
       }
-      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, muted: mu ? mu.until : 0, dms, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      let clan = null;
+      if (!body.lite) {
+        const cl = await clanOfName(sa, name);
+        if (cl) { const cm = (await fsGet(sa, "chatmeta/clan_" + cl.id)) || {}; clan = { id: cl.id, tag: cl.tag, name: cl.name, lead: isLeader(cl, name), ts: cm.ts || 0, last: cm.last || "", from: cm.from || "", fromName: cm.name || "" }; }
+      }
+      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
-      const r = roomOf(uid, body), since = body.since == null || body.since === "" ? "" : String(body.since), before = body.before == null || body.before === "" ? "" : String(body.before);
+      const r = await roomFor(sa, uid, name, admin, body), since = body.since == null || body.since === "" ? "" : String(body.since), before = body.before == null || body.before === "" ? "" : String(body.before);
       if ((since && !okId(since)) || (before && !okId(before))) return json({ error: "bad request" }, 400);
       const rows = await fsMsgs(sa, r.key, since, since ? 100 : 60, before);
-      return json({ ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 });
+      const out = { ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 };
+      if (!since && !before && metaPath(r.key)) { const meta = await fsGet(sa, metaPath(r.key)); out.pin = meta && meta.pin && okId(meta.pin.id) ? { id: meta.pin.id, name: String(meta.pin.name || ""), text: String(meta.pin.text || ""), by: String(meta.pin.by || "") } : null; }
+      if (r.dm && !before) {
+        const w = [];
+        if (body.seen && okId(body.seen) && rate(uid, "sn", 1, 900)) w.push([["s", uid], String(body.seen)]);
+        if (body.typ && rate(uid, "ty", 1, 1800)) w.push([["t", uid], Date.now()]);
+        if (w.length) await fsSet(sa, "chatst/" + r.key, w);
+        const sd = (await fsGet(sa, "chatst/" + r.key)) || {}, pt = sd.t && sd.t[r.peer], ps = sd.s && sd.s[r.peer];
+        out.st = { typ: !!(pt && pt > Date.now() - 6000), seen: ps && okId(ps) ? ps : "" };
+      }
+      return json(out);
     }
     if (a === "send") {
       if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -382,7 +452,12 @@ export async function onRequestPost({ request, env }) {
         const mine = (await fsGet(sa, "chatidx/" + uid)) || {};
         if (mine.b && mine.b[peer]) return json({ error: "blocked", message: "You blocked this player. Unblock them first." }, 403);
         r = { key: dmKey(uid, peer), dm: true, peer, pn };
-      } else r = { key: "main", dm: false };
+      } else if (body.clan != null && body.clan !== "") r = await roomFor(sa, uid, name, admin, body);
+      else r = { key: "main", dm: false };
+      if (!r.dm && cfg.slow > 0 && !admin) {
+        const mineS = (await fsGet(sa, "chatidx/" + uid)) || {}, lastS = (mineS.st && mineS.st[r.key]) || 0, left = Math.ceil((lastS + cfg.slow * 1000 - Date.now()) / 1000);
+        if (left > 0) return json({ error: "slowmode", message: "Slow mode is on. You can send again in " + left + " second" + (left === 1 ? "" : "s") + ".", wait: left }, 429);
+      }
       const ent = [[["from"], uid], [["name"], name], [["text"], text], [["img"], !!img]];
       if (body.reply && okId(body.reply)) {
         const t = await fsGet(sa, "chat/" + r.key + "/m/" + body.reply);
@@ -397,12 +472,13 @@ export async function onRequestPost({ request, env }) {
       if (r.dm) {
         await fsSet(sa, "chatidx/" + uid, [[["c", r.peer], { name: r.pn, ts, last: snip, from: uid }]]);
         await fsSet(sa, "chatidx/" + r.peer, [[["c", uid], { name, ts, last: snip, from: uid }]]);
-      } else await fsSet(sa, "chatmeta/main", [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
+      } else await fsSet(sa, metaPath(r.key), [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
+      if (!r.dm && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
       const echo = { id, from: uid, name, text, img: !!img, ts }; ent.forEach(([p, v]) => { if (["rt", "rn", "rq", "gif", "gw", "gh"].includes(p[0])) echo[p[0]] = v; });
       return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
     }
     if (a === "react") {
-      const r = roomOf(uid, body);
+      const r = await roomFor(sa, uid, name, admin, body);
       if (!okId(body.id) || !REACT.includes(body.e)) return json({ error: "bad request" }, 400);
       if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
       if (!rate(uid, "react", 20, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
@@ -414,31 +490,80 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: true });
     }
     if (a === "img") {
-      const r = roomOf(uid, body);
+      const r = await roomFor(sa, uid, name, admin, body);
       if (!okId(body.id)) return json({ error: "bad request" }, 400);
       const d = await fsGet(sa, "chatimg/" + body.id);
       if (!d || d.room !== r.key) return json({ error: "gone", message: "Image not found." }, 404);
       return json({ ok: true, data: d.data });
     }
     if (a === "del") {
-      const r = roomOf(uid, body);
+      const r = await roomFor(sa, uid, name, admin, body);
       if (!okId(body.id)) return json({ error: "bad request" }, 400);
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del) return json({ ok: true });
       if (m.k) return json({ error: "bad request" }, 400);
-      if (m.from !== uid && !(admin && !r.dm)) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
+      if (m.from !== uid && !(admin && !r.dm) && !(r.clan && isLeader(r.clan, name))) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
       await removeMsg(sa, r.key, body.id);
+      await unpinIf(sa, r.key, [body.id]);
       return json({ ok: true });
     }
+    if (a === "edit") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!okId(body.id)) return json({ error: "bad request" }, 400);
+      if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      const mu = await muteState(sa, uid);
+      if (mu) return json({ error: "muted", message: "You're muted until " + new Date(mu.until).toUTCString().replace(" GMT", " UTC") + "." }, 403);
+      if (!rate(uid, "edit", 8, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
+      if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
+      if (m.from !== uid) return json({ error: "mine", message: "You can only edit your own messages." }, 403);
+      if (Date.now() - (m.ts || 0) > EDITWIN) return json({ error: "late", message: "A message can only be edited for 15 minutes." }, 403);
+      const text = cleanText(body.text);
+      if (!text && !m.img && !m.gif) return json({ error: "empty", message: "A message can't be empty. Delete it instead." }, 400);
+      if (text === String(m.text || "")) return json({ ok: true, text, ed: m.ed || 0 });
+      const ts = Date.now();
+      await fsSet(sa, "chat/" + r.key + "/m/" + body.id, [[["text"], text], [["ed"], ts]]);
+      await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "ed"], [["t"], body.id], [["text"], text], [["ts"], ts]]);
+      return json({ ok: true, text, ed: ts });
+    }
+    if (a === "pin") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (r.dm) return json({ error: "bad request", message: "Pins work in the room and in clan chats." }, 400);
+      if (!(admin || (r.clan && isLeader(r.clan, name)))) return json({ error: "admin", message: r.clan ? "Only admins and the clan leader can pin." : "Only admins can pin." }, 403);
+      if (!rate(uid, "pin", 10, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const mp = metaPath(r.key), on = body.on !== false;
+      if (!on) {
+        await fsSet(sa, mp, [[["pin"], undefined]]);
+        await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "pin"], [["t"], ""], [["on"], false], [["ts"], Date.now()]]);
+        return json({ ok: true });
+      }
+      if (!okId(body.id)) return json({ error: "bad request" }, 400);
+      const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
+      if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
+      const snip = String(m.text || (m.gif ? "GIF" : m.img ? "Photo" : "")).slice(0, 100), ts = Date.now();
+      await fsSet(sa, mp, [[["pin"], { id: body.id, name: String(m.name || "").slice(0, 30), text: snip, by: name, ts }]]);
+      await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "pin"], [["t"], body.id], [["on"], true], [["snip"], snip], [["pn"], String(m.name || "").slice(0, 30)], [["pby"], name], [["ts"], ts]]);
+      return json({ ok: true });
+    }
+    if (a === "search") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      const q = cleanText(body.q).toLowerCase().slice(0, 60);
+      if (q.length < 2) return json({ error: "bad request", message: "Type at least 2 letters." }, 400);
+      if (!rate(uid, "srch", 2, 5000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const rows = await fsMsgs(sa, r.key, "", 300);
+      const hits = rows.filter((m) => !m.k && !m.del && (String(m.text || "").toLowerCase().includes(q) || String(m.name || "").toLowerCase().includes(q))).reverse().slice(0, 30);
+      return json({ ok: true, msgs: hits.map((m) => pubMsg(m)), scanned: rows.length, more: rows.length >= 300 });
+    }
     if (a === "report") {
-      const r = roomOf(uid, body);
+      const r = await roomFor(sa, uid, name, admin, body);
       if (!okId(body.id)) return json({ error: "bad request" }, 400);
       if (!rate(uid, "rep", 5, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
       if (m.from === uid) return json({ error: "self", message: "That's your own message." }, 400);
       const rid = r.key + "__" + body.id;
-      await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm]]);
+      await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm], [["clan"], r.clan ? r.clan.tag : ""]]);
       return json({ ok: true });
     }
     if (a === "block") {
@@ -515,6 +640,7 @@ export async function onRequestPost({ request, env }) {
       const rep = await fsGet(sa, "chatreports/" + body.report);
       if (!rep) return json({ error: "gone", message: "That report is already handled." }, 404);
       await removeMsg(sa, rep.room, rep.mid);
+      await unpinIf(sa, rep.room, [rep.mid]);
       await fsDelete(sa, "chatreports/" + body.report);
       return json({ ok: true });
     }
@@ -541,9 +667,24 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: true });
     }
     if (a === "settings") {
-      await fsSet(sa, "chatcfg/main", [[["chat"], body.chat !== false], [["images"], body.images !== false]]);
+      const sl = body.slow === undefined ? undefined : Number(body.slow);
+      if (sl !== undefined && !SLOWS.includes(sl)) return json({ error: "bad request", message: "Pick one of the slow mode choices." }, 400);
+      await fsSet(sa, "chatcfg/main", [[["chat"], body.chat !== false], [["images"], body.images !== false]].concat(sl === undefined ? [] : [[["slow"], sl]]));
       CFG = { v: null, t: 0 };
       return json({ ok: true });
+    }
+    if (a === "purge") {
+      const target = body.uid ? String(body.uid) : await uidOf(sa, body.name);
+      if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
+      if (await isAdmin(sa, target)) return json({ error: "admin", message: "You can't do this to an admin." }, 400);
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (r.dm) return json({ error: "bad request" }, 400);
+      if (!rate(uid, "purge", 4, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const hours = Math.min(Math.max(Number(body.hours) || 24, 1), 168), since = Date.now() - hours * 3600 * 1000;
+      const rows = await fsMsgs(sa, r.key, "", 300), mine = rows.filter((m) => m.from === target && !m.k && !m.del && (m.ts || 0) > since).slice(-80);
+      for (let i = 0; i < mine.length; i += 8) await Promise.all(mine.slice(i, i + 8).map((m) => removeMsg(sa, r.key, m.id)));
+      if (mine.length) await unpinIf(sa, r.key, mine.map((m) => m.id));
+      return json({ ok: true, removed: mine.length });
     }
     if (a === "ctlList") {
       if (!PL.v || PL.t < Date.now()) {
