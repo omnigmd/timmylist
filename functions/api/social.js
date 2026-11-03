@@ -23,6 +23,11 @@
 //   clipNew { sz, ty, dur, w, h, lv, p } / clipPut { id, i, d } / clipDone { id }   upload a video in pieces (an MP4, MOV or WebM up to 26 MB)
 //   clipInfo { id } / clipGet { id, i }      a video's details and comments / one piece of it (no sign-in needed)
 //   clipLike { id, on } / clipCm { id, text } / clipCmDel { id, cid } / clipDel { id } / clipMine {}
+//   clipCm also takes { r: <comment id> } to reply; lvcList { lv } (no sign-in) / lvcPost { lv, text, r? } / lvcDel { lv, cid }   comments on a level's page
+//   clipReport { id: <clip id | "L<level>">, cm?, why?, note? }   a clip, or a comment on a clip or level page
+//   notes {} / notes { clear: 1 }   your in-app alerts (replies, @mentions, comments on your videos)
+//   profGet { u } (no sign-in) / profSet { bio?, pin? } / profClear { u } (admin)   bio and pinned video
+//   frOnline {} / frHide { on } / frFeed {}   which friends are on the site now, hide yourself, friends' newest videos
 //   frList {} / frReq { to | uid } / frAccept { uid } / frDecline { uid } / frCancel { uid } / frRemove { uid }   friends
 //   ctlStop {}              a player ends any session an admin has opened on them
 //   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings, ctlList, ctlStart { uid }, ctlSend { uid, cmd }, ctlEnd { uid }
@@ -516,11 +521,72 @@ async function clipWipe(sa, id, c, ownerUid) {
   try { for (const m of await fsList(sa, "clips/" + id + "/c", 400)) writes.push(wrDel(sa, "clips/" + id + "/c/" + m._id)); } catch (e) {}
   writes.push(wrDel(sa, "clips/" + id));
   if (ownerUid) writes.push(wrUpd(sa, "chatidx/" + ownerUid, [[["cl", id], undefined]]));
+  writes.push(wrUpd(sa, "clipidx/main", [[["e", id], undefined]]));
+  try { for (const r of await fsList(sa, "clipreports", 300)) if (String(r._id).startsWith(id + "__")) writes.push(wrDel(sa, "clipreports/" + r._id)); } catch (e) {}
   await fsCommit(sa, writes);
+  CLC.t = 0;
 }
 const clipLikes = (c) => Object.keys((c && c.l) || {}).length;
 function clipPub(c, id, uid) {
   return { id, by: String(c.on || ""), own: !!uid && c.o === uid, ts: c.ts || 0, n: c.n || 0, sz: c.sz || 0, ty: c.ty || "", st: c.st || "up", dur: c.dur || 0, w: c.w || 0, h: c.h || 0, lv: c.lv || "", p: c.p || "", likes: clipLikes(c), liked: !!uid && !!(c.l && c.l[uid]) };
+}
+// ---------- the clips index: one small document that lists every finished clip, so the Clips page needs no scan ----------
+const CLIPIDX = "clipidx/main", CL_PAGE = 12;
+const idxEnt = (c) => ({ t: c.ts || 0, lv: String(c.lv || ""), by: String(c.on || ""), d: c.dur || 0, k: clipLikes(c), cn: c.cn || 0 });
+let CLC = { t: 0, e: null }, PRC = { t: 0, v: null };
+async function clipIdx(sa) {
+  if (CLC.e && CLC.t > Date.now()) return CLC.e;
+  let d = await fsGet(sa, CLIPIDX);
+  if (!d || !d.built) { // first use: build it from the clips that already exist
+    const e = {};
+    for (const c of await fsList(sa, "clips", 300)) if (c.st === "ok" && okClip(c._id)) e[c._id] = idxEnt(c);
+    const ents = Object.keys(e).map((k) => [["e", k], e[k]]); ents.push([["built"], Date.now()]);
+    await fsSet(sa, CLIPIDX, ents); d = { e };
+  }
+  CLC = { t: Date.now() + 10000, e: d.e || {} };
+  return CLC.e;
+}
+async function clipIdxPut(sa, id, c, patch) { await fsSet(sa, CLIPIDX, [[["e", id], Object.assign(idxEnt(c), patch || {})]]); CLC.t = 0; }
+// ---------- comment threads: a clip has one, and so does every level page (id "L<level>") ----------
+const okThr = (s) => okClip(s) || /^L-?\d{1,10}$/.test(String(s || ""));
+const thrOf = (id) => String(id)[0] === "L" ? { level: true, lv: String(id).slice(1), coll: "lvc/" + String(id).slice(1) + "/c", par: "lvc/" + String(id).slice(1) } : { level: false, lv: "", coll: "clips/" + id + "/c", par: "clips/" + id };
+const cmPub = (m, uid, mod, owner) => ({ id: m._id, name: String(m.n || ""), t: String(m.t || ""), ts: m.ts || 0, r: m.r || "", own: !!uid && m.u === uid, can: !!uid && (m.u === uid || !!owner || mod) });
+// after a comment is removed: keep the thread's count right and drop the replies that hung off it
+async function thrAfterDel(sa, id, c) {
+  const th = thrOf(id), left = await fsList(sa, th.coll, 400);
+  if (th.level) await fsSet(sa, th.par, [[["cn"], left.length]]);
+  else if (c) { c.cn = left.length; await fsSet(sa, th.par, [[["cn"], c.cn]]); await clipIdxPut(sa, id, c); }
+}
+async function thrDrop(sa, id, cid, c) { // delete one comment, its replies, and any reports about them
+  const th = thrOf(id), all = await fsList(sa, th.coll, 400), gone = all.filter((m) => m._id === cid || m.r === cid).map((m) => m._id), writes = [];
+  for (const g of gone) { writes.push(wrDel(sa, th.coll + "/" + g)); writes.push(wrDel(sa, "clipreports/" + id + "__" + g)); }
+  if (writes.length) await fsCommit(sa, writes);
+  const left = all.length - gone.length;
+  if (th.level) await fsSet(sa, th.par, [[["cn"], left]]);
+  else if (c) { c.cn = left; await fsSet(sa, th.par, [[["cn"], left]]); await clipIdxPut(sa, id, c); }
+  return gone.length;
+}
+// ---------- in-app alerts (the bell): newest 30 per player ----------
+const NOTE_KEEP = 30;
+async function noteAdd(sa, uid, n) {
+  try {
+    const cur = (await fsGet(sa, "notes/" + uid)) || {}, e = cur.e || {}, ks = Object.keys(e).sort(), id = mkId();
+    const ents = [[["e", id], { k: String(n.k).slice(0, 10), n: oneLine(n.n, 30), u: String(n.u || "").slice(0, 70), x: oneLine(n.x, 100), t: Date.now() }]];
+    for (const k of ks.slice(0, Math.max(0, ks.length + 1 - NOTE_KEEP))) ents.push([["e", k], undefined]);
+    await fsSet(sa, "notes/" + uid, ents);
+  } catch (e) {}
+}
+const MEN_RE = /(?:^|[^A-Za-z0-9_@-])@([A-Za-z0-9_-]{3,20})(?![A-Za-z0-9_-])/g;
+const mentionsOf = (text) => { const out = []; let m; MEN_RE.lastIndex = 0; while ((m = MEN_RE.exec(String(text || ""))) && out.length < 4) { const l = m[1].toLowerCase(); if (!out.includes(l)) out.push(l); } return out; };
+// Who hears about a new comment: the person replied to, anyone @mentioned, and a video's owner. Each person once, never the writer.
+async function cmNotify(sa, p) {
+  const told = new Set([p.uid]), jobs = [];
+  const tell = (to, kind, title, note, tag) => { if (!to || told.has(to)) return; told.add(to); jobs.push(notifyUser(sa, to, { kind, title, body: p.text, url: p.url, tag }), noteAdd(sa, to, note)); };
+  if (p.parent) tell(p.parent, "men", p.name + " replied to your comment", { k: "reply", n: p.name, u: p.url, x: p.text }, "re-" + p.tag);
+  const names = mentionsOf(p.text), uids = await Promise.all(names.map((n) => uidOf(sa, n).catch(() => null)));
+  uids.forEach((u) => tell(u, "men", p.name + " mentioned you", { k: "mention", n: p.name, u: p.url, x: p.text }, "mn-" + p.tag));
+  if (p.owner) tell(p.owner, "cl", p.name + " commented on your video", { k: "comment", n: p.name, u: p.url, x: p.text }, "cl-" + p.tag);
+  await Promise.all(jobs);
 }
 const FR_MAXF = 100, FR_MAXI = 60, FR_MAXO = 30;
 const frOf = (idx) => { const fr = (idx && idx.fr) || {}; return { f: fr.f || {}, i: fr.i || {}, o: fr.o || {} }; };
@@ -579,7 +645,40 @@ export async function onRequestPost(context) {
       if (!c || (c.st !== "ok" && c.o !== uid)) return json({ error: "gone", message: "That video isn't here any more." }, 404);
       const list = (await fsList(sa, "clips/" + id + "/c", 400)).sort((x, y) => (x._id < y._id ? -1 : 1)).slice(-100);
       const mod = uid ? await isAdmin(sa, uid) : false;
-      return json({ ok: true, clip: clipPub(c, id, uid), mod, cms: list.map((m) => ({ id: m._id, name: String(m.n || ""), t: String(m.t || ""), ts: m.ts || 0, own: !!uid && m.u === uid, can: !!uid && (m.u === uid || c.o === uid || mod) })) });
+      return json({ ok: true, clip: clipPub(c, id, uid), mod, cms: list.map((m) => cmPub(m, uid, mod, c.o === uid)) });
+    }
+    // ---------- comments on a level's page: anyone can read ----------
+    if (a === "lvcList") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "lvclist", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const lv = String(body.lv == null ? "" : body.lv), id = "L" + lv;
+      if (!/^-?\d{1,10}$/.test(lv)) return json({ error: "bad request" }, 400);
+      const list = (await fsList(sa, thrOf(id).coll, 400)).sort((x, y) => (x._id < y._id ? -1 : 1)).slice(-200), mod = uid ? await isAdmin(sa, uid) : false;
+      return json({ ok: true, mod, cms: list.map((m) => cmPub(m, uid, mod, false)) });
+    }
+    // ---------- profiles: bio and pinned video are public ----------
+    if (a === "profGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "profget", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const pu = await uidOf(sa, oneLine(body.u, 20));
+      if (!pu) return json({ ok: true, bio: "", pin: null });
+      const d = (await fsGet(sa, "profx/" + pu)) || {};
+      let pin = null;
+      if (okClip(d.pin)) { const c = await fsGet(sa, "clips/" + d.pin); if (c && c.st === "ok" && c.o === pu) pin = { id: d.pin, by: String(c.on || ""), ts: c.ts || 0, dur: c.dur || 0, lv: String(c.lv || ""), p: c.p || "", likes: clipLikes(c), cn: c.cn || 0 }; }
+      return json({ ok: true, bio: String(d.bio || ""), pin });
+    }
+
+    if (a === "clipList") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "cliplist", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const sort = body.sort === "top" ? "top" : "new", lv = String(body.lv || "").replace(/[^0-9]/g, "").slice(0, 12), by = oneLine(body.by, 30).toLowerCase(), off = Math.max(0, Math.min(2000, Math.floor(Number(body.o)) || 0));
+      const e = await clipIdx(sa);
+      const ids = Object.keys(e).filter((k) => (!lv || e[k].lv === lv) && (!by || String(e[k].by).toLowerCase() === by));
+      ids.sort(sort === "top" ? (x, y) => ((e[y].k || 0) - (e[x].k || 0)) || ((e[y].t || 0) - (e[x].t || 0)) : (x, y) => (e[y].t || 0) - (e[x].t || 0));
+      const page = ids.slice(off, off + CL_PAGE), rows = await Promise.all(page.map((k) => fsGet(sa, "clips/" + k).catch(() => null)));
+      const items = [];
+      rows.forEach((c, i) => { if (c && c.st === "ok") items.push({ id: page[i], by: String(c.on || ""), ts: c.ts || 0, dur: c.dur || 0, lv: String(c.lv || ""), p: c.p || "", likes: clipLikes(c), cn: c.cn || 0 }); });
+      return json({ ok: true, items, more: off + CL_PAGE < ids.length, total: ids.length });
     }
 
     if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
@@ -592,7 +691,7 @@ export async function onRequestPost(context) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v237" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v239" });
     }
 
     if (a === "vote") {
@@ -844,6 +943,55 @@ export async function onRequestPost(context) {
       return json({ ok: true });
     }
 
+    // ---------- in-app alerts ----------
+    if (a === "notes") {
+      if (body.clear) { await fsDelete(sa, "notes/" + uid); return json({ ok: true, items: [] }); }
+      const d = (await fsGet(sa, "notes/" + uid)) || {}, e = d.e || {};
+      return json({ ok: true, items: Object.keys(e).map((k) => ({ id: k, k: e[k].k || "", n: e[k].n || "", u: e[k].u || "", x: e[k].x || "", t: e[k].t || 0 })).sort((x, y) => y.t - x.t).slice(0, NOTE_KEEP) });
+    }
+    // ---------- profile: bio and pinned video ----------
+    if (a === "profSet") {
+      if (!rate(uid, "profset", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now, so you can't change your bio." }, 403);
+      const ents = [];
+      if (body.bio !== undefined) ents.push([["bio"], oneLine(String(body.bio == null ? "" : body.bio).replace(/[ 	]{2,}/g, " "), 160) || undefined]);
+      if (body.pin !== undefined) {
+        const pin = String(body.pin || "");
+        if (pin) { if (!okClip(pin)) return json({ error: "bad request" }, 400); const c = await fsGet(sa, "clips/" + pin); if (!c || c.st !== "ok" || c.o !== uid) return json({ error: "forbidden", message: "You can only pin your own finished videos." }, 403); }
+        ents.push([["pin"], pin || undefined]);
+      }
+      if (!ents.length) return json({ error: "bad request" }, 400);
+      await fsSet(sa, "profx/" + uid, ents.concat([[["ts"], Date.now()]]));
+      const d = (await fsGet(sa, "profx/" + uid)) || {};
+      return json({ ok: true, bio: String(d.bio || ""), pin: String(d.pin || "") });
+    }
+    if (a === "profClear") {
+      if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      const tu = await uidOf(sa, oneLine(body.u, 20)); if (!tu) return json({ error: "gone", message: "No account has that name." }, 404);
+      await fsSet(sa, "profx/" + tu, [[["bio"], undefined], [["ts"], Date.now()]]);
+      await modLog(sa, name, "bio cleared", oneLine(body.u, 20), "");
+      return json({ ok: true });
+    }
+    // ---------- friends: who is on the site, and what they posted ----------
+    if (a === "frOnline" || a === "frHide" || a === "frFeed") {
+      if (a === "frHide") {
+        if (!rate(uid, "frhide", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+        await fsSet(sa, "presence/" + uid, [[["ho"], body.on ? true : undefined]]);
+        PRC.t = 0;
+        return json({ ok: true, ho: !!body.on });
+      }
+      const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, fr = frOf(idx).f;
+      if (a === "frOnline") {
+        if (!rate(uid, "fronline", 30, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+        if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 4000, v: await fsList(sa, "presence", 400) };
+        const now = Date.now(), me = PRC.v.find((d) => d._id === uid);
+        return json({ ok: true, ho: !!(me && me.ho), on: PRC.v.filter((d) => fr[d._id] && d.ts && d.ts > now - ONLINE && !d.ho).map((d) => d._id) });
+      }
+      if (!rate(uid, "frfeed", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const names = new Set(Object.keys(fr).map((k) => String((fr[k] && fr[k].n) || "").toLowerCase()).filter(Boolean)), e = await clipIdx(sa);
+      const items = Object.keys(e).filter((k) => names.has(String(e[k].by).toLowerCase())).sort((x, y) => (e[y].t || 0) - (e[x].t || 0)).slice(0, 15).map((k) => ({ id: k, by: e[k].by, ts: e[k].t || 0, lv: e[k].lv, dur: e[k].d || 0, likes: e[k].k || 0, cn: e[k].cn || 0 }));
+      return json({ ok: true, items });
+    }
     // ---------- friends ----------
     if (a === "frList") { const idx = (await fsGet(sa, "chatidx/" + uid)) || {}; return json({ ok: true, fr: frPub(idx) }); }
     if (a === "frReq" || a === "frAccept" || a === "frDecline" || a === "frCancel" || a === "frRemove") {
@@ -947,7 +1095,8 @@ export async function onRequestPost(context) {
       const got = c.g || {}, missing = [];
       for (let i = 0; i < c.n; i++) if (!got[String(i)]) missing.push(i);
       if (missing.length) return json({ error: "incomplete", message: "Some of the video didn't arrive.", missing: missing.slice(0, 80) }, 409);
-      await fsCommit(sa, [wrUpd(sa, "clips/" + id, [[["st"], "ok"], [["g"], undefined]]), wrUpd(sa, "chatidx/" + uid, [[["cl", id, "st"], "ok"]])]);
+      await fsCommit(sa, [wrUpd(sa, "clips/" + id, [[["st"], "ok"], [["g"], undefined]]), wrUpd(sa, "chatidx/" + uid, [[["cl", id, "st"], "ok"]]), wrUpd(sa, CLIPIDX, [[["e", id], idxEnt(c)]])]);
+      CLC.t = 0;
       return json({ ok: true, id });
     }
     if (a === "clipMine") {
@@ -972,8 +1121,9 @@ export async function onRequestPost(context) {
       const c = await fsGet(sa, "clips/" + id);
       if (!c || c.st !== "ok") return json({ error: "gone", message: "That video isn't here any more." }, 404);
       const on = !!body.on, was = !!(c.l && c.l[uid]);
-      if (on !== was) await fsSet(sa, "clips/" + id, [[["l", uid], on ? 1 : undefined]]);
-      return json({ ok: true, liked: on, likes: clipLikes(c) + (on && !was ? 1 : 0) - (!on && was ? 1 : 0) });
+      const nl = clipLikes(c) + (on && !was ? 1 : 0) - (!on && was ? 1 : 0);
+      if (on !== was) { await fsSet(sa, "clips/" + id, [[["l", uid], on ? 1 : undefined]]); await clipIdxPut(sa, id, c, { k: nl }); }
+      return json({ ok: true, liked: on, likes: nl });
     }
     if (a === "clipCm") {
       const id = String(body.id || ""), text = cleanText(body.text).slice(0, 300);
@@ -984,10 +1134,17 @@ export async function onRequestPost(context) {
       if (!c || c.st !== "ok") return json({ error: "gone", message: "That video isn't here any more." }, 404);
       const have = await fsList(sa, "clips/" + id + "/c", CLIP_CMS + 1);
       if (have.length >= CLIP_CMS) return json({ error: "limit", message: "This video has reached its comment limit." }, 403);
+      let r = "", parent = "";
+      if (body.r) { // a reply always hangs off a top-level comment
+        const pm = have.find((m) => m._id === String(body.r));
+        if (!pm) return json({ error: "gone", message: "That comment is gone, so it can't be replied to." }, 404);
+        r = pm.r || pm._id; parent = pm.u || "";
+      }
       const cid = mkId(), ts = Date.now();
-      await fsSet(sa, "clips/" + id + "/c/" + cid, [[["u"], uid], [["n"], name], [["t"], text], [["ts"], ts]]);
-      if (c.o !== uid) await defer(notifyUser(sa, c.o, { kind: "cl", title: name + " commented on your video", body: text, url: "#/clip/" + id, tag: "cl-" + id }));
-      return json({ ok: true, cm: { id: cid, name, t: text, ts, own: true, can: true } });
+      await fsSet(sa, "clips/" + id + "/c/" + cid, [[["u"], uid], [["n"], name], [["t"], text], [["ts"], ts]].concat(r ? [[["r"], r]] : []));
+      c.cn = have.length + 1; await fsSet(sa, "clips/" + id, [[["cn"], c.cn]]); await clipIdxPut(sa, id, c);
+      await defer(cmNotify(sa, { uid, name, text, url: "#/clip/" + id, tag: id, parent, owner: c.o }));
+      return json({ ok: true, cm: { id: cid, name, t: text, ts, r, own: true, can: true } });
     }
     if (a === "clipCmDel") {
       const id = String(body.id || ""), cid = String(body.cid || "");
@@ -995,8 +1152,59 @@ export async function onRequestPost(context) {
       const c = await fsGet(sa, "clips/" + id), m = await fsGet(sa, "clips/" + id + "/c/" + cid);
       if (!c || !m) return json({ ok: true });
       if (m.u !== uid && c.o !== uid && !admin) return json({ error: "forbidden", message: "You can't delete that comment." }, 403);
-      await fsDelete(sa, "clips/" + id + "/c/" + cid);
+      try { await thrDrop(sa, id, cid, c); } catch (e) { await fsDelete(sa, "clips/" + id + "/c/" + cid); }
       if (m.u !== uid && admin && c.o !== uid) await modLog(sa, name, "comment deleted", m.n, id);
+      return json({ ok: true });
+    }
+    // ---------- comments on a level's page ----------
+    if (a === "lvcPost" || a === "lvcDel") {
+      const lv = String(body.lv == null ? "" : body.lv), id = "L" + lv;
+      if (!/^-?\d{1,10}$/.test(lv)) return json({ error: "bad request" }, 400);
+      const th = thrOf(id);
+      if (a === "lvcDel") {
+        const cid = String(body.cid || ""); if (!okId(cid)) return json({ error: "bad request" }, 400);
+        const m = await fsGet(sa, th.coll + "/" + cid); if (!m) return json({ ok: true });
+        if (m.u !== uid && !admin) return json({ error: "forbidden", message: "You can't delete that comment." }, 403);
+        await thrDrop(sa, id, cid, null);
+        if (m.u !== uid && admin) await modLog(sa, name, "comment deleted", m.n, "level " + lv);
+        return json({ ok: true });
+      }
+      const text = cleanText(body.text).slice(0, 300);
+      if (!text) return json({ error: "bad request", message: "Write something first." }, 400);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now, so you can't comment." }, 403);
+      if (!rate(uid, "clipcm", 8, 60000) || !rate(uid, "clipcmh", 40, 3600000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const have = await fsList(sa, th.coll, CLIP_CMS + 1);
+      if (have.length >= CLIP_CMS) return json({ error: "limit", message: "This level's page has reached its comment limit." }, 403);
+      let r = "", parent = "";
+      if (body.r) {
+        const pm = have.find((m) => m._id === String(body.r));
+        if (!pm) return json({ error: "gone", message: "That comment is gone, so it can't be replied to." }, 404);
+        r = pm.r || pm._id; parent = pm.u || "";
+      }
+      const cid = mkId(), ts = Date.now();
+      await fsSet(sa, th.coll + "/" + cid, [[["u"], uid], [["n"], name], [["t"], text], [["ts"], ts]].concat(r ? [[["r"], r]] : []));
+      await fsSet(sa, th.par, [[["cn"], have.length + 1], [["ts"], ts]]);
+      await defer(cmNotify(sa, { uid, name, text, url: "#/level/" + lv, tag: "L" + lv, parent, owner: "" }));
+      return json({ ok: true, cm: { id: cid, name, t: text, ts, r, own: true, can: true } });
+    }
+    if (a === "clipReport") {
+      const id = String(body.id || ""), cm = body.cm ? String(body.cm) : "";
+      if (!okThr(id) || (cm && !okId(cm)) || (!cm && id[0] === "L")) return json({ error: "bad request" }, 400);
+      if (!rate(uid, "cliprep", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = id[0] === "L" ? { on: "", o: "", lv: id.slice(1) } : await fsGet(sa, "clips/" + id);
+      if (!c || (id[0] !== "L" && c.st !== "ok")) return json({ error: "gone", message: "That video isn't here any more." }, 404);
+      let m = null;
+      if (cm) { m = await fsGet(sa, thrOf(id).coll + "/" + cm); if (!m) return json({ error: "gone", message: "That comment is gone." }, 404); }
+      if ((cm ? m.u : c.o) === uid) return json({ error: "self", message: cm ? "That's your own comment." : "That's your own video." }, 400);
+      let why = String(body.why || ""), note = oneLine(body.note, 140);
+      if (!Object.prototype.hasOwnProperty.call(REP_WHY, why)) { if (!note) note = oneLine(why, 140); why = "other"; }
+      const rid = id + "__" + (cm || "clip"), prev = await fsGet(sa, "clipreports/" + rid), rs = (prev && prev.rs) || {};
+      const ents = [[["cid"], id], [["cm"], cm], [["ts"], Date.now()], [["owner"], cm ? String(m.n || "") : String(c.on || "")], [["ou"], cm ? String(m.u || "") : String(c.o || "")], [["text"], cm ? String(m.t || "").slice(0, 300) : ""], [["lv"], String(c.lv || "")]];
+      if (!prev || !prev.by) ents.push([["by"], uid], [["byName"], name], [["why"], REP_WHY[why] + (note ? ": " + note : "")]);
+      if (rs[uid] || Object.keys(rs).length < REP_MAXRS) ents.push([["rs", uid], { w: why, n: note, nm: name, t: Date.now() }]);
+      ents.push([["n"], Object.keys(Object.assign({}, rs, { [uid]: 1 })).length]);
+      await fsSet(sa, "clipreports/" + rid, ents);
+      if (!prev && rate("all", "clreppush", 20, 60000)) await defer(notifyAdmins(sa, { kind: "rep", title: cm ? "Reported comment" : "Reported video", body: name + " reported " + (cm ? String(m.n || "a player") + "'s comment" : String(c.on || "a player") + "'s video") + ": " + REP_WHY[why], url: "?open=admin:chat", tag: "rep" }, uid));
       return json({ ok: true });
     }
 
@@ -1204,6 +1412,35 @@ export async function onRequestPost(context) {
         if (cm) { try { const cc = await fsGet(sa, "clips/" + cm[1]); if (cc && cc.o === tuid) await clipWipe(sa, cm[1], cc, cc.o); } catch (e) {} }
       }
       try { await defer(notifyUser(sa, tuid, { kind: "rec", title: dec === "accepted" ? "Record accepted" : "Record declined", body: (dec === "accepted" ? "Your record on " : "Your record on ") + (rec.ln || "a level") + (dec === "accepted" ? " was accepted." : " was declined" + (rec.r ? ": " + rec.r : ".")), url: "#/sub", tag: "rec-" + body.id })); } catch (e) {}
+      return json({ ok: true });
+    }
+    if (a === "clipReports") {
+      const raw = await fsList(sa, "clipreports", 200);
+      if (body.lite) return json({ ok: true, open: raw.length });
+      const reports = raw.sort((x, y) => (y.ts || 0) - (x.ts || 0)).map((x) => { const rs = Object.keys(x.rs || {}).map((k) => ({ w: x.rs[k].w || "other", n: x.rs[k].n || "", nm: x.rs[k].nm || "", t: x.rs[k].t || 0 })).sort((p, q) => p.t - q.t); return { id: x._id, cid: x.cid || "", cm: x.cm || "", owner: x.owner || "", ou: x.ou || "", text: x.text || "", lv: x.lv || "", why: x.why || "", ts: x.ts || 0, by: x.byName || "", n: Math.max(rs.length, x.n || 0, 1), rs }; });
+      return json({ ok: true, reports });
+    }
+    if (a === "clipRepAct") {
+      const rid = String(body.rid || ""), act = String(body.act || "");
+      if (!/^(c[a-z0-9]{11}|L-?\d{1,10})__(clip|\d{13}-[a-z0-9]{1,6})$/.test(rid) || !["dismiss", "del", "delmute"].includes(act)) return json({ error: "bad request" }, 400);
+      const rep = await fsGet(sa, "clipreports/" + rid);
+      if (!rep) return json({ error: "gone", message: "That report is already handled." }, 404);
+      if (act === "dismiss") { await fsDelete(sa, "clipreports/" + rid); await modLog(sa, name, "dismiss", rep.owner, "video report"); return json({ ok: true }); }
+      const id = rep.cid, c = id[0] === "L" ? null : await fsGet(sa, "clips/" + id);
+      if (rep.cm) {
+        try { await thrDrop(sa, id, rep.cm, c); } catch (e) { await fsDelete(sa, thrOf(id).coll + "/" + rep.cm); }
+        await fsDelete(sa, "clipreports/" + rid);
+        await modLog(sa, name, "comment deleted", rep.owner, rep.text ? String(rep.text).replace(/\s+/g, " ").slice(0, 60) : "");
+      } else {
+        if (c) await clipWipe(sa, id, c, c.o); else await fsDelete(sa, "clipreports/" + rid);
+        await modLog(sa, name, "clip deleted", rep.owner, id);
+      }
+      if (act === "delmute" && okUid(rep.ou) && !(await isAdmin(sa, rep.ou))) {
+        const hours = Math.min(Math.max(Number(body.hours) || 24, 1), 24 * 365), tname = (await userName(sa, rep.ou)) || rep.owner || "";
+        await fsSet(sa, "chatmod/" + rep.ou, [[["until"], Date.now() + hours * 3600 * 1000], [["name"], tname], [["by"], uid]]);
+        MUTE.delete(rep.ou);
+        await modLog(sa, name, "mute", tname, hours >= 48 && hours % 24 === 0 ? hours / 24 + " days" : hours + (hours === 1 ? " hour" : " hours"));
+      }
       return json({ ok: true });
     }
     if (a === "mod") {
