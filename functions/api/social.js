@@ -265,8 +265,88 @@ const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(Number(v)) 
 let PL = { t: 0, v: null }, AL = { t: 0, v: null };
 const mkId = () => String(Date.now()).padStart(13, "0") + "-" + Math.random().toString(36).slice(2, 7);
 const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
-const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+)__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
+const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+|clan_[a-z0-9-]{1,40})__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okUid = (s) => /^[A-Za-z0-9_-]{6,128}$/.test(String(s || ""));
+const okPid = (s) => /^[A-Za-z0-9_-]{6,64}$/.test(String(s || ""));
+const oneLine = (s, n) => cleanText(s).replace(/\s*\n\s*/g, " ").slice(0, n);
+const okVideo = (u) => (/^https?:\/\/[^\s"'<>]{3,400}$/.test(String(u || "")) ? String(u) : "");
+const REC_KEEP = 40; // decided submissions kept per player
+// ---- chat moderation: report reasons and a short log of what admins did ----
+const REP_WHY = { spam: "Spam", harass: "Harassment or bullying", inappropriate: "Inappropriate content", scam: "Scam or suspicious link", other: "Something else" };
+const REP_MAXRS = 30, MODLOG_KEEP = 100;
+let MODLOG_SEQ = 0; // keeps two entries made in the same millisecond in the order they happened
+async function modLog(sa, admin, act, who, note) {
+  try {
+    const doc = (await fsGet(sa, "modlog/main")) || {}, e = doc.e || {}, id = String(Date.now()).padStart(13, "0") + "-" + String(MODLOG_SEQ++ % 1000).padStart(3, "0") + Math.random().toString(36).slice(2, 4);
+    const ents = [[["e", id], { t: Date.now(), by: String(admin || "").slice(0, 30), act, w: String(who || "").slice(0, 30), n: String(note || "").slice(0, 80) }]];
+    const old = Object.keys(e).sort();
+    for (const k of old.slice(0, Math.max(0, old.length + 1 - MODLOG_KEEP))) ents.push([["e", k], undefined]);
+    await fsSet(sa, "modlog/main", ents);
+  } catch (e) {}
+}
+// ---------- push alerts: standard Web Push (RFC 8030 delivery, RFC 8291 encryption, RFC 8292 VAPID) ----------
+// The signing key is made once, on first use, and kept in the server-only collection pushcfg. Nothing secret reaches the page.
+const PUSH_KINDS = { dm: 1, men: 1, rec: 1, rep: 1, test: 1 };
+const PUSH_HOSTS = [/(^|\.)googleapis\.com$/, /(^|\.)push\.services\.mozilla\.com$/, /(^|\.)push\.apple\.com$/, /(^|\.)notify\.windows\.com$/];
+const PUSH_MAXDEV = 5;
+const okEndpoint = (u) => { try { const x = new URL(String(u)); return String(u).length <= 700 && x.protocol === "https:" && !x.port && !x.username && !x.password && PUSH_HOSTS.some((r) => r.test(x.hostname)); } catch (e) { return false; } };
+const catBytes = (...a) => { const o = new Uint8Array(a.reduce((n, x) => n + x.length, 0)); let i = 0; for (const x of a) { o.set(x, i); i += x.length; } return o; };
+let VK = null;
+async function vapid(sa) {
+  if (VK) return VK;
+  let d = await fsGet(sa, "pushcfg/vapid");
+  if (!d || !d.x || !d.y || !d.d) {
+    const kp = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+    const j = await crypto.subtle.exportKey("jwk", kp.privateKey);
+    await fsSet(sa, "pushcfg/vapid", [[["x"], j.x], [["y"], j.y], [["d"], j.d], [["ts"], Date.now()]]);
+    d = (await fsGet(sa, "pushcfg/vapid")) || j; // if two requests raced, everyone settles on the stored key
+  }
+  const pub = catBytes(new Uint8Array([4]), b64uBytes(d.x), b64uBytes(d.y));
+  const key = await crypto.subtle.importKey("jwk", { kty: "EC", crv: "P-256", x: d.x, y: d.y, d: d.d, ext: true }, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  VK = { pub: b64u(pub), key };
+  return VK;
+}
+async function vapidAuth(sa, endpoint) {
+  const v = await vapid(sa), head = b64uStr(JSON.stringify({ typ: "JWT", alg: "ES256" })) + "." + b64uStr(JSON.stringify({ aud: new URL(endpoint).origin, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: "https://timmylist.pages.dev" }));
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, v.key, enc.encode(head)); // WebCrypto gives r||s, which is what JWS ES256 wants
+  return "vapid t=" + head + "." + b64u(sig) + ", k=" + v.pub;
+}
+const hkdf = async (salt, ikm, info, len) => new Uint8Array(await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt, info }, await crypto.subtle.importKey("raw", ikm, "HKDF", false, ["deriveBits"]), len * 8));
+async function encryptPush(sub, plain) {
+  const ua = b64uBytes(sub.p), auth = b64uBytes(sub.a);
+  const as = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
+  const asPub = new Uint8Array(await crypto.subtle.exportKey("raw", as.publicKey));
+  const secret = await crypto.subtle.deriveBits({ name: "ECDH", public: await crypto.subtle.importKey("raw", ua, { name: "ECDH", namedCurve: "P-256" }, false, []) }, as.privateKey, 256);
+  const ikm = await hkdf(auth, new Uint8Array(secret), catBytes(enc.encode("WebPush: info\0"), ua, asPub), 32);
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const cek = await hkdf(salt, ikm, enc.encode("Content-Encoding: aes128gcm\0"), 16), nonce = await hkdf(salt, ikm, enc.encode("Content-Encoding: nonce\0"), 12);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, await crypto.subtle.importKey("raw", cek, "AES-GCM", false, ["encrypt"]), catBytes(plain, new Uint8Array([2]))));
+  return catBytes(salt, new Uint8Array([0, 0, 16, 0]), new Uint8Array([65]), asPub, ct); // header: salt, record size 4096, key id = our public key
+}
+async function sendPush(sa, sub, payload) {
+  const body = await encryptPush(sub, enc.encode(JSON.stringify(payload))), ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
+  try {
+    const r = await fetch(sub.e, { method: "POST", signal: ctl.signal, body, headers: { Authorization: await vapidAuth(sa, sub.e), "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", TTL: "86400", Urgency: "normal" } });
+    return r.status;
+  } finally { clearTimeout(tm); }
+}
+const subId = async (e) => b64u(new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(String(e))))).slice(0, 22);
+const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k && d.k.men === false), rec: !(d && d.k && d.k.rec === false), rep: !(d && d.k && d.k.rep === false) });
+// Send one alert to every device a player turned alerts on for. Never throws; returns how many devices accepted it.
+async function notifyUser(sa, uid, msg) {
+  try {
+    if (!okUid(uid) || !PUSH_KINDS[msg.kind]) return 0;
+    const d = await fsGet(sa, "push/" + uid); if (!d || !d.s || (d.k && d.k[msg.kind] === false)) return 0;
+    const payload = { title: oneLine(msg.title, 60) || "The Timmylist", body: oneLine(msg.body, 140), url: String(msg.url || "#/").slice(0, 60), tag: String(msg.tag || "").slice(0, 40), kind: msg.kind };
+    let sent = 0; const dead = [];
+    await Promise.all(Object.keys(d.s).slice(0, PUSH_MAXDEV).map(async (id) => { try { const st = await sendPush(sa, d.s[id], payload); if (st === 404 || st === 410) dead.push(id); else if (st >= 200 && st < 300) sent++; } catch (e) {} }));
+    if (dead.length) await fsSet(sa, "push/" + uid, dead.map((id) => [["s", id], undefined]));
+    return sent;
+  } catch (e) { return 0; }
+}
+async function notifyAdmins(sa, msg, except) {
+  try { const adms = await fsList(sa, "admins", 100); await Promise.all(adms.filter((x) => x._id !== except).slice(0, 20).map((x) => notifyUser(sa, x._id, msg))); } catch (e) {}
+}
 const dmKey = (a, b) => "dm_" + [a, b].sort().join("_");
 // Clans are saved by the site in approved/cfg_clans. A player belongs to a clan when their account name (or the player it is linked to) is on its member list.
 const slugOf = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "pack";
@@ -336,7 +416,10 @@ async function unpinIf(sa, room, ids) {
 const okSdp = (s) => typeof s === "string" && /^v=0\r?\n/.test(s) && s.length <= 14000;
 const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  // alerts finish after the reply when the platform allows it; otherwise (tests, local runs) they are awaited
+  const defer = (p) => { p = Promise.resolve(p).catch(() => {}); if (context.waitUntil) { try { context.waitUntil(p); return Promise.resolve(); } catch (e) {} } return p; };
   const { FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY } = env;
   if (!FIREBASE_SERVICE_ACCOUNT) return json({ error: "setup", message: "Chat and likes aren't set up on this site yet." }, 500);
   let sa; try { sa = JSON.parse(FIREBASE_SERVICE_ACCOUNT); } catch (e) { return json({ error: "setup", message: "Chat and likes are misconfigured." }, 500); }
@@ -373,7 +456,7 @@ export async function onRequestPost({ request, env }) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v232" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v234" });
     }
 
     if (a === "vote") {
@@ -451,7 +534,7 @@ export async function onRequestPost({ request, env }) {
         if (theirs.b && theirs.b[uid]) return json({ error: "blocked", message: "You can't message this player." }, 403);
         const mine = (await fsGet(sa, "chatidx/" + uid)) || {};
         if (mine.b && mine.b[peer]) return json({ error: "blocked", message: "You blocked this player. Unblock them first." }, 403);
-        r = { key: dmKey(uid, peer), dm: true, peer, pn };
+        r = { key: dmKey(uid, peer), dm: true, peer, pn, prev: ((theirs.c || {})[uid] || {}).ts || 0 };
       } else if (body.clan != null && body.clan !== "") r = await roomFor(sa, uid, name, admin, body);
       else r = { key: "main", dm: false };
       if (!r.dm && cfg.slow > 0 && !admin) {
@@ -474,6 +557,20 @@ export async function onRequestPost({ request, env }) {
         await fsSet(sa, "chatidx/" + r.peer, [[["c", uid], { name, ts, last: snip, from: uid }]]);
       } else await fsSet(sa, metaPath(r.key), [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
       if (!r.dm && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
+      if (r.dm) {
+        // one alert per burst: nothing if they already heard from this player in the last 45 seconds
+        if (!(r.prev && ts - r.prev < 45000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid }));
+      } else if (text && rate(uid, "men", 12, 60000)) {
+        const names = [...new Set([...text.matchAll(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g)].map((m) => m[2].toLowerCase()))].slice(0, 3);
+        if (names.length) await defer((async () => {
+          for (const n of names) {
+            const tu = await uidOf(sa, n); if (!tu || tu === uid) continue;
+            if ((((await fsGet(sa, "chatidx/" + tu)) || {}).b || {})[uid]) continue;
+            if (r.clan) { const tn = await userName(sa, tu), mine = tn && (await clanOfName(sa, tn)); if (!mine || mine.id !== r.clan.id) continue; }
+            await notifyUser(sa, tu, { kind: "men", title: name + " mentioned you", body: snip, url: "?open=" + (r.clan ? "clan:" + r.clan.id : "main"), tag: "men-" + (r.clan ? r.clan.id : "main") });
+          }
+        })());
+      }
       const echo = { id, from: uid, name, text, img: !!img, ts }; ent.forEach(([p, v]) => { if (["rt", "rn", "rq", "gif", "gw", "gh"].includes(p[0])) echo[p[0]] = v; });
       return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
     }
@@ -563,7 +660,15 @@ export async function onRequestPost({ request, env }) {
       if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
       if (m.from === uid) return json({ error: "self", message: "That's your own message." }, 400);
       const rid = r.key + "__" + body.id;
-      await fsSet(sa, "chatreports/" + rid, [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["by"], uid], [["byName"], name], [["why"], cleanText(body.why).slice(0, 200)], [["ts"], Date.now()], [["dm"], r.dm], [["clan"], r.clan ? r.clan.tag : ""]]);
+      let why = String(body.why || ""), note = oneLine(body.note, 140);
+      if (!Object.prototype.hasOwnProperty.call(REP_WHY, why)) { if (!note) note = oneLine(why, 140); why = "other"; }
+      const prev = await fsGet(sa, "chatreports/" + rid), rs = (prev && prev.rs) || {};
+      const ents = [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["ts"], Date.now()], [["dm"], r.dm], [["clan"], r.clan ? r.clan.tag : ""], [["why"], REP_WHY[why] + (note ? ": " + note : "")]];
+      if (!prev || !prev.by) ents.push([["by"], uid], [["byName"], name]);
+      if (rs[uid] || Object.keys(rs).length < REP_MAXRS) ents.push([["rs", uid], { w: why, n: note, nm: name, t: Date.now() }]);
+      ents.push([["n"], Object.keys(Object.assign({}, rs, { [uid]: 1 })).length]);
+      await fsSet(sa, "chatreports/" + rid, ents);
+      if (!prev && rate("all", "reppush", 20, 60000)) await defer(notifyAdmins(sa, { kind: "rep", title: "New chat report", body: name + " reported " + (m.name || "a player") + ": " + (REP_WHY[why] || "") + (m.text ? " \u2014 " + String(m.text).replace(/\s+/g, " ").slice(0, 60) : ""), url: "?open=admin:chat", tag: "rep" }, uid));
       return json({ ok: true });
     }
     if (a === "block") {
@@ -628,12 +733,82 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: true });
     }
 
+    // ---------- a player's own record submissions (waiting / accepted / declined) ----------
+    if (a === "myRecords") {
+      if (!rate(uid, "myrec", 40, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const ru = (await fsGet(sa, "recuser/" + uid)) || {}, seen = Number(ru.seen) || 0;
+      const done = Object.keys(ru.d || {}).map((id) => Object.assign({ id }, ru.d[id]));
+      const waiting = body.lite ? [] : (await fsList(sa, "pending", 400)).filter((p) => p.uid === uid && !(ru.d && ru.d[p._id])).map((p) => ({ id: p._id, lvl: Number(p.lvl), ln: "", u: String(p.user || "").slice(0, 30), v: okVideo(p.video), s: "pending", r: "", ts: Number(p.ts) || 0 }));
+      const unseen = done.filter((i) => (i.ts || 0) > seen).length;
+      if (body.mark && unseen) await fsSet(sa, "recuser/" + uid, [[["seen"], Date.now()]]);
+      const items = done.concat(waiting).sort((x, y) => (y.ts || 0) - (x.ts || 0)).slice(0, REC_KEEP);
+      return json({ ok: true, items, unseen: body.mark ? 0 : unseen });
+    }
+
+    // ---------- push alerts (every signed-in player) ----------
+    if (a === "pushKey") return json({ ok: true, key: (await vapid(sa)).pub });
+    if (a === "pushState") {
+      const d = (await fsGet(sa, "push/" + uid)) || {}, ep = typeof body.endpoint === "string" ? body.endpoint : "";
+      return json({ ok: true, devices: Object.keys(d.s || {}).length, here: !!(ep && d.s && d.s[await subId(ep)]), k: pushPrefs(d), admin });
+    }
+    if (a === "pushSub") {
+      if (!rate(uid, "psub", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const s = body.sub || {}, e = s.endpoint, kk = s.keys || {};
+      let pk, au; try { pk = b64uBytes(String(kk.p256dh || "")); au = b64uBytes(String(kk.auth || "")); } catch (x) { pk = null; }
+      if (!okEndpoint(e) || !pk || pk.length !== 65 || pk[0] !== 4 || !au || au.length !== 16) return json({ error: "bad request", message: "That device can't be used for alerts." }, 400);
+      const id = await subId(e), d = (await fsGet(sa, "push/" + uid)) || {}, ents = [[["s", id], { e, p: String(kk.p256dh), a: String(kk.auth), t: Date.now(), ua: oneLine(body.ua, 60) }]];
+      const old = Object.keys(d.s || {}).filter((k) => k !== id).sort((x, y) => ((d.s[x] || {}).t || 0) - ((d.s[y] || {}).t || 0));
+      for (const k of old.slice(0, Math.max(0, old.length + 1 - PUSH_MAXDEV))) ents.push([["s", k], undefined]);
+      if (!d.k) ents.push([["k"], { dm: true, men: true, rec: true, rep: true }]);
+      await fsSet(sa, "push/" + uid, ents);
+      return json({ ok: true, k: pushPrefs(d) });
+    }
+    if (a === "pushOff") {
+      const d = (await fsGet(sa, "push/" + uid)) || {}, ep = typeof body.endpoint === "string" ? body.endpoint : "";
+      const ids = ep ? [await subId(ep)] : Object.keys(d.s || {});
+      if (ids.length) await fsSet(sa, "push/" + uid, ids.map((id) => [["s", id], undefined]));
+      return json({ ok: true });
+    }
+    if (a === "pushPrefs") {
+      const k = body.k && typeof body.k === "object" ? body.k : {}, ents = [];
+      for (const kind of ["dm", "men", "rec", "rep"]) if (typeof k[kind] === "boolean") ents.push([["k", kind], k[kind]]);
+      if (ents.length) await fsSet(sa, "push/" + uid, ents);
+      return json({ ok: true, k: pushPrefs(Object.assign({}, (await fsGet(sa, "push/" + uid)) || {})) });
+    }
+    if (a === "pushTest") {
+      if (!rate(uid, "ptest", 3, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const n = await notifyUser(sa, uid, { kind: "test", title: "Alerts are on", body: "This is a test from The Timmylist. You'll see messages and record decisions like this one.", url: "#/", tag: "test" });
+      return json({ ok: true, sent: n });
+    }
+
     // ---------- admin only ----------
     if (!admin) return json({ error: "admin", message: "Only admins can use this." }, 403);
+    if (a === "recDecide") {
+      if (!okPid(body.id)) return json({ error: "bad request" }, 400);
+      const dec = body.decision === "accepted" ? "accepted" : body.decision === "declined" ? "declined" : "";
+      if (!dec) return json({ error: "bad request" }, 400);
+      const pend = await fsGet(sa, "pending/" + body.id), src = pend || {};
+      let tuid = okUid(src.uid) ? String(src.uid) : okUid(body.uid) ? String(body.uid) : "";
+      const by = String(src.by || body.by || "");
+      if (!tuid && by) tuid = (await uidOf(sa, by)) || "";
+      if (!tuid) return json({ ok: true, skipped: "no account" });
+      const lvl = Number(src.lvl != null ? src.lvl : body.lvl);
+      if (!Number.isFinite(lvl)) return json({ error: "bad request" }, 400);
+      const rec = { lvl, ln: oneLine(body.ln, 80), u: oneLine(src.user != null ? src.user : body.user, 30), v: okVideo(src.video != null ? src.video : body.video), s: dec, r: dec === "declined" ? oneLine(body.reason, 200) : "", ts: Date.now(), by: name };
+      const ru = (await fsGet(sa, "recuser/" + tuid)) || {}, ents = [[["d", body.id], rec]];
+      const old = Object.keys(ru.d || {}).filter((k) => k !== body.id).sort((x, y) => ((ru.d[y] || {}).ts || 0) - ((ru.d[x] || {}).ts || 0));
+      for (const k of old.slice(REC_KEEP - 1)) ents.push([["d", k], undefined]);
+      await fsSet(sa, "recuser/" + tuid, ents);
+      try { await defer(notifyUser(sa, tuid, { kind: "rec", title: dec === "accepted" ? "Record accepted" : "Record declined", body: (dec === "accepted" ? "Your record on " : "Your record on ") + (rec.ln || "a level") + (dec === "accepted" ? " was accepted." : " was declined" + (rec.r ? ": " + rec.r : ".")), url: "#/sub", tag: "rec-" + body.id })); } catch (e) {}
+      return json({ ok: true });
+    }
     if (a === "mod") {
-      const reports = (await fsList(sa, "chatreports", 200)).sort((x, y) => (y.ts || 0) - (x.ts || 0)).map((x) => Object.assign({}, x, { id: x._id }));
+      const raw = await fsList(sa, "chatreports", 200);
+      if (body.lite) return json({ ok: true, open: raw.length });
+      const reports = raw.sort((x, y) => (y.ts || 0) - (x.ts || 0)).map((x) => { const rs = Object.keys(x.rs || {}).map((k) => ({ w: x.rs[k].w || "other", n: x.rs[k].n || "", nm: x.rs[k].nm || "", t: x.rs[k].t || 0 })).sort((p, q) => p.t - q.t); return Object.assign({}, x, { id: x._id, rs, n: Math.max(rs.length, x.n || 0, 1) }); });
       const muted = (await fsList(sa, "chatmod", 200)).filter((x) => x.until && x.until > Date.now()).map((x) => ({ uid: x._id, name: x.name || "", until: x.until }));
-      return json({ ok: true, reports, muted, settings: cfg });
+      const ml = (await fsGet(sa, "modlog/main")) || {}, log = Object.keys(ml.e || {}).sort().reverse().slice(0, 30).map((k) => Object.assign({ id: k }, ml.e[k]));
+      return json({ ok: true, reports, muted, settings: cfg, log });
     }
     if (a === "modDel") {
       if (!okRep(body.report)) return json({ error: "bad request" }, 400);
@@ -642,6 +817,7 @@ export async function onRequestPost({ request, env }) {
       await removeMsg(sa, rep.room, rep.mid);
       await unpinIf(sa, rep.room, [rep.mid]);
       await fsDelete(sa, "chatreports/" + body.report);
+      await modLog(sa, name, "del", rep.fromName, rep.text ? String(rep.text).replace(/\s+/g, " ").slice(0, 60) : "");
       return json({ ok: true });
     }
     if (a === "repimg") {
@@ -651,19 +827,29 @@ export async function onRequestPost({ request, env }) {
       const d = await fsGet(sa, "chatimg/" + rep.mid);
       return d ? json({ ok: true, data: d.data }) : json({ error: "gone", message: "Image not found." }, 404);
     }
-    if (a === "dismiss") { if (!okRep(body.report)) return json({ error: "bad request" }, 400); await fsDelete(sa, "chatreports/" + body.report); return json({ ok: true }); }
+    if (a === "dismiss") {
+      if (!okRep(body.report)) return json({ error: "bad request" }, 400);
+      const rep = await fsGet(sa, "chatreports/" + body.report);
+      await fsDelete(sa, "chatreports/" + body.report);
+      if (rep) await modLog(sa, name, "dismiss", rep.fromName, "");
+      return json({ ok: true });
+    }
     if (a === "mute") {
       const target = body.uid ? String(body.uid) : await uidOf(sa, body.name);
       if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
       if (await isAdmin(sa, target)) return json({ error: "admin", message: "You can't mute an admin." }, 400);
       const hours = Math.min(Math.max(Number(body.hours) || 24, 1), 24 * 365);
-      await fsSet(sa, "chatmod/" + target, [[["until"], Date.now() + hours * 3600 * 1000], [["name"], (await userName(sa, target)) || ""], [["by"], uid]]);
+      const tname = (await userName(sa, target)) || "";
+      await fsSet(sa, "chatmod/" + target, [[["until"], Date.now() + hours * 3600 * 1000], [["name"], tname], [["by"], uid]]);
       MUTE.delete(target);
+      await modLog(sa, name, "mute", tname, hours >= 48 && hours % 24 === 0 ? hours / 24 + " days" : hours + (hours === 1 ? " hour" : " hours"));
       return json({ ok: true });
     }
     if (a === "unmute") {
       if (!okUid(body.uid)) return json({ error: "bad request" }, 400);
+      const was = await fsGet(sa, "chatmod/" + body.uid);
       await fsDelete(sa, "chatmod/" + body.uid); MUTE.delete(body.uid);
+      await modLog(sa, name, "unmute", (was && was.name) || (await userName(sa, body.uid)) || "", "");
       return json({ ok: true });
     }
     if (a === "settings") {
@@ -671,6 +857,7 @@ export async function onRequestPost({ request, env }) {
       if (sl !== undefined && !SLOWS.includes(sl)) return json({ error: "bad request", message: "Pick one of the slow mode choices." }, 400);
       await fsSet(sa, "chatcfg/main", [[["chat"], body.chat !== false], [["images"], body.images !== false]].concat(sl === undefined ? [] : [[["slow"], sl]]));
       CFG = { v: null, t: 0 };
+      await modLog(sa, name, "settings", "", "chat " + (body.chat !== false ? "on" : "off") + ", photos " + (body.images !== false ? "on" : "off") + (sl === undefined ? "" : ", slow " + (sl ? sl + "s" : "off")));
       return json({ ok: true });
     }
     if (a === "purge") {
@@ -684,6 +871,7 @@ export async function onRequestPost({ request, env }) {
       const rows = await fsMsgs(sa, r.key, "", 300), mine = rows.filter((m) => m.from === target && !m.k && !m.del && (m.ts || 0) > since).slice(-80);
       for (let i = 0; i < mine.length; i += 8) await Promise.all(mine.slice(i, i + 8).map((m) => removeMsg(sa, r.key, m.id)));
       if (mine.length) await unpinIf(sa, r.key, mine.map((m) => m.id));
+      await modLog(sa, name, "purge", (await userName(sa, target)) || "", mine.length + " message" + (mine.length === 1 ? "" : "s"));
       return json({ ok: true, removed: mine.length });
     }
     if (a === "ctlList") {
