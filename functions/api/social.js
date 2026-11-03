@@ -20,6 +20,10 @@
 //   report { room | peer, id, why? }
 //   block  { peer, on }
 //   callStart { peer, offer } / callGet { id } / callAnswer { id, answer } / callEnd { id, reason, dur }   voice calls (WebRTC signalling)
+//   clipNew { sz, ty, dur, w, h, lv, p } / clipPut { id, i, d } / clipDone { id }   upload a video in pieces (an MP4, MOV or WebM up to 26 MB)
+//   clipInfo { id } / clipGet { id, i }      a video's details and comments / one piece of it (no sign-in needed)
+//   clipLike { id, on } / clipCm { id, text } / clipCmDel { id, cid } / clipDel { id } / clipMine {}
+//   frList {} / frReq { to | uid } / frAccept { uid } / frDecline { uid } / frCancel { uid } / frRemove { uid }   friends
 //   ctlStop {}              a player ends any session an admin has opened on them
 //   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings, ctlList, ctlStart { uid }, ctlSend { uid, cmd }, ctlEnd { uid }
 //   inbox also takes { pr: {r,sc,th,vw} } (which page the player is on) and { ca: sessionId } (the player's tab joined a session)
@@ -289,7 +293,7 @@ async function modLog(sa, admin, act, who, note) {
 }
 // ---------- push alerts: standard Web Push (RFC 8030 delivery, RFC 8291 encryption, RFC 8292 VAPID) ----------
 // The signing key is made once, on first use, and kept in the server-only collection pushcfg. Nothing secret reaches the page.
-const PUSH_KINDS = { dm: 1, men: 1, rec: 1, rep: 1, test: 1 };
+const PUSH_KINDS = { dm: 1, men: 1, rec: 1, rep: 1, fr: 1, cl: 1, test: 1 };
 const PUSH_HOSTS = [/(^|\.)googleapis\.com$/, /(^|\.)push\.services\.mozilla\.com$/, /(^|\.)push\.apple\.com$/, /(^|\.)notify\.windows\.com$/];
 const PUSH_MAXDEV = 5;
 const okEndpoint = (u) => { try { const x = new URL(String(u)); return String(u).length <= 700 && x.protocol === "https:" && !x.port && !x.username && !x.password && PUSH_HOSTS.some((r) => r.test(x.hostname)); } catch (e) { return false; } };
@@ -334,7 +338,7 @@ async function sendPush(sa, sub, payload) {
   } finally { clearTimeout(tm); }
 }
 const subId = async (e) => b64u(new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(String(e))))).slice(0, 22);
-const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k && d.k.men === false), rec: !(d && d.k && d.k.rec === false), rep: !(d && d.k && d.k.rep === false) });
+const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k && d.k.men === false), rec: !(d && d.k && d.k.rec === false), rep: !(d && d.k && d.k.rep === false), fr: !(d && d.k && d.k.fr === false), cl: !(d && d.k && d.k.cl === false) });
 // Send one alert to every device a player turned alerts on for. Never throws; returns how many devices accepted it.
 async function notifyUser(sa, uid, msg) {
   try {
@@ -477,6 +481,57 @@ async function unpinIf(sa, room, ids) {
 const okSdp = (s) => typeof s === "string" && /^v=0\r?\n/.test(s) && s.length <= 14000;
 const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 
+// ---------- videos (clips) and friends ----------
+// A clip is a video a player uploaded for a record. It is stored in the database as small pieces (clipd/<id>_<n>), one
+// description document (clips/<id>) and the comments (clips/<id>/c/<comment>). Likes sit on the description document.
+const CLIP_CHUNK = 491520, CLIP_B64 = 655360, CLIP_MAX = 26 * 1024 * 1024, CLIP_KEEP = 6, CLIP_CMS = 300;
+const CLIP_TYPES = { "video/mp4": 1, "video/webm": 1, "video/quicktime": 1 };
+const okClip = (s) => /^c[a-z0-9]{11}$/.test(String(s || ""));
+const mkClip = () => { const b = crypto.getRandomValues(new Uint8Array(11)); let s = "c"; for (const x of b) s += "abcdefghijklmnopqrstuvwxyz0123456789"[x % 36]; return s; };
+const okPoster = (s) => typeof s === "string" && s.length <= 30000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(s);
+// writes for one batch request (documents:commit): a few changes at once, or up to 400 deletes in one go
+function wrUpd(sa, path, entries) {
+  const f = {}, mask = [];
+  for (const [parts, val] of entries) {
+    mask.push(parts.map(q1).join("."));
+    if (val === undefined) continue;
+    let cur = f;
+    for (let i = 0; i < parts.length - 1; i++) { const k = parts[i]; if (!cur[k]) cur[k] = { mapValue: { fields: {} } }; cur = cur[k].mapValue.fields; }
+    cur[parts[parts.length - 1]] = toFS(val);
+  }
+  return { update: { name: root(sa) + "/" + path, fields: f }, updateMask: { fieldPaths: mask } };
+}
+const wrFull = (sa, path, obj) => ({ update: { name: root(sa) + "/" + path, fields: toFS(obj).mapValue.fields } });
+const wrDel = (sa, path) => ({ delete: root(sa) + "/" + path });
+async function fsCommit(sa, writes) {
+  for (let i = 0; i < writes.length; i += 400) {
+    const r = await fetch("https://firestore.googleapis.com/v1/" + root(sa) + ":commit", { method: "POST", headers: await authz(sa), body: JSON.stringify({ writes: writes.slice(i, i + 400) }) });
+    if (!r.ok) throw new Error("firestore " + r.status);
+  }
+}
+// remove a clip completely: its pieces, its comments, its description and the owner's list entry
+async function clipWipe(sa, id, c, ownerUid) {
+  const writes = [], n = c && c.n ? Math.min(Number(c.n) || 0, 64) : 0;
+  for (let i = 0; i < n; i++) writes.push(wrDel(sa, "clipd/" + id + "_" + i));
+  try { for (const m of await fsList(sa, "clips/" + id + "/c", 400)) writes.push(wrDel(sa, "clips/" + id + "/c/" + m._id)); } catch (e) {}
+  writes.push(wrDel(sa, "clips/" + id));
+  if (ownerUid) writes.push(wrUpd(sa, "chatidx/" + ownerUid, [[["cl", id], undefined]]));
+  await fsCommit(sa, writes);
+}
+const clipLikes = (c) => Object.keys((c && c.l) || {}).length;
+function clipPub(c, id, uid) {
+  return { id, by: String(c.on || ""), own: !!uid && c.o === uid, ts: c.ts || 0, n: c.n || 0, sz: c.sz || 0, ty: c.ty || "", st: c.st || "up", dur: c.dur || 0, w: c.w || 0, h: c.h || 0, lv: c.lv || "", p: c.p || "", likes: clipLikes(c), liked: !!uid && !!(c.l && c.l[uid]) };
+}
+const FR_MAXF = 100, FR_MAXI = 60, FR_MAXO = 30;
+const frOf = (idx) => { const fr = (idx && idx.fr) || {}; return { f: fr.f || {}, i: fr.i || {}, o: fr.o || {} }; };
+const frRows = (m, n) => Object.keys(m || {}).map((u) => ({ uid: u, name: String((m[u] && m[u].n) || ""), t: (m[u] && m[u].t) || 0 })).sort((x, y) => (y.t - x.t) || (x.name < y.name ? -1 : 1)).slice(0, n);
+const frPub = (idx) => { const fr = frOf(idx); return { f: frRows(fr.f, FR_MAXF).sort((x, y) => (x.name.toLowerCase() < y.name.toLowerCase() ? -1 : x.name.toLowerCase() > y.name.toLowerCase() ? 1 : 0)), i: frRows(fr.i, FR_MAXI), o: frRows(fr.o, FR_MAXO) }; };
+async function frMake(sa, uid, name, peer, pname) {
+  const now = Date.now();
+  await fsSet(sa, "chatidx/" + uid, [[["fr", "f", peer], { n: pname, t: now }], [["fr", "i", peer], undefined], [["fr", "o", peer], undefined]]);
+  await fsSet(sa, "chatidx/" + peer, [[["fr", "f", uid], { n: name, t: now }], [["fr", "o", uid], undefined], [["fr", "i", uid], undefined]]);
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   // alerts finish after the reply when the platform allows it; otherwise (tests, local runs) they are awaited
@@ -507,6 +562,26 @@ export async function onRequestPost(context) {
       return json({ ok: true, c, mine });
     }
 
+    // ---------- videos: anyone can watch (no sign-in needed) ----------
+    if (a === "clipInfo" || a === "clipGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "clipget", a === "clipGet" ? 900 : 240, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const id = String(body.id || "");
+      if (!okClip(id)) return json({ error: "gone", message: "That video isn't here any more." }, 404);
+      if (a === "clipGet") {
+        const i = Number(body.i);
+        if (!Number.isInteger(i) || i < 0 || i >= 64) return json({ error: "bad request" }, 400);
+        const d = await fsGet(sa, "clipd/" + id + "_" + i);
+        if (!d || typeof d.d !== "string") return json({ error: "gone", message: "That video isn't here any more." }, 404);
+        return json({ ok: true, d: d.d });
+      }
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c || (c.st !== "ok" && c.o !== uid)) return json({ error: "gone", message: "That video isn't here any more." }, 404);
+      const list = (await fsList(sa, "clips/" + id + "/c", 400)).sort((x, y) => (x._id < y._id ? -1 : 1)).slice(-100);
+      const mod = uid ? await isAdmin(sa, uid) : false;
+      return json({ ok: true, clip: clipPub(c, id, uid), mod, cms: list.map((m) => ({ id: m._id, name: String(m.n || ""), t: String(m.t || ""), ts: m.ts || 0, own: !!uid && m.u === uid, can: !!uid && (m.u === uid || c.o === uid || mod) })) });
+    }
+
     if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
 
     // ---------- health check ----------
@@ -517,7 +592,7 @@ export async function onRequestPost(context) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v236" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v237" });
     }
 
     if (a === "vote") {
@@ -555,7 +630,7 @@ export async function onRequestPost(context) {
         const cl = await clanOfName(sa, name);
         if (cl) { const cm = (await fsGet(sa, "chatmeta/clan_" + cl.id)) || {}; clan = { id: cl.id, tag: cl.tag, name: cl.name, lead: isLeader(cl, name), ts: cm.ts || 0, last: cm.last || "", from: cm.from || "", fromName: cm.name || "" }; }
       }
-      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      return json({ ok: true, pr: wrote, fri: frRows(frOf(idx).i, 20), frn: Object.keys(frOf(idx).f).length, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -762,6 +837,166 @@ export async function onRequestPost(context) {
     if (a === "block") {
       if (!okUid(body.peer) || body.peer === uid) return json({ error: "bad request" }, 400);
       await fsSet(sa, "chatidx/" + uid, [[["b", body.peer], body.on ? true : undefined]]);
+      if (body.on) {
+        await fsSet(sa, "chatidx/" + uid, [[["fr", "f", body.peer], undefined], [["fr", "i", body.peer], undefined], [["fr", "o", body.peer], undefined]]);
+        await fsSet(sa, "chatidx/" + body.peer, [[["fr", "f", uid], undefined], [["fr", "i", uid], undefined], [["fr", "o", uid], undefined]]);
+      }
+      return json({ ok: true });
+    }
+
+    // ---------- friends ----------
+    if (a === "frList") { const idx = (await fsGet(sa, "chatidx/" + uid)) || {}; return json({ ok: true, fr: frPub(idx) }); }
+    if (a === "frReq" || a === "frAccept" || a === "frDecline" || a === "frCancel" || a === "frRemove") {
+      if (!rate(uid, a === "frReq" ? "frreq" : "fract", a === "frReq" ? 20 : 60, a === "frReq" ? 3600000 : 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      let peer = body.uid ? String(body.uid) : (body.to ? await uidOf(sa, body.to) : null);
+      if (!peer || !okUid(peer)) return json({ error: "nouser", message: (body.to ? String(body.to).slice(0, 20) : "That player") + " hasn't made an account on the site yet." }, 404);
+      if (peer === uid) return json({ error: "bad request", message: "That's you!" }, 400);
+      const mine = (await fsGet(sa, "chatidx/" + uid)) || {}, m = frOf(mine), now = Date.now();
+      const done = async (state) => json({ ok: true, state, fr: frPub((await fsGet(sa, "chatidx/" + uid)) || {}) });
+      if (a === "frReq") {
+        const pname = await userName(sa, peer);
+        if (!pname) return json({ error: "nouser", message: String(body.to || "That player").slice(0, 20) + " hasn't made an account on the site yet." }, 404);
+        const theirs = (await fsGet(sa, "chatidx/" + peer)) || {}, t = frOf(theirs);
+        if ((theirs.b || {})[uid]) return json({ error: "blocked", message: "You can't add this player right now." }, 403);
+        if ((mine.b || {})[peer]) return json({ error: "blocked", message: "Unblock this player first." }, 403);
+        if (m.f[peer]) return done("friends");
+        if (m.i[peer] || t.o[uid]) { // they already asked you, so this makes you friends
+          if (Object.keys(m.f).length >= FR_MAXF) return json({ error: "limit", message: "Your friends list is full." }, 403);
+          await frMake(sa, uid, name, peer, pname);
+          await defer(notifyUser(sa, peer, { kind: "fr", title: name + " is now your friend", body: "You're friends on The Timmylist.", url: "#/friends", tag: "fr-" + uid }));
+          return done("friends");
+        }
+        if (m.o[peer]) return done("sent");
+        if (Object.keys(m.o).length >= FR_MAXO) return json({ error: "limit", message: "You have too many requests waiting. Cancel a few first." }, 403);
+        if (Object.keys(t.i).length >= FR_MAXI) return json({ error: "limit", message: "That player has too many requests waiting right now." }, 403);
+        if (Object.keys(m.f).length >= FR_MAXF) return json({ error: "limit", message: "Your friends list is full." }, 403);
+        await fsSet(sa, "chatidx/" + uid, [[["fr", "o", peer], { n: pname, t: now }]]);
+        await fsSet(sa, "chatidx/" + peer, [[["fr", "i", uid], { n: name, t: now }]]);
+        await defer(notifyUser(sa, peer, { kind: "fr", title: name + " sent you a friend request", body: "Open The Timmylist to accept or decline.", url: "#/friends", tag: "fr-" + uid }));
+        return done("sent");
+      }
+      if (a === "frAccept") {
+        if (!m.i[peer]) return done(m.f[peer] ? "friends" : "none");
+        if (Object.keys(m.f).length >= FR_MAXF) return json({ error: "limit", message: "Your friends list is full." }, 403);
+        const pname = String(m.i[peer].n || "") || (await userName(sa, peer)) || "Player";
+        await frMake(sa, uid, name, peer, pname);
+        await defer(notifyUser(sa, peer, { kind: "fr", title: name + " accepted your friend request", body: "You're friends on The Timmylist.", url: "#/friends", tag: "fr-" + uid }));
+        return done("friends");
+      }
+      if (a === "frDecline") {
+        if (!m.i[peer]) return done("none");
+        await fsSet(sa, "chatidx/" + uid, [[["fr", "i", peer], undefined]]);
+        await fsSet(sa, "chatidx/" + peer, [[["fr", "o", uid], undefined]]);
+        return done("none");
+      }
+      if (a === "frCancel") {
+        if (!m.o[peer]) return done("none");
+        await fsSet(sa, "chatidx/" + uid, [[["fr", "o", peer], undefined]]);
+        await fsSet(sa, "chatidx/" + peer, [[["fr", "i", uid], undefined]]);
+        return done("none");
+      }
+      if (!m.f[peer]) return done("none");
+      await fsSet(sa, "chatidx/" + uid, [[["fr", "f", peer], undefined]]);   // frRemove
+      await fsSet(sa, "chatidx/" + peer, [[["fr", "f", uid], undefined]]);
+      return done("none");
+    }
+
+    // ---------- videos: upload, like, comment, delete ----------
+    if (a === "clipNew") {
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now, so you can't upload." }, 403);
+      if (!rate(uid, "clipnew", 8, 3600000)) return json({ error: "slow", message: "That's a lot of uploads. Try again in a bit." }, 429);
+      const sz = Math.round(Number(body.sz)), ty = String(body.ty || "").toLowerCase().split(";")[0].trim();
+      if (!(sz >= 1000 && sz <= CLIP_MAX) || !CLIP_TYPES[ty]) return json({ error: "bad request", message: "That video can't be uploaded. Use an MP4, MOV or WebM under " + Math.floor(CLIP_MAX / 1048576) + " MB." }, 400);
+      const n = Math.ceil(sz / CLIP_CHUNK), idx = (await fsGet(sa, "chatidx/" + uid)) || {}, have = Object.assign({}, idx.cl || {});
+      for (const k of Object.keys(have)) { // unfinished uploads older than an hour are cleaned up
+        const e = have[k] || {};
+        if (e.st !== "ok" && Date.now() - (e.t || 0) > 3600000) { try { await clipWipe(sa, k, { n: e.n }, uid); delete have[k]; } catch (x) {} }
+      }
+      if (Object.keys(have).length >= CLIP_KEEP) return json({ error: "limit", message: "You already have " + CLIP_KEEP + " videos uploaded. Delete one first.", clips: Object.keys(have).map((k) => ({ id: k, t: have[k].t || 0, sz: have[k].sz || 0, lv: have[k].lv || "", st: have[k].st || "up" })) }, 403);
+      const id = mkClip(), dur = clampInt(body.dur, 0, 3600), w = clampInt(body.w, 0, 8000), h = clampInt(body.h, 0, 8000), lv = /^-?\d{1,10}$/.test(String(body.lv == null ? "" : body.lv)) ? String(body.lv) : "";
+      const poster = okPoster(body.p) ? body.p : "", now = Date.now();
+      await fsCommit(sa, [
+        wrFull(sa, "clips/" + id, { o: uid, on: name, ts: now, n, sz, ty, st: "up", dur, w, h, lv, p: poster }),
+        wrUpd(sa, "chatidx/" + uid, [[["cl", id], { t: now, sz, n, lv, st: "up" }]]),
+      ]);
+      return json({ ok: true, id, chunk: CLIP_CHUNK, n });
+    }
+    if (a === "clipPut") {
+      const id = String(body.id || ""), i = Number(body.i), d = body.d;
+      if (!okClip(id) || !Number.isInteger(i) || i < 0 || typeof d !== "string") return json({ error: "bad request" }, 400);
+      if (!rate(uid, "clipput", 240, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c || c.o !== uid) return json({ error: "gone", message: "That upload isn't here any more." }, 404);
+      if (c.st !== "up") return json({ error: "done", message: "That upload is already finished." }, 409);
+      if (i >= c.n) return json({ error: "bad request" }, 400);
+      const last = c.sz - CLIP_CHUNK * (c.n - 1), expect = i < c.n - 1 ? CLIP_B64 : Math.ceil(last / 3) * 4;
+      if (d.length !== expect || !/^[A-Za-z0-9+/]+={0,2}$/.test(d)) return json({ error: "bad request", message: "That piece of the video was damaged. Try again." }, 400);
+      if (i === 0) { // a real video starts with a known marker
+        const h = atob(d.slice(0, 24)), isMp4 = h.slice(4, 8) === "ftyp", isWebm = h.charCodeAt(0) === 0x1a && h.charCodeAt(1) === 0x45 && h.charCodeAt(2) === 0xdf && h.charCodeAt(3) === 0xa3;
+        if (!isMp4 && !isWebm) return json({ error: "bad request", message: "That file isn't a video we can use. Try an MP4 or WebM." }, 400);
+      }
+      await fsCommit(sa, [wrFull(sa, "clipd/" + id + "_" + i, { d }), wrUpd(sa, "clips/" + id, [[["g", String(i)], true]])]);
+      return json({ ok: true, i });
+    }
+    if (a === "clipDone") {
+      const id = String(body.id || "");
+      if (!okClip(id)) return json({ error: "bad request" }, 400);
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c || c.o !== uid) return json({ error: "gone", message: "That upload isn't here any more." }, 404);
+      if (c.st === "ok") return json({ ok: true, id });
+      const got = c.g || {}, missing = [];
+      for (let i = 0; i < c.n; i++) if (!got[String(i)]) missing.push(i);
+      if (missing.length) return json({ error: "incomplete", message: "Some of the video didn't arrive.", missing: missing.slice(0, 80) }, 409);
+      await fsCommit(sa, [wrUpd(sa, "clips/" + id, [[["st"], "ok"], [["g"], undefined]]), wrUpd(sa, "chatidx/" + uid, [[["cl", id, "st"], "ok"]])]);
+      return json({ ok: true, id });
+    }
+    if (a === "clipMine") {
+      const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, cl = idx.cl || {};
+      return json({ ok: true, max: CLIP_KEEP, clips: Object.keys(cl).map((k) => ({ id: k, t: cl[k].t || 0, sz: cl[k].sz || 0, lv: cl[k].lv || "", st: cl[k].st || "up" })).sort((x, y) => y.t - x.t) });
+    }
+    if (a === "clipDel") {
+      const id = String(body.id || "");
+      if (!okClip(id)) return json({ error: "bad request" }, 400);
+      if (!rate(uid, "clipdel", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c) { await fsSet(sa, "chatidx/" + uid, [[["cl", id], undefined]]); return json({ ok: true }); }
+      if (c.o !== uid && !admin) return json({ error: "forbidden", message: "That's not your video." }, 403);
+      await clipWipe(sa, id, c, c.o);
+      if (c.o !== uid) await modLog(sa, name, "clip deleted", c.on, id);
+      return json({ ok: true });
+    }
+    if (a === "clipLike") {
+      const id = String(body.id || "");
+      if (!okClip(id)) return json({ error: "bad request" }, 400);
+      if (!rate(uid, "cliplike", 40, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c || c.st !== "ok") return json({ error: "gone", message: "That video isn't here any more." }, 404);
+      const on = !!body.on, was = !!(c.l && c.l[uid]);
+      if (on !== was) await fsSet(sa, "clips/" + id, [[["l", uid], on ? 1 : undefined]]);
+      return json({ ok: true, liked: on, likes: clipLikes(c) + (on && !was ? 1 : 0) - (!on && was ? 1 : 0) });
+    }
+    if (a === "clipCm") {
+      const id = String(body.id || ""), text = cleanText(body.text).slice(0, 300);
+      if (!okClip(id) || !text) return json({ error: "bad request", message: "Write something first." }, 400);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now, so you can't comment." }, 403);
+      if (!rate(uid, "clipcm", 8, 60000) || !rate(uid, "clipcmh", 40, 3600000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = await fsGet(sa, "clips/" + id);
+      if (!c || c.st !== "ok") return json({ error: "gone", message: "That video isn't here any more." }, 404);
+      const have = await fsList(sa, "clips/" + id + "/c", CLIP_CMS + 1);
+      if (have.length >= CLIP_CMS) return json({ error: "limit", message: "This video has reached its comment limit." }, 403);
+      const cid = mkId(), ts = Date.now();
+      await fsSet(sa, "clips/" + id + "/c/" + cid, [[["u"], uid], [["n"], name], [["t"], text], [["ts"], ts]]);
+      if (c.o !== uid) await defer(notifyUser(sa, c.o, { kind: "cl", title: name + " commented on your video", body: text, url: "#/clip/" + id, tag: "cl-" + id }));
+      return json({ ok: true, cm: { id: cid, name, t: text, ts, own: true, can: true } });
+    }
+    if (a === "clipCmDel") {
+      const id = String(body.id || ""), cid = String(body.cid || "");
+      if (!okClip(id) || !okId(cid)) return json({ error: "bad request" }, 400);
+      const c = await fsGet(sa, "clips/" + id), m = await fsGet(sa, "clips/" + id + "/c/" + cid);
+      if (!c || !m) return json({ ok: true });
+      if (m.u !== uid && c.o !== uid && !admin) return json({ error: "forbidden", message: "You can't delete that comment." }, 403);
+      await fsDelete(sa, "clips/" + id + "/c/" + cid);
+      if (m.u !== uid && admin && c.o !== uid) await modLog(sa, name, "comment deleted", m.n, id);
       return json({ ok: true });
     }
 
@@ -924,7 +1159,7 @@ export async function onRequestPost(context) {
       const id = await subId(e), d = (await fsGet(sa, "push/" + uid)) || {}, ents = [[["s", id], { e, p: String(kk.p256dh), a: String(kk.auth), t: Date.now(), ua: oneLine(body.ua, 60) }]];
       const old = Object.keys(d.s || {}).filter((k) => k !== id).sort((x, y) => ((d.s[x] || {}).t || 0) - ((d.s[y] || {}).t || 0));
       for (const k of old.slice(0, Math.max(0, old.length + 1 - PUSH_MAXDEV))) ents.push([["s", k], undefined]);
-      if (!d.k) ents.push([["k"], { dm: true, men: true, rec: true, rep: true }]);
+      if (!d.k) ents.push([["k"], { dm: true, men: true, rec: true, rep: true, fr: true, cl: true }]);
       await fsSet(sa, "push/" + uid, ents);
       return json({ ok: true, k: pushPrefs(d) });
     }
@@ -936,7 +1171,7 @@ export async function onRequestPost(context) {
     }
     if (a === "pushPrefs") {
       const k = body.k && typeof body.k === "object" ? body.k : {}, ents = [];
-      for (const kind of ["dm", "men", "rec", "rep"]) if (typeof k[kind] === "boolean") ents.push([["k", kind], k[kind]]);
+      for (const kind of ["dm", "men", "rec", "rep", "fr", "cl"]) if (typeof k[kind] === "boolean") ents.push([["k", kind], k[kind]]);
       if (ents.length) await fsSet(sa, "push/" + uid, ents);
       return json({ ok: true, k: pushPrefs(Object.assign({}, (await fsGet(sa, "push/" + uid)) || {})) });
     }
@@ -964,6 +1199,10 @@ export async function onRequestPost(context) {
       const old = Object.keys(ru.d || {}).filter((k) => k !== body.id).sort((x, y) => ((ru.d[y] || {}).ts || 0) - ((ru.d[x] || {}).ts || 0));
       for (const k of old.slice(REC_KEEP - 1)) ents.push([["d", k], undefined]);
       await fsSet(sa, "recuser/" + tuid, ents);
+      if (dec === "declined") {
+        const cm = /#\/clip\/(c[a-z0-9]{11})(?![a-z0-9])/.exec(String(src.video != null ? src.video : body.video || ""));
+        if (cm) { try { const cc = await fsGet(sa, "clips/" + cm[1]); if (cc && cc.o === tuid) await clipWipe(sa, cm[1], cc, cc.o); } catch (e) {} }
+      }
       try { await defer(notifyUser(sa, tuid, { kind: "rec", title: dec === "accepted" ? "Record accepted" : "Record declined", body: (dec === "accepted" ? "Your record on " : "Your record on ") + (rec.ln || "a level") + (dec === "accepted" ? " was accepted." : " was declined" + (rec.r ? ": " + rec.r : ".")), url: "#/sub", tag: "rec-" + body.id })); } catch (e) {}
       return json({ ok: true });
     }
