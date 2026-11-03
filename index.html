@@ -7905,6 +7905,211 @@ html body .chdr .chcomp textarea:focus-visible{outline:none!important;box-shadow
 .chdr #chbody::-webkit-scrollbar-thumb{background:hsl(var(--h) 100% 72% / .3);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
 .chdr #chbody::-webkit-scrollbar-thumb:hover{background:hsl(var(--h) 100% 78% / .5);background-clip:padding-box}
 html:not([data-fx="low"]) .chdr #chbody{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}
+:root{--tvm:hsl(var(--h) 45% 90%)}
+[data-theme="light"]{--tvm:hsl(var(--h) 40% 26%)}
+[data-theme="light"] .tvback{color:hsl(var(--h) 90% 30%)}
+/* ===== v237: video uploads and clip pages ===== */
+.tvu{margin:2px 0 16px}
+.tvu-seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:hsl(var(--h) 60% 50% / .10);border:1px solid var(--line);margin-bottom:12px}
+.tvu-seg button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:700;font-size:13px;line-height:1;color:var(--tvm);background:transparent;border:0;border-radius:10px;padding:11px 10px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+.tvu-seg button:hover{color:var(--text)}
+.tvu-seg button[aria-selected="true"]{color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 52%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 6px 18px hsl(var(--h) 100% 55% / .32)}
+.tvu-drop{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:26px 18px;border-radius:18px;border:2px dashed hsl(var(--h) 90% 62% / .5);background:linear-gradient(180deg,hsl(var(--h) 90% 55% / .10),hsl(var(--h) 90% 55% / .04));cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+.tvu-drop:hover,.tvu-drop.on{border-color:hsl(var(--h) 100% 68%);background:linear-gradient(180deg,hsl(var(--h) 90% 55% / .18),hsl(var(--h) 90% 55% / .07))}
+.tvu-drop.on{transform:scale(1.01)}
+.tvu-drop b{font-size:16px;color:var(--text)}
+.tvu-drop span{font-size:13px;color:var(--tvm);max-width:34ch}
+.tvu-drop small{font-size:12px;color:var(--tvm);opacity:.9}
+.tvu-dic{display:grid!important;place-items:center;width:58px;height:58px;border-radius:18px;color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 45%));box-shadow:0 8px 24px hsl(var(--h) 100% 55% / .35);margin-bottom:4px}
+.tvu-card{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px;border-radius:18px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .07)}
+.tvu-card[hidden],.tvu-drop[hidden],.tvu-link[hidden],.tvu-up[hidden]{display:none!important}
+.tvu-th{position:relative;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:hsl(var(--h) 60% 12%);display:grid;place-items:center;color:hsl(var(--h) 100% 80%)}
+.tvu-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tvu-th i{position:absolute;right:5px;bottom:5px;font-family:inherit;font-weight:700;font-size:11px;line-height:1;font-style:normal;color:#fff;background:rgba(0,0,0,.66);border-radius:6px;padding:3px 5px}
+.tvu-info{min-width:0;display:flex;flex-direction:column;gap:4px}
+.tvu-n{font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tvu-m{font-size:12px;color:var(--tvm)}
+.tvu-bar{height:7px;border-radius:99px;background:hsl(var(--h) 60% 50% / .18);overflow:hidden;margin-top:3px}
+.tvu-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,hsl(var(--h) 100% 54%),hsl(var(--h) 100% 75%));transition:width .25s ease}
+.tvu-st{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tvm);line-height:1.35}
+.tvu-st.good{color:hsl(var(--h) 100% 72%)}
+.tvu-st.bad{color:#ff8a8a}
+[data-theme="light"] .tvu-st.good{color:hsl(var(--h) 90% 36%)}
+[data-theme="light"] .tvu-st.bad{color:#c62828}
+.tvu-st svg{flex:none}
+.tvu-tap{align-self:flex-start;font-family:inherit;font-weight:700;font-size:12px;line-height:1;color:#fff;background:hsl(var(--h) 100% 42%);border:0;border-radius:9px;padding:8px 11px;cursor:pointer}
+.tvu-x{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--tvm);cursor:pointer}
+.tvu-x:hover{color:var(--text);background:hsl(var(--h) 60% 50% / .14)}
+.tvu-link label{margin:0}
+.tvm{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:hsl(var(--h) 60% 50% / .05)}
+.tvm summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font-family:inherit;font-weight:700;font-size:13px;line-height:1;color:var(--text)}
+.tvm summary::-webkit-details-marker{display:none}
+.tvm summary em{font-style:normal;font-size:11.5px;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:3px 8px}
+.tvm-l{padding:2px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.tvm-r{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:hsl(var(--h) 60% 50% / .07)}
+.tvm-i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;color:hsl(var(--h) 100% 80%);background:hsl(var(--h) 90% 50% / .18);flex:none}
+.tvm-t{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.tvm-t b{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tvm-t small{font-size:11.5px;color:var(--tvm)}
+.tvm-b{font-family:inherit;font-weight:700;font-size:12px;line-height:1;color:var(--text);text-decoration:none;background:hsl(var(--h) 60% 50% / .16);border:0;border-radius:9px;padding:8px 10px;cursor:pointer;white-space:nowrap}
+.tvm-b:hover{background:hsl(var(--h) 60% 50% / .28)}
+.tvm-b.dng{color:#ff9a9a}
+.tvm-n{margin:2px 2px 0;font-size:11.5px;color:var(--tvm)}
+
+/* ---- the clip page ---- */
+.tvpg{max-width:1280px;margin:0 auto}
+.tvback{margin:0 0 12px!important}
+.tvback svg{vertical-align:-3px}
+.tvgrid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+.tvmain{min-width:0}
+.tvp{--ar:1.7778;position:relative;width:100%;aspect-ratio:var(--ar);max-height:76vh;margin:0 auto;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 0 1px hsl(var(--h) 80% 70% / .18)}
+.tvp.tall{width:auto;max-width:100%;height:min(76vh,calc(100vw * .92 / var(--ar)))}
+.tvp video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.tvl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;font-family:inherit;font-weight:600;font-size:14px;line-height:1.3;text-align:center;padding:20px;background:radial-gradient(120% 120% at 50% 0%,hsl(var(--h) 80% 22%),hsl(var(--h) 70% 8%));background-size:cover;background-position:center}
+.tvl.hasp::before{content:"";position:absolute;inset:0;background:rgba(3,10,28,.62);backdrop-filter:blur(3px)}
+.tvl>*{position:relative}
+.tvspin{width:46px;height:46px;border-radius:50%;border:4px solid rgba(255,255,255,.22);border-top-color:#fff;animation:tvspin 0.9s linear infinite}
+@keyframes tvspin{to{transform:rotate(360deg)}}
+.tvgone{background:hsl(var(--h) 60% 10%)}
+.tvgone i{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:hsl(var(--h) 90% 50% / .2);color:hsl(var(--h) 100% 82%)}
+.tvhead{margin:16px 2px 0}
+.tvt{margin:0 0 10px;font-size:clamp(20px,3.4vw,28px);line-height:1.15;color:var(--text)}
+.tvsub{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:13px;color:var(--tvm)}
+.tvby{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none}
+.tvby .av{margin:0!important}
+.tvchip{font-size:11.5px;font-weight:700;color:hsl(var(--h) 100% 80%);background:hsl(var(--h) 90% 50% / .16);border-radius:99px;padding:4px 9px}
+[data-theme="light"] .tvchip{color:hsl(var(--h) 90% 32%)}
+.tvact{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 4px}
+.tvb{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:var(--text);background:hsl(var(--h) 60% 50% / .14);border:1px solid var(--line);border-radius:12px;padding:11px 15px;cursor:pointer;transition:background .18s,transform .12s,border-color .18s}
+.tvb:hover{background:hsl(var(--h) 60% 50% / .26)}
+.tvb:active{transform:scale(.97)}
+.tvb:disabled{opacity:.65;cursor:default}
+.tvb.pri{color:#fff;border-color:transparent;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 6px 18px hsl(var(--h) 100% 55% / .3)}
+.tvb.pri:disabled{opacity:.45;box-shadow:none}
+.tvb.dng{color:#ff9a9a}
+[data-theme="light"] .tvb.dng{color:#c62828}
+.tvlike b{font-variant-numeric:tabular-nums}
+.tvlike.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 6px 18px hsl(var(--h) 100% 55% / .3)}
+.tvlike.on svg{fill:currentColor}
+.tvlike.pop svg{animation:tvpop .42s cubic-bezier(.34,1.6,.5,1)}
+@keyframes tvpop{0%{transform:scale(.6)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+.tvside{position:sticky;top:86px;display:flex;flex-direction:column;max-height:calc(100vh - 110px);padding:18px!important;margin:0!important}
+.tvch{margin:0 0 12px;font-size:16px;letter-spacing:.02em;text-shadow:none;color:var(--text);display:flex;align-items:center;gap:8px}
+.tvch em{font-style:normal;font-size:12px;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:3px 8px}
+.tvcl{display:flex;flex-direction:column;min-height:0;flex:1}
+.tvcs{overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:60px;padding-right:2px;margin-top:12px}
+.tvcf{display:flex;align-items:flex-end;gap:10px}
+.tvcf.in{align-items:center;justify-content:space-between;padding:12px;border-radius:14px;background:hsl(var(--h) 60% 50% / .08);font-size:13px;color:var(--tvm)}
+.tvcf textarea{flex:1;min-width:0;resize:none;font-family:inherit;font-weight:500;font-size:14px;line-height:1.4;color:var(--text);background:hsl(var(--h) 60% 50% / .08);border:1px solid var(--line);border-radius:14px;padding:11px 13px;max-height:120px}
+.tvcf textarea::placeholder{color:var(--tvm)}
+.tvcav .av{margin:0!important}
+.tvc{display:flex;gap:10px;align-items:flex-start}
+.tvc .av{flex:none;margin:0!important}
+.tvcb{min-width:0;flex:1;padding:9px 12px;border-radius:14px;background:hsl(var(--h) 60% 50% / .09)}
+.tvcn{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--tvm)}
+.tvcn a{color:var(--text);text-decoration:none}
+.tvcn b{font-size:13px}
+.tvcb p{margin:3px 0 0;font-size:14px;line-height:1.42;color:var(--text);overflow-wrap:anywhere}
+.tvcx{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;border:0;background:transparent;color:var(--tvm);cursor:pointer;opacity:.75}
+.tvcx:hover{opacity:1;background:hsl(var(--h) 60% 50% / .16)}
+.tvcx.arm{opacity:1;color:#fff;background:#d33}
+.tvempty{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:26px 10px;color:var(--tvm);font-size:13px}
+.tvempty b{color:var(--text);font-size:14px}
+@media (max-width:980px){
+  .tvgrid{grid-template-columns:minmax(0,1fr)}
+  .tvside{position:static;max-height:none}
+  .tvcs{max-height:none;overflow:visible}
+}
+@media (max-width:520px){
+  .tvu-card{grid-template-columns:76px minmax(0,1fr) auto;gap:10px}
+  .tvp{border-radius:14px}
+  .tvact .tvb{flex:1 1 auto}
+}
+@media (prefers-reduced-motion:reduce){ .tvspin{animation-duration:2.4s} .tvlike.pop svg{animation:none} }
+
+#app .panel>h3.tvch,#app .panel>h3.frh,#app h3.frh{text-shadow:none;letter-spacing:.02em}
+/* ===== v237: friends ===== */
+.frpg{max-width:880px;margin:0 auto}
+.frtabs{display:flex;gap:4px;padding:4px;border-radius:14px;background:hsl(var(--h) 60% 50% / .10);border:1px solid var(--line);margin:0 0 16px;overflow-x:auto}
+.frtabs button{flex:1 1 auto;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:var(--tvm);background:transparent;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+.frtabs button:hover{color:var(--text)}
+.frtabs button[aria-selected="true"]{color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 52%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 6px 18px hsl(var(--h) 100% 55% / .32)}
+.frtabs em,.frh em{font-style:normal;font-size:11.5px;font-weight:800;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:3px 8px}
+.frtabs button[aria-selected="true"] em{background:rgba(0,24,80,.4)}
+.frpanel{padding:18px!important}
+.frh{display:flex;align-items:center;gap:8px;margin:4px 2px 10px;font-size:14px;letter-spacing:.02em;text-shadow:none;color:var(--text)}
+.frh:not(:first-child){margin-top:22px}
+.frlist{display:flex;flex-direction:column;gap:10px}
+.frrow{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:16px;background:hsl(var(--h) 60% 50% / .08);border:1px solid var(--line)}
+.frrow .av{flex:none}
+.frm{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.frn{color:var(--text);text-decoration:none;font-size:15px}
+.frn:hover b{text-decoration:underline}
+.frm small{font-size:12px;color:var(--tvm)}
+.frbtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.frb{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:700;font-size:13px;line-height:1;color:var(--text);text-decoration:none;background:hsl(var(--h) 60% 50% / .16);border:1px solid var(--line);border-radius:11px;padding:10px 13px;cursor:pointer;white-space:nowrap;transition:background .18s,transform .12s}
+.frb:hover{background:hsl(var(--h) 60% 50% / .28)}
+.frb:active{transform:scale(.97)}
+.frb:disabled{opacity:.55;cursor:default}
+.frb.pri{color:#fff;border-color:transparent;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 5px 16px hsl(var(--h) 100% 55% / .28)}
+.frb.dng{color:#ff9a9a}
+[data-theme="light"] .frb.dng{color:#c62828}
+.frempty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:34px 16px;color:var(--tvm);font-size:13.5px}
+.frempty i{display:grid;place-items:center;width:64px;height:64px;border-radius:20px;color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 45%));box-shadow:0 8px 24px hsl(var(--h) 100% 55% / .3);margin-bottom:4px}
+.frempty b{font-size:16px;color:var(--text)}
+.frempty span{max-width:38ch}
+.frempty .frb{margin-top:8px}
+.frfind label{display:block;font-size:12.5px;font-weight:700;color:var(--tvm);margin:0 0 7px}
+.frfr{display:flex;align-items:stretch;gap:8px}
+.frsi{position:relative;flex:1;min-width:0}
+.frfr input{flex:1;min-width:0;width:100%;font-family:inherit;font-weight:600;font-size:15px;line-height:1;color:var(--text);background:hsl(var(--h) 60% 50% / .08);border:1px solid var(--line);border-radius:12px;padding:13px 14px 13px 14px}
+.frfr .frsi{display:none}
+.frmsg{min-height:20px;margin:9px 2px 0;font-size:13px;color:hsl(var(--h) 100% 78%)}
+.frmsg.bad{color:#ff8a8a}
+[data-theme="light"] .frmsg{color:hsl(var(--h) 90% 36%)}
+[data-theme="light"] .frmsg.bad{color:#c62828}
+.frsug{display:flex;flex-wrap:wrap;gap:8px}
+.frsg{display:inline-flex;align-items:center;gap:9px;font-family:inherit;font-weight:600;font-size:13.5px;line-height:1;color:var(--text);background:hsl(var(--h) 60% 50% / .10);border:1px solid var(--line);border-radius:99px;padding:6px 12px 6px 6px;cursor:pointer;transition:background .18s}
+.frsg:hover{background:hsl(var(--h) 60% 50% / .24)}
+.frsg svg{color:hsl(var(--h) 100% 78%)}
+[data-theme="light"] .frsg svg{color:hsl(var(--h) 90% 38%)}
+@media (max-width:620px){
+  .frrow{flex-wrap:wrap}
+  .frbtns{width:100%;justify-content:stretch}
+  .frbtns .frb{flex:1 1 auto}
+  .frfr{flex-direction:column}
+}
+
+/* ---- player profile button ---- */
+.pfr{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px}
+.phero .pfr{justify-content:flex-start}
+@media (max-width:640px){ .phero .pfr{justify-content:center} }
+.pfrb{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:11px 15px;cursor:pointer;backdrop-filter:blur(6px);transition:background .18s,transform .12s}
+.pfrb:hover{background:rgba(255,255,255,.24)}
+.pfrb:active{transform:scale(.97)}
+.pfrb:disabled{opacity:.6;cursor:default}
+.pfrb.pri{border-color:transparent;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 46%));box-shadow:0 6px 20px hsl(var(--h) 100% 55% / .38)}
+.pfrs{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-weight:700;font-size:13px;line-height:1;color:#fff;background:rgba(255,255,255,.12);border-radius:99px;padding:9px 13px}
+.pfrs.ok{background:hsl(var(--h) 100% 50% / .32)}
+
+/* ---- in the chat list ---- */
+.frcb{flex:none;display:flex;align-items:center;gap:12px;width:100%;padding:11px 13px;margin:0 0 6px;border-radius:18px;border:1px solid hsl(var(--h) 100% 70% / .4);background:linear-gradient(135deg,hsl(var(--h) 100% 55% / .28),hsl(var(--h) 100% 45% / .14));color:inherit;font:inherit;text-align:left;cursor:pointer}
+.frcb i{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 54%),hsl(calc(var(--h) + 6) 82% 46%));flex:none}
+.frcb span{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.frcb b{font-size:14px}
+.frcb small{font-size:12px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frcb em{font-style:normal;font-size:12px;font-weight:800;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:6px 11px}
+.frstrip{flex:none;min-height:84px;display:flex;gap:10px;overflow-x:auto;padding:4px 6px 8px;margin:0 -2px;scrollbar-width:none}
+.frstrip::-webkit-scrollbar{display:none}
+.frchip{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;background:transparent;border:0;color:inherit;font:inherit;cursor:pointer;padding:4px 0;border-radius:14px}
+.frchip:hover .av{box-shadow:0 0 0 3px hsl(var(--h) 100% 65% / .6)}
+.frchip span{max-width:64px;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frnone p{font-size:13px!important}
+
+/* ---- in the bell ---- */
+.frnic{background:hsl(var(--h) 100% 50% / .22)!important;color:hsl(var(--h) 100% 80%)!important}
+.frnit .frbtns{display:flex;gap:8px;margin-top:8px;justify-content:flex-start}
+.frnit .frb{padding:8px 11px;font-size:12px}
 /* ================= v235: the page background is one plain blue (no glow, grid, orbs, shapes or motion) ================= */
 :root:root:root:root .bgfx{background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;animation:none!important}
 :root:root:root:root .bgfx::before,:root:root:root:root .bgfx::after,:root:root:root:root .bgfx *,:root:root:root:root .bgfx *::before,:root:root:root:root .bgfx *::after{display:none!important;animation:none!important}
@@ -11868,7 +12073,7 @@ var _sh=window.show;
       h+='<button class="chrm clan'+(cun?' un':'')+'" data-cc="'+esc(cl.id)+'" type="button"><span class="chrav clan"><b>'+esc(cl.tag)+'</b></span><span class="chrt"><b>'+esc(cl.name)+'</b><small>'+
         (cl.last?esc(cl.fromName||"")+': '+lastHtml(cl.last):'Clan chat &middot; just for members')+'</small></span><span class="chrr">'+(cl.ts?ago(cl.ts):'')+(cun?'<i class="chud"></i>':'')+'</span></button>';
     }
-    h+=grpListHtml(ib,me);
+    h+=(window.TML237&&TML237.chatHtml?TML237.chatHtml():"")+grpListHtml(ib,me);
     h+='<div class="chsec"><span>Direct messages</span><button class="chnewb" id="chnewb" type="button">'+svg(IC.plus,14)+' New</button></div>';
     var dms=(ib.dms||[]).filter(function(d){ return !q||String(d.name).toLowerCase().indexOf(q)>=0; });
     if((ib.dms||[]).length>5) h+='<input class="chfind" id="chfind" type="search" placeholder="Search your messages" value="'+esc(CH.filter||"")+'" aria-label="Search your messages">';
@@ -11884,7 +12089,7 @@ var _sh=window.show;
     body.innerHTML=h;
     body.querySelector('[data-cr="main"]').onclick=function(){ go("thread",{dm:false,name:"Timmylist Room"}); };
     var cb=body.querySelector("[data-cc]"); if(cb) cb.onclick=function(){ var c=(CH.inbox||{}).clan; if(c) go("thread",{dm:false,clan:c.id,tag:c.tag,name:c.name}); };
-    $("chnewb").onclick=function(){ go("new"); }; grpWireList(body);
+    $("chnewb").onclick=function(){ go("new"); }; grpWireList(body); if(window.TML237&&TML237.chatWire) TML237.chatWire(body);
     var fi=$("chfind"); if(fi) fi.oninput=function(){ CH.filter=this.value; var pos=this.selectionStart; renderList(); var n=$("chfind"); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } };
     var rs=body.querySelectorAll("[data-cp]"), i; for(i=0;i<rs.length;i++) rs[i].onclick=function(){ go("thread",{dm:true,peer:this.getAttribute("data-cp"),name:this.getAttribute("data-cn")}); };
   }
@@ -12567,7 +12772,7 @@ var _sh=window.show;
       if(r&&r.ok){
         var prevMain=CH.inbox&&CH.inbox.main; if(lite&&CH.inbox&&r.main===undefined) r.main=prevMain;
         if(lite&&CH.inbox&&r.clan===undefined) r.clan=CH.inbox.clan;
-        CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab();
+        CH.inbox=r; CH.me=r.me; CH.muted=r.muted||0; CH.errN=0; CH.srvErr=null; paintFab(); if(window.TML237&&TML237.frNote) TML237.frNote(r);
         var after=unread(); if(after>before){ var latest=grpLatest(r); ping(); if(latest) notify(latest.name,latest.last||"New message"); }
         if(r.call) onIncoming(r.call);
         ctlSync(r.ctl);
@@ -13948,7 +14153,7 @@ var _sh=window.show;
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="sessions"]'); if(t) setTimeout(function(){ SS.sig=""; ssLoad(); },50); });
     ssStart();
   },_ctl:CTL,_ss:SS};
-  window.TML220=window.TML221={adminChat:adminHtml,wireAdmin:function(){
+  window.TML220=window.TML221={openDm:function(peer,name){ if(!CH.open) openChat(); go("thread",{dm:true,peer:peer||null,name:name,to:peer?undefined:name}); },refreshList:function(){ if(CH.open&&CH.view==="list") render(); },closeChat:function(){ if(CH.open) closeChat(); },adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
   },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_gif:{setKey:function(k){ GIPHY_KEY=k; paintGifBtn(); },GF:GF,gifOk:gifOk,gifNorm:gifNorm,close:closeGif},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
@@ -14808,7 +15013,7 @@ var _sh=window.show;
   function doInstall(){ if(!DEF) return; var d=DEF; DEF=null; try{ d.prompt(); d.userChoice.then(function(){ refreshUI(); }); }catch(e){} refreshUI(); }
 
   /* ---------- alerts: this device ---------- */
-  var ST={loaded:false,devices:0,here:false,k:{dm:true,men:true,rec:true,rep:true},admin:false,busy:'',msg:'',err:''};
+  var ST={loaded:false,devices:0,here:false,k:{dm:true,men:true,rec:true,rep:true,fr:true,cl:true},admin:false,busy:'',msg:'',err:''};
   function getSub(){
     if(!canPush()) return Promise.resolve(null);
     return wait(navigator.serviceWorker.ready,4000,'sw').then(function(reg){ return reg.pushManager.getSubscription(); }).catch(function(){ return null; });
@@ -14878,7 +15083,7 @@ var _sh=window.show;
     if(perm()==='denied'&&!ST.here) h+='<p class="pwtx">Alerts are blocked for this site in your browser. Allow notifications for it in the browser\'s site settings, then come back here.</p>';
     else if(!ST.here) h+='<p class="pwtx">Get a pop-up on this device for direct messages, @mentions and when a record you submitted is accepted or declined. Nobody can see that you turned it on.</p><button type="button" class="adm-b pwpri" id="pwon"'+(ST.busy?' disabled':'')+'>'+(ST.busy==='on'?'Turning on...':'Turn on alerts')+'</button>';
     else {
-      var rows=[['dm','Direct messages','When someone writes to you'],['men','@Mentions','When someone @mentions you in the room or a clan chat'],['rec','Record decisions','When one of your submissions is accepted or declined']];
+      var rows=[['dm','Direct messages','When someone writes to you'],['men','@Mentions','When someone @mentions you in the room or a clan chat'],['rec','Record decisions','When one of your submissions is accepted or declined'],['fr','Friend requests','When someone sends you a friend request or accepts yours'],['cl','Video comments','When someone comments on a video you uploaded']];
       if(ST.admin) rows.push(['rep','Chat reports','When a player reports a message']);
       h+='<p class="pwok"><i></i>Alerts are on for this device'+(ST.devices>1?' (and '+(ST.devices-1)+' other'+(ST.devices>2?'s':'')+')':'')+'.</p><div class="pwrows" role="group" aria-label="Which alerts">'+rows.map(function(r){
         return '<label class="pwrow"><span><b>'+E(r[1])+'</b><small>'+E(r[2])+'</small></span><span class="pwsw"><input type="checkbox" data-pk="'+r[0]+'"'+(ST.k[r[0]]?' checked':'')+'><i></i></span></label>';
@@ -14963,6 +15168,823 @@ var _sh=window.show;
   bellHook();
   function start(){ footerLink(); setTimeout(footerLink,1500); bellHook(); fromUrl(); var n=0,t=setInterval(function(){ if(signed()){ clearInterval(t); load(); } else if(++n>40) clearInterval(t); },1500); }
   if(D.readyState==='loading') D.addEventListener('DOMContentLoaded',start); else start();
+})();
+/* ===== v237: video uploads for records, a page for every clip (likes + comments) ===== */
+(function(){
+  'use strict';
+  var API=window.TML_SOCIAL_API||'/api/social', D=document;
+  var CLIP_MAX=26*1024*1024, SHRINK_MAX_SEC=360, SHRINK_BUDGET=22*1024*1024;
+  function $(id){ return D.getElementById(id); }
+  function E(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function NT(){ return window.TMLNET; }
+  function signed(){ var n=NT(); return !!(n&&n.on&&n.user&&n.user.getIdToken&&n.prof); }
+  function netOn(){ var n=NT(); return !!(n&&n.on); }
+  function call(a,body){
+    var n=NT(), tp=(n&&n.user&&n.user.getIdToken)?n.user.getIdToken().catch(function(){ return ''; }):Promise.resolve('');
+    return tp.then(function(t){
+      var h={'content-type':'application/json'}; if(t) h.Authorization='Bearer '+t;
+      return fetch(API,{method:'POST',headers:h,body:JSON.stringify(Object.assign({a:a},body||{}))});
+    }).then(function(r){ return r.json().catch(function(){ return {error:'bad response'}; }).then(function(j){ j.status=r.status; return j; }); });
+  }
+  function ago(ts){
+    if(!ts) return '';
+    var s=Math.max(0,(Date.now()-ts)/1000);
+    if(s<90) return 'just now'; if(s<3600) return Math.round(s/60)+' min ago'; if(s<86400) return Math.round(s/3600)+' h ago';
+    var d=Math.round(s/86400); if(d<30) return d+' day'+(d===1?'':'s')+' ago';
+    try{ return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric',year:new Date(ts).getFullYear()!==new Date().getFullYear()?'numeric':undefined}); }catch(e){ return ''; }
+  }
+  function mb(b){ return b>=1048576?(b/1048576).toFixed(b>=10485760?0:1)+' MB':Math.max(1,Math.round(b/1024))+' KB'; }
+  function mmss(s){ s=Math.max(0,Math.round(s||0)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function ic(d,w){ return '<svg viewBox="0 0 24 24" width="'+(w||18)+'" height="'+(w||18)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>'; }
+  var IC={
+    up:'<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>',
+    film:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3z" fill="currentColor"/>',
+    heart:'<path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.6 4.5 6.9 4.5c2 0 3.5 1.1 5.1 3 1.6-1.9 3.1-3 5.1-3 3.3 0 5.3 3.1 4.1 6.6-1.7 4.8-9.2 9.4-9.2 9.4z"/>',
+    link:'<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
+    trash:'<path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/>',
+    check:'<path d="M20 6 9 17l-5-5"/>', x:'<path d="M18 6 6 18M6 6l12 12"/>', back:'<path d="m15 18-6-6 6-6"/>',
+    chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', play:'<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>',
+    alert:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>'
+  };
+  var CLIP_RE=/#\/clip\/(c[a-z0-9]{11})(?![a-z0-9])/;
+  function clipId(u){ var m=CLIP_RE.exec(String(u||'')); return m?m[1]:null; }
+  function clipUrl(id){ var o=''; try{ if(/^https?:$/.test(location.protocol)) o=location.origin; }catch(e){} return (o||'https://timmylist.pages.dev')+'/#/clip/'+id; }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  function apiErr(r,fallback){ var e=new Error((r&&r.message)||fallback||'Something went wrong. Try again.'); e.api=r||null; return e; }
+  function lvOf(id){ try{ return (typeof lv==='function')?lv(+id):null; }catch(e){ return null; } }
+  function lvTitle(l){ try{ return '#'+rk(l.id)+' '+l.name; }catch(e){ return l.name; } }
+  function toastS(t){ try{ toast(t); }catch(e){} }
+
+  /* ============================== getting a clip back out of the database ============================== */
+  var MEM={};   // id -> {url, blob}
+  function b64blob(d){ var bin=atob(d), n=bin.length, u=new Uint8Array(n); for(var i=0;i<n;i++) u[i]=bin.charCodeAt(i); return new Blob([u]); }
+  function ckey(id){ return new Request(location.origin+'/__clip/'+id); }
+  function cacheOk(){ try{ return !!(window.caches&&/^https?:$/.test(location.protocol)); }catch(e){ return false; } }
+  function cacheGet(id){ if(!cacheOk()) return Promise.resolve(null); try{ return caches.open('tml-clips-1').then(function(c){ return c.match(ckey(id)); }).then(function(r){ return r?r.blob():null; }).catch(function(){ return null; }); }catch(e){ return Promise.resolve(null); } }
+  function cachePut(id,blob){
+    if(!cacheOk()) return;
+    try{ caches.open('tml-clips-1').then(function(c){ return c.put(ckey(id),new Response(blob,{headers:{'content-type':blob.type||'video/mp4'}})).then(function(){ return c.keys(); }).then(function(ks){ if(ks.length>4) ks.slice(0,ks.length-4).forEach(function(k){ c.delete(k); }); }); }).catch(function(){}); }catch(e){}
+  }
+  function getPiece(id,i,t){
+    return call('clipGet',{id:id,i:i}).then(function(r){
+      if(r&&r.ok) return b64blob(r.d);
+      var e=new Error(r&&r.status===404?'gone':'net'); e.fatal=!!(r&&r.status===404); throw e;
+    },function(){ var e=new Error('net'); throw e; }).catch(function(e){
+      if(!e.fatal&&t<3) return sleep(500*(t+1)).then(function(){ return getPiece(id,i,t+1); });
+      throw e;
+    });
+  }
+  function fetchClip(id,info,onP){
+    if(MEM[id]) return Promise.resolve(MEM[id]);
+    return cacheGet(id).then(function(b){
+      if(b&&b.size) return b;
+      var n=info.n, parts=new Array(n), next=0, done=0, fin=false, bad=false;
+      return new Promise(function(res,rej){
+        function worker(){
+          if(bad) return; var i=next++;
+          if(i>=n){ if(done===n&&!fin){ fin=true; res(new Blob(parts,{type:info.ty||'video/mp4'})); } return; }
+          getPiece(id,i,0).then(function(p){ parts[i]=p; done++; if(onP) onP(done/n); worker(); },function(e){ bad=true; rej(e); });
+        }
+        for(var k=0;k<Math.min(4,n);k++) worker();
+      }).then(function(blob){ cachePut(id,blob); return blob; });
+    }).then(function(blob){ var o={blob:blob,url:URL.createObjectURL(blob)}; MEM[id]=o; return o; });
+  }
+  // a recorded WebM can say its length is "forever"; asking for the end makes the browser find out, which also makes seeking work
+  function fixDuration(v){
+    try{ v.addEventListener('loadedmetadata',function(){ if(v.duration===Infinity){ var back=function(){ v.removeEventListener('timeupdate',back); try{ v.currentTime=0; }catch(e){} }; v.addEventListener('timeupdate',back); try{ v.currentTime=1e101; }catch(e){} } }); }catch(e){}
+  }
+
+  /* ============================== preparing a video on this device ============================== */
+  function typeOf(file){
+    var t=String(file.type||'').toLowerCase().split(';')[0], n=String(file.name||'').toLowerCase();
+    if(t==='video/mp4'||t==='video/webm'||t==='video/quicktime') return t;
+    if(/\.mp4$|\.m4v$/.test(n)) return 'video/mp4'; if(/\.webm$/.test(n)) return 'video/webm'; if(/\.mov$/.test(n)) return 'video/quicktime';
+    return t||'';
+  }
+  function probe(file){
+    return new Promise(function(res,rej){
+      var url=URL.createObjectURL(file), v=D.createElement('video'), t=0, settled=false;
+      v.preload='metadata'; v.muted=true; v.playsInline=true; v.setAttribute('playsinline','');
+      function fail(m){ if(settled) return; settled=true; clearTimeout(t); try{ URL.revokeObjectURL(url); }catch(e){} rej(new Error(m||'unreadable')); }
+      t=setTimeout(function(){ fail('unreadable'); },20000);
+      v.onerror=function(){ fail('unreadable'); };
+      v.onloadedmetadata=function(){
+        var go=function(){
+          var dur=v.duration;
+          if(!isFinite(dur)||dur<=0){ fail('unreadable'); return; }
+          var w=v.videoWidth, h=v.videoHeight; if(!w||!h){ fail('unreadable'); return; }
+          var done=function(){
+            if(settled) return; settled=true; clearTimeout(t);
+            res({dur:dur,w:w,h:h,poster:poster(v,w,h),url:url});
+          };
+          v.onseeked=done; v.onerror=function(){ done(); };
+          try{ v.currentTime=Math.min(1,dur*.1); }catch(e){ done(); }
+          setTimeout(done,4000);
+        };
+        if(v.duration===Infinity){ v.ontimeupdate=function(){ v.ontimeupdate=null; go(); }; try{ v.currentTime=1e101; }catch(e){ go(); } } else go();
+      };
+      v.src=url;
+    });
+  }
+  function poster(v,w,h){
+    try{
+      var cw=320, q=.72, d='';
+      for(var k=0;k<5;k++){
+        var cv=D.createElement('canvas'); cv.width=cw; cv.height=Math.max(2,Math.round(cw*h/w)); cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height);
+        d=cv.toDataURL('image/jpeg',q); if(d.length<=28000) return d;
+        q-=.12; cw=Math.round(cw*.82);
+      }
+      return d.length<=30000?d:'';
+    }catch(e){ return ''; }
+  }
+  function pickMime(){
+    var MR=window.MediaRecorder; if(!MR||!MR.isTypeSupported) return '';
+    var c=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    for(var i=0;i<c.length;i++){ try{ if(MR.isTypeSupported(c[i])) return c[i]; }catch(e){} }
+    return '';
+  }
+  // play the video once at normal speed into a recorder at a smaller size; sound goes to the recorder, not the speakers
+  function shrink(meta,onP,ctl){
+    return new Promise(function(res,rej){
+      var mime=pickMime(); if(!mime){ rej(new Error('norec')); return; }
+      var dur=meta.dur, abps=64000, vbps=Math.max(250000,Math.min(2500000,Math.floor(SHRINK_BUDGET*8/dur)-abps));
+      var maxS=vbps>=1600000?720:vbps>=900000?540:vbps>=520000?432:360, short=Math.min(meta.w,meta.h), sc=Math.min(1,maxS/short);
+      var cw=Math.max(2,Math.round(meta.w*sc/2)*2), ch=Math.max(2,Math.round(meta.h*sc/2)*2);
+      var v=D.createElement('video'); v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto'; v.src=meta.url;
+      var cv=D.createElement('canvas'); cv.width=cw; cv.height=ch; var cx=cv.getContext('2d',{alpha:false});
+      var ac=null, dest=null, rec=null, stopped=false, wl=null, chunks=[], lastP=0;
+      try{ var AC=window.AudioContext||window.webkitAudioContext; ac=new AC(); var src=ac.createMediaElementSource(v); dest=ac.createMediaStreamDestination(); src.connect(dest); if(ac.resume) ac.resume(); }catch(e){ ac=null; dest=null; }
+      var vs; try{ vs=cv.captureStream(30); }catch(e){ rej(new Error('norec')); return; }
+      var tracks=vs.getVideoTracks().concat(dest?dest.stream.getAudioTracks():[]);
+      try{ rec=new MediaRecorder(new MediaStream(tracks),{mimeType:mime,videoBitsPerSecond:vbps,audioBitsPerSecond:abps}); }catch(e){ rej(new Error('norec')); return; }
+      rec.ondataavailable=function(e){ if(e.data&&e.data.size) chunks.push(e.data); };
+      rec.onerror=function(){ cleanup(); rej(new Error('recfail')); };
+      rec.onstop=function(){
+        var blob=new Blob(chunks,{type:mime.split(';')[0]}); cleanup();
+        if(ctl.cancelled){ rej(new Error('cancel')); return; }
+        res({blob:blob,w:cw,h:ch});
+      };
+      function cleanup(){
+        stopped=true; try{ v.pause(); }catch(e){} try{ if(ac&&ac.close) ac.close(); }catch(e){}
+        try{ if(wl&&wl.release) wl.release(); }catch(e){} D.removeEventListener('visibilitychange',vis);
+      }
+      function frame(){
+        if(stopped) return;
+        if(v.readyState>=2){ try{ cx.drawImage(v,0,0,cw,ch); }catch(e){} }
+        next();
+      }
+      function next(){ if(stopped) return; if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(frame); else requestAnimationFrame(frame); }
+      function vis(){
+        if(stopped) return;
+        if(D.hidden){ try{ v.pause(); if(rec.state==='recording') rec.pause(); }catch(e){} ctl.paused=true; if(ctl.onPause) ctl.onPause(true); }
+        else { try{ if(rec.state==='paused') rec.resume(); v.play(); }catch(e){} ctl.paused=false; if(ctl.onPause) ctl.onPause(false); }
+      }
+      D.addEventListener('visibilitychange',vis);
+      ctl.cancel=function(){ ctl.cancelled=true; if(rec&&rec.state!=='inactive'){ try{ rec.stop(); }catch(e){ cleanup(); rej(new Error('cancel')); } } else { cleanup(); rej(new Error('cancel')); } };
+      v.ontimeupdate=function(){ var p=Math.min(1,v.currentTime/dur); if(p>lastP){ lastP=p; onP(p); } };
+      v.onended=function(){ setTimeout(function(){ if(rec.state!=='inactive') rec.stop(); },250); };
+      v.onerror=function(){ cleanup(); rej(new Error('unreadable')); };
+      v.onloadeddata=function(){
+        try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ wl=l; },function(){}); }catch(e){}
+        try{ rec.start(1000); }catch(e){ cleanup(); rej(new Error('norec')); return; }
+        var pr=v.play(); if(pr&&pr.catch) pr.catch(function(){ ctl.needTap=true; if(ctl.onTap) ctl.onTap(function(){ v.play(); }); });
+        next();
+      };
+      v.load();
+    });
+  }
+
+  /* ============================== uploading ============================== */
+  function sliceB64(blob,a,b){ return new Promise(function(res,rej){ var fr=new FileReader(); fr.onload=function(){ var s=String(fr.result); res(s.slice(s.indexOf(',')+1)); }; fr.onerror=function(){ rej(new Error('read')); }; fr.readAsDataURL(blob.slice(a,b)); }); }
+  function putPiece(id,i,d,t){
+    return call('clipPut',{id:id,i:i,d:d}).then(function(r){
+      if(r&&r.ok) return true;
+      if(r&&r.status&&r.status<500&&r.status!==429) throw apiErr(r);
+      throw new Error('net');
+    },function(){ throw new Error('net'); }).catch(function(e){
+      if(!e.api&&t<3) return sleep(700*(t+1)).then(function(){ return putPiece(id,i,d,t+1); });
+      throw e;
+    });
+  }
+  function uploadBlob(blob,meta,lvl,onP){
+    return call('clipNew',{sz:blob.size,ty:blob.type||'video/mp4',dur:Math.round(meta.dur),w:meta.w,h:meta.h,lv:String(lvl==null?'':lvl),p:meta.poster||''}).then(function(r){
+      if(!r||!r.ok) throw apiErr(r,'Couldn’t start the upload. Try again.');
+      var id=r.id, CH=r.chunk, n=r.n, done=0, next=0, bad=null;
+      return new Promise(function(res,rej){
+        function worker(){
+          if(bad) return; var i=next++; if(i>=n) return;
+          sliceB64(blob,i*CH,Math.min(blob.size,(i+1)*CH)).then(function(d){ return putPiece(id,i,d,0); }).then(function(){ done++; onP(done/n); if(done===n) res(); else worker(); },function(e){ bad=e; rej(e); });
+        }
+        for(var k=0;k<Math.min(3,n);k++) worker();
+      }).then(function(){ return call('clipDone',{id:id}); }).then(function(d){
+        if(d&&d.ok) return id; throw apiErr(d,'The upload didn’t finish. Try again.');
+      }).catch(function(e){ call('clipDel',{id:id}); throw e; });
+    });
+  }
+
+  /* ============================== the Submit page ============================== */
+  var UP=null;
+  function resetUp(){
+    if(UP){ if(UP.ctl&&UP.ctl.cancel&&UP.state==='shrinking'){ try{ UP.ctl.cancel(); }catch(e){} } if(UP.meta&&UP.meta.url){ try{ URL.revokeObjectURL(UP.meta.url); }catch(e){} } }
+    UP={mode:'up',state:'idle',file:null,meta:null,blob:null,clipId:null,pct:0,msg:'',ctl:null,busy:false,info:null};
+  }
+  function upHtml(){
+    return '<div class="tvu" id="tvu" data-m="up">'+
+      '<div class="tvu-seg" role="tablist" aria-label="How to send your video"><button type="button" role="tab" id="tvu-t-up" aria-selected="true" data-m="up">'+ic(IC.up,16)+'Upload a video</button><button type="button" role="tab" id="tvu-t-link" aria-selected="false" data-m="link">'+ic(IC.link,16)+'Paste a link</button></div>'+
+      '<div class="tvu-up" id="tvu-up">'+
+        '<input type="file" id="tvuf" accept="video/*,.mp4,.mov,.webm,.m4v" hidden>'+
+        '<div class="tvu-drop" id="tvud" tabindex="0" role="button" aria-label="Choose a video to upload"><span class="tvu-dic">'+ic(IC.film,30)+'</span><b>Choose a video</b><span>From your phone’s gallery or your computer. You can drop one here too.</span><small>MP4, MOV or WebM. Big videos are shrunk on your device first (up to 6 minutes).</small></div>'+
+        '<div class="tvu-card" id="tvuc" hidden>'+
+          '<div class="tvu-th" id="tvuth"></div>'+
+          '<div class="tvu-info"><b class="tvu-n" id="tvun"></b><span class="tvu-m" id="tvum2"></span><div class="tvu-bar" id="tvub" hidden><i id="tvubi"></i></div><span class="tvu-st" id="tvust" role="status" aria-live="polite"></span><button type="button" class="tvu-tap" id="tvutap" hidden>Tap to start shrinking</button></div>'+
+          '<button type="button" class="tvu-x" id="tvux" aria-label="Remove this video" title="Remove">'+ic(IC.x,16)+'</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="tvu-link" id="tvu-link" hidden></div>'+
+      '<div class="tvu-mine" id="tvumine"></div>'+
+    '</div>';
+  }
+  function setMode(m){
+    UP.mode=m; var r=$('tvu'); if(!r) return; r.setAttribute('data-m',m);
+    $('tvu-t-up').setAttribute('aria-selected',m==='up'?'true':'false'); $('tvu-t-link').setAttribute('aria-selected',m==='link'?'true':'false');
+    $('tvu-up').hidden=(m!=='up'); $('tvu-link').hidden=(m!=='link');
+    var f=$('f'); if(f&&f.video){ if(m==='link') f.video.setAttribute('required',''); else f.video.removeAttribute('required'); }
+    var b=f&&f.querySelector('button[type=submit]'); if(b) b.textContent=(m==='up'?'Upload and submit':'Submit record');
+  }
+  function paintUp(){
+    var c=$('tvuc'), dr=$('tvud'); if(!c||!dr) return;
+    var s=UP.state, has=s!=='idle';
+    c.hidden=!has; dr.hidden=has;
+    if(!has) return;
+    c.setAttribute('data-s',s);
+    var th=$('tvuth'); if(UP.meta){ th.innerHTML=(UP.meta.poster?'<img alt="" src="'+UP.meta.poster+'">':ic(IC.film,22))+'<i>'+mmss(UP.meta.dur)+'</i>'; } else th.innerHTML=ic(IC.film,22);
+    $('tvun').textContent=UP.file?UP.file.name:'Video';
+    var size=UP.blob?UP.blob.size:(UP.file?UP.file.size:0), m=[];
+    if(UP.meta) m.push(mmss(UP.meta.dur)); if(size) m.push(mb(size)); $('tvum2').textContent=m.join(' · ');
+    var showBar=(s==='shrinking'||s==='uploading'); $('tvub').hidden=!showBar; if(showBar) $('tvubi').style.width=Math.round(UP.pct*100)+'%';
+    var st=$('tvust'); st.className='tvu-st'+(s==='error'?' bad':(s==='ready'||s==='done')?' good':'');
+    var msg=UP.msg; if(!msg){
+      if(s==='probing') msg='Checking your video…';
+      else if(s==='shrinking') msg=(UP.paused?'Paused. Come back to this tab to finish. ':'Shrinking to fit the site… '+Math.round(UP.pct*100)+'%. Keep this tab open.');
+      else if(s==='ready') msg=UP.note||'Ready to send';
+      else if(s==='uploading') msg='Uploading… '+Math.round(UP.pct*100)+'%';
+      else if(s==='done') msg='Uploaded';
+    }
+    st.innerHTML=(s==='ready'||s==='done'?ic(IC.check,14):s==='error'?ic(IC.alert,14):'')+E(msg);
+    $('tvutap').hidden=!UP.needTap;
+    var f=$('f'), b=f&&f.querySelector('button[type=submit]'); if(b){ b.disabled=!!(UP.busy||s==='probing'||s==='shrinking'); }
+  }
+  function fail(msg){ UP.state='error'; UP.msg=msg; UP.busy=false; paintUp(); }
+  function pickFile(file){
+    if(!file) return;
+    resetUp(); UP.mode='up'; UP.file=file; UP.state='probing'; paintUp();
+    var ty=typeOf(file);
+    if(!/^video\//.test(String(file.type||''))&&!/\.(mp4|mov|webm|m4v)$/i.test(file.name||'')){ fail('That doesn’t look like a video. Pick an MP4, MOV or WebM.'); return; }
+    var mine=UP;
+    probe(file).then(function(meta){
+      if(UP!==mine) { try{ URL.revokeObjectURL(meta.url); }catch(e){} return; }
+      UP.meta=meta;
+      if(meta.dur>3600){ fail('That video is over an hour long. Trim it and try again.'); return; }
+      var direct=(ty==='video/mp4'||ty==='video/webm')&&file.size<=CLIP_MAX;
+      if(direct){ UP.blob=file; UP.blob2=null; UP.state='ready'; UP.note='Ready to send · '+mb(file.size); paintUp(); return; }
+      if(!window.MediaRecorder||!pickMime()){
+        if(file.size<=CLIP_MAX&&(ty==='video/quicktime')){ UP.blob=file; UP.state='ready'; UP.note='Ready to send · '+mb(file.size); paintUp(); return; }
+        fail('This video is too big ('+mb(file.size)+') and this browser can’t shrink it. Try Chrome or Safari, trim it, or paste a YouTube link instead.'); return;
+      }
+      if(meta.dur>SHRINK_MAX_SEC){ fail('That video is '+mmss(meta.dur)+' long. Uploads can be up to 6 minutes. Trim it, or paste a YouTube link instead.'); return; }
+      UP.state='shrinking'; UP.pct=0; UP.ctl={onPause:function(p){ UP.paused=p; paintUp(); },onTap:function(fn){ UP.needTap=true; UP.tap=fn; paintUp(); }}; paintUp();
+      shrink(meta,function(p){ if(UP===mine){ UP.pct=p; paintUp(); } },UP.ctl).then(function(out){
+        if(UP!==mine) return;
+        if(out.blob.size>CLIP_MAX){ fail('Even shrunk, that video is '+mb(out.blob.size)+', over the '+mb(CLIP_MAX)+' limit. Try a shorter clip.'); return; }
+        if(out.blob.size<1000){ fail('Shrinking didn’t work on this device. Try another browser, or paste a link instead.'); return; }
+        UP.blob=out.blob; UP.needTap=false; UP.state='ready'; UP.note='Ready to send · shrunk from '+mb(file.size)+' to '+mb(out.blob.size); paintUp();
+      },function(e){
+        if(UP!==mine) return;
+        if(e&&e.message==='cancel'){ return; }
+        fail(e&&e.message==='unreadable'?'This browser can’t play that video, so it can’t be shrunk. Try Safari or Chrome, or convert it to MP4.':'Shrinking didn’t work on this device. Try another browser, or paste a link instead.');
+      });
+    },function(e){
+      if(UP!==mine) return;
+      fail('This browser can’t open that video. It may be in a format only some devices can play. Try another browser, or convert it to MP4.');
+    });
+  }
+  function wireUp(f){
+    var r=$('tvu'); if(!r) return;
+    var fi=$('tvuf'), dr=$('tvud');
+    dr.onclick=function(){ fi.click(); };
+    dr.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fi.click(); } };
+    fi.onchange=function(){ var fl=fi.files&&fi.files[0]; fi.value=''; if(fl) pickFile(fl); };
+    ['dragenter','dragover'].forEach(function(n){ dr.addEventListener(n,function(e){ e.preventDefault(); dr.classList.add('on'); }); });
+    ['dragleave','drop'].forEach(function(n){ dr.addEventListener(n,function(e){ e.preventDefault(); dr.classList.remove('on'); }); });
+    dr.addEventListener('drop',function(e){ var fl=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(fl) pickFile(fl); });
+    $('tvux').onclick=function(){ var m=UP.mode; resetUp(); UP.mode=m; paintUp(); };
+    $('tvutap').onclick=function(){ if(UP.tap){ UP.tap(); } UP.needTap=false; paintUp(); };
+    r.querySelector('.tvu-seg').addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-m]'); if(b) setMode(b.getAttribute('data-m')); });
+    r.querySelector('.tvu-seg').addEventListener('keydown',function(e){ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ var m=UP.mode==='up'?'link':'up'; setMode(m); $('tvu-t-'+m).focus(); } });
+  }
+  function recsDup(user,id){ try{ return recs().some(function(r){ return r.lvl===id&&String(r.user).toLowerCase()===String(user).toLowerCase(); }); }catch(e){ return false; } }
+  function wrapSubmit(f){
+    var old=f.onsubmit; if(typeof old!=='function'||old.__tv) return;
+    var w=function(e){
+      if(UP.mode!=='up') return old.call(this,e);
+      e.preventDefault();
+      if(UP.busy) return;
+      var u=f.user.value.trim(), id=+f.lvl.value;
+      if(UP.state!=='ready'&&UP.state!=='done'){ toastS(UP.state==='idle'?'Pick a video first':(UP.state==='error'?'Fix the problem with your video first':'Hold on, your video is still being prepared')); return; }
+      if(recsDup(u,id)){ toastS(u+' already has a record here'); return; }
+      if(!signed()){ toastS('Sign in to submit a record'); try{ openAcct(); }catch(x){} return; }
+      var finish=function(cid){
+        f.video.value=clipUrl(cid);
+        UP.busy=false; var sb=f.querySelector('button[type=submit]'); if(sb) sb.disabled=false;
+        old.call(f,{preventDefault:function(){},target:f});
+      };
+      if(UP.clipId){ finish(UP.clipId); return; }
+      UP.busy=true; UP.state='uploading'; UP.pct=0; UP.msg=''; paintUp();
+      var mine=UP;
+      uploadBlob(UP.blob,UP.meta,id,function(p){ if(UP===mine){ UP.pct=p; paintUp(); } }).then(function(cid){
+        if(UP!==mine) return;
+        UP.clipId=cid; UP.state='done'; UP.busy=false; paintUp(); finish(cid);
+      },function(err){
+        if(UP!==mine) return;
+        UP.busy=false; UP.state='ready'; UP.msg=''; paintUp();
+        var m=(err&&err.message)||'The upload didn’t work. Try again.';
+        if(err&&err.api&&err.api.error==='limit'&&err.api.clips){ toastS(m); showMine(err.api.clips,true); }
+        else if(err&&err.api&&err.api.status===401){ toastS('Sign in to submit a record'); try{ openAcct(); }catch(x){} }
+        else toastS(/^net/.test(m)||m==='net'?'The connection dropped. Try again.':m);
+      });
+    };
+    w.__tv=1; f.onsubmit=w;
+    f.addEventListener('reset',function(){ setTimeout(function(){ var m=UP.mode; resetUp(); UP.mode=m; paintUp(); if(m==='up'&&f.video) f.video.removeAttribute('required'); if(signed()) loadMine(); },0); });
+  }
+  /* ---------- the player's own uploads ---------- */
+  function onList(id){ try{ return recs().some(function(r){ return clipId(r.video)===id; }); }catch(e){ return false; } }
+  function showMine(list,force){
+    var el=$('tvumine'); if(!el) return;
+    if(!list||!list.length){ el.innerHTML=''; return; }
+    var rows=list.map(function(c){
+      var l=lvOf(c.lv), on=onList(c.id);
+      return '<div class="tvm-r" data-id="'+E(c.id)+'"><i class="tvm-i">'+ic(IC.film,16)+'</i><span class="tvm-t"><b>'+(l?E(lvTitle(l)):'Video')+'</b><small>'+E(ago(c.t))+' · '+mb(c.sz)+(c.st!=='ok'?' · unfinished':'')+(on?' · on the list':'')+'</small></span>'+
+        '<a class="tvm-b" href="'+E(clipUrl(c.id))+'" target="_blank" rel="noopener">Watch</a>'+
+        (on?'':'<button type="button" class="tvm-b dng" data-del="'+E(c.id)+'">Delete</button>')+'</div>';
+    }).join('');
+    el.innerHTML='<details class="tvm"'+(force?' open':'')+'><summary>Your uploaded videos <em>'+list.length+'</em></summary><div class="tvm-l">'+rows+'<p class="tvm-n">Each player can keep up to 6 videos. Videos on the list can’t be deleted here.</p></div></details>';
+    el.onclick=function(e){
+      var b=e.target.closest&&e.target.closest('button[data-del]'); if(!b) return;
+      if(b.getAttribute('data-arm')!=='1'){ b.setAttribute('data-arm','1'); b.textContent='Tap again to delete'; setTimeout(function(){ if(b.parentNode){ b.setAttribute('data-arm','0'); b.textContent='Delete'; } },3500); return; }
+      b.disabled=true; b.textContent='Deleting…';
+      call('clipDel',{id:b.getAttribute('data-del')}).then(function(r){ if(r&&r.ok){ toastS('Video deleted'); loadMine(); } else { b.disabled=false; b.textContent='Delete'; toastS((r&&r.message)||'Couldn’t delete that'); } });
+    };
+  }
+  function loadMine(){
+    if(!signed()||!$('tvumine')) return;
+    call('clipMine',{}).then(function(r){ if(r&&r.ok) showMine(r.clips); });
+  }
+  function wrapSub(){
+    var o=window.rSub; if(typeof o!=='function'||o.__tv) return;
+    var w=function(){
+      var r=o.apply(this,arguments);
+      try{
+        var f=$('f'); if(!f||!f.video||!netOn()) return r;
+        resetUp();
+        var lab=f.video.closest('label'); if(!lab) return r;
+        var wrap=D.createElement('div'); wrap.className='tvu-wrap'; wrap.innerHTML=upHtml();
+        lab.parentNode.insertBefore(wrap,lab); $('tvu-link').appendChild(lab);
+        wireUp(f); wrapSubmit(f); setMode('up'); paintUp();
+        var hs=D.querySelector('.steps'); if(hs){ var li=hs.querySelectorAll('li'); if(li[1]){ li[1].innerHTML='<b>Upload your video</b><span>Pick the recording from your gallery or computer. Or paste a link if you prefer.</span>'; } }
+        if(signed()) loadMine(); else { var t=0,iv=setInterval(function(){ if(!$('tvumine')||++t>20){ clearInterval(iv); return; } if(signed()){ clearInterval(iv); loadMine(); } },1000); }
+      }catch(e){ try{ console.error('v237 upload',e); }catch(x){} }
+      return r;
+    }; w.__tv=1;
+    window.rSub=rSub=w;
+  }
+
+  /* ============================== a clip's own page ============================== */
+  var PG=null;
+  function pageGone(){ return !PG||!$('tvpg')||$('tvpg').getAttribute('data-id')!==PG.id; }
+  function rClip(id){
+    var app=window.app||$('app'); if(!app) return;
+    PG={id:id,info:null,cms:[],mod:false,busy:false,t:0};
+    var back='<button class="link gback tvback" id="tvback" type="button">'+ic(IC.back,16)+' Back</button>';
+    app.innerHTML='<div class="tvpg" id="tvpg" data-id="'+E(id)+'">'+back+
+      '<div class="tvgrid"><div class="tvmain">'+
+        '<div class="tvp" id="tvp"><div class="tvl" id="tvl"><div class="tvspin" aria-hidden="true"></div><span id="tvlm">Loading…</span></div></div>'+
+        '<div class="tvhead" id="tvhead"><h2 class="tvt">&nbsp;</h2></div>'+
+        '<div class="tvact" id="tvact"></div>'+
+      '</div><aside class="tvside panel" id="tvside"><h3 class="tvch">Comments</h3><div class="tvcl" id="tvcl"><div class="tvempty">Loading…</div></div></aside></div></div>';
+    $('tvback').onclick=function(){ if(history.length>1&&D.referrer!==''&&history.state!==null){ history.back(); } else if(history.length>1){ history.back(); } else { show('list'); } };
+    call('clipInfo',{id:id}).then(function(r){
+      if(pageGone()) return;
+      if(!r||!r.ok){ gone(r&&r.status===404?'This video isn’t here any more. It may have been removed.':'Couldn’t load this video. Check your connection and try again.'); return; }
+      PG.info=r.clip; PG.cms=r.cms||[]; PG.mod=!!r.mod;
+      paintHead(); paintAct(); paintCms(); loadPlayer();
+      clearInterval(PG.t); PG.t=setInterval(poll,30000);
+    },function(){ if(!pageGone()) gone('Couldn’t load this video. Check your connection and try again.'); });
+  }
+  function gone(msg){
+    var p=$('tvp'); if(p) p.innerHTML='<div class="tvl tvgone"><i>'+ic(IC.alert,30)+'</i><b>'+E(msg)+'</b></div>';
+    var h=$('tvhead'); if(h) h.innerHTML=''; var a=$('tvact'); if(a) a.innerHTML=''; var s=$('tvside'); if(s) s.hidden=true;
+  }
+  function recFor(id){ try{ return recs().filter(function(r){ return clipId(r.video)===id; })[0]||null; }catch(e){ return null; } }
+  function paintHead(){
+    var c=PG.info, rec=recFor(c.id), l=lvOf(rec?rec.lvl:c.lv), who=rec?rec.user:c.by, h=$('tvhead'); if(!h) return;
+    var title=l?lvTitle(l):'Completion video';
+    h.innerHTML='<h2 class="tvt">'+E(title)+'</h2><div class="tvsub"><a class="tvby" href="#/player/'+encodeURIComponent(who)+'">'+(typeof av==='function'?av(who,'sm','margin:0'):'')+'<b>'+E(who)+'</b></a><span>'+E(ago(c.ts))+'</span>'+(c.dur?'<span>'+mmss(c.dur)+'</span>':'')+'<span>'+mb(c.sz)+'</span>'+
+      (rec?'':(c.own||PG.mod?'<span class="tvchip">Not on the list yet</span>':''))+'</div>';
+    try{ document.title=(l?l.name+' · ':'')+who+'’s video · The Timmylist'; }catch(e){}
+  }
+  function paintAct(){
+    var c=PG.info, a=$('tvact'); if(!a) return;
+    a.innerHTML='<button type="button" class="tvb tvlike'+(c.liked?' on':'')+'" id="tvlike" aria-pressed="'+(c.liked?'true':'false')+'">'+ic(IC.heart,18)+'<b id="tvln">'+c.likes+'</b><span>'+(c.liked?'Liked':'Like')+'</span></button>'+
+      '<button type="button" class="tvb" id="tvcopy">'+ic(IC.link,18)+'<span>Copy link</span></button>'+
+      (c.own||PG.mod?'<button type="button" class="tvb dng" id="tvdel">'+ic(IC.trash,18)+'<span>Delete video</span></button>':'');
+    $('tvlike').onclick=like; $('tvcopy').onclick=function(){ var u=clipUrl(c.id); try{ navigator.clipboard.writeText(u).then(function(){ toastS('Link copied'); },function(){ toastS(u); }); }catch(e){ toastS(u); } };
+    var d=$('tvdel'); if(d) d.onclick=function(){
+      if(d.getAttribute('data-arm')!=='1'){ d.setAttribute('data-arm','1'); d.querySelector('span').textContent='Tap again to delete'; setTimeout(function(){ if(d.parentNode){ d.setAttribute('data-arm','0'); d.querySelector('span').textContent='Delete video'; } },3500); return; }
+      d.disabled=true; call('clipDel',{id:c.id}).then(function(r){ if(r&&r.ok){ toastS('Video deleted'); try{ delete MEM[c.id]; }catch(e){} location.hash='#/list'; } else { d.disabled=false; toastS((r&&r.message)||'Couldn’t delete that'); } });
+    };
+  }
+  function like(){
+    var c=PG.info; if(!signed()){ toastS('Sign in to like videos'); try{ openAcct(); }catch(e){} return; }
+    var on=!c.liked, b=$('tvlike'); if(b.disabled) return; b.disabled=true;
+    c.liked=on; c.likes+=on?1:-1; paintAct(); $('tvlike').disabled=true; if(on){ $('tvlike').classList.add('pop'); }
+    call('clipLike',{id:c.id,on:on}).then(function(r){
+      if(pageGone()) return;
+      if(r&&r.ok){ c.liked=r.liked; c.likes=r.likes; } else { c.liked=!on; c.likes+=on?-1:1; toastS((r&&r.message)||'Couldn’t like that'); }
+      paintAct();
+    },function(){ c.liked=!on; c.likes+=on?-1:1; paintAct(); toastS('Couldn’t reach the site'); });
+  }
+  function loadPlayer(){
+    var c=PG.info, p=$('tvp'), id=c.id; if(!p) return;
+    var ar=(c.w&&c.h)?Math.max(9/16,Math.min(16/9,c.w/c.h)):16/9; p.style.setProperty('--ar',ar.toFixed(4)); p.classList.toggle('tall',ar<1);
+    var l=$('tvl'); if(l&&c.p) l.style.backgroundImage='url("'+c.p+'")'; if(l) l.classList.toggle('hasp',!!c.p);
+    var m=$('tvlm');
+    fetchClip(id,c,function(f){ if(!pageGone()&&m) m.textContent='Loading… '+Math.round(f*100)+'%'; }).then(function(o){
+      if(pageGone()) return;
+      var v=D.createElement('video'); v.id='tvv'; v.controls=true; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto'; if(c.p) v.poster=c.p; fixDuration(v); v.src=o.url;
+      p.innerHTML=''; p.appendChild(v);
+    },function(e){
+      if(pageGone()) return;
+      var gnd=e&&e.message==='gone';
+      p.innerHTML='<div class="tvl tvgone"><i>'+ic(IC.alert,30)+'</i><b>'+(gnd?'This video isn’t here any more.':'The video didn’t finish loading.')+'</b>'+(gnd?'':'<button type="button" class="tvb" id="tvretry">Try again</button>')+'</div>';
+      var rb=$('tvretry'); if(rb) rb.onclick=function(){ p.innerHTML='<div class="tvl" id="tvl"><div class="tvspin"></div><span id="tvlm">Loading…</span></div>'; loadPlayer(); };
+    });
+  }
+  /* ---------- comments ---------- */
+  function paintCms(){
+    var box=$('tvcl'), head=D.querySelector('#tvside .tvch'); if(!box) return;
+    var list=PG.cms||[];
+    if(head) head.innerHTML='Comments <em>'+list.length+'</em>';
+    var compose=signed()?
+      '<form class="tvcf" id="tvcf"><span class="tvcav">'+(typeof av==='function'?av((NT().prof&&NT().prof.username)||'?','sm','margin:0'):'')+'</span><textarea id="tvct" maxlength="300" rows="1" placeholder="Add a comment…" aria-label="Add a comment"></textarea><button class="tvb pri" type="submit" id="tvpost" disabled>Post</button></form>':
+      '<div class="tvcf in"><span>Sign in to like and comment.</span><button type="button" class="tvb pri" id="tvsign">Sign in</button></div>';
+    var rows=list.length?list.map(function(m){
+      return '<div class="tvc" data-id="'+E(m.id)+'">'+(typeof av==='function'?av(m.name,'sm','margin:0'):'')+'<div class="tvcb"><div class="tvcn"><a href="#/player/'+encodeURIComponent(m.name)+'"><b>'+E(m.name)+'</b></a><span>'+E(ago(m.ts))+'</span></div><p>'+E(m.t).replace(/\n/g,'<br>')+'</p></div>'+
+        (m.can?'<button type="button" class="tvcx" data-d="'+E(m.id)+'" aria-label="Delete comment" title="Delete">'+ic(IC.trash,15)+'</button>':'')+'</div>';
+    }).join(''):'<div class="tvempty">'+ic(IC.chat,26)+'<b>No comments yet</b><span>Be the first to say something.</span></div>';
+    var keep=$('tvct')?$('tvct').value:'';
+    box.innerHTML=compose+'<div class="tvcs" id="tvcs">'+rows+'</div>';
+    var ta=$('tvct'), f=$('tvcf');
+    if(ta){
+      ta.value=keep; var grow=function(){ ta.style.height='auto'; ta.style.height=Math.min(120,ta.scrollHeight)+'px'; $('tvpost').disabled=!ta.value.trim(); };
+      ta.oninput=grow; grow();
+      ta.onkeydown=function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(ta.value.trim()) f.requestSubmit?f.requestSubmit():f.dispatchEvent(new Event('submit',{cancelable:true})); } };
+      f.onsubmit=function(e){
+        e.preventDefault(); var t=ta.value.trim(); if(!t||PG.busy) return; PG.busy=true; $('tvpost').disabled=true;
+        call('clipCm',{id:PG.id,text:t}).then(function(r){
+          PG.busy=false; if(pageGone()) return;
+          if(r&&r.ok){ PG.cms.push(r.cm); var k=$('tvct'); if(k) k.value=''; paintCms(); var s=$('tvcs'); if(s) s.scrollTop=s.scrollHeight; }
+          else { toastS((r&&r.message)||'Couldn’t post that'); var pb=$('tvpost'); if(pb) pb.disabled=false; }
+        },function(){ PG.busy=false; toastS('Couldn’t reach the site'); var pb=$('tvpost'); if(pb) pb.disabled=false; });
+      };
+    }
+    var sg=$('tvsign'); if(sg) sg.onclick=function(){ try{ openAcct(); }catch(e){} };
+    box.onclick=function(e){
+      var b=e.target.closest&&e.target.closest('button[data-d]'); if(!b) return;
+      if(b.getAttribute('data-arm')!=='1'){ b.setAttribute('data-arm','1'); b.classList.add('arm'); setTimeout(function(){ if(b.parentNode){ b.setAttribute('data-arm','0'); b.classList.remove('arm'); } },3000); return; }
+      var cid=b.getAttribute('data-d'); b.disabled=true;
+      call('clipCmDel',{id:PG.id,cid:cid}).then(function(r){ if(pageGone()) return; if(r&&r.ok){ PG.cms=PG.cms.filter(function(x){ return x.id!==cid; }); paintCms(); } else { b.disabled=false; toastS((r&&r.message)||'Couldn’t delete that'); } });
+    };
+  }
+  function poll(){
+    if(pageGone()){ if(PG) clearInterval(PG.t); return; }
+    if(D.hidden||PG.busy) return;
+    var ta=$('tvct'); if(ta&&ta.value) return;
+    call('clipInfo',{id:PG.id}).then(function(r){
+      if(pageGone()||!r||!r.ok) return;
+      var a=JSON.stringify(PG.cms.map(function(m){ return m.id; })), b=JSON.stringify((r.cms||[]).map(function(m){ return m.id; }));
+      PG.mod=!!r.mod; PG.info.likes=r.clip.likes; PG.info.liked=r.clip.liked;
+      if(a!==b){ PG.cms=r.cms||[]; paintCms(); } paintAct();
+    });
+  }
+
+  /* ---------- routing: #/clip/<id> ---------- */
+  var _route=route, _show=show;
+  route=function(){
+    var p=location.hash.replace(/^#\/?/,'').split('/');
+    if(p[0]==='clip'&&/^c[a-z0-9]{11}$/.test(p[1]||'')) return {v:'clip',a:p[1]};
+    return _route.apply(this,arguments);
+  };
+  show=function(v,a,fromHash){
+    if(v!=='clip'){ if(PG){ clearInterval(PG.t); PG=null; } return _show.apply(this,arguments); }
+    var app=window.app||$('app');
+    window.curId=null; app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation='';
+    rClip(a); cur={v:'clip',a:a};
+    var nb=D.querySelectorAll('#nav button, #tabbar button'); for(var i=0;i<nb.length;i++) nb[i].className=(nb[i].getAttribute('data-v')==='list')?'on':'';
+    window.scrollTo(0,0);
+    if(!fromHash){ try{ var h='#/clip/'+a; if(location.hash!==h) location.hash=h; }catch(e){} }
+  };
+  try{ var r0=route(); if(r0.v==='clip') show('clip',r0.a,true); }catch(e){}
+
+  wrapSub();
+  window.TML237=window.TML237||{};
+  window.TML237.vid={clipId:clipId,clipUrl:clipUrl,call:call,signed:signed,E:E,ago:ago,ic:ic,_mem:MEM,_up:function(){ return UP; },_pick:pickFile,_shrink:shrink,_probe:probe,_pickMime:pickMime};
+  window.TML237.call=call; window.TML237.signed=signed; window.TML237.E=E; window.TML237.ago=ago; window.TML237.ic=ic;
+})();
+/* ===== v237: friend requests, a friends page, an "Add friend" button on profiles, friends in chat and in the bell ===== */
+(function(){
+  'use strict';
+  var API=window.TML_SOCIAL_API||'/api/social', D=document;
+  function $(id){ return D.getElementById(id); }
+  function E(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function NT(){ return window.TMLNET; }
+  function signed(){ var n=NT(); return !!(n&&n.on&&n.user&&n.user.getIdToken&&n.prof); }
+  function myName(){ var n=NT(); return (n&&n.prof&&n.prof.username)?String(n.prof.username):''; }
+  function call(a,body){
+    var n=NT(), tp=(n&&n.user&&n.user.getIdToken)?n.user.getIdToken().catch(function(){ return ''; }):Promise.resolve('');
+    return tp.then(function(t){
+      var h={'content-type':'application/json'}; if(t) h.Authorization='Bearer '+t;
+      return fetch(API,{method:'POST',headers:h,body:JSON.stringify(Object.assign({a:a},body||{}))});
+    }).then(function(r){ return r.json().catch(function(){ return {error:'bad response'}; }).then(function(j){ j.status=r.status; return j; }); });
+  }
+  function ago(ts){
+    if(!ts) return '';
+    var s=Math.max(0,(Date.now()-ts)/1000);
+    if(s<90) return 'just now'; if(s<3600) return Math.round(s/60)+' min ago'; if(s<86400) return Math.round(s/3600)+' h ago';
+    var d=Math.round(s/86400); if(d<30) return d+' day'+(d===1?'':'s')+' ago';
+    try{ return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return ''; }
+  }
+  function ic(d,w){ return '<svg viewBox="0 0 24 24" width="'+(w||18)+'" height="'+(w||18)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>'; }
+  var IC={
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    add:'<circle cx="10" cy="8" r="4"/><path d="M2.5 21a7.5 7.5 0 0 1 15 0"/><path d="M19 8v6M16 11h6"/>',
+    users:'<circle cx="9" cy="8" r="3.6"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M17.5 14.5A5.5 5.5 0 0 1 21.5 20"/>',
+    check:'<path d="M20 6 9 17l-5-5"/>', x:'<path d="M18 6 6 18M6 6l12 12"/>', msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', trash:'<path d="M4 7h16"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', back:'<path d="m15 18-6-6 6-6"/>'
+  };
+  function toastS(t){ try{ toast(t); }catch(e){} }
+
+  /* ============================== the data ============================== */
+  var FR={f:[],i:[],o:[],loaded:false,busy:false}, SEEN_KEY='tml_fr_seen';
+  function seenSet(){ try{ return JSON.parse(localStorage.getItem(SEEN_KEY)||'[]')||[]; }catch(e){ return []; } }
+  function reqNew(){ if(!signed()) return 0; var s=seenSet(); return FR.i.filter(function(r){ return s.indexOf(r.uid)<0; }).length; }
+  function markSeen(){ try{ localStorage.setItem(SEEN_KEY,JSON.stringify(FR.i.map(function(r){ return r.uid; }).slice(0,80))); }catch(e){} }
+  function keyOf(n){ n=String(n||'').toLowerCase(); try{ if(typeof LINKS!=='undefined'&&LINKS[n]) return String(LINKS[n]).toLowerCase(); }catch(e){} return n; }
+  function profName(n){
+    var k=String(n||'').toLowerCase();
+    try{ if(typeof LINKS!=='undefined'&&LINKS[k]) return LINKS[k]; }catch(e){}
+    try{ var ps=players(); for(var i=0;i<ps.length;i++) if(String(ps[i]).toLowerCase()===k) return ps[i]; }catch(e){}
+    return n;
+  }
+  function userFor(n){ // the account name to ask for, given a player's name on the list
+    var k=String(n||'').toLowerCase();
+    try{ if(typeof LINKS!=='undefined'){ for(var u in LINKS) if(String(LINKS[u]).toLowerCase()===k) return u; } }catch(e){}
+    return String(n||'');
+  }
+  function rel(name){
+    var k=keyOf(name), i;
+    for(i=0;i<FR.f.length;i++) if(keyOf(FR.f[i].name)===k) return {s:'friends',r:FR.f[i]};
+    for(i=0;i<FR.i.length;i++) if(keyOf(FR.i[i].name)===k) return {s:'incoming',r:FR.i[i]};
+    for(i=0;i<FR.o.length;i++) if(keyOf(FR.o[i].name)===k) return {s:'sent',r:FR.o[i]};
+    return {s:'none',r:null};
+  }
+  function setFr(fr){
+    fr=fr||{}; FR.f=fr.f||[]; FR.i=fr.i||[]; FR.o=fr.o||[]; FR.loaded=true; repaint();
+  }
+  function load(){
+    if(!signed()||FR.busy) return Promise.resolve(false);
+    FR.busy=true;
+    return call('frList').then(function(r){ FR.busy=false; if(r&&r.ok){ setFr(r.fr); return true; } return false; },function(){ FR.busy=false; return false; });
+  }
+  function act(a,body){
+    return call(a,body).then(function(r){
+      if(r&&r.ok){ setFr(r.fr); return r; }
+      toastS((r&&r.message)||'Couldn’t do that. Try again.'); if(r&&r.status===401){ try{ openAcct(); }catch(e){} }
+      var e=new Error('fail'); e.r=r; throw e;
+    },function(err){ if(err&&err.message==='fail') throw err; toastS('Couldn’t reach the site.'); throw err; });
+  }
+  function repaint(){
+    try{ if(window.TMLbell) TMLbell.update(); }catch(e){}
+    try{ if(window.TML220&&TML220.refreshList) TML220.refreshList(); }catch(e){}
+    if($('frpg')) paintPage();
+    paintProfile();
+  }
+
+  /* ============================== the friends page ============================== */
+  var TAB='f', EXPL=false, PGEX=false, FIND={msg:'',err:false,busy:false};
+  function row(r,kind){
+    var nm=r.name, pn=profName(nm), btns='';
+    if(kind==='f') btns='<button type="button" class="frb pri" data-dm="'+E(r.uid)+'" data-n="'+E(nm)+'">'+ic(IC.msg,15)+'Message</button><a class="frb" href="#/player/'+encodeURIComponent(pn)+'">Profile</a><button type="button" class="frb dng" data-rm="'+E(r.uid)+'" data-n="'+E(nm)+'" aria-label="Remove '+E(nm)+' from friends">Remove</button>';
+    if(kind==='i') btns='<button type="button" class="frb pri" data-ac="'+E(r.uid)+'">'+ic(IC.check,15)+'Accept</button><button type="button" class="frb" data-dc="'+E(r.uid)+'">Decline</button>';
+    if(kind==='o') btns='<button type="button" class="frb" data-cn="'+E(r.uid)+'">Cancel request</button>';
+    return '<div class="frrow" data-u="'+E(r.uid)+'">'+(typeof av==='function'?av(pn,'','width:46px;height:46px;font-size:18px;margin:0'):'')+'<div class="frm"><a class="frn" href="#/player/'+encodeURIComponent(pn)+'"><b>'+E(nm)+'</b></a><small>'+(kind==='f'?'Became friends '+E(ago(r.t)):kind==='i'?'Wants to be friends · '+E(ago(r.t)):'Waiting for them · sent '+E(ago(r.t)))+'</small></div><div class="frbtns">'+btns+'</div></div>';
+  }
+  function empty(icon,title,text,btn){ return '<div class="frempty"><i>'+ic(icon,28)+'</i><b>'+E(title)+'</b><span>'+E(text)+'</span>'+(btn||'')+'</div>'; }
+  function suggestions(){
+    var out=[], mine=keyOf(myName()), seen={};
+    try{ players().forEach(function(p){ var k=keyOf(p); if(!k||k===mine||seen[k]) return; seen[k]=1; if(rel(p).s!=='none') return; out.push(p); }); }catch(e){}
+    return out.slice(0,12);
+  }
+  function paintPage(){
+    var pg=$('frpg'), body=$('frbody'); if(!pg||!body) return;
+    var nReq=FR.i.length;
+    var tabs=[['f','Friends',FR.f.length],['r','Requests',nReq+(FR.o.length?0:0)],['a','Add a friend',0]];
+    $('frtabs').innerHTML=tabs.map(function(t){ return '<button type="button" role="tab" data-t="'+t[0]+'" aria-selected="'+(TAB===t[0]?'true':'false')+'">'+t[1]+(t[2]?' <em>'+t[2]+'</em>':'')+'</button>'; }).join('');
+    if(!signed()){ body.innerHTML=empty(IC.users,'Sign in to add friends','Friends can see each other’s profiles and message each other quickly.','<button type="button" class="frb pri" id="frsign">Sign in</button>'); var sb=$('frsign'); if(sb) sb.onclick=function(){ try{ openAcct(); }catch(e){} }; return; }
+    if(!FR.loaded){ body.innerHTML='<div class="frempty"><span>Loading…</span></div>'; return; }
+    var h='';
+    if(TAB==='f'){
+      h=FR.f.length?'<div class="frlist">'+FR.f.map(function(r){ return row(r,'f'); }).join('')+'</div>':empty(IC.users,'No friends yet','Add people you play with. They’ll show up here and at the top of your chat.','<button type="button" class="frb pri" data-go="a">'+ic(IC.add,15)+'Find friends</button>');
+    } else if(TAB==='r'){
+      h=(FR.i.length?'<h3 class="frh">Received <em>'+FR.i.length+'</em></h3><div class="frlist">'+FR.i.map(function(r){ return row(r,'i'); }).join('')+'</div>':'')+
+        (FR.o.length?'<h3 class="frh">Sent <em>'+FR.o.length+'</em></h3><div class="frlist">'+FR.o.map(function(r){ return row(r,'o'); }).join('')+'</div>':'');
+      if(!h) h=empty(IC.clock,'No requests','When someone sends you a friend request, it shows up here.');
+    } else {
+      var sg=suggestions();
+      h='<form class="frfind" id="frfind"><label for="frq">Player name</label><div class="frfr"><span class="frsi">'+ic(IC.search,17)+'</span><input id="frq" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="20" placeholder="Their username" value=""><button type="submit" class="frb pri" id="frsend"'+(FIND.busy?' disabled':'')+'>Send request</button></div>'+
+        '<p class="frmsg'+(FIND.err?' bad':'')+'" id="frmsg" role="status" aria-live="polite">'+E(FIND.msg)+'</p></form>'+
+        (sg.length?'<h3 class="frh">Players on the list</h3><div class="frsug">'+sg.map(function(p){ return '<button type="button" class="frsg" data-add="'+E(p)+'">'+(typeof av==='function'?av(p,'sm','margin:0'):'')+'<b>'+E(p)+'</b>'+ic(IC.add,16)+'</button>'; }).join('')+'</div>':'');
+    }
+    body.innerHTML=h;
+  }
+  function rFriends(){
+    var app=window.app||$('app'); PGEX=EXPL; EXPL=false; TAB=(FR.i.length&&TAB==='f'&&reqNew())?'r':TAB;
+    app.innerHTML='<div class="frpg" id="frpg"><div class="shead"><h2>Friends</h2><span>YOUR PEOPLE</span></div><div class="frtabs" id="frtabs" role="tablist" aria-label="Friends"></div><div class="panel frpanel" id="frbody"></div></div>';
+    paintPage(); markSeen(); try{ if(window.TMLbell) TMLbell.update(); }catch(e){}
+    var pg=$('frpg');
+    pg.addEventListener('click',function(e){
+      var b=e.target.closest&&e.target.closest('button'); if(!b) return;
+      var t=b.getAttribute('data-t'); if(t){ TAB=t; PGEX=true; paintPage(); if(t==='r'){ markSeen(); try{ if(window.TMLbell) TMLbell.update(); }catch(x){} } return; }
+      var g=b.getAttribute('data-go'); if(g){ TAB=g; PGEX=true; paintPage(); return; }
+      var u;
+      if((u=b.getAttribute('data-ac'))){ b.disabled=true; act('frAccept',{uid:u}).then(function(){ toastS('You’re now friends'); },function(){ b.disabled=false; }); return; }
+      if((u=b.getAttribute('data-dc'))){ b.disabled=true; act('frDecline',{uid:u}).catch(function(){ b.disabled=false; }); return; }
+      if((u=b.getAttribute('data-cn'))){ b.disabled=true; act('frCancel',{uid:u}).catch(function(){ b.disabled=false; }); return; }
+      if((u=b.getAttribute('data-rm'))){
+        if(b.getAttribute('data-arm')!=='1'){ b.setAttribute('data-arm','1'); b.textContent='Tap again to remove'; setTimeout(function(){ if(b.parentNode){ b.setAttribute('data-arm','0'); b.textContent='Remove'; } },3500); return; }
+        b.disabled=true; act('frRemove',{uid:u}).then(function(){ toastS('Removed'); },function(){ b.disabled=false; }); return;
+      }
+      if((u=b.getAttribute('data-dm'))){ openDm(u,b.getAttribute('data-n')); return; }
+      var ad=b.getAttribute('data-add'); if(ad){ send(userFor(ad),ad,b); return; }
+    });
+    pg.addEventListener('submit',function(e){
+      if(!e.target||e.target.id!=='frfind') return; e.preventDefault();
+      var v=$('frq').value.trim().replace(/^@/,''); if(!v){ FIND.msg='Type a username first.'; FIND.err=true; paintPage(); return; }
+      send(v,v,null);
+    });
+    if(signed()) load().then(function(){ if($('frpg')&&!PGEX&&TAB==='f'&&FR.i.length&&reqNew()){ TAB='r'; paintPage(); markSeen(); try{ if(window.TMLbell) TMLbell.update(); }catch(x){} } });
+  }
+  function send(to,label,btn){
+    if(!signed()){ toastS('Sign in to add friends'); try{ openAcct(); }catch(e){} return; }
+    if(keyOf(to)===keyOf(myName())){ FIND.msg='That’s you!'; FIND.err=true; paintPage(); return; }
+    FIND.busy=true; if(btn) btn.disabled=true;
+    call('frReq',{to:to}).then(function(r){
+      FIND.busy=false;
+      if(r&&r.ok){ setFr(r.fr); FIND.err=false; FIND.msg=r.state==='friends'?'You and '+label+' are friends.':'Request sent to '+label+'.'; toastS(FIND.msg); }
+      else { FIND.err=true; FIND.msg=(r&&r.message)||'Couldn’t send that request.'; if(r&&r.status===401){ try{ openAcct(); }catch(e){} } }
+      if($('frpg')){ paintPage(); var q=$('frq'); if(q&&FIND.err) q.value=to; }
+      else toastS(FIND.msg);
+    },function(){ FIND.busy=false; FIND.err=true; FIND.msg='Couldn’t reach the site.'; paintPage(); });
+  }
+  function openDm(uid,name){
+    try{ if(window.TML220&&TML220.openDm) TML220.openDm(uid,name); }catch(e){}
+  }
+
+  /* ============================== profile button ============================== */
+  function profHtml(name){
+    var me=myName(); if(!me||keyOf(name)===keyOf(me)) return '';
+    var r=rel(name), s=r.s;
+    if(s==='friends') return '<span class="pfrs ok">'+ic(IC.check,15)+'Friends</span><button type="button" class="pfrb" data-pf="dm">'+ic(IC.msg,15)+'Message</button>';
+    if(s==='incoming') return '<button type="button" class="pfrb pri" data-pf="acc">'+ic(IC.check,15)+'Accept friend request</button><button type="button" class="pfrb" data-pf="dec">Decline</button>';
+    if(s==='sent') return '<span class="pfrs">'+ic(IC.clock,15)+'Request sent</span><button type="button" class="pfrb" data-pf="can">Cancel</button>';
+    return '<button type="button" class="pfrb pri" data-pf="add">'+ic(IC.add,15)+'Add friend</button>';
+  }
+  function paintProfile(){
+    var box=D.querySelector('.pfr'); if(!box) return;
+    box.innerHTML=signed()?profHtml(box.getAttribute('data-n')):'<button type="button" class="pfrb" data-pf="sign">'+ic(IC.add,15)+'Add friend</button>';
+  }
+  function wrapPlayer(){
+    var o=window.rPlayer; if(typeof o!=='function'||o.__fr) return;
+    var w=function(name){
+      var r=o.apply(this,arguments);
+      try{
+        var info=D.querySelector('.pinfo'); if(info&&!info.querySelector('.pfr')){
+          var box=D.createElement('div'); box.className='pfr'; box.setAttribute('data-n',String(name)); info.appendChild(box);
+          box.addEventListener('click',function(e){
+            var b=e.target.closest&&e.target.closest('button[data-pf]'); if(!b) return; var k=b.getAttribute('data-pf'), nm=box.getAttribute('data-n'), rr=rel(nm).r;
+            if(k==='sign'){ toastS('Sign in to add friends'); try{ openAcct(); }catch(x){} return; }
+            b.disabled=true;
+            if(k==='add'){ call('frReq',{to:userFor(nm)}).then(function(j){ if(j&&j.ok){ setFr(j.fr); toastS(j.state==='friends'?'You’re now friends':'Friend request sent'); } else { b.disabled=false; toastS((j&&j.message)||'Couldn’t send that request.'); } },function(){ b.disabled=false; toastS('Couldn’t reach the site.'); }); }
+            else if(k==='acc'&&rr) act('frAccept',{uid:rr.uid}).then(function(){ toastS('You’re now friends'); },function(){ b.disabled=false; });
+            else if(k==='dec'&&rr) act('frDecline',{uid:rr.uid}).catch(function(){ b.disabled=false; });
+            else if(k==='can'&&rr) act('frCancel',{uid:rr.uid}).catch(function(){ b.disabled=false; });
+            else if(k==='dm'&&rr){ b.disabled=false; openDm(rr.uid,rr.name); }
+          });
+          paintProfile();
+          if(signed()&&!FR.loaded) load();
+        }
+      }catch(e){ try{ console.error('v237 profile',e); }catch(x){} }
+      return r;
+    }; w.__fr=1;
+    window.rPlayer=rPlayer=w;
+  }
+
+  /* ============================== in the chat ============================== */
+  function chatHtml(){
+    if(!signed()||!FR.loaded) return '';
+    var h='<div class="chsec"><span>Friends</span><button class="chnewb" id="chfrb" type="button">'+ic(IC.users,14)+' '+(FR.f.length||FR.i.length?'Manage':'Add')+'</button></div>';
+    if(FR.i.length) h+='<button class="frcb" id="chfrq" type="button"><i>'+ic(IC.add,16)+'</i><span><b>'+FR.i.length+' friend request'+(FR.i.length===1?'':'s')+'</b><small>'+FR.i.slice(0,2).map(function(r){ return E(r.name); }).join(', ')+(FR.i.length>2?' and more':'')+'</small></span><em>Review</em></button>';
+    if(FR.f.length) h+='<div class="frstrip" role="list" aria-label="Friends">'+FR.f.slice(0,12).map(function(r){ return '<button class="frchip" role="listitem" type="button" data-fdm="'+E(r.uid)+'" data-fn="'+E(r.name)+'" title="Message '+E(r.name)+'">'+(typeof av==='function'?av(profName(r.name),'','width:44px;height:44px;font-size:17px;margin:0'):'')+'<span>'+E(r.name)+'</span></button>'; }).join('')+'</div>';
+    else if(!FR.i.length) h+='<div class="chempty sm frnone"><p>Add friends to message them in one tap.</p></div>';
+    return h;
+  }
+  function chatWire(body){
+    function toPage(tab){
+      TAB=tab||'f'; EXPL=true; try{ if(window.TML220&&TML220.closeChat) TML220.closeChat(); }catch(e){}
+      if(location.hash==='#/friends'){ show('friends'); } else location.hash='#/friends';
+    }
+    var a=body.querySelector('#chfrb'); if(a) a.onclick=function(){ toPage(FR.i.length?'r':'f'); };
+    var q=body.querySelector('#chfrq'); if(q) q.onclick=function(){ toPage('r'); };
+    var cs=body.querySelectorAll('[data-fdm]'); for(var i=0;i<cs.length;i++) cs[i].onclick=function(){ openDm(this.getAttribute('data-fdm'),this.getAttribute('data-fn')); };
+  }
+
+  /* ============================== in the bell ============================== */
+  function bellBlock(){
+    return FR.i.slice(0,5).map(function(r){
+      return '<div class="nit un frnit" data-fru="'+E(r.uid)+'"><i class="nic frnic">'+ic(IC.add,14)+'</i><div class="ntx"><b>'+E(r.name)+'</b> sent you a friend request<span class="ntm">'+E(ago(r.t))+'</span><span class="frbtns"><button type="button" class="frb pri" data-bfa="'+E(r.uid)+'">Accept</button><button type="button" class="frb" data-bfd="'+E(r.uid)+'">Decline</button></span></div></div>';
+    }).join('');
+  }
+  function hookBell(){
+    var T=window.TML234rs; if(!T||T.__fr) return false; T.__fr=1;
+    var p=T.paintBell, u=T.unseen, m=T.markSeen;
+    T.paintBell=function(list){
+      var r=p.apply(this,arguments);
+      try{
+        if(list){ var old=list.querySelector('[data-frblock]'); if(old) old.remove();
+          if(signed()&&FR.i.length){ var w=D.createElement('div'); w.setAttribute('data-frblock','1'); w.innerHTML=bellBlock(); list.insertBefore(w,list.firstChild); var nem=list.querySelector('.nem'); if(nem) nem.remove(); } }
+      }catch(e){}
+      return r;
+    };
+    T.unseen=function(){ return u.apply(this,arguments)+reqNew(); };
+    T.markSeen=function(){ markSeen(); return m.apply(this,arguments); };
+    return true;
+  }
+  D.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('button[data-bfa],button[data-bfd]'); if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var a=b.getAttribute('data-bfa'), d=b.getAttribute('data-bfd'); b.disabled=true;
+    (a?act('frAccept',{uid:a}):act('frDecline',{uid:d})).then(function(){ if(a) toastS('You’re now friends'); },function(){ b.disabled=false; });
+  },true);
+
+  /* ============================== routing: #/friends ============================== */
+  var _route=route, _show=show;
+  route=function(){
+    var p=location.hash.replace(/^#\/?/,'').split('/');
+    if(p[0]==='friends') return {v:'friends',a:null};
+    return _route.apply(this,arguments);
+  };
+  show=function(v,a,fromHash){
+    if(v!=='friends') return _show.apply(this,arguments);
+    var app=window.app||$('app');
+    window.curId=null; app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation='';
+    rFriends(); cur={v:'friends',a:null};
+    try{ document.title='Friends · The Timmylist'; }catch(e){}
+    var nb=D.querySelectorAll('#nav button, #tabbar button'); for(var i=0;i<nb.length;i++) nb[i].className='';
+    window.scrollTo(0,0);
+    if(!fromHash){ try{ if(location.hash!=='#/friends') location.hash='#/friends'; }catch(e){} }
+  };
+  try{ var r0=route(); if(r0.v==='friends') show('friends',null,true); }catch(e){}
+
+  /* ============================== start ============================== */
+  wrapPlayer();
+  var tries=0, boot=setInterval(function(){
+    hookBell();
+    if(signed()){ clearInterval(boot); load(); } else if(++tries>40) clearInterval(boot);
+  },1500);
+  setInterval(function(){ if(!D.hidden&&signed()) load(); },60000);
+  D.addEventListener('visibilitychange',function(){ if(!D.hidden&&signed()) load(); });
+  // the chat's inbox poll already carries the incoming requests and the friend count, so use it to notice changes quickly
+  function frNote(ib){
+    try{
+      if(!signed()||!FR.loaded||FR.busy||!ib) return;
+      var a=ib.fri||[], same=true;
+      if(FR.i.length<=20){ var x=FR.i.map(function(r){ return r.uid; }).sort().join(','), y=a.map(function(r){ return r.uid; }).sort().join(','); same=(x===y); }
+      if(same&&typeof ib.frn==='number'&&FR.f.length<=100&&ib.frn!==FR.f.length) same=false;
+      if(!same) load();
+    }catch(e){}
+  }
+  window.TML237=window.TML237||{};
+  window.TML237.frNote=frNote; window.TML237.chatHtml=chatHtml; window.TML237.chatWire=chatWire; window.TML237.reqNew=reqNew; window.TML237.fr=FR; window.TML237.frLoad=load; window.TML237.frRel=rel;
 })();
 </script>
 </body>
