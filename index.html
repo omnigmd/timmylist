@@ -8524,6 +8524,54 @@ a.ntnote{text-decoration:none;color:inherit}
 /* v241: "Seen by ..." under your last message in a group */
 .chdr .chseen.gs{text-transform:none;letter-spacing:.01em;font-size:10.5px;font-weight:700;white-space:normal;line-height:1.25;max-width:220px;text-align:right}
 .evcb .evnote{display:block;margin-top:5px;font-weight:700;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+/* ===== v242: group voice calls ===== */
+.gcp{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:96;width:min(460px,calc(100vw - 24px));display:flex;flex-direction:column;gap:14px;padding:16px 18px 18px;border-radius:26px;border:1px solid rgba(255,255,255,.3);background:linear-gradient(160deg,#0f4fb8,#082a63 70%);color:#fff;box-shadow:0 30px 80px -20px rgba(0,0,0,.85),0 0 0 1px rgba(120,180,255,.2) inset;animation:gcIn .4s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes gcIn{from{transform:translate(-50%,-26px) scale(.95);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.gch{display:flex;align-items:center;gap:10px}
+.gcw{display:flex;flex-direction:column;min-width:0;flex:1}
+.gcw b{font:900 17px Outfit,Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+.gcw small{color:rgba(255,255,255,.82);font:700 13px Outfit,Inter,sans-serif;font-variant-numeric:tabular-nums;line-height:1.35}
+.gcmin{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.gcmin:hover{background:rgba(255,255,255,.24)}.gcmin:focus-visible,.gcb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.gcgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gcalone{grid-column:1/-1;margin:2px 0 0;text-align:center;color:rgba(255,255,255,.85);font:600 13.5px/1.45 Inter,sans-serif}
+.gct{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 6px 10px;border-radius:18px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);min-width:0;transition:background .2s,border-color .2s,transform .2s}
+.gct b{font:800 13.5px Outfit,Inter,sans-serif;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+.gct small{font:700 11px Inter,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.02em}
+.gct.off{opacity:.72}
+.gct .gcav{position:relative;display:inline-flex;border-radius:50%;box-shadow:0 0 0 0 rgba(255,255,255,0);transition:box-shadow .15s}
+.gct.spk{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55)}
+.gct.spk .gcav{box-shadow:0 0 0 3px #fff,0 0 0 8px rgba(160,205,255,.45)}
+.gcmi{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:50%;background:#fff;color:#0b2a66;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.gcbt{display:flex;gap:10px;justify-content:center}
+.gcb{flex:1;max-width:160px;min-height:52px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;border-radius:99px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;font:800 14px Outfit,Inter,sans-serif;cursor:pointer;transition:transform .18s,background .2s}
+.gcb:hover{background:rgba(255,255,255,.26)}.gcb:active{transform:scale(.96)}.gcb:disabled{opacity:.5;cursor:default}
+.gcb.mute.on{background:#fff;color:#0b2a66}
+.gcb.end{background:#fff;color:#0b2a66;border-color:#fff}.gcb.end:hover{background:#eaf3ff}.gcb.end svg{transform:rotate(135deg)}
+.gcp.min .gcgrid{display:none}
+body.ingc .chfab{bottom:96px}
+@media(max-width:480px){.gcgrid{gap:8px}.gct{padding:10px 4px 8px}.gct .gcav .av,.gct .gcav>*{transform-origin:center}}
+@media(prefers-reduced-motion:reduce){.gcp{animation:none!important}.gct,.gct .gcav{transition:none!important}}
+
+/* the button in a group's header, and the bar that says a call is going */
+.gcbtn{position:relative;display:inline-flex;align-items:center;gap:1px}
+.gcbtn[hidden]{display:none!important}
+.gcbtn.live{color:#fff;background:#1d6bf0}
+.gcbtn.live::after{content:"";position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #1d6bf0;animation:gcDot 1.6s ease-in-out infinite}
+@keyframes gcDot{0%,100%{opacity:1}50%{opacity:.35}}
+.gcbar{display:flex;align-items:center;gap:11px;margin:8px 12px 0;padding:10px 12px 10px 14px;border-radius:16px;background:linear-gradient(135deg,#1d6bf0,#0b4fc4);color:#fff;border:1px solid rgba(255,255,255,.3);box-shadow:0 8px 22px -10px rgba(10,60,160,.7)}
+.gcbar .gcdot{width:10px;height:10px;border-radius:50%;background:#fff;flex:none;animation:gcDot 1.6s ease-in-out infinite}
+.gcbar .gct2{display:flex;flex-direction:column;min-width:0;flex:1}
+.gcbar .gct2 b{font:800 14px Outfit,Inter,sans-serif;text-shadow:none}
+.gcbar .gct2 small{font:600 12px Inter,sans-serif;color:rgba(255,255,255,.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcjoin{min-height:38px;padding:0 18px;border-radius:99px;border:0;background:#fff;color:#0b2a66;font:800 13.5px Outfit,Inter,sans-serif;cursor:pointer;flex:none}
+.gcjoin:hover{background:#eaf3ff}.gcjoin:focus-visible{outline:2px solid #fff;outline-offset:2px}.gcjoin:disabled{opacity:.6;cursor:default}
+:root[data-theme="light"] .gcbtn.live{color:#fff}
+@media(prefers-reduced-motion:reduce){.gcbtn.live::after,.gcbar .gcdot{animation:none!important}}
+/* with the chat open on a wide screen, keep the call panel clear of it */
+@media(min-width:900px){body:has(.chdr:not([hidden])) .gcp{left:calc(50% - 230px)}}
+/* with the chat open on a wide screen, keep the call panel clear of it */
+@media(min-width:900px){body:has(.chdr:not([hidden])) .gcp{left:calc(50% - 230px)}}
 /* ================= v235: the page background is one plain blue (no glow, grid, orbs, shapes or motion) ================= */
 :root:root:root:root .bgfx{background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;animation:none!important}
 :root:root:root:root .bgfx::before,:root:root:root:root .bgfx::after,:root:root:root:root .bgfx *,:root:root:root:root .bgfx *::before,:root:root:root:root .bgfx *::after{display:none!important;animation:none!important}
@@ -13804,6 +13852,7 @@ var _sh=window.show;
   }
   function startCall(peer,name){
     if(CALL.st!=="idle"){ toast("You're already in a call."); return; }
+    if(window.TML242&&TML242.gc&&TML242.gc.active()){ toast("You're in a group call. Leave it first."); return; }
     if(!gate("Calls")) return; if(!callSupported()){ toast("Your browser can't make voice calls."); return; }
     var g=++CALL.gen; CALL.st="calling"; CALL.dir="out"; CALL.peer=peer; CALL.name=name; CALL.id=null; CALL.msg="Starting…"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); setHead(CH.room.name,"Private message",true,true);
     getMic().then(function(stream){
@@ -13838,6 +13887,7 @@ var _sh=window.show;
   // incoming ring (found through the inbox)
   function onIncoming(c){
     if(!c||!c.id||CALL.ignore[c.id]) return;
+    if(window.TML242&&TML242.gc&&TML242.gc.active()) return;   // it will ring again after the group call if they are still calling
     if(CALL.st!=="idle"){ if(CALL.id!==c.id) CALL.ignore[c.id]=1; return; }
     if(!callSupported()) return;
     var g=++CALL.gen; CALL.st="ringing"; CALL.dir="in"; CALL.id=c.id; CALL.peer=c.from; CALL.name=c.name||"Someone"; CALL.msg="Incoming voice call"; CALL.muted=false; CALL.rmuted=false; CALL.ended=false; paintCall(); startRing(); notify(CALL.name,"Incoming voice call");
@@ -14575,7 +14625,7 @@ var _sh=window.show;
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="sessions"]'); if(t) setTimeout(function(){ SS.sig=""; ssLoad(); },50); });
     ssStart();
   },_ctl:CTL,_ss:SS};
-  window.TML220=window.TML221={openDm:function(peer,name){ if(!CH.open) openChat(); go("thread",{dm:true,peer:peer||null,name:name,to:peer?undefined:name}); },refreshList:function(){ if(CH.open&&CH.view==="list") render(); },closeChat:function(){ if(CH.open) closeChat(); },adminChat:adminHtml,wireAdmin:function(){
+  window.TML220=window.TML221={groupRoom:function(){ var r=CH.room; return (CH.open&&CH.view==="thread"&&r&&r.group)?{id:r.group,name:r.name}:null; },callIdle:function(){ return CALL.st==="idle"; },openDm:function(peer,name){ if(!CH.open) openChat(); go("thread",{dm:true,peer:peer||null,name:name,to:peer?undefined:name}); },refreshList:function(){ if(CH.open&&CH.view==="list") render(); },closeChat:function(){ if(CH.open) closeChat(); },adminChat:adminHtml,wireAdmin:function(){
     var nav=document.getElementById("admnav"); if(nav) nav.addEventListener("click",function(e){ var t=e.target.closest&&e.target.closest('button[data-t="chat"]'); if(t) setTimeout(adminLoad,50); });
     adminStart();
   },_c:CH,_v:VO,_call:CALL,_av:{avUrl:avUrl,avp:avp,avSig:avSig,avPaint:avPaint,avRefresh:avRefresh,AVB:AVB},_gif:{setKey:function(k){ GIPHY_KEY=k; paintGifBtn(); },GF:GF,gifOk:gifOk,gifNorm:gifNorm,close:closeGif},_sfx:{sfx:sfx,sfxAt:sfxAt,sfxRaw:sfxRaw,SND:SND},_voice:{VS:VS,VS_D:VS_D,vsSave:vsSave,micSwitch:micSwitch,applyTx:applyTx,tuneOut:tuneOut,tuneSend:tuneSend,pttSet:pttSet,keyLabel:keyLabel,level:level,mkAn:mkAn,vtStart:vtStart,vtStop:vtStop,VT:VT,LV:LV,outNode:outNode,rv:rv,getMic:getMic},_share:{SH:SH,startShare:startShare,stopShare:stopShare,hintSdp:hintSdp,shareSupported:shareSupported}};
@@ -17493,6 +17543,276 @@ var _sh=window.show;
   var ft=0, fiv=setInterval(function(){ footerLinks(); if($('evfoot')||++ft>30) clearInterval(fiv); },800); footerLinks();
 
   window.TML240.events={loadCh:loadCh,loadPl:loadPl,levelForWeek:levelForWeek,left:left,_ch:CH,_pl:PL};
+})();
+/* ===== v242: group voice calls =====
+   Up to 6 people in one group chat talk at once. Everybody connects straight to everybody else (a small mesh of audio-only
+   peer connections), so the server only carries "who is in the call" and the offers/answers (gcJoin / gcPoll / gcSig / gcLeave).
+   This is a separate layer from the one-to-one call, so a one-to-one call works exactly as before. */
+(function(){
+  'use strict';
+  var D=document, T=window.TML237, V=T&&T.vid;
+  if(!V||!V.call||!window.TML221||!TML221.groupRoom) return;
+  function $(id){ return D.getElementById(id); }
+  var E=V.E, signed=V.signed;
+  function myName(){ var n=window.TMLNET; return (n&&n.prof&&n.prof.username)?String(n.prof.username):''; }
+  function toastS(t){ try{ toast(t); }catch(e){} }
+  function netOn(){ var n=window.TMLNET; return !!(n&&n.on); }
+  function call(a,b){ return netOn()?V.call(a,b):Promise.resolve({error:'offline',message:'You are offline.'}); }
+  function supported(){ return !!(window.RTCPeerConnection&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia); }
+  function iceCfg(){ return {iceServers:window.TML_ICE_SERVERS||[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}],bundlePolicy:'max-bundle'}; }
+  function svg(p,s){ return '<svg viewBox="0 0 24 24" width="'+(s||18)+'" height="'+(s||18)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'; }
+  var IC={
+    phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+    mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    micoff:'<path d="M2 2l20 20M9 9v2a3 3 0 0 0 5.1 2.1M15 9.3V6a3 3 0 0 0-5.7-1.3"/><path d="M5 11a7 7 0 0 0 11.3 5.5M19 11a7 7 0 0 1-.6 2.8M12 18v3"/>',
+    users:'<circle cx="9" cy="8" r="3.6"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M17.5 14.5A5.5 5.5 0 0 1 21.5 20"/>',
+    down:'<path d="m6 9 6 6 6-6"/>', up:'<path d="m6 15 6-6 6 6"/>'
+  };
+  var G={st:'idle',gid:null,name:'',stream:null,peers:{},parts:[],me:null,t0:0,muted:false,poll:null,tick:null,gen:0,fails:0,seenA:{},busyJoin:false,min:false,ac:null,lvT:null,lvLocal:null,info:{},infoAt:0,infoBusy:false,infoFor:null};
+  function active(){ return G.st!=='idle'; }
+  function myPart(){ for(var i=0;i<G.parts.length;i++) if(G.parts[i].uid===G.me) return G.parts[i]; return null; }
+  function partOf(u){ for(var i=0;i<G.parts.length;i++) if(G.parts[i].uid===u) return G.parts[i]; return null; }
+  function nm(u){ var p=partOf(u); return (p&&p.name)||(G.peers[u]&&G.peers[u].name)||'Someone'; }
+
+  /* ---------- little sounds (generated, no files) ---------- */
+  function ctx(){ if(G.ac&&G.ac.state!=='closed') return G.ac; try{ var C=window.AudioContext||window.webkitAudioContext; if(C) G.ac=new C(); }catch(e){} return G.ac; }
+  function chime(up){
+    var a=ctx(); if(!a) return; try{
+      if(a.state==='suspended') a.resume();
+      var t=a.currentTime, f=up?[660,880]:[740,520], g=a.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.07,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.34); g.connect(a.destination);
+      f.forEach(function(hz,i){ var o=a.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(hz,t+i*0.12); o.connect(g); o.start(t+i*0.12); o.stop(t+i*0.12+0.2); });
+    }catch(e){}
+  }
+
+  /* ---------- microphone ---------- */
+  function micErr(e){
+    var n=e&&e.name||'';
+    if(n==='NotAllowedError'||n==='SecurityError') return 'Microphone is blocked. Allow it in your browser’s address bar, then try again.';
+    if(n==='NotFoundError'||n==='OverconstrainedError') return 'No microphone found.';
+    if(n==='NotReadableError') return 'Your microphone is being used by another app.';
+    return 'Couldn’t use the microphone.';
+  }
+  function getMic(){
+    var o={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
+    try{ var vs=JSON.parse(localStorage.getItem('tml_voice')||'{}'); if(vs){ if(vs.ns===false) o.noiseSuppression=false; if(vs.ec===false) o.echoCancellation=false; if(vs.agc===false) o.autoGainControl=false; if(vs.mic) o.deviceId={ideal:vs.mic}; } }catch(e){}
+    return navigator.mediaDevices.getUserMedia({audio:o,video:false});
+  }
+
+  /* ---------- peers ---------- */
+  function gathered(pc){
+    return new Promise(function(res){
+      if(pc.iceGatheringState==='complete') return res();
+      var done=false, fin=function(){ if(done) return; done=true; res(); };
+      pc.addEventListener('icegatheringstatechange',function(){ if(pc.iceGatheringState==='complete') fin(); });
+      setTimeout(fin,2500);
+    });
+  }
+  function closePeer(u){
+    var p=G.peers[u]; if(!p) return; delete G.peers[u];
+    try{ p.pc.onconnectionstatechange=null; p.pc.ontrack=null; p.pc.close(); }catch(e){}
+    try{ if(p.audio){ p.audio.srcObject=null; p.audio.remove(); } }catch(e){}
+    try{ if(p.src) p.src.disconnect(); }catch(e){}
+  }
+  function makePeer(u,name){
+    closePeer(u);
+    var pc=new RTCPeerConnection(iceCfg()), p={pc:pc,name:name||nm(u),state:'connecting',t:Date.now(),audio:null,an:null,src:null,lvl:0,lastO:0,minA:0,gen:G.gen};
+    G.peers[u]=p;
+    G.stream.getTracks().forEach(function(t){ pc.addTrack(t,G.stream); });
+    pc.ontrack=function(e){
+      if(!p.audio){ var a=D.createElement('audio'); a.autoplay=true; a.setAttribute('playsinline',''); a.style.display='none'; a.setAttribute('data-gcu',u); D.body.appendChild(a); p.audio=a; }
+      var st=(e.streams&&e.streams[0])||new MediaStream([e.track]); p.audio.srcObject=st; var pr=p.audio.play(); if(pr&&pr.catch) pr.catch(function(){});
+      meter(p,st);
+    };
+    pc.onconnectionstatechange=function(){
+      if(G.peers[u]!==p) return; var s=pc.connectionState;
+      if(s==='connected'){ if(p.state!=='connected'){ p.state='connected'; chime(true); } }
+      else if(s==='disconnected'){ p.state='shaky'; }
+      else if(s==='failed'){ p.state='failed'; p.failAt=Date.now(); }
+      paint();
+    };
+    return p;
+  }
+  function meter(p,st){
+    try{ var a=ctx(); if(!a) return; p.src=a.createMediaStreamSource(st); p.an=a.createAnalyser(); p.an.fftSize=256; p.src.connect(p.an); }catch(e){}
+  }
+  function level(an){
+    if(!an) return 0; try{ var b=new Uint8Array(an.fftSize); an.getByteTimeDomainData(b); var s=0,i; for(i=0;i<b.length;i++){ var v=(b[i]-128)/128; s+=v*v; } return Math.sqrt(s/b.length); }catch(e){ return 0; }
+  }
+  function offerTo(part){
+    var u=part.uid, g=G.gen, p=makePeer(u,part.name); p.offered=true; p.minA=G.seenA[u]||0;
+    return p.pc.createOffer().then(function(o){ return p.pc.setLocalDescription(o); }).then(function(){ return gathered(p.pc); }).then(function(){
+      if(G.gen!==g||G.peers[u]!==p) return;
+      return call('gcSig',{group:G.gid,to:u,k:'o',sdp:p.pc.localDescription.sdp}).then(function(r){ if(G.gen===g&&G.peers[u]===p&&(!r||!r.ok)){ p.state='failed'; p.failAt=Date.now(); paint(); } });
+    }).catch(function(){ if(G.gen===g&&G.peers[u]===p){ p.state='failed'; p.failAt=Date.now(); paint(); } });
+  }
+  function answerTo(from,off){
+    var g=G.gen, p=makePeer(from,nm(from)); p.lastO=off.ts; p.offered=false;
+    return p.pc.setRemoteDescription({type:'offer',sdp:off.s}).then(function(){ return p.pc.createAnswer(); }).then(function(a){ return p.pc.setLocalDescription(a); }).then(function(){ return gathered(p.pc); }).then(function(){
+      if(G.gen!==g||G.peers[from]!==p) return;
+      return call('gcSig',{group:G.gid,to:from,k:'a',sdp:p.pc.localDescription.sdp}).then(function(r){ if(G.gen===g&&G.peers[from]===p&&(!r||!r.ok)){ p.state='failed'; p.failAt=Date.now(); paint(); } });
+    }).catch(function(){ if(G.gen===g&&G.peers[from]===p){ p.state='failed'; p.failAt=Date.now(); paint(); } });
+  }
+
+  /* ---------- the poll loop: who is in, offers for me, answers for me ---------- */
+  function iOffer(x){ var m=myPart(); if(!m) return false; if(m.j!==x.j) return m.j>x.j; return m.uid>x.uid; }
+  function settled(){
+    var others=G.parts.filter(function(x){ return x.uid!==G.me; });
+    return others.every(function(x){ var p=G.peers[x.uid]; return p&&p.state==='connected'; });
+  }
+  function nextPoll(g){ if(G.gen!==g||G.st!=='live') return; clearTimeout(G.poll); G.poll=setTimeout(function(){ pollNow(); },settled()?3500:1500); }
+  function pollNow(){
+    if(G.st!=='live') return; var g=G.gen;
+    call('gcPoll',{group:G.gid}).then(function(r){
+      if(G.gen!==g||G.st!=='live') return;
+      if(!r||!r.ok){ G.fails++; if(G.fails>=6||(r&&(r.status===404))){ leave('lost',(r&&r.status===404)?'This group isn’t available any more.':'Lost the connection to the call.'); return; } nextPoll(g); return; }
+      G.fails=0;
+      if(!r.in){ leave('dropped','You were disconnected from the call.'); return; }
+      var before=G.parts.map(function(x){ return x.uid; }); G.parts=r.parts||[];
+      var ids={}; G.parts.forEach(function(x){ ids[x.uid]=1; });
+      G.parts.forEach(function(x){ if(x.uid!==G.me&&before.indexOf(x.uid)<0&&before.length) chime(true); });
+      before.forEach(function(u){ if(!ids[u]&&u!==G.me) chime(false); });
+      Object.keys(G.peers).forEach(function(u){ if(!ids[u]) closePeer(u); });
+      var o=r.o||{}, a=r.a||{};
+      Object.keys(a).forEach(function(u){ if(a[u]&&a[u].ts>(G.seenA[u]||0)) G.seenA[u]=a[u].ts; });
+      // offers sent to me: answer each new one (a newer one from the same person means they came back, so start over with them)
+      Object.keys(o).forEach(function(u){
+        var off=o[u]; if(!ids[u]||u===G.me||!off||!off.s) return;
+        var p=G.peers[u]; if(p&&p.lastO>=off.ts) return;
+        answerTo(u,off);
+      });
+      // answers to my offers
+      Object.keys(a).forEach(function(u){
+        var ans=a[u], p=G.peers[u]; if(!ans||!ans.s||!p||!p.offered||p.answered) return;
+        if(ans.ts<=p.minA||p.pc.signalingState!=='have-local-offer') return;
+        p.answered=true; p.pc.setRemoteDescription({type:'answer',sdp:ans.s}).catch(function(){ p.state='failed'; p.failAt=Date.now(); paint(); });
+      });
+      // people I should call that I am not connected to (the later joiner always makes the offer)
+      G.parts.forEach(function(x){
+        if(x.uid===G.me) return; var p=G.peers[x.uid];
+        if(!iOffer(x)) { if(p&&p.state==='failed'&&Date.now()-p.failAt>6000) closePeer(x.uid); return; }
+        if(!p||(p.state==='failed'&&Date.now()-p.failAt>4000)||(p.state==='connecting'&&Date.now()-p.t>22000)) offerTo(x);
+      });
+      paint(); nextPoll(g);
+    });
+  }
+
+  /* ---------- join / leave ---------- */
+  function join(gid,name){
+    if(active()||G.busyJoin){ toastS(G.gid===gid?'You’re already in this call.':'You’re already in a call.'); return; }
+    if(!signed()){ toastS('Sign in to join calls.'); return; }
+    if(!supported()){ toastS('Your browser can’t make voice calls.'); return; }
+    if(TML221.callIdle&&!TML221.callIdle()){ toastS('Finish your other call first.'); return; }
+    G.busyJoin=true; var g=++G.gen; ctx(); G.st='joining'; G.gid=gid; G.name=name||'Group call'; G.muted=false; G.fails=0; G.seenA={}; G.parts=[]; G.min=false; paint();
+    getMic().then(function(stream){
+      if(G.gen!==g){ stream.getTracks().forEach(function(t){ t.stop(); }); return Promise.reject({silent:1}); }
+      G.stream=stream;
+      try{ var a=ctx(); if(a){ if(a.state==='suspended') a.resume(); G.lvLocal=a.createAnalyser(); G.lvLocal.fftSize=256; a.createMediaStreamSource(stream).connect(G.lvLocal); } }catch(e){}
+      return call('gcJoin',{group:gid});
+    }).then(function(r){
+      G.busyJoin=false; if(G.gen!==g) return;
+      if(!r||!r.ok){ cleanup(); toastS((r&&r.message)||'Couldn’t join the call.'); return; }
+      G.me=r.me; G.st='live'; G.t0=Date.now(); G.info={n:(r.peers||[]).length+1};
+      G.parts=(r.peers||[]).concat([{uid:r.me,name:'You',j:Date.now()}]);   // replaced by the first poll
+      chime(true);
+      G.tick=setInterval(function(){ paintTimer(); },1000); G.lvT=setInterval(levels,160);
+      pollNow(); paint(); sync(true);
+    }).catch(function(e){ G.busyJoin=false; if(e&&e.silent) return; if(G.gen!==g) return; cleanup(); toastS(e&&e.name?micErr(e):'Couldn’t join the call.'); });
+  }
+  function leave(why,msg){
+    if(!active()) return; var gid=G.gid, was=G.st==='live';
+    if(was){ try{ call('gcLeave',{group:gid}); }catch(e){} chime(false); }
+    cleanup(); if(msg) toastS(msg); G.infoAt=0; setTimeout(function(){ sync(true); },700);
+  }
+  function cleanup(){
+    G.gen++; clearTimeout(G.poll); clearInterval(G.tick); clearInterval(G.lvT);
+    Object.keys(G.peers).forEach(closePeer);
+    try{ if(G.stream) G.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+    var ac0=G.ac; if(ac0&&ac0.close) setTimeout(function(){ try{ ac0.close(); }catch(e){} },700); G.ac=null; G.lvLocal=null;   // let the "left" chime finish
+    G.st='idle'; G.stream=null; G.me=null; G.parts=[]; G.peers={}; G.t0=0; G.muted=false; G.busyJoin=false;
+    var p=$('gcp'); if(p) p.remove();
+    paintBar();
+  }
+  function setMuted(on){
+    G.muted=!!on; if(G.stream) G.stream.getAudioTracks().forEach(function(t){ t.enabled=!G.muted; }); paint();
+  }
+
+  /* ---------- the call panel ---------- */
+  function mmss(s){ s=Math.max(0,Math.round(s)); var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), x=s%60; return (h?h+':'+(m<10?'0':''):'')+m+':'+(x<10?'0':'')+x; }
+  function tileHtml(u,name,state,me){
+    var nmv=me?myName()||name:name, face=(typeof av==='function')?av(nmv,'sm','margin:0;width:54px;height:54px;font-size:22px'):'';
+    var st=me?(G.muted?'Muted':'You'):(state==='connected'?'Connected':state==='shaky'?'Reconnecting…':state==='failed'?'Can’t connect':'Connecting…');
+    return '<div class="gct'+(me&&G.muted?' mu':'')+(!me&&state!=='connected'?' off':'')+'" data-u="'+E(u)+'"><span class="gcav">'+face+(me&&G.muted?'<i class="gcmi">'+svg(IC.micoff,13)+'</i>':'')+'</span><b>'+E(me?'You':name)+'</b><small>'+E(st)+'</small></div>';
+  }
+  function paint(){
+    if(!active()){ var x=$('gcp'); if(x) x.remove(); return; }
+    var p=$('gcp');
+    if(!p){
+      p=D.createElement('div'); p.id='gcp'; p.className='gcp'; p.setAttribute('role','dialog'); p.setAttribute('aria-label','Group voice call');
+      p.innerHTML='<div class="gch"><div class="gcw"><b id="gcname"></b><small id="gcsub" aria-live="polite"></small></div><button type="button" class="gcmin" id="gcmin" aria-label="Hide the people" aria-expanded="true"></button></div><div class="gcgrid" id="gcgrid"></div><div class="gcbt"><button type="button" class="gcb mute" id="gcmute"></button><button type="button" class="gcb end" id="gcend"></button></div>';
+      D.body.appendChild(p);
+      $('gcmute').onclick=function(){ setMuted(!G.muted); };
+      $('gcend').onclick=function(){ leave('left'); };
+      $('gcmin').onclick=function(){ G.min=!G.min; paint(); };
+    }
+    p.classList.toggle('min',!!G.min);
+    $('gcname').textContent=G.name;
+    var mb=$('gcmin'); mb.innerHTML=svg(G.min?IC.down:IC.up,18); mb.setAttribute('aria-expanded',G.min?'false':'true'); mb.setAttribute('aria-label',G.min?'Show the people':'Hide the people');
+    var live=G.st==='live', n=G.parts.length;
+    $('gcsub').textContent=live?(mmss((Date.now()-G.t0)/1000)+' · '+n+' in the call'):'Joining…';
+    var h='';
+    if(live){
+      h+=tileHtml(G.me,'You','connected',true);
+      G.parts.forEach(function(x){ if(x.uid===G.me) return; var pe=G.peers[x.uid]; h+=tileHtml(x.uid,x.name,pe?pe.state:'connecting',false); });
+      if(n<=1) h+='<p class="gcalone">You’re the only one here for now. Everyone in the group can join from the chat.</p>';
+    } else h='<p class="gcalone">Getting your microphone ready…</p>';
+    var gr=$('gcgrid'); var sig=h; if(gr.getAttribute('data-sig')!==sig){ gr.innerHTML=h; gr.setAttribute('data-sig',sig); }
+    var m=$('gcmute'); m.innerHTML=svg(G.muted?IC.micoff:IC.mic,19)+'<span>'+(G.muted?'Unmute':'Mute')+'</span>'; m.classList.toggle('on',G.muted); m.setAttribute('aria-pressed',G.muted?'true':'false'); m.disabled=!live;
+    $('gcend').innerHTML=svg(IC.phone,19)+'<span>Leave</span>';
+    D.body.classList.add('ingc');
+  }
+  function paintTimer(){ var s=$('gcsub'); if(s&&G.st==='live') s.textContent=mmss((Date.now()-G.t0)/1000)+' · '+G.parts.length+' in the call'; }
+  function levels(){
+    if(G.st!=='live') return; var p=$('gcp'); if(!p||G.min) return;
+    var me=p.querySelector('.gct[data-u="'+G.me+'"]'); if(me) me.classList.toggle('spk',!G.muted&&level(G.lvLocal)>0.035);
+    Object.keys(G.peers).forEach(function(u){ var pe=G.peers[u], t=p.querySelector('.gct[data-u="'+u+'"]'); if(t) t.classList.toggle('spk',level(pe.an)>0.035); });
+  }
+
+  /* ---------- the chat side: a button in the group's header and a "Join" bar ---------- */
+  function ensureBtn(r){
+    var b=$('gcb'), h=$('chmore'); if(!h) return;
+    if(!b){
+      b=D.createElement('button'); b.type='button'; b.id='gcb'; b.className='chb gcbtn'; h.parentNode.insertBefore(b,h);
+      b.onclick=function(){ var rr=TML221.groupRoom(); if(!rr) return; if(active()){ if(G.gid===rr.id) leave('left'); else toastS('You’re already in a call.'); } else join(rr.id,rr.name); };
+    }
+    var inThis=active()&&G.gid===r.id;
+    b.innerHTML=svg(IC.users,18)+svg(IC.phone,13); b.setAttribute('aria-label',inThis?'Leave the group call':(G.info.n>0&&G.infoFor===r.id?'Join the group call':'Start a group call')); b.title=b.getAttribute('aria-label'); b.classList.toggle('live',inThis||(G.info.n>0&&G.infoFor===r.id)); b.hidden=!supported();
+  }
+  function removeBtn(){ var b=$('gcb'); if(b) b.remove(); var x=$('gcbar'); if(x) x.remove(); }
+  function paintBar(){
+    var r=TML221.groupRoom(), bar=$('gcbar'); if(!r){ if(bar) bar.remove(); return; }
+    var i=(G.infoFor===r.id)?G.info:{}, inThis=active()&&G.gid===r.id;
+    if(!(i.n>0)&&!inThis){ if(bar) bar.remove(); return; }
+    if(!bar){ bar=D.createElement('div'); bar.id='gcbar'; bar.className='gcbar'; bar.setAttribute('role','status'); var body=$('chbody'); if(!body) return; body.parentNode.insertBefore(bar,body); }
+    var names=(i.names||[]).slice(0,3).join(', ')+((i.names||[]).length>3?' and '+((i.names||[]).length-3)+' more':'');
+    var h='<span class="gcdot" aria-hidden="true"></span><span class="gct2"><b>Voice call</b><small>'+(inThis?'You’re in the call':E(names||'In progress'))+'</small></span>';
+    if(!inThis) h+='<button type="button" class="gcjoin" id="gcjoin"'+(i.n>=(i.max||6)?' disabled':'')+'>'+(i.n>=(i.max||6)?'Full':'Join')+'</button>';
+    if(bar.getAttribute('data-sig')!==h){ bar.innerHTML=h; bar.setAttribute('data-sig',h); var jb=$('gcjoin'); if(jb) jb.onclick=function(){ var rr=TML221.groupRoom(); if(rr) join(rr.id,rr.name); }; }
+  }
+  function sync(force){
+    var r=TML221.groupRoom();
+    if(!r){ removeBtn(); G.infoFor=null; return; }
+    if(G.infoFor!==r.id){ G.infoFor=r.id; G.info={}; G.infoAt=0; }
+    ensureBtn(r); paintBar();
+    if(!signed()||!netOn()) return;
+    if(!G.infoBusy&&(force||Date.now()-G.infoAt>4000)){
+      G.infoBusy=true; var rid=r.id;
+      call('gcInfo',{group:rid}).then(function(x){ G.infoBusy=false; G.infoAt=Date.now(); if(x&&x.ok&&G.infoFor===rid){ G.info=x; ensureBtn(r); paintBar(); } },function(){ G.infoBusy=false; });
+    }
+  }
+  setInterval(function(){ try{ sync(false); }catch(e){} },500);
+
+  window.TML242=window.TML242||{};
+  window.TML242.gc={join:join,leave:leave,active:active,mute:setMuted,info:function(){ return G.info; },_G:G,_sync:sync};
 })();
 </script>
 </body>
