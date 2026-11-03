@@ -8322,6 +8322,208 @@ a.ntnote{text-decoration:none;color:inherit}
   .frrow.fav .frbtns{width:100%;justify-content:flex-start}
 }
 @media (prefers-reduced-motion:reduce){ .frsw,.frsw i{transition:none} }
+/* ===== v240: progress, history, compare, community (challenge + poll) ===== */
+
+/* ---- shared bits ---- */
+.pgmut{margin:0;font-size:13px;color:var(--tvm)}
+.pgh{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:14px;color:var(--text);letter-spacing:.02em}
+#app h3.pgh{text-shadow:none}
+.pgh em,.panel>h2 em{font-style:normal;font-size:11.5px;font-weight:800;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:3px 8px}
+.pgbar{display:block;flex:1 1 90px;min-width:70px;height:10px;border-radius:99px;background:hsl(var(--h) 40% 30% / .55);overflow:hidden;border:1px solid hsl(var(--h) 70% 70% / .25)}
+.pgbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,hsl(var(--h) 100% 60%),hsl(calc(var(--h) + 10) 95% 72%))}
+.pgbar.big{height:14px}
+[data-theme="light"] .pgbar{background:hsl(var(--h) 60% 85%)}
+
+/* ---- a level: progress ---- */
+.lvprog>h2,.lvhist>h2{display:flex;align-items:center;gap:8px}
+.pgcol{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.pgf>label{display:block;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--text)}
+.pgfr{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px}
+.pgin{display:inline-flex;align-items:center;gap:6px}
+.pgin input,.mppw input{width:84px;font-family:inherit;font-size:16px;font-weight:700;color:var(--text);background:hsl(var(--h) 60% 8% / .5);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+[data-theme="light"] .pgin input,[data-theme="light"] .mppw input{background:#fff}
+.pgin b,.mppw b{color:var(--tvm)}
+.pgmsg{min-height:18px;margin:8px 0 0;font-size:12.5px;color:var(--tvm)}
+.pgmsg.bad{color:#ff9aa8}
+[data-theme="light"] .pgmsg.bad{color:#b4172e}
+.pgchk{display:flex;align-items:flex-start;gap:12px;margin:14px 0 0;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .06);cursor:pointer}
+.pgchk input{flex:none;width:20px;height:20px;margin-top:2px;accent-color:hsl(var(--h) 100% 50%)}
+.pgchk b{display:block;font-size:13.5px;color:var(--text)}
+.pgchk small{display:block;margin-top:2px;font-size:12px;color:var(--tvm)}
+.pgdone{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;margin:0;padding:14px;border-radius:14px;border:1px solid hsl(var(--h) 90% 66% / .4);background:hsl(var(--h) 90% 50% / .12)}
+.pgdone i{grid-row:1/3;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;color:#fff;background:hsl(var(--h) 100% 42%)}
+.pgdone b{font-size:14.5px;color:var(--text)}
+.pgdone span{font-size:12.5px;color:var(--tvm)}
+.pgwk{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.pgwk li{display:flex;align-items:center;gap:12px}
+.pgwp{display:inline-flex;align-items:center;gap:9px;min-width:0;flex:0 1 46%;color:var(--text);text-decoration:none;overflow:hidden}
+.pgwp b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}
+.pgwp:hover b{text-decoration:underline}
+.pgwk em{flex:none;min-width:40px;text-align:right;font-style:normal;font-weight:800;font-size:13px;color:var(--text)}
+.pgwk.lg li{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .05)}
+.pgwk.lg .pgwp{flex:1 1 40%}
+
+/* ---- a level: history ---- */
+.tlh{position:relative;margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.tln{position:relative;display:flex;gap:14px;padding:0 0 18px 0}
+.tln:last-child{padding-bottom:0}
+.tln:not(:last-child)::before{content:"";position:absolute;left:15px;top:32px;bottom:2px;width:2px;background:hsl(var(--h) 80% 66% / .3)}
+.tln>i{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;color:hsl(var(--h) 100% 88%);background:hsl(var(--h) 90% 50% / .2);border:1px solid hsl(var(--h) 90% 70% / .45)}
+[data-theme="light"] .tln>i{color:hsl(var(--h) 90% 30%)}
+.tln.now>i{color:#fff;background:hsl(var(--h) 100% 42%);border-color:transparent;box-shadow:0 4px 14px hsl(var(--h) 100% 50% / .4)}
+.tln>div{display:flex;flex-direction:column;gap:2px;padding-top:5px;min-width:0}
+.tln span{font-size:14px;line-height:1.4;color:var(--text)}
+.tln span a{color:inherit}
+.tln small{font-size:12px;color:var(--tvm)}
+
+/* ---- profile: progress panel ---- */
+.pgxh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
+.pgxh h2{margin:0}
+.pgx .pgh{margin-top:14px}
+
+/* ---- my progress ---- */
+.mpanel{padding:18px}
+.mpsum{display:flex;align-items:center;gap:18px;margin:0 0 16px}
+.mpsum>div{display:flex;flex-direction:column;align-items:flex-start;flex:none}
+.mpsum b{font-size:34px;line-height:1;font-weight:800;color:var(--text)}
+.mpsum div span{font-size:12.5px;color:var(--tvm)}
+.mpsum .pgbar{flex:1 1 120px}
+.mpsum .mpn b{font-size:26px}
+.mpnote{margin:0 0 14px}
+.mptabs,.vstabs{margin:0 0 14px}
+.mplist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.mprow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .05)}
+.mprow.done{border-color:hsl(var(--h) 90% 66% / .45);background:hsl(var(--h) 90% 50% / .12)}
+.mprow.self{border-color:hsl(var(--h) 80% 66% / .35)}
+.mplv{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto;color:var(--text);text-decoration:none}
+.mplv b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.mplv:hover b{text-decoration:underline}
+.mprk{flex:none;min-width:38px;text-align:center;font-size:12px;font-weight:800;color:hsl(var(--h) 100% 88%);background:hsl(var(--h) 90% 50% / .2);border-radius:8px;padding:5px 6px}
+[data-theme="light"] .mprk{color:hsl(var(--h) 90% 28%)}
+.mpctl{display:flex;align-items:center;gap:12px;flex:none}
+.mpck{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
+.mpck input{width:20px;height:20px;accent-color:hsl(var(--h) 100% 50%)}
+.mppw{display:inline-flex;align-items:center;gap:5px}
+.mppw input{width:64px;padding:8px 8px;font-size:14px}
+.mpchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#fff;background:hsl(var(--h) 100% 40%);border-radius:99px;padding:6px 12px}
+
+/* ---- compare ---- */
+.vspick{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:end;gap:12px;padding:16px;margin:0 0 16px}
+.vspick label{display:flex;flex-direction:column;gap:6px;min-width:0}
+.vspick label span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tvm)}
+.vspick select{width:100%;font-family:inherit;font-size:15px;font-weight:600;color:var(--text);background:hsl(var(--h) 60% 8% / .5);border:1px solid var(--line);border-radius:12px;padding:12px 12px}
+[data-theme="light"] .vspick select{background:#fff}
+.vspick #vssw{width:44px;height:44px;padding:0;display:grid;place-items:center}
+.vsh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:12px;margin:0 0 14px}
+.vsc{position:relative;display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:18px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .07)}
+.vsc.lead{border-color:hsl(var(--h) 90% 66% / .6);background:hsl(var(--h) 90% 50% / .14);box-shadow:0 10px 30px hsl(var(--h) 100% 50% / .22)}
+.vsp{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;min-width:0}
+.vsp b{font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vsc dl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0}
+.vsc dt{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tvm)}
+.vsc dd{margin:2px 0 0;font-size:20px;font-weight:800;color:var(--text)}
+.vsl{position:absolute;right:14px;top:14px;font-size:11.5px;font-weight:800;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:4px 10px}
+.vsx{display:grid;place-items:center}
+.vsx b{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font-size:13px;color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 46%),hsl(calc(var(--h) + 6) 86% 38%))}
+.vssum{margin:0 0 14px;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.5;color:var(--text);background:hsl(var(--h) 60% 50% / .08);border:1px solid var(--line)}
+.vstbl{display:flex;flex-direction:column;border-radius:16px;border:1px solid var(--line);overflow:hidden}
+.vsr{display:grid;grid-template-columns:minmax(0,1fr) 96px 96px;align-items:center;gap:8px;padding:11px 14px;border-top:1px solid var(--line)}
+.vsr:first-child{border-top:0}
+.vsr.hd{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--tvm);background:hsl(var(--h) 60% 50% / .10)}
+.vsr.hd span:not(:first-child){text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vsr.diff{background:hsl(var(--h) 90% 50% / .07)}
+.vsr>a{display:flex;align-items:center;gap:10px;min-width:0;color:var(--text);text-decoration:none}
+.vsr>a b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.vsr>a:hover b{text-decoration:underline}
+.vsm{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--tvm);font-weight:800}
+.vsm.on{color:hsl(var(--h) 100% 82%)}
+[data-theme="light"] .vsm.on{color:hsl(var(--h) 90% 30%)}
+.vsm small{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+
+/* ---- community ---- */
+.evpg{display:flex;flex-direction:column;gap:18px}
+.evc{overflow:hidden;padding:0}
+.evcb{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:190px;padding:20px;color:#fff;background:linear-gradient(135deg,hsl(var(--h) 100% 30%),hsl(calc(var(--h) + 8) 90% 22%)) center/cover}
+.evcb::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,12,40,.15),rgba(0,12,40,.82))}
+.evcb>*{position:relative}
+.evk{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:hsl(var(--h) 100% 42%);border-radius:99px;padding:5px 11px}
+.evcb h2{margin:0;font-size:26px;line-height:1.15;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+#app .evcb h2{text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.evcb p{margin:0;font-size:13.5px;color:rgba(255,255,255,.9)}
+.evcn{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px}
+.evbd{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.evbd li{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .05)}
+.evbd li.me{border-color:hsl(var(--h) 90% 66% / .55);background:hsl(var(--h) 90% 50% / .14)}
+.evrk{font-size:13px;font-weight:800;text-align:center;color:var(--tvm)}
+.evbd li:nth-child(-n+3) .evrk{color:hsl(var(--h) 100% 82%)}
+[data-theme="light"] .evbd li:nth-child(-n+3) .evrk{color:hsl(var(--h) 90% 30%)}
+.evnm{display:flex;align-items:center;gap:10px;min-width:0;color:var(--text);text-decoration:none}
+.evnm b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.evnm:hover b{text-decoration:underline}
+.evpc{font-size:15px;font-weight:800;color:var(--text);min-width:46px;text-align:right}
+.evx{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:9px;background:transparent;color:var(--tvm);cursor:pointer}
+.evx:hover,.evx.arm{background:#d33;color:#fff}
+.evwa{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fff;background:hsl(var(--h) 100% 40%);border-radius:99px;padding:6px 10px;text-decoration:none}
+.evf{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding:14px;border-radius:14px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .06)}
+.evf label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--tvm)}
+.evf input,.evf select,.evadm input,.evadm select{font-family:inherit;font-size:15px;font-weight:600;color:var(--text);background:hsl(var(--h) 60% 8% / .5);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-transform:none;letter-spacing:0}
+[data-theme="light"] .evf input,[data-theme="light"] .evf select,[data-theme="light"] .evadm input,[data-theme="light"] .evadm select{background:#fff}
+.evf input[type=number]{width:96px}
+.evf select{min-width:200px;max-width:100%}
+.evmsg{flex:1 1 100%;margin:0;min-height:18px;font-size:12.5px;color:var(--tvm)}
+.evmsg.bad{color:#ff9aa8}
+[data-theme="light"] .evmsg.bad{color:#b4172e}
+.evcd{font-weight:800}
+.evadm{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:14px;border:1px dashed hsl(var(--h) 80% 66% / .5);background:hsl(var(--h) 60% 50% / .05)}
+.evadm h3{margin:0;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--tvm)}
+#app .evadm h3{text-shadow:none}
+.evadr{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.evadr input[type=text]{flex:1 1 200px;min-width:0}
+/* poll */
+.evpl{display:flex;flex-direction:column;gap:12px;padding:20px}
+.evpl>h2{margin:0;display:flex;align-items:center;gap:10px;font-size:20px;line-height:1.3}
+.evpq{margin:0;font-size:18px;font-weight:700;line-height:1.35;color:var(--text)}
+.evpo{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.evpo button{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;overflow:hidden;font-family:inherit;font-size:15px;font-weight:700;text-align:left;color:var(--text);background:hsl(var(--h) 60% 50% / .07);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s}
+.evpo button:hover:not(:disabled),.evpo button:focus-visible{border-color:hsl(var(--h) 90% 70% / .7);background:hsl(var(--h) 90% 50% / .14)}
+.evpo button:disabled{cursor:default}
+.evpo .fill{position:absolute;inset:0 auto 0 0;background:hsl(var(--h) 100% 50% / .28);border-right:2px solid hsl(var(--h) 100% 66% / .7);z-index:0;transition:width .5s}
+.evpo .t,.evpo .n{position:relative;z-index:1}
+.evpo .n{flex:none;font-size:13px;font-weight:800;color:var(--text)}
+.evpo li.mine button{border-color:hsl(var(--h) 90% 70% / .85);box-shadow:0 0 0 2px hsl(var(--h) 100% 55% / .35)}
+.evpo li.mine .t::after{content:" ✓";font-weight:800}
+.evpm{margin:0;font-size:12.5px;color:var(--tvm)}
+.evpe{display:inline-flex;align-self:flex-start;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text);background:hsl(var(--h) 60% 50% / .2);border-radius:99px;padding:4px 10px}
+.evnone{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:16px;border:1px dashed hsl(var(--h) 80% 66% / .5);color:var(--tvm);font-size:13.5px}
+.evnone b{color:var(--text);font-size:15px}
+/* home panel */
+.evhome .evhr{display:block;padding:12px 14px;margin:0 0 10px;border-radius:14px;border:1px solid var(--line);background:hsl(var(--h) 60% 50% / .06);color:var(--text);text-decoration:none}
+.evhome .evhr:hover{border-color:hsl(var(--h) 90% 70% / .6)}
+.evhome .evhr small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:hsl(var(--h) 100% 80%)}
+[data-theme="light"] .evhome .evhr small{color:hsl(var(--h) 90% 32%)}
+.evhome .evhr b{display:block;margin:3px 0 0;font-size:14.5px;line-height:1.3}
+.evhome .evhr span{display:block;margin-top:3px;font-size:12.5px;color:var(--tvm)}
+
+@media (max-width:760px){
+  .pgcol{grid-template-columns:1fr}
+  .vsh{grid-template-columns:1fr}
+  .vsx{margin:-4px 0}
+  .vspick{grid-template-columns:1fr 1fr}
+  .vspick #vssw{grid-column:1/-1;width:100%}
+  .vsr{grid-template-columns:minmax(0,1fr) 62px 62px;padding:11px 10px}
+  .mprow{flex-direction:column;align-items:stretch}
+  .mpctl{justify-content:space-between}
+  .mpsum{flex-wrap:wrap}
+  .evbd li{grid-template-columns:28px minmax(0,1fr) auto}
+  .evbd li .evwa,.evbd li .evx{grid-column:3}
+  .evcb h2{font-size:22px}
+  .evf select{min-width:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){ .evpo .fill{transition:none} }
+
+/* v241: "Seen by ..." under your last message in a group */
+.chdr .chseen.gs{text-transform:none;letter-spacing:.01em;font-size:10.5px;font-weight:700;white-space:normal;line-height:1.25;max-width:220px;text-align:right}
+.evcb .evnote{display:block;margin-top:5px;font-weight:700;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6)}
 /* ================= v235: the page background is one plain blue (no glow, grid, orbs, shapes or motion) ================= */
 :root:root:root:root .bgfx{background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;animation:none!important}
 :root:root:root:root .bgfx::before,:root:root:root:root .bgfx::after,:root:root:root:root .bgfx *,:root:root:root:root .bgfx *::before,:root:root:root:root .bgfx *::after{display:none!important;animation:none!important}
@@ -8771,7 +8973,7 @@ var WM={by:{},rank:{},sel:"",z:1,x:0,y:0,act:false,raf:0};
 var WM_YMAX=1.25*Math.log(Math.tan(Math.PI/4+0.4*84*Math.PI/180)), WM_SC=1000/(2*Math.PI);
 function wmY(lat){ lat=Math.max(-58,Math.min(84,lat)); return (WM_YMAX-1.25*Math.log(Math.tan(Math.PI/4+0.4*lat*Math.PI/180)))*WM_SC; }
 function wmCC(u){ return String(playerInfo(u).cc||"us").toLowerCase(); }
-function wmFlag(cc){ return cc==="us"?'<img class="wmf" src="'+US_FLAG+'" alt="">':'<img class="wmf" src="https://flagcdn.com/w40/'+esc(cc)+'.png" alt="" onerror="this.style.display=\'none\'">'; }
+function wmFlag(cc){ return cc==="us"?'<img loading="lazy" decoding="async" class="wmf" src="'+US_FLAG+'" alt="">':'<img loading="lazy" decoding="async" class="wmf" src="https://flagcdn.com/w40/'+esc(cc)+'.png" alt="" onerror="this.style.display=\'none\'">'; }
 function wmHtml(all){
   var by={},rank={}; all.forEach(function(x,i){ rank[x.u]=i+1; var c=wmCC(x.u); (by[c]=by[c]||[]).push(x); }); WM.by=by; WM.rank=rank; WM.sel=""; WM.z=1; WM.x=0; WM.y=0;
   var mx=1; Object.keys(by).forEach(function(c){ if(by[c].length>mx) mx=by[c].length; });
@@ -8917,7 +9119,7 @@ function myPic(){ var p=myPlayer(), u=p&&(STATE.avatars||{})[p.toLowerCase()]; r
 function role(){ return !ME||!ME.id?"Guest":(ME.isOwner?"Owner":(ME.canEdit?"Editor":"Member")); }
 function paintLogin(){
   var b=document.getElementById("loginBtn"); if(!b) return;
-  if(ME&&(ME.id||ME.name)){ var nm=(ME.name||"Account").split(" ")[0]; b.innerHTML='<img class="lav" alt=""><span class="lnm"></span>'; b.querySelector("img").src=myPic(); b.querySelector(".lnm").textContent=nm; b.classList.add("in"); b.setAttribute("aria-label","Account: "+(ME.name||"signed in")); }
+  if(ME&&(ME.id||ME.name)){ var nm=(ME.name||"Account").split(" ")[0]; b.innerHTML='<img loading="lazy" decoding="async" class="lav" alt=""><span class="lnm"></span>'; b.querySelector("img").src=myPic(); b.querySelector(".lnm").textContent=nm; b.classList.add("in"); b.setAttribute("aria-label","Account: "+(ME.name||"signed in")); }
   else { b.textContent="LOGIN"; b.classList.remove("in"); b.removeAttribute("aria-label"); }
   if(window.__setBtnSync) window.__setBtnSync();
 }
@@ -9045,7 +9247,7 @@ function readSquare(file,cb){
   fr.readAsDataURL(file);
 }
 function unvTag(l){ return l&&l.unverified?'<span class="unv" title="This level has not been verified yet">Unverified</span>':""; }
-function faceImg(l,cls){ var u=(STATE.faces||{})[l.face]; return u?'<img class="face'+(cls?" "+cls:"")+'" src="'+u+'" alt="">':""; }
+function faceImg(l,cls){ var u=(STATE.faces||{})[l.face]; return u?'<img loading="lazy" decoding="async" class="face'+(cls?" "+cls:"")+'" src="'+u+'" alt="">':""; }
 // ================= inline YouTube player =================
 function ytId(u){ var m=String(u||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/); return m?m[1]:null; }
 function vidOf(l){
@@ -9160,11 +9362,11 @@ var US_FLAG="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH4AAABICAIAAAC/YtZvA
 var STATES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",DC:"District of Columbia"};
 function playerInfo(n){ return (STATE.players||{})[String(n).toLowerCase()]||{}; }
 // every player is from the United States: the country flag goes before the name, the state flag after it
-function flagPre(n){ var cc=playerInfo(n).cc; if(cc&&cc!=="us") return '<img class="fus" data-st="'+esc(String(cc).toUpperCase())+'" src="https://flagcdn.com/w80/'+esc(cc)+'.png" alt="'+esc(cname(cc))+'" title="'+esc(cname(cc))+'">'; return '<img class="fus" src="'+US_FLAG+'" alt="United States" title="United States">'; }
+function flagPre(n){ var cc=playerInfo(n).cc; if(cc&&cc!=="us") return '<img loading="lazy" decoding="async" class="fus" data-st="'+esc(String(cc).toUpperCase())+'" src="https://flagcdn.com/w80/'+esc(cc)+'.png" alt="'+esc(cname(cc))+'" title="'+esc(cname(cc))+'">'; return '<img loading="lazy" decoding="async" class="fus" src="'+US_FLAG+'" alt="United States" title="United States">'; }
 function flagPost(n){
   var p=playerInfo(n), nm=STATES[p.state]||""; if(p.cc&&p.cc!=="us") return "";
-  if(p.flag) return '<img class="fst" src="'+p.flag+'" alt="'+esc(nm)+'" title="'+esc(nm)+'">';
-  if(nm) return '<img class="fst" data-st="'+p.state+'" src="https://flagcdn.com/us-'+String(p.state).toLowerCase()+'.svg" alt="'+esc(nm)+'" title="'+esc(nm)+'">';
+  if(p.flag) return '<img loading="lazy" decoding="async" class="fst" src="'+p.flag+'" alt="'+esc(nm)+'" title="'+esc(nm)+'">';
+  if(nm) return '<img loading="lazy" decoding="async" class="fst" data-st="'+p.state+'" src="https://flagcdn.com/us-'+String(p.state).toLowerCase()+'.svg" alt="'+esc(nm)+'" title="'+esc(nm)+'">';
   return "";
 }
 // if a state flag image can't load, show the state's abbreviation instead
@@ -9961,8 +10163,8 @@ function readCover(file,w,h,maxLen,cb){
 }
 var PD=null;
 function flagsHtml(cc,st){
-  var pre=(!cc||cc==="us")?'<img class="fus" src="'+US_FLAG+'" alt="" title="United States">':'<img class="fus" data-st="'+esc(cc.toUpperCase())+'" src="https://flagcdn.com/w80/'+esc(cc)+'.png" alt="" title="'+esc(cname(cc))+'">';
-  var post=(cc==="us"||!cc)&&st?'<img class="fst" data-st="'+esc(st)+'" src="https://flagcdn.com/us-'+esc(st.toLowerCase())+'.svg" alt="" title="'+esc(STATES[st]||"")+'">':"";
+  var pre=(!cc||cc==="us")?'<img loading="lazy" decoding="async" class="fus" src="'+US_FLAG+'" alt="" title="United States">':'<img loading="lazy" decoding="async" class="fus" data-st="'+esc(cc.toUpperCase())+'" src="https://flagcdn.com/w80/'+esc(cc)+'.png" alt="" title="'+esc(cname(cc))+'">';
+  var post=(cc==="us"||!cc)&&st?'<img loading="lazy" decoding="async" class="fst" data-st="'+esc(st)+'" src="https://flagcdn.com/us-'+esc(st.toLowerCase())+'.svg" alt="" title="'+esc(STATES[st]||"")+'">':"";
   return {pre:pre,post:post};
 }
 function psPaint(){
@@ -12374,7 +12576,7 @@ var _sh=window.show;
       var day=dayLbl(m.ts); if(day!==lastDay){ items.push(["day:"+m.id,'<div class="chday"><span>'+day+'</span></div>']); lastDay=day; prev=null; }
       if(m.k==="sys"){ items.push(["m:"+m.id,'<div class="chsys sysl" data-cid="'+esc(m.id)+'"><span>'+esc(m.text)+'</span></div>']); prev=null; return; }
       if(m.k==="call"){ items.push(["m:"+m.id,'<div class="chsys" data-cid="'+esc(m.id)+'">'+svg(IC.phone,13)+'<span>'+esc(m.text)+'</span><time>'+when(m.ts)+'</time></div>']); prev=null; return; }
-      items.push(["m:"+m.id,msgHtml(m,prev,myId,!!(lastMine&&lastMine.id===m.id&&seenId&&seenId>=m.id))]); prev=m;
+      items.push(["m:"+m.id,msgHtml(m,prev,myId,(lastMine&&lastMine.id===m.id)?(r.group?(rrOn()?grpSeenLabel(m.id):false):!!(seenId&&seenId>=m.id)):false)]); prev=m;
     });
     var pends=CH.pendMsgs.filter(function(p){ return sameRoom(p.room,r); });
     pends.forEach(function(p){
@@ -12390,6 +12592,13 @@ var _sh=window.show;
     wireThread(body); paintPin(); paintSlow();
     if(fid){ var fe=body.querySelector('.chm[data-cid="'+fid+'"]'); if(fe&&document.activeElement!==fe){ try{ fe.focus({preventScroll:true}); }catch(e){} } }
     var dn=$("chdown"); if(dn) dn.hidden=CH.stick||body.scrollHeight-body.clientHeight<200;
+  }
+  function grpSeenLabel(id){
+    var sn=(CH.st&&CH.st.sn)||[], who=sn.filter(function(e){ return e[1]>=id; }).map(function(e){ return e[0]; }), tot=CH.grp&&CH.grp.n?CH.grp.n-1:0;
+    if(!who.length) return false;
+    if(tot>2&&who.length>=tot) return "Seen by everyone";
+    if(who.length<=2) return "Seen by "+who.join(" and ");
+    return "Seen by "+who[0]+", "+who[1]+" and "+(who.length-2)+" more";
   }
   function msgHtml(m,prev,myId,seen){
     var mine=myId&&m.from===myId, grp=prev&&prev.from===m.from&&m.ts-prev.ts<300000&&!prev.del&&prev.k!=="call";
@@ -12411,7 +12620,7 @@ var _sh=window.show;
       if(m.text&&!(cd&&cd.only)) h+='<p>'+rich(m.text)+'</p>';
       if(cd&&cd.cards.length) h+=cd.cards.map(cardHtml).join("");
     }
-    h+='<span class="chmeta">'+(m.ed&&!m.del?'<span class="chedit">edited</span>':'')+'<time>'+when(m.ts)+'</time>'+(seen?'<span class="chseen">'+svg(IC.check,11)+'Seen</span>':'')+'</span></div>';
+    h+='<span class="chmeta">'+(m.ed&&!m.del?'<span class="chedit">edited</span>':'')+'<time>'+when(m.ts)+'</time>'+(seen?'<span class="chseen'+(typeof seen==="string"?' gs':'')+'">'+svg(IC.check,11)+(typeof seen==="string"?esc(seen):'Seen')+'</span>':'')+'</span></div>';
     var rx=m.rx||{}, ks=REACTS.map(function(x){ return x[0]; }).filter(function(k){ return rx[k]&&rx[k].length; });
     if(ks.length&&!m.del) h+='<div class="chrx">'+ks.map(function(k){ var mi=myId&&rx[k].indexOf(myId)>=0; return '<button type="button" class="chrxb'+(mi?' on':'')+'" data-crx="'+k+'" data-cid="'+esc(m.id)+'" aria-pressed="'+mi+'" aria-label="'+esc(rEmoji(k)+" "+rx[k].length)+'">'+rEmoji(k)+'<b>'+rx[k].length+'</b></button>'; }).join("")+'</div>';
     if(CH.sel===m.id&&!m.del) h+=actions(m,mine);
@@ -12553,7 +12762,7 @@ var _sh=window.show;
   function typNames(){ var t=CH.st&&CH.st.typs; return t&&t.length?t:null; }
   function typLine(){ var t=typNames(); if(!t) return ""; return t.length===1?t[0]+" is typing…":t.length===2?t[0]+" and "+t[1]+" are typing…":t[0]+" and "+(t.length-1)+" others are typing…"; }
   function typingNow(){ var r=CH.room; return !!(r&&((r.dm&&CH.st.typ)||(r.group&&typNames()))); }
-  function stSig(s){ s=s||{}; return (s.typ?1:0)+"|"+(s.seen||"")+"|"+(s.typs||[]).join(","); }
+  function stSig(s){ s=s||{}; return (s.typ?1:0)+"|"+(s.seen||"")+"|"+(s.typs||[]).join(",")+"|"+(s.sn||[]).map(function(e){ return e[0]+":"+e[1]; }).join(","); }
   function grpSub(){ var g=CH.grp, t=typLine(); if(t) return t; return g?g.n+(g.n===1?" person":" people")+" · private group":"Private group"; }
   function grpById(id){ var a=(CH.inbox&&CH.inbox.groups)||[], i; for(i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
   function grpSet(g){
@@ -12953,6 +13162,7 @@ var _sh=window.show;
     if(!CH.open||CH.view!=="thread"||!CH.room||(CH.room.dm&&!CH.room.peer)||CH.polling||!CH.loaded) return;
     CH.polling=true; var rr=CH.room, extra={};
     if(rr.group&&Date.now()-CH.typingAt<4500&&$("chtx").value.trim()) extra.typ=1;
+    if(rr.group){ var lg=lastInId(); if(lg&&lg!==CH.seenSent&&rrOn()&&!document.hidden) extra.seen=lg; }
     if(rr.dm){
       if(Date.now()-CH.typingAt<4500&&$("chtx").value.trim()) extra.typ=1;
       var li=lastInId(); if(li&&li!==CH.seenSent&&rrOn()&&!document.hidden) extra.seen=li;
@@ -12969,7 +13179,7 @@ var _sh=window.show;
           renderThread(); markSeen();
           var inc=x.msgs.some(function(m){ return !m.k&&CH.me&&m.from!==CH.me.uid; });
           if(!near&&inc) $("chnew").hidden=false;
-          if(inc&&rr.dm&&rrOn()) setTimeout(function(){ if(CH.room===rr&&CH.open&&!document.hidden) poll(); },350); // tell them right away that you saw it
+          if(inc&&(rr.dm||rr.group)&&rrOn()) setTimeout(function(){ if(CH.room===rr&&CH.open&&!document.hidden) poll(); },350); // tell them right away that you saw it
         } else if(stCh) renderThread();
       } else if(x&&x.error==="nogroup"){ grpGone(rr); }
       else { CH.errN++; if(x&&x.status>=400&&x.status!==429) CH.srvErr=x; paintBanner(); }
@@ -16782,6 +16992,507 @@ var _sh=window.show;
     var sig=FR.f.map(function(r){ return r.uid; }).sort().join(','); if(sig!==FD.sig){ FD.sig=sig; FD.loaded=false; FD.err=false; }
   }
   window.TML239={dot:dot,isOn:isOn,onlineRow:onlineRow,onlineWire:onlineWire,feedHtml:feedHtml,feedWire:feedWire,onFr:onFr,clipActs:clipActs,loadOn:loadOn,loadNotes:loadNotes,_on:ON,_fd:FD,_ns:NS,_pf:PF,_lb:LB,_lt:function(){ return LT; }};
+})();
+/* ===== v240: progress tracking (best %, a checklist), compare two players, a history timeline on every level ===== */
+(function(){
+  'use strict';
+  var D=document, T=window.TML237, V=T&&T.vid;
+  if(!V||!V.call||!window.TML239) return;
+  function $(id){ return D.getElementById(id); }
+  var E=V.E, ago=V.ago, ic=V.ic, signed=V.signed;
+  function netOn(){ var n=window.TMLNET; return !!(n&&n.on); }
+  function call(a,b){ return netOn()?V.call(a,b):Promise.reject(new Error('offline')); }
+  function toastS(t){ try{ toast(t); }catch(e){} }
+  function myName(){ var n=window.TMLNET; return (n&&n.prof&&n.prof.username)?String(n.prof.username):''; }
+  function keyOf(n){ n=String(n||'').toLowerCase(); try{ if(typeof LINKS!=='undefined'&&LINKS[n]) return String(LINKS[n]).toLowerCase(); }catch(e){} return n; }
+  function userFor(n){ var k=String(n||'').toLowerCase(); try{ if(typeof LINKS!=='undefined'){ for(var u in LINKS) if(String(LINKS[u]).toLowerCase()===k) return u; } }catch(e){} return String(n||''); }
+  function playerName(n){ var k=keyOf(n); try{ var ps=players(); for(var i=0;i<ps.length;i++) if(String(ps[i]).toLowerCase()===k) return ps[i]; }catch(e){} return String(n||''); }
+  function me(){ try{ return signed()?myPlayer():''; }catch(e){ return ''; } }
+  function lvOf(id){ return V.lvOf(id); }
+  function lvTitle(l){ return V.lvTitle(l); }
+  function pct(n){ return Math.max(0,Math.min(100,Math.round(n)))+'%'; }
+  var IC={
+    check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+    up:'<path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>', down:'<path d="M12 5v14"/><path d="m18 13-6 6-6-6"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M18 6 6 18M6 6l12 12"/>',
+    flag:'<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>', swap:'<path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/>', users:'<circle cx="9" cy="8" r="3.6"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M17.5 14.5A5.5 5.5 0 0 1 21.5 20"/>',
+    list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+    arrow:'<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', dot:'<circle cx="12" cy="12" r="4" fill="currentColor"/>'
+  };
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fdate(s){ var m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(s||'')); return m?MON[(+m[1]||1)-1]+' '+(+m[2])+', '+m[3]:String(s||''); }
+  function stats(){ try{ var a=pstats().slice().sort(function(x,y){ return y.p-x.p||y.n-x.n; }); a.forEach(function(x,i){ x.rank=i+1; }); return a; }catch(e){ return []; } }
+  function statOf(name){ var k=String(name||'').toLowerCase(), a=stats(); for(var i=0;i<a.length;i++) if(String(a[i].u).toLowerCase()===k) return a[i]; return null; }
+  function beatenBy(name,levelId){ var s=statOf(name); return !!(s&&s.done&&s.done[levelId]); }
+  function sortedLevels(){ var a=(window.LEVELS||[]).slice(); try{ a.sort(function(x,y){ return rk(x.id)-rk(y.id); }); }catch(e){} return a; }
+
+  /* ============================== my progress (shared state) ============================== */
+  var PG={map:{},loaded:false,busy:false,w:[]};
+  function loadMine(cb){
+    if(!signed()||!netOn()){ if(cb) cb(); return; }
+    if(PG.busy){ if(cb) PG.w.push(cb); return; }
+    PG.busy=true; if(cb) PG.w.push(cb);
+    call('progGet').then(function(r){
+      PG.busy=false; if(r&&r.ok){ var m={}; (r.items||[]).forEach(function(i){ m[i.lv]=i; }); PG.map=m; PG.loaded=true; }
+      var w=PG.w; PG.w=[]; w.forEach(function(f){ try{ f(); }catch(e){} });
+    },function(){ PG.busy=false; var w=PG.w; PG.w=[]; w.forEach(function(f){ try{ f(); }catch(e){} }); });
+  }
+  function save(lv,body){
+    return call('progSet',Object.assign({lv:String(lv)},body)).then(function(r){
+      if(r&&r.ok){ var it=PG.map[lv]||{lv:String(lv),p:0,c:false,t:Date.now()}; it.p=r.p||0; it.c=!!r.c; it.t=Date.now(); if(!it.p&&!it.c) delete PG.map[lv]; else PG.map[lv]=it; }
+      return r;
+    });
+  }
+  function drop(lv){ return call('progDel',{lv:String(lv)}).then(function(r){ if(r&&r.ok) delete PG.map[lv]; return r; }); }
+
+  /* ============================== a level's page: progress, who else is working on it, history ============================== */
+  var LV={id:null,others:null,n:0};
+  function lvGone(){ return !LV.id||!$('lvprog')||$('lvprog').getAttribute('data-id')!==String(LV.id); }
+  function othersHtml(){
+    if(!LV.others) return '<p class="pgmut">Loading…</p>';
+    var list=LV.others.filter(function(o){ return !o.me&&!beatenBy(playerName(o.n),LV.id); });
+    if(!list.length) return '<p class="pgmut">'+(LV.others.length&&LV.others.every(function(o){ return o.me; })?'Only you so far.':'Nobody else has said they’re working on this one yet.')+'</p>';
+    return '<ul class="pgwk">'+list.map(function(o){
+      var pn=playerName(o.n);
+      return '<li><a class="pgwp" href="#/player/'+encodeURIComponent(pn)+'">'+(typeof av==='function'?av(pn,'sm','margin:0'):'')+'<b>'+E(o.n)+'</b></a><span class="pgbar" role="img" aria-label="'+o.p+' percent"><i style="width:'+o.p+'%"></i></span><em>'+o.p+'%</em></li>';
+    }).join('')+'</ul>';
+  }
+  function mineHtml(id){
+    if(!signed()) return '<p class="pgmut">Sign in to track your best % on this level.</p><button type="button" class="frb pri" id="pgsign">Sign in</button>';
+    var mp=me(), done=mp&&beatenBy(mp,id);
+    if(done) return '<p class="pgdone"><i>'+ic(IC.shield,18)+'</i><b>You’ve beaten this level</b><span>It’s on your record.</span></p>';
+    if(!PG.loaded) return '<p class="pgmut">Loading…</p>';
+    var it=PG.map[id]||{p:0,c:false};
+    return '<form class="pgf" id="pgf" novalidate><label for="pgp">My best so far</label><div class="pgfr"><span class="pgin"><input id="pgp" type="number" min="1" max="99" step="1" inputmode="numeric" placeholder="0" value="'+(it.p||'')+'" aria-describedby="pgmsg"><b>%</b></span>'+
+      '<button type="submit" class="frb pri" id="pgs">'+(it.p?'Update':'Save')+'</button>'+(it.p?'<button type="button" class="frb" id="pgrm">Remove</button>':'')+'</div>'+
+      (it.p?'<span class="pgbar big" role="img" aria-label="'+it.p+' percent"><i style="width:'+it.p+'%"></i></span>':'')+
+      '<p class="pgmsg" id="pgmsg" role="status" aria-live="polite"></p></form>'+
+      '<label class="pgchk"><input type="checkbox" id="pgc"'+(it.c?' checked':'')+'><span><b>I’ve beaten this level</b><small>Only you can see this. Submit a record to make it count on the list.</small></span></label>';
+  }
+  function paintLv(id){
+    var b=$('lvprogb'); if(!b||lvGone()) return;
+    b.innerHTML='<div class="pgcol"><div>'+mineHtml(id)+'</div><div><h3 class="pgh">Working on it'+(LV.others&&LV.n?' <em>'+LV.n+'</em>':'')+'</h3><div id="lvwk">'+othersHtml()+'</div></div></div>';
+    var f=$('pgf'), msg=function(t,bad){ var m=$('pgmsg'); if(m){ m.textContent=t||''; m.className='pgmsg'+(bad?' bad':''); } };
+    var sg=$('pgsign'); if(sg) sg.onclick=function(){ try{ openAcct(); }catch(e){} };
+    if(f){
+      f.onsubmit=function(e){
+        e.preventDefault(); var v=$('pgp').value.trim(), n=Number(v); var bt=$('pgs');
+        if(!v||!isFinite(n)||n<1) { msg('Enter a % from 1 to 99.',true); return; }
+        if(n>=100){ msg('Got to 100%? Submit your record!',true); return; }
+        bt.disabled=true; save(id,{p:Math.floor(n)}).then(function(r){
+          if(lvGone()) return;
+          if(r&&r.ok){ toastS('Saved'); loadOthers(id,true); paintLv(id); } else { bt.disabled=false; msg((r&&r.message)||'Couldn’t save that.',true); }
+        },function(){ bt.disabled=false; msg('Couldn’t reach the site.',true); });
+      };
+      var rm=$('pgrm'); if(rm) rm.onclick=function(){ rm.disabled=true; (PG.map[id]&&PG.map[id].c?save(id,{p:0}):drop(id)).then(function(r){ if(lvGone()) return; if(r&&r.ok){ toastS('Removed'); loadOthers(id,true); paintLv(id); } else { rm.disabled=false; msg((r&&r.message)||'Couldn’t do that.',true); } },function(){ rm.disabled=false; msg('Couldn’t reach the site.',true); }); };
+      var c=$('pgc'); if(c) c.onchange=function(){ var on=c.checked; c.disabled=true; save(id,{c:on}).then(function(r){ if(lvGone()) return; c.disabled=false; if(r&&r.ok){ toastS(on?'Marked as beaten':'Unmarked'); paintLv(id); } else { c.checked=!on; toastS((r&&r.message)||'Couldn’t do that'); } },function(){ c.disabled=false; c.checked=!on; toastS('Couldn’t reach the site'); }); };
+    }
+  }
+  function loadOthers(id,force){
+    call('progLevel',{lv:String(id)}).then(function(r){
+      if(lvGone()||String(LV.id)!==String(id)) return;
+      if(r&&r.ok){ LV.others=r.items||[]; LV.n=r.n||0; var w=$('lvwk'); if(w){ w.innerHTML=othersHtml(); } var h=D.querySelector('#lvprog .pgh'); if(h) h.innerHTML='Working on it'+(LV.n?' <em>'+LV.n+'</em>':''); }
+    },function(){ if(!lvGone()&&!LV.others){ LV.others=[]; var w=$('lvwk'); if(w) w.innerHTML=othersHtml(); } });
+  }
+  /* ----- history ----- */
+  function histItems(id){
+    var cl=[]; try{ cl=(STATE.changelog||[]).filter(function(c){ return String(c.id)===String(id); }); }catch(e){}
+    return cl.slice().reverse();
+  }
+  function histRow(c){
+    var k=c.k, icon, text;
+    if(k==='placed'){ icon=IC.plus; text='Added to the list at <b>#'+c.to+'</b>'+(c.above&&c.above.n?', below <b>'+E(c.above.n)+'</b>':'')+(c.below&&c.below.n?(c.above&&c.above.n?' and above ':', above ')+'<b>'+E(c.below.n)+'</b>':''); }
+    else if(k==='raised'){ icon=IC.up; text='Moved up from <b>#'+c.from+'</b> to <b>#'+c.to+'</b>'; }
+    else if(k==='lowered'){ icon=IC.down; text='Moved down from <b>#'+c.from+'</b> to <b>#'+c.to+'</b>'; }
+    else if(k==='removed'){ icon=IC.x; text='Removed from the list'; }
+    else { icon=IC.dot; text=E(k||'Changed'); }
+    return '<li class="tln '+E(k||'')+'"><i aria-hidden="true">'+ic(icon,14)+'</i><div><span>'+text+'</span><small>'+E(fdate(c.d))+'</small></div></li>';
+  }
+  function histPanel(id){
+    var l=lvOf(id); if(!l) return null;
+    var items=histItems(id), nrec=0; try{ nrec=recs().filter(function(r){ return String(r.lvl)===String(id); }).length; }catch(e){}
+    var rows=items.map(histRow).join('');
+    var now='<li class="tln now"><i aria-hidden="true">'+ic(IC.flag,14)+'</i><div><span>Now <b>#'+rk(l.id)+'</b> of '+(window.LEVELS||[]).length+'</span><small>'+nrec+' player'+(nrec===1?'':'s')+' '+(nrec===1?'has':'have')+' beaten it</small></div></li>';
+    var ver=l.verifier?'<li class="tln ver"><i aria-hidden="true">'+ic(IC.shield,14)+'</i><div><span>Verified by <a href="#/player/'+encodeURIComponent(l.verifier)+'"><b>'+E(l.verifier)+'</b></a></span><small>First completion</small></div></li>':'';
+    var d=D.createElement('div'); d.className='panel lvhist'; d.id='lvhist';
+    d.innerHTML='<h2>History '+(items.length?'<em>'+items.length+'</em>':'')+'</h2><ol class="tlh">'+now+rows+(items.length?'':'<li class="tln"><i aria-hidden="true">'+ic(IC.clock,14)+'</i><div><span>No changes since it joined the list</span></div></li>')+ver+'</ol>';
+    return d;
+  }
+  function levelExtras(id){
+    var disc=$('lvdisc'), hs=D.querySelectorAll('#app .panel>h2'), h=null; for(var i=0;i<hs.length;i++) if(/^Records/.test(hs[i].textContent)){ h=hs[i]; break; }
+    var anchor=disc||(h?h.parentNode.nextSibling:null), parent=disc?disc.parentNode:(h?h.parentNode.parentNode:null); if(!parent||$('lvhist')) return;
+    var hp=histPanel(id); if(hp) parent.insertBefore(hp,anchor);
+    if(!netOn()) return;
+    LV={id:String(id),others:null,n:0};
+    var p=D.createElement('div'); p.className='panel lvprog'; p.id='lvprog'; p.setAttribute('data-id',String(id));
+    p.innerHTML='<h2>Progress</h2><div id="lvprogb"><p class="pgmut">Loading…</p></div>';
+    parent.insertBefore(p,hp||anchor);
+    paintLv(id); loadOthers(id); loadMine(function(){ if(!lvGone()) paintLv(id); });
+  }
+  var _rLevel=rLevel;
+  rLevel=function(id){ var r=_rLevel.apply(this,arguments); try{ levelExtras(id); }catch(e){ try{ console.error('v240 level',e); }catch(x){} } return r; };
+
+  /* ============================== a profile: what they are working on, and a way to compare ============================== */
+  function pgxRows(items){
+    return '<ul class="pgwk lg">'+items.map(function(i){
+      var l=lvOf(i.lv); if(!l) return '';
+      return '<li><a class="pgwp" href="#/level/'+l.id+'"><b>'+E(lvTitle(l))+'</b></a><span class="pgbar" role="img" aria-label="'+i.p+' percent"><i style="width:'+i.p+'%"></i></span><em>'+i.p+'%</em></li>';
+    }).join('')+'</ul>';
+  }
+  var _rPlayer=rPlayer;
+  rPlayer=function(name){
+    var r=_rPlayer.apply(this,arguments);
+    try{
+      var host=$('pfx')||D.querySelector('#app .kpis'); if(!host||$('pgx')) return r;
+      var mine=signed()&&keyOf(myName())===String(name).toLowerCase()||(me()&&me().toLowerCase()===String(name).toLowerCase()), mp=me();
+      var d=D.createElement('div'); d.className='panel pgx'; d.id='pgx'; d.setAttribute('data-n',String(name));
+      var cmp=mp&&!mine?'<a class="frb pri" href="#/compare/'+encodeURIComponent(mp)+'/'+encodeURIComponent(name)+'" data-nomodal>'+ic(IC.swap,15)+'Compare with me</a>':(!mine?'<a class="frb pri" href="#/compare/'+encodeURIComponent(name)+'" data-nomodal>'+ic(IC.swap,15)+'Compare with…</a>':'<a class="frb" href="#/progress" data-nomodal>'+ic(IC.list,15)+'My checklist</a>');
+      d.innerHTML='<div class="pgxh"><h2>Progress</h2>'+cmp+'</div><div id="pgxb">'+(netOn()?'<p class="pgmut">Loading…</p>':'')+'</div>';
+      host.parentNode.insertBefore(d,host.nextSibling);
+      if(!netOn()){ $('pgxb').innerHTML=''; return r; }
+      call('progGet',{u:userFor(name)}).then(function(x){
+        var b=$('pgxb'); if(!b||!$('pgx')||$('pgx').getAttribute('data-n')!==String(name)) return;
+        var items=(x&&x.ok?x.items:[]).filter(function(i){ return i.p&&lvOf(i.lv)&&!beatenBy(playerName(name),i.lv); });
+        b.innerHTML=items.length?'<h3 class="pgh">Working on <em>'+items.length+'</em></h3>'+pgxRows(items):'<p class="pgmut">'+(mine?'You haven’t added any levels you’re working on yet. Open a level and enter your best %.':'Nothing in progress yet.')+'</p>';
+      },function(){ var b=$('pgxb'); if(b) b.innerHTML=''; });
+    }catch(e){ try{ console.error('v240 profile',e); }catch(x){} }
+    return r;
+  };
+
+  /* ============================== my progress: a checklist of every level ============================== */
+  var MP={f:'all'};
+  function rowState(l,mp){
+    var done=mp&&beatenBy(mp,l.id), it=PG.map[l.id]||null;
+    if(done) return 'done';
+    if(it&&it.c) return 'self';
+    if(it&&it.p) return 'work';
+    return 'todo';
+  }
+  function paintMP(){
+    var pg=$('mppg'); if(!pg) return; var body=$('mpbody'); if(!body) return;
+    if(!signed()){ body.innerHTML='<div class="frempty"><i>'+ic(IC.list,28)+'</i><b>Sign in to keep a checklist</b><span>Track the levels you’re working on and the ones you’ve beaten.</span><button type="button" class="frb pri" id="mpsign">Sign in</button></div>'; var s=$('mpsign'); if(s) s.onclick=function(){ try{ openAcct(); }catch(e){} }; return; }
+    if(!PG.loaded){ body.innerHTML='<div class="frempty"><span>Loading…</span></div>'; return; }
+    var mp=me(), lvs=sortedLevels(), cnt={done:0,self:0,work:0,todo:0};
+    var rows=lvs.map(function(l){ var st=rowState(l,mp); cnt[st]++; return {l:l,st:st,it:PG.map[l.id]||null}; });
+    var beaten=cnt.done+cnt.self, tot=lvs.length, pc=tot?Math.round(100*beaten/tot):0;
+    var chips=[['all','All',tot],['done','Beaten',beaten],['work','In progress',cnt.work],['todo','To do',cnt.todo]];
+    var shown=rows.filter(function(r){ return MP.f==='all'||(MP.f==='done'?(r.st==='done'||r.st==='self'):r.st===MP.f); });
+    body.innerHTML='<div class="mpsum"><div><b>'+beaten+'</b><span>of '+tot+' beaten</span></div><span class="pgbar big" role="img" aria-label="'+pc+' percent beaten"><i style="width:'+pc+'%"></i></span><div class="mpn"><b>'+cnt.work+'</b><span>in progress</span></div></div>'+
+      (mp?'':'<p class="pgmut mpnote">Your account isn’t linked to a player on the list, so only the levels you tick here count.</p>')+
+      '<div class="frtabs mptabs" role="tablist" aria-label="Show">'+chips.map(function(c){ return '<button type="button" role="tab" data-f="'+c[0]+'" aria-selected="'+(MP.f===c[0])+'">'+c[1]+' <em>'+c[2]+'</em></button>'; }).join('')+'</div>'+
+      (shown.length?'<ol class="mplist">'+shown.map(function(r){
+        var l=r.l, st=r.st, it=r.it, ctl;
+        if(st==='done') ctl='<span class="mpchip ok">'+ic(IC.shield,14)+'Beaten</span>';
+        else ctl='<label class="mpck"><input type="checkbox" data-c="'+l.id+'"'+(st==='self'?' checked':'')+'><span>I beat it</span></label>'+
+          '<span class="mppw"><input type="number" min="1" max="99" inputmode="numeric" data-p="'+l.id+'" placeholder="%" aria-label="Best % on '+E(l.name)+'" value="'+(it&&it.p?it.p:'')+'"><b>%</b></span>';
+        return '<li class="mprow '+st+'" data-id="'+l.id+'"><a class="mplv" href="#/level/'+l.id+'"><span class="mprk">#'+rk(l.id)+'</span><b>'+E(l.name)+'</b></a><div class="mpctl">'+ctl+'</div></li>';
+      }).join('')+'</ol>':'<div class="frempty"><b>Nothing here</b><span>Try another filter.</span></div>');
+    var tb=body.querySelector('.mptabs'); if(tb) tb.onclick=function(e){ var b=e.target.closest&&e.target.closest('button[data-f]'); if(!b) return; MP.f=b.getAttribute('data-f'); paintMP(); var t=body.querySelector('.mptabs [aria-selected="true"]'); if(t) t.focus(); };
+    body.onchange=function(e){
+      var t=e.target, id=t.getAttribute&&(t.getAttribute('data-c')||t.getAttribute('data-p')); if(!id) return;
+      if(t.hasAttribute('data-c')){ var on=t.checked; t.disabled=true; save(id,{c:on}).then(function(r){ if(r&&r.ok){ paintMP(); } else { t.disabled=false; t.checked=!on; toastS((r&&r.message)||'Couldn’t save that'); } },function(){ t.disabled=false; t.checked=!on; toastS('Couldn’t reach the site'); }); }
+      else { var v=t.value.trim(), n=Number(v); if(v&&(!isFinite(n)||n<1)){ toastS('Enter a % from 1 to 99'); return; } if(n>=100){ toastS('Got to 100%? Submit your record!'); t.value=PG.map[id]&&PG.map[id].p||''; return; }
+        t.disabled=true; (v?save(id,{p:Math.floor(n)}):((PG.map[id]&&PG.map[id].c)?save(id,{p:0}):drop(id))).then(function(r){ if(r&&r.ok){ paintMP(); } else { t.disabled=false; toastS((r&&r.message)||'Couldn’t save that'); } },function(){ t.disabled=false; toastS('Couldn’t reach the site'); }); }
+    };
+  }
+  function rProgress(){
+    var app=window.app||$('app'); if(!app) return;
+    app.innerHTML='<div class="mppg" id="mppg"><div class="shead"><h2>My progress</h2><span>CHECKLIST</span></div><div class="panel mpanel" id="mpbody"></div></div>';
+    paintMP(); loadMine(function(){ paintMP(); });
+  }
+
+  /* ============================== compare two players ============================== */
+  function playerOpts(sel){
+    var a=stats(), h='<option value="">Choose a player</option>';
+    a.forEach(function(x){ h+='<option value="'+E(x.u)+'"'+(String(x.u).toLowerCase()===String(sel||'').toLowerCase()?' selected':'')+'>'+E(x.u)+' (#'+x.rank+')</option>'; });
+    return h;
+  }
+  function headCard(s,side,lead){
+    return '<div class="vsc '+side+(lead?' lead':'')+'"><a class="vsp" href="#/player/'+encodeURIComponent(s.u)+'">'+(typeof av==='function'?av(s.u,'','width:56px;height:56px;font-size:21px;margin:0'):'')+'<b>'+E(s.u)+'</b></a>'+
+      '<dl><div><dt>Rank</dt><dd>#'+s.rank+'</dd></div><div><dt>Points</dt><dd>'+(typeof P2==='function'?P2(s.p):s.p)+'</dd></div><div><dt>Beaten</dt><dd>'+s.n+'</dd></div><div><dt>Verified</dt><dd>'+s.ver+'</dd></div></dl>'+(lead?'<span class="vsl">Ahead</span>':'')+'</div>';
+  }
+  var VS={a:'',b:'',f:'diff'};
+  function paintVS(){
+    var out=$('vsout'); if(!out) return;
+    var A=statOf(VS.a), B=statOf(VS.b);
+    if(!VS.a||!VS.b){ out.innerHTML='<div class="frempty"><i>'+ic(IC.users,28)+'</i><b>Pick two players</b><span>See who has beaten what, level by level.</span></div>'; return; }
+    if(String(VS.a).toLowerCase()===String(VS.b).toLowerCase()){ out.innerHTML='<div class="frempty"><b>That’s the same player</b><span>Pick two different players to compare.</span></div>'; return; }
+    if(!A||!B){ out.innerHTML='<div class="frempty"><b>Couldn’t find '+E(!A?VS.a:VS.b)+'</b><span>Pick a player from the lists.</span></div>'; return; }
+    var lvs=sortedLevels(), both=0, onlyA=0, onlyB=0, none=0;
+    var rows=lvs.map(function(l){ var a=!!(A.done&&A.done[l.id]), b=!!(B.done&&B.done[l.id]); if(a&&b) both++; else if(a) onlyA++; else if(b) onlyB++; else none++; return {l:l,a:a,b:b}; });
+    var diff=Math.round((A.p-B.p)*100)/100, lead=diff>0?'a':(diff<0?'b':''), nameLead=lead==='a'?A.u:B.u;
+    var chips=[['diff','Different',onlyA+onlyB],['all','All levels',lvs.length],['both','Both beat',both],['a','Only '+A.u,onlyA],['b','Only '+B.u,onlyB]];
+    var shown=rows.filter(function(r){ return VS.f==='all'||(VS.f==='diff'?r.a!==r.b:VS.f==='both'?(r.a&&r.b):VS.f==='a'?(r.a&&!r.b):(r.b&&!r.a)); });
+    var mark=function(on,l,s){ return on?'<span class="vsm on" aria-label="Beaten">'+ic(IC.check,16)+(l.verifier&&String(l.verifier).toLowerCase()===String(s.u).toLowerCase()?'<small>verified</small>':'')+'</span>':'<span class="vsm" aria-label="Not beaten">&ndash;</span>'; };
+    out.innerHTML='<div class="vsh">'+headCard(A,'a',lead==='a')+'<div class="vsx"><b>VS</b></div>'+headCard(B,'b',lead==='b')+'</div>'+
+      '<p class="vssum" role="status">'+(lead?'<b>'+E(nameLead)+'</b> is ahead by <b>'+(typeof P2==='function'?P2(Math.abs(diff)):Math.abs(diff))+'</b> points. ':'Level on points. ')+'Both have beaten <b>'+both+'</b> level'+(both===1?'':'s')+'; <b>'+onlyA+'</b> only '+E(A.u)+', <b>'+onlyB+'</b> only '+E(B.u)+'.</p>'+
+      '<div class="frtabs vstabs" role="tablist" aria-label="Show levels">'+chips.map(function(c){ return '<button type="button" role="tab" data-f="'+c[0]+'" aria-selected="'+(VS.f===c[0])+'">'+E(c[1])+' <em>'+c[2]+'</em></button>'; }).join('')+'</div>'+
+      (shown.length?'<div class="vstbl" role="table" aria-label="Level by level"><div class="vsr hd" role="row"><span>Level</span><span>'+E(A.u)+'</span><span>'+E(B.u)+'</span></div>'+shown.map(function(r){
+        return '<div class="vsr'+(r.a!==r.b?' diff':'')+'" role="row"><a href="#/level/'+r.l.id+'" role="cell"><span class="mprk">#'+rk(r.l.id)+'</span><b>'+E(r.l.name)+'</b></a><span role="cell">'+mark(r.a,r.l,A)+'</span><span role="cell">'+mark(r.b,r.l,B)+'</span></div>';
+      }).join('')+'</div>':'<div class="frempty"><b>Nothing here</b><span>Try another filter.</span></div>');
+    var tb=out.querySelector('.vstabs'); if(tb) tb.onclick=function(e){ var b=e.target.closest&&e.target.closest('button[data-f]'); if(!b) return; VS.f=b.getAttribute('data-f'); paintVS(); var t=out.querySelector('.vstabs [aria-selected="true"]'); if(t) t.focus(); };
+  }
+  function vsHash(){ return '#/compare'+(VS.a?'/'+encodeURIComponent(VS.a)+(VS.b?'/'+encodeURIComponent(VS.b):''):''); }
+  function rCompare(a,b){
+    var app=window.app||$('app'); if(!app) return;
+    VS.a=a?playerName(a):''; VS.b=b?playerName(b):''; VS.f='diff';
+    var mp=me(); if(VS.a&&!VS.b&&mp&&mp.toLowerCase()!==VS.a.toLowerCase()){ VS.b=VS.a; VS.a=mp; }   // "Compare with…" from a profile: you against them
+    app.innerHTML='<div class="vspg" id="vspg"><div class="shead"><h2>Compare</h2><span>HEAD TO HEAD</span></div>'+
+      '<div class="panel vspick"><label><span>Player 1</span><select id="vsa" aria-label="First player">'+playerOpts(VS.a)+'</select></label><button type="button" class="frb" id="vssw" aria-label="Swap the two players">'+ic(IC.swap,16)+'</button><label><span>Player 2</span><select id="vsb" aria-label="Second player">'+playerOpts(VS.b)+'</select></label></div><div id="vsout"></div></div>';
+    var go=function(){ VS.a=$('vsa').value; VS.b=$('vsb').value; try{ history.replaceState(null,'',vsHash()); }catch(e){} paintVS(); };
+    $('vsa').onchange=go; $('vsb').onchange=go;
+    $('vssw').onclick=function(){ var t=$('vsa').value; $('vsa').value=$('vsb').value; $('vsb').value=t; go(); };
+    paintVS();
+  }
+
+  /* ============================== routing ============================== */
+  var _route=route, _show=show;
+  route=function(){
+    var p=location.hash.replace(/^#\/?/,'').split('/');
+    if(p[0]==='progress') return {v:'progress',a:null};
+    if(p[0]==='compare'){ var d=function(s){ try{ return decodeURIComponent(s||''); }catch(e){ return ''; } }; return {v:'compare',a:{a:d(p[1]),b:d(p[2])}}; }
+    return _route.apply(this,arguments);
+  };
+  show=function(v,a,fromHash){
+    if(v!=='progress'&&v!=='compare') return _show.apply(this,arguments);
+    var app=window.app||$('app');
+    window.curId=null; app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation='';
+    try{ V.stop(); }catch(e){}
+    if(v==='progress'){ rProgress(); cur={v:'progress',a:null}; try{ D.title='My progress · The Timmylist'; }catch(e){} }
+    else { var q=a||{a:'',b:''}; rCompare(q.a,q.b); cur={v:'compare',a:q}; try{ D.title='Compare players · The Timmylist'; }catch(e){} }
+    var nb=D.querySelectorAll('#nav button, #tabbar button'); for(var i=0;i<nb.length;i++) nb[i].className='';
+    window.scrollTo(0,0);
+    if(!fromHash){ try{ var h=v==='progress'?'#/progress':vsHash(); if(location.hash!==h) location.hash=h; }catch(e){} }
+  };
+  try{ var r0=route(); if(r0.v==='progress'||r0.v==='compare') show(r0.v,r0.a,true); }catch(e){}
+
+  /* ============================== footer links ============================== */
+  function footerLinks(){
+    var s=D.querySelector('#tclfoot'); if(!s||!s.parentNode||$('pgfoot')) return;
+    var a=s.cloneNode(false); a.id='pgfoot'; a.setAttribute('href','#/progress'); a.removeAttribute('data-go');
+    a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC.list+'</svg> My progress<i>&rarr;</i>';
+    var c=D.querySelector('#frfoot')||s; c.parentNode.insertBefore(a,c.nextSibling);
+    var b=s.cloneNode(false); b.id='vsfoot'; b.setAttribute('href','#/compare'); b.removeAttribute('data-go');
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC.swap+'</svg> Compare players<i>&rarr;</i>';
+    a.parentNode.insertBefore(b,a.nextSibling);
+  }
+  var ft=0, fiv=setInterval(function(){ footerLinks(); if($('pgfoot')||++ft>30) clearInterval(fiv); },800); footerLinks();
+
+  window.TML240=window.TML240||{};
+  window.TML240.prog={loadMine:loadMine,_pg:PG,_vs:VS,_mp:MP,statOf:statOf,beatenBy:beatenBy,fdate:fdate};
+})();
+/* ===== v240: a Community page with a weekly challenge and a poll, a "This week" panel on the home page ===== */
+(function(){
+  'use strict';
+  var D=document, T=window.TML237, V=T&&T.vid;
+  if(!V||!V.call||!window.TML240||!TML240.prog) return;
+  function $(id){ return D.getElementById(id); }
+  var E=V.E, ago=V.ago, ic=V.ic, signed=V.signed;
+  function netOn(){ var n=window.TMLNET; return !!(n&&n.on); }
+  function call(a,b){ return netOn()?V.call(a,b):Promise.reject(new Error('offline')); }
+  function toastS(t){ try{ toast(t); }catch(e){} }
+  function myName(){ var n=window.TMLNET; return (n&&n.prof&&n.prof.username)?String(n.prof.username):''; }
+  function lvOf(id){ return V.lvOf(id); }
+  function lvTitle(l){ return V.lvTitle(l); }
+  function playerName(n){ var k=String(n||'').toLowerCase(); try{ if(typeof LINKS!=='undefined'&&LINKS[k]) return LINKS[k]; var ps=players(); for(var i=0;i<ps.length;i++) if(String(ps[i]).toLowerCase()===k) return ps[i]; }catch(e){} return String(n||''); }
+  var IC={
+    trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>', poll:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    play:'<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>', x:'<path d="M18 6 6 18M6 6l12 12"/>', plus:'<path d="M12 5v14M5 12h14"/>', arrow:'<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+    users:'<circle cx="9" cy="8" r="3.6"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M17.5 14.5A5.5 5.5 0 0 1 21.5 20"/>', cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>'
+  };
+  function sortedLevels(){ var a=(window.LEVELS||[]).slice(); try{ a.sort(function(x,y){ return rk(x.id)-rk(y.id); }); }catch(e){} return a; }
+  // when nobody has picked a level for the week, everyone gets the same one
+  function levelForWeek(wk){ var L=window.LEVELS||[]; if(!L.length) return null; var h=7; for(var i=0;i<wk.length;i++) h=(h*31+wk.charCodeAt(i))|0; return L[Math.abs(h)%L.length]; }
+  function left(end){
+    var ms=end-Date.now(); if(ms<=0) return 'ending now';
+    var m=Math.floor(ms/60000), d=Math.floor(m/1440), h=Math.floor((m%1440)/60);
+    if(d>=1) return d+' day'+(d===1?'':'s')+(h?' '+h+' h':''); if(h>=1) return h+' h '+(m%60)+' min'; return Math.max(1,m)+' min';
+  }
+  function weekLabel(wk){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(wk||''); if(!m) return ''; var mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return 'Week of '+mon[+m[2]-1]+' '+(+m[3]); }
+
+  /* ============================== data ============================== */
+  var CH={d:null,t:0,busy:false}, PL={d:null,t:0,busy:false};
+  function loadCh(force){
+    if(CH.busy) return Promise.resolve(CH.d);
+    if(CH.d&&!force&&Date.now()-CH.t<30000) return Promise.resolve(CH.d);
+    CH.busy=true;
+    return call('chalGet').then(function(r){ CH.busy=false; if(r&&r.ok){ CH.d=r; CH.t=Date.now(); } return CH.d; },function(){ CH.busy=false; return CH.d; });
+  }
+  function loadPl(force){
+    if(PL.busy) return Promise.resolve(PL.d);
+    if(PL.d&&!force&&Date.now()-PL.t<30000) return Promise.resolve(PL.d);
+    PL.busy=true;
+    return call('pollGet').then(function(r){ PL.busy=false; if(r&&r.ok){ PL.d=r; PL.t=Date.now(); } return PL.d; },function(){ PL.busy=false; return PL.d; });
+  }
+  function levelOf(d){ var id=d&&d.lv?d.lv:(d?(levelForWeek(d.wk)||{}).id:null); return id==null?null:lvOf(id); }
+
+  /* ============================== the weekly challenge ============================== */
+  var CL=[];   // my videos for this week's level
+  function pageGone(){ return !$('evpg'); }
+  function boardHtml(d){
+    if(!d.top.length) return '<div class="evnone"><b>Nobody has posted yet</b><span>Be the first. Post the furthest % you’ve reached on this level.</span></div>';
+    return '<ol class="evbd" aria-label="This week’s best attempts">'+d.top.map(function(r,i){
+      var pn=playerName(r.n);
+      return '<li'+(r.me?' class="me"':'')+'><span class="evrk">#'+(i+1)+'</span><a class="evnm" href="#/player/'+encodeURIComponent(pn)+'">'+(typeof av==='function'?av(pn,'sm','margin:0'):'')+'<b>'+E(r.n)+'</b></a><span class="evpc">'+r.p+'%</span>'+
+        (r.c?'<a class="evwa" href="#/clip/'+E(r.c)+'">'+ic(IC.play,12)+'Watch</a>':'<span></span>')+(d.mod?'<button type="button" class="evx" data-rm="'+E(r.n)+'" aria-label="Remove '+E(r.n)+'’s entry" title="Remove">'+ic(IC.x,15)+'</button>':'')+'</li>';
+    }).join('')+'</ol>';
+  }
+  function formHtml(d,l){
+    if(!signed()) return '<div class="evf"><span class="pgmut">Sign in to post your best %.</span><button type="button" class="frb pri" id="evsign">Sign in</button></div>';
+    var mine=d.mine, vids=CL.length?'<label>Attach a video (optional)<select id="evcc"><option value="">No video</option>'+CL.map(function(c){ return '<option value="'+E(c.id)+'"'+(mine&&mine.c===c.id?' selected':'')+'>'+E(ago(c.ts))+' · '+V.mmss(c.dur)+'</option>'; }).join('')+'</select></label>':'';
+    return '<form class="evf" id="evcf" novalidate><label>My best %<input id="evcp" type="number" min="1" max="100" step="1" inputmode="numeric" placeholder="'+(mine?mine.p:'0')+'"></label>'+vids+
+      '<button type="submit" class="frb pri" id="evcs">'+(mine?'Update my best':'Post my best')+'</button><p class="evmsg" id="evcm" role="status" aria-live="polite">'+(mine?'Your best this week: <b>'+mine.p+'%</b>. A lower number never replaces it.':'')+'</p></form>';
+  }
+  function adminHtml(d){
+    if(!d.mod) return '';
+    var opts='<option value="">Choose automatically</option>'+sortedLevels().map(function(l){ return '<option value="'+l.id+'"'+(String(l.id)===String(d.lv)?' selected':'')+'>'+E(lvTitle(l))+'</option>'; }).join('');
+    return '<div class="evadm"><h3>Admin: this week’s level</h3><div class="evadr"><select id="eval" aria-label="Challenge level">'+opts+'</select><input type="text" id="evan" maxlength="100" placeholder="A short note (optional)" value="'+E(d.note||'')+'" aria-label="Note"><button type="button" class="frb pri" id="evas">Save</button></div><p class="pgmut">Changing the level clears this week’s scores.</p></div>';
+  }
+  function chPaint(){
+    var box=$('evch'); if(!box) return; var d=CH.d;
+    if(!d){ box.innerHTML='<div class="evcn"><p class="pgmut">'+(CH.err?'Couldn’t load this week’s challenge.':'Loading…')+'</p></div>'; return; }
+    var l=levelOf(d);
+    if(!l){ box.innerHTML='<div class="evcn"><div class="evnone"><b>No challenge level right now</b><span>The level that was picked isn’t on the list any more. An admin can choose another.</span></div>'+adminHtml(d)+'</div>'; wireCh(d,null); return; }
+    var bg=l.img&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(l.img)?' style="background-image:url(\''+l.img+'\')"':'';
+    box.innerHTML='<div class="evcb"'+bg+'><span class="evk">'+ic(IC.trophy,13)+'Weekly challenge</span><h2><a href="#/level/'+l.id+'" style="color:inherit;text-decoration:none">'+E(lvTitle(l))+'</a></h2><p>'+E(weekLabel(d.wk))+' · ends in <span class="evcd" id="evcd">'+E(left(d.end))+'</span> · '+d.n+' player'+(d.n===1?'':'s')+' in'+(d.note?'<span class="evnote">'+E(d.note)+'</span>':'')+'</p></div>'+
+      '<div class="evcn">'+boardHtml(d)+formHtml(d,l)+adminHtml(d)+'</div>';
+    wireCh(d,l);
+  }
+  function wireCh(d,l){
+    var sg=$('evsign'); if(sg) sg.onclick=function(){ try{ openAcct(); }catch(e){} };
+    var f=$('evcf'), msg=function(t,bad){ var m=$('evcm'); if(m){ m.textContent=t||''; m.className='evmsg'+(bad?' bad':''); } };
+    if(f&&l){
+      f.onsubmit=function(e){
+        e.preventDefault(); var v=$('evcp').value.trim(), n=Number(v);
+        if(!v||!isFinite(n)||n<1||n>100||Math.floor(n)!==n){ msg('Enter a whole number from 1 to 100.',true); return; }
+        var body={lv:String(l.id),p:n}; var cc=$('evcc'); if(cc&&cc.value) body.clip=cc.value;
+        var bt=$('evcs'); bt.disabled=true;
+        call('chalPost',body).then(function(r){
+          bt.disabled=false;
+          if(r&&r.ok){ toastS(r.same?'You already have a better score':(n>=100?'You beat it! Submit your record too.':'Posted')); loadCh(true).then(function(){ chPaint(); }); }
+          else msg((r&&r.message)||'Couldn’t post that.',true);
+        },function(){ bt.disabled=false; msg('Couldn’t reach the site.',true); });
+      };
+    }
+    var as=$('evas'); if(as) as.onclick=function(){ as.disabled=true; call('chalSet',{lv:$('eval').value,note:$('evan').value}).then(function(r){ as.disabled=false; if(r&&r.ok){ toastS('Saved'); loadCh(true).then(chPaint); } else toastS((r&&r.message)||'Couldn’t save that'); },function(){ as.disabled=false; toastS('Couldn’t reach the site'); }); };
+    var box=$('evch'); if(!box) return;
+    box.onclick=function(e){
+      var b=e.target.closest&&e.target.closest('button[data-rm]'); if(!b) return;
+      if(b.getAttribute('data-arm')!=='1'){ b.setAttribute('data-arm','1'); b.classList.add('arm'); setTimeout(function(){ if(b.parentNode){ b.setAttribute('data-arm','0'); b.classList.remove('arm'); } },3000); return; }
+      b.disabled=true; call('chalDel',{n:b.getAttribute('data-rm')}).then(function(r){ if(r&&r.ok){ loadCh(true).then(chPaint); } else { b.disabled=false; toastS((r&&r.message)||'Couldn’t remove that'); } },function(){ b.disabled=false; });
+    };
+  }
+  function loadMyClips(d){
+    var l=levelOf(d), un=myName(); CL=[];
+    if(!l||!signed()||!un||l.id<0) return Promise.resolve();
+    return call('clipList',{by:un,lv:String(l.id),sort:'new'}).then(function(r){ if(r&&r.ok) CL=(r.items||[]).map(function(c){ return {id:c.id,ts:c.ts,dur:c.dur}; }); },function(){});
+  }
+
+  /* ============================== the poll ============================== */
+  function pollAdminHtml(d){
+    if(!d.mod) return '';
+    var P=d.poll;
+    return '<div class="evadm"><h3>Admin: poll</h3><form id="evpf" novalidate><div class="evadr"><input type="text" id="evpq2" maxlength="120" placeholder="Question" aria-label="Poll question"></div>'+
+      '<div class="evadr" id="evpos">'+[0,1].map(function(i){ return '<input type="text" maxlength="50" placeholder="Answer '+(i+1)+'" aria-label="Answer '+(i+1)+'" data-o="'+i+'">'; }).join('')+'</div>'+
+      '<div class="evadr"><button type="button" class="frb" id="evpadd">'+ic(IC.plus,14)+'Add an answer</button><button type="submit" class="frb pri" id="evpgo">'+(P?'Replace the poll':'Start the poll')+'</button></div><p class="evmsg" id="evpmsg" role="status" aria-live="polite"></p></form>'+
+      (P?'<div class="evadr">'+(P.end?'':'<button type="button" class="frb" id="evpend">Close the poll</button>')+'<button type="button" class="frb" id="evpclr">Remove the poll</button></div>':'')+'</div>';
+  }
+  function plPaint(){
+    var box=$('evpl'); if(!box) return; var d=PL.d;
+    if(!d){ box.innerHTML='<h2>'+ic(IC.poll,20)+'Community poll</h2><p class="pgmut">'+(PL.err?'Couldn’t load the poll.':'Loading…')+'</p>'; return; }
+    var P=d.poll;
+    if(!P){ box.innerHTML='<h2>'+ic(IC.poll,20)+'Community poll</h2><div class="evnone"><b>No poll right now</b><span>Check back soon.</span></div>'+pollAdminHtml(d); wirePl(d); return; }
+    var show=d.mine>=0||P.end||!signed(), tot=d.total||0;
+    box.innerHTML='<h2>'+ic(IC.poll,20)+'Community poll'+(P.end?' <span class="evpe">Closed</span>':'')+'</h2><p class="evpq">'+E(P.q)+'</p><ul class="evpo">'+P.o.map(function(t,i){
+      var n=d.counts[i]||0, pc=tot?Math.round(100*n/tot):0;
+      return '<li'+(d.mine===i?' class="mine"':'')+'><button type="button" data-i="'+i+'"'+(P.end||!signed()?' disabled':'')+' aria-pressed="'+(d.mine===i)+'">'+(show?'<i class="fill" style="width:'+pc+'%"></i>':'')+'<span class="t">'+E(t)+'</span>'+(show?'<span class="n">'+pc+'% · '+n+'</span>':'')+'</button></li>';
+    }).join('')+'</ul><p class="evpm" role="status" aria-live="polite" id="evpmeta">'+(show?tot+' vote'+(tot===1?'':'s'):'Pick an answer to see the results')+(P.end?' · this poll has closed':(signed()?(d.mine>=0?' · tap another answer to change your vote':''):' · sign in to vote'))+'</p>'+pollAdminHtml(d);
+    wirePl(d);
+  }
+  function wirePl(d){
+    var box=$('evpl'); if(!box) return;
+    box.onclick=function(e){
+      var b=e.target.closest&&e.target.closest('button[data-i]'); if(!b||b.disabled||!d.poll) return;
+      var i=+b.getAttribute('data-i'); if(i===d.mine) return;
+      var all=box.querySelectorAll('button[data-i]'); for(var k=0;k<all.length;k++) all[k].disabled=true;
+      call('pollVote',{id:d.poll.id,i:i}).then(function(r){
+        if(r&&r.ok){ loadPl(true).then(plPaint); }
+        else { toastS((r&&r.message)||'Couldn’t save your vote'); loadPl(true).then(plPaint); }
+      },function(){ toastS('Couldn’t reach the site'); plPaint(); });
+    };
+    var f=$('evpf'); if(!f) return;
+    var msg=function(t,bad){ var m=$('evpmsg'); if(m){ m.textContent=t||''; m.className='evmsg'+(bad?' bad':''); } };
+    $('evpadd').onclick=function(){ var w=$('evpos'), n=w.querySelectorAll('input').length; if(n>=5){ msg('A poll can have up to 5 answers.',true); return; } var x=D.createElement('input'); x.type='text'; x.maxLength=50; x.placeholder='Answer '+(n+1); x.setAttribute('aria-label','Answer '+(n+1)); x.setAttribute('data-o',n); w.appendChild(x); x.focus(); };
+    f.onsubmit=function(e){
+      e.preventDefault(); var q=$('evpq2').value.trim(), o=[].slice.call(f.querySelectorAll('[data-o]')).map(function(x){ return x.value.trim(); }).filter(Boolean);
+      if(q.length<3){ msg('Write a question first.',true); return; } if(o.length<2){ msg('Add at least two answers.',true); return; }
+      var bt=$('evpgo'); bt.disabled=true;
+      call('pollSet',{q:q,o:o}).then(function(r){ bt.disabled=false; if(r&&r.ok){ toastS('Poll started'); loadPl(true).then(plPaint); } else msg((r&&r.message)||'Couldn’t start that poll.',true); },function(){ bt.disabled=false; msg('Couldn’t reach the site.',true); });
+    };
+    var en=$('evpend'); if(en) en.onclick=function(){ en.disabled=true; call('pollEnd',{}).then(function(r){ if(r&&r.ok){ toastS('Poll closed'); loadPl(true).then(plPaint); } else { en.disabled=false; toastS((r&&r.message)||'Couldn’t do that'); } },function(){ en.disabled=false; }); };
+    var cl=$('evpclr'); if(cl) cl.onclick=function(){
+      if(cl.getAttribute('data-arm')!=='1'){ cl.setAttribute('data-arm','1'); cl.textContent='Tap again to remove'; setTimeout(function(){ if(cl.parentNode){ cl.setAttribute('data-arm','0'); cl.textContent='Remove the poll'; } },3500); return; }
+      cl.disabled=true; call('pollEnd',{clear:true}).then(function(r){ if(r&&r.ok){ toastS('Poll removed'); loadPl(true).then(plPaint); } else { cl.disabled=false; toastS((r&&r.message)||'Couldn’t do that'); } },function(){ cl.disabled=false; });
+    };
+  }
+
+  /* ============================== the page ============================== */
+  var tick=0;
+  function rEvents(){
+    var app=window.app||$('app'); if(!app) return;
+    app.innerHTML='<div class="evpg" id="evpg"><div class="shead"><h2>Community</h2><span>THIS WEEK</span></div><div class="panel evc" id="evch"><div class="evcn"><p class="pgmut">Loading…</p></div></div><div class="panel evpl" id="evpl"></div></div>';
+    clearInterval(tick); tick=setInterval(function(){ if(pageGone()){ clearInterval(tick); return; } var c=$('evcd'); if(c&&CH.d) c.textContent=left(CH.d.end); },30000);
+    if(!netOn()){ $('evch').innerHTML='<div class="evcn"><div class="evnone"><b>Not available here</b><span>The weekly challenge and poll need the live site.</span></div></div>'; return; }
+    CH.err=false; PL.err=false; chPaint(); plPaint();
+    loadCh(true).then(function(d){ if(pageGone()) return; if(!d) CH.err=true; return loadMyClips(d).then(function(){ if(!pageGone()) chPaint(); }); });
+    loadPl(true).then(function(d){ if(pageGone()) return; if(!d) PL.err=true; plPaint(); });
+  }
+  var _route=route, _show=show;
+  route=function(){
+    var p=location.hash.replace(/^#\/?/,'').split('/');
+    if(p[0]==='community') return {v:'community',a:null};
+    return _route.apply(this,arguments);
+  };
+  show=function(v,a,fromHash){
+    if(v!=='community') return _show.apply(this,arguments);
+    var app=window.app||$('app');
+    window.curId=null; app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation='';
+    try{ V.stop(); }catch(e){}
+    rEvents(); cur={v:'community',a:null}; try{ D.title='Community · The Timmylist'; }catch(e){}
+    var nb=D.querySelectorAll('#nav button, #tabbar button'); for(var i=0;i<nb.length;i++) nb[i].className='';
+    window.scrollTo(0,0);
+    if(!fromHash){ try{ if(location.hash!=='#/community') location.hash='#/community'; }catch(e){} }
+  };
+  try{ var r0=route(); if(r0.v==='community') show('community',null,true); }catch(e){}
+
+  /* ============================== a "This week" panel on the home page, and a footer link ============================== */
+  function homePanel(){
+    if(!netOn()) return;
+    var cols=D.querySelectorAll('.homegrid .hcol'), col=cols[1]||cols[0]; if(!col||$('evhome')) return;
+    Promise.all([loadCh(false),loadPl(false)]).then(function(a){
+      var c=a[0], p=a[1]; if(!c&&!(p&&p.poll)) return;
+      var cs=D.querySelectorAll('.homegrid .hcol'), c2=cs[1]||cs[0]; if(!c2||$('evhome')) return;
+      var h='';
+      if(c){ var l=levelOf(c); if(l) h+='<a class="evhr" href="#/community" data-nomodal><small>Weekly challenge</small><b>'+E(lvTitle(l))+'</b><span>'+(c.top.length?'Top: '+E(c.top[0].n)+' · '+c.top[0].p+'% · ':'No scores yet · ')+'ends in '+E(left(c.end))+'</span></a>'; }
+      if(p&&p.poll) h+='<a class="evhr" href="#/community" data-nomodal><small>Community poll'+(p.poll.end?' · closed':'')+'</small><b>'+E(p.poll.q)+'</b><span>'+p.total+' vote'+(p.total===1?'':'s')+(p.poll.end?'':(p.mine>=0?' · you voted':' · tap to vote'))+'</span></a>';
+      if(!h) return;
+      var d=D.createElement('div'); d.className='panel side evhome'; d.id='evhome';
+      d.innerHTML='<h2 class="chead" style="font-size:15px">This week</h2>'+h+'<a class="tclall" href="#/community" data-nomodal>Open Community'+ic(IC.arrow,15)+'</a>';
+      c2.appendChild(d);
+    });
+  }
+  var _rHome=rHome;
+  rHome=function(){ var r=_rHome.apply(this,arguments); try{ homePanel(); }catch(e){ try{ console.error('v240 home',e); }catch(x){} } return r; };
+  function firstPaint(){ try{ if(D.querySelector('.homegrid')) homePanel(); }catch(e){} }
+  firstPaint(); setTimeout(firstPaint,1500);
+  function footerLinks(){
+    var s=D.querySelector('#tclfoot'); if(!s||!s.parentNode||$('evfoot')) return;
+    var a=s.cloneNode(false); a.id='evfoot'; a.setAttribute('href','#/community'); a.removeAttribute('data-go');
+    a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC.trophy+'</svg> Community<i>&rarr;</i>';
+    s.parentNode.insertBefore(a,s.nextSibling);
+  }
+  var ft=0, fiv=setInterval(function(){ footerLinks(); if($('evfoot')||++ft>30) clearInterval(fiv); },800); footerLinks();
+
+  window.TML240.events={loadCh:loadCh,loadPl:loadPl,levelForWeek:levelForWeek,left:left,_ch:CH,_pl:PL};
 })();
 </script>
 </body>
