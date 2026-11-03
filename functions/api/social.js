@@ -265,7 +265,10 @@ const clampInt = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(Number(v)) 
 let PL = { t: 0, v: null }, AL = { t: 0, v: null };
 const mkId = () => String(Date.now()).padStart(13, "0") + "-" + Math.random().toString(36).slice(2, 7);
 const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
-const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+|clan_[a-z0-9-]{1,40})__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
+const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+|clan_[a-z0-9-]{1,40}|grp_g[a-z0-9]{10})__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
+const okGid = (s) => /^g[a-z0-9]{10}$/.test(String(s || ""));
+const mkGid = () => { const b = crypto.getRandomValues(new Uint8Array(10)); let s = "g"; for (const x of b) s += "abcdefghijklmnopqrstuvwxyz0123456789"[x % 36]; return s; };
+const GRP_MAXM = 8, GRP_MAXG = 20;   // people in one group, groups one player can be in
 const okUid = (s) => /^[A-Za-z0-9_-]{6,128}$/.test(String(s || ""));
 const okPid = (s) => /^[A-Za-z0-9_-]{6,64}$/.test(String(s || ""));
 const oneLine = (s, n) => cleanText(s).replace(/\s*\n\s*/g, " ").slice(0, n);
@@ -369,7 +372,65 @@ async function clans(sa) {
 const playerOf = (name) => { const n = String(name || "").toLowerCase(); return String(LINKS[n] || n).toLowerCase(); };
 async function clanOfName(sa, name) { const n = String(name || "").toLowerCase(), p = playerOf(name); return (await clans(sa)).find((c) => c.members.has(p) || c.members.has(n)) || null; }
 const isLeader = (clan, name) => !!clan && !!clan.leader && (clan.leader === String(name || "").toLowerCase() || clan.leader === playerOf(name));
+// ---------- group chats ----------
+// chatgroups/<gid> = { name, owner, mem: { uid: { n: name, t: joinedAt } }, ts }.  Messages live in chat/grp_<gid>/m, each member's list row in chatidx/<uid>.g.<gid>.
+// Groups are private: only members read or write them, and that includes admins (an admin sees a message only when a member reports it).
+async function grpFor(sa, uid, gid) {
+  gid = String(gid || "");
+  if (!okGid(gid)) throw fail(400, "bad request");
+  const g = await fsGet(sa, "chatgroups/" + gid);
+  if (!g || !g.mem || !g.mem[uid]) throw fail(404, "nogroup", "That group isn't available any more.");
+  g.id = gid;
+  return g;
+}
+const grpOrder = (g) => Object.keys(g.mem || {}).sort((x, y) => ((g.mem[x] || {}).t || 0) - ((g.mem[y] || {}).t || 0) || (x < y ? -1 : 1));
+const grpPub = (g) => ({ id: g.id, name: g.name || "Group chat", owner: g.owner || "", n: Object.keys(g.mem || {}).length, mem: grpOrder(g).map((u) => ({ uid: u, name: (g.mem[u] && g.mem[u].n) || "", t: (g.mem[u] && g.mem[u].t) || 0 })) });
+// the row every member sees in their chat list
+async function grpRows(sa, gid, gname, mem, last, from, fn, ts) {
+  const row = { name: gname, ts, last, from, fn, n: Object.keys(mem).length };
+  await Promise.all(Object.keys(mem).map((u) => fsSet(sa, "chatidx/" + u, [[["g", gid], row]])));
+}
+// a line in the thread that isn't a person talking ("Alice added Bobby")
+async function grpSay(sa, gid, gname, mem, uid, uname, text) {
+  const ts = Date.now();
+  await fsSet(sa, "chat/grp_" + gid + "/m/" + mkId(), [[["k"], "sys"], [["from"], uid], [["name"], uname], [["text"], text], [["ts"], ts]]);
+  await grpRows(sa, gid, gname, mem, text, uid, "", ts);
+  return ts;
+}
+// Who the creator or an adder picked: { names: ["bob"], uids: ["..."] }. Throws a friendly error for the first problem.
+async function grpResolve(sa, uid, body, have) {
+  const seen = new Set(have || []); seen.add(uid);
+  const raw = [];
+  for (const u of Array.isArray(body.uids) ? body.uids.slice(0, GRP_MAXM) : []) { if (!okUid(u)) throw fail(400, "bad request"); raw.push({ uid: String(u) }); }
+  for (const n of Array.isArray(body.names) ? body.names.slice(0, GRP_MAXM) : []) raw.push({ name: String(n).replace(/^@/, "") });
+  const mine = (await fsGet(sa, "chatidx/" + uid)) || {}, out = [];
+  for (const x of raw) {
+    const tu = x.uid || (await uidOf(sa, x.name));
+    if (!tu) throw fail(404, "nouser", "No player named " + oneLine(x.name, 20) + ".");
+    if (seen.has(tu)) continue; seen.add(tu);
+    const tn = await userName(sa, tu);
+    if (!tn) throw fail(404, "nouser", "No player with that name.");
+    const theirs = (await fsGet(sa, "chatidx/" + tu)) || {};
+    if (theirs.b && theirs.b[uid]) throw fail(403, "blocked", "You can't add " + tn + ".");
+    if (mine.b && mine.b[tu]) throw fail(403, "blocked", "You blocked " + tn + ". Unblock them first.");
+    if (Object.keys(theirs.g || {}).length >= GRP_MAXG) throw fail(403, "full", tn + " is in too many groups.");
+    out.push({ uid: tu, name: tn });
+  }
+  return out;
+}
+// Removes what a deleted group leaves behind. Best effort and capped, because a single request may only make so many calls.
+async function wipeRoom(sa, room) {
+  try {
+    const rows = (await fsList(sa, "chat/" + room + "/m", 400)).slice(0, 30);
+    for (let i = 0; i < rows.length; i += 6) await Promise.all(rows.slice(i, i + 6).map(async (m) => { if (m.img) await fsDelete(sa, "chatimg/" + m._id); await fsDelete(sa, "chat/" + room + "/m/" + m._id); }));
+    await fsDelete(sa, "chatmeta/" + room);
+  } catch (e) {}
+}
 async function roomFor(sa, uid, name, admin, body) {
+  if (body.group != null && body.group !== "") {
+    const g = await grpFor(sa, uid, body.group);
+    return { key: "grp_" + g.id, dm: false, group: g };
+  }
   if (body.clan != null && body.clan !== "") {
     const id = String(body.clan);
     if (!/^[a-z0-9-]{1,40}$/.test(id)) throw fail(400, "bad request");
@@ -380,7 +441,7 @@ async function roomFor(sa, uid, name, admin, body) {
   }
   return roomOf(uid, body);
 }
-const metaPath = (key) => (key === "main" ? "chatmeta/main" : key.startsWith("clan_") ? "chatmeta/" + key : "");
+const metaPath = (key) => (key === "main" ? "chatmeta/main" : (key.startsWith("clan_") || key.startsWith("grp_")) ? "chatmeta/" + key : "");
 function roomOf(uid, body) {
   if (body.peer) { if (!okUid(body.peer) || body.peer === uid) throw fail(400, "bad request"); return { key: dmKey(uid, body.peer), dm: true, peer: String(body.peer) }; }
   return { key: "main", dm: false };
@@ -456,7 +517,7 @@ export async function onRequestPost(context) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v234" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v236" });
     }
 
     if (a === "vote") {
@@ -478,6 +539,7 @@ export async function onRequestPost(context) {
     if (a === "inbox") {
       const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, main = body.lite ? null : await fsGet(sa, "chatmeta/main");
       const dms = Object.keys(idx.c || {}).map((p) => Object.assign({ peer: p }, idx.c[p])).sort((x, y) => (y.ts || 0) - (x.ts || 0)).slice(0, 60);
+      const groups = Object.keys(idx.g || {}).map((gid) => Object.assign({ id: gid }, idx.g[gid])).sort((x, y) => (y.ts || 0) - (x.ts || 0)).slice(0, GRP_MAXG);
       const mu = await muteState(sa, uid), call = idx.call && idx.call.ts > Date.now() - CALLTTL ? idx.call : null;
       const ctl = idx.ctl && idx.ctl.exp > Date.now() ? { id: idx.ctl.id, by: idx.ctl.byName || "An admin", ok: !!idx.ctl.ok, seq: idx.ctl.seq || 0, q: (idx.ctl.q || []).slice(-8) } : null;
       const p = body.pr; let wrote = false;
@@ -493,7 +555,7 @@ export async function onRequestPost(context) {
         const cl = await clanOfName(sa, name);
         if (cl) { const cm = (await fsGet(sa, "chatmeta/clan_" + cl.id)) || {}; clan = { id: cl.id, tag: cl.tag, name: cl.name, lead: isLeader(cl, name), ts: cm.ts || 0, last: cm.last || "", from: cm.from || "", fromName: cm.name || "" }; }
       }
-      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      return json({ ok: true, pr: wrote, me: { uid, name, admin }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -502,6 +564,12 @@ export async function onRequestPost(context) {
       const rows = await fsMsgs(sa, r.key, since, since ? 100 : 60, before);
       const out = { ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 };
       if (!since && !before && metaPath(r.key)) { const meta = await fsGet(sa, metaPath(r.key)); out.pin = meta && meta.pin && okId(meta.pin.id) ? { id: meta.pin.id, name: String(meta.pin.name || ""), text: String(meta.pin.text || ""), by: String(meta.pin.by || "") } : null; }
+      if (r.group && !before) {
+        if (!since) out.grp = grpPub(r.group);
+        if (body.typ && rate(uid, "ty", 1, 1800)) await fsSet(sa, "chatst/" + r.key, [[["t", uid], Date.now()]]);
+        const sd = (await fsGet(sa, "chatst/" + r.key)) || {}, tt = sd.t || {};
+        out.st = { typs: Object.keys(tt).filter((u) => u !== uid && tt[u] > Date.now() - 6000 && r.group.mem[u]).map((u) => r.group.mem[u].n || "").filter(Boolean).slice(0, 3) };
+      }
       if (r.dm && !before) {
         const w = [];
         if (body.seen && okId(body.seen) && rate(uid, "sn", 1, 900)) w.push([["s", uid], String(body.seen)]);
@@ -535,9 +603,9 @@ export async function onRequestPost(context) {
         const mine = (await fsGet(sa, "chatidx/" + uid)) || {};
         if (mine.b && mine.b[peer]) return json({ error: "blocked", message: "You blocked this player. Unblock them first." }, 403);
         r = { key: dmKey(uid, peer), dm: true, peer, pn, prev: ((theirs.c || {})[uid] || {}).ts || 0 };
-      } else if (body.clan != null && body.clan !== "") r = await roomFor(sa, uid, name, admin, body);
+      } else if ((body.clan != null && body.clan !== "") || (body.group != null && body.group !== "")) r = await roomFor(sa, uid, name, admin, body);
       else r = { key: "main", dm: false };
-      if (!r.dm && cfg.slow > 0 && !admin) {
+      if (!r.dm && !r.group && cfg.slow > 0 && !admin) {
         const mineS = (await fsGet(sa, "chatidx/" + uid)) || {}, lastS = (mineS.st && mineS.st[r.key]) || 0, left = Math.ceil((lastS + cfg.slow * 1000 - Date.now()) / 1000);
         if (left > 0) return json({ error: "slowmode", message: "Slow mode is on. You can send again in " + left + " second" + (left === 1 ? "" : "s") + ".", wait: left }, 429);
       }
@@ -546,6 +614,8 @@ export async function onRequestPost(context) {
         const t = await fsGet(sa, "chat/" + r.key + "/m/" + body.reply);
         if (t && !t.del && !t.k) { ent.push([["rt"], body.reply], [["rn"], String(t.name || "").slice(0, 30)], [["rq"], String(t.text || (t.gif ? "GIF" : t.img ? "Photo" : "")).slice(0, 80)]); }
       }
+      let gprev = 0;
+      if (r.group) { const gm = await fsGet(sa, metaPath(r.key)); gprev = (gm && gm.ts) || 0; }
       const id = mkId(), ts = Date.now(); ent.push([["ts"], ts]);
       const gw = cleanDim(body.gw), gh = cleanDim(body.gh);
       if (gif) { ent.push([["gif"], gif]); if (gw && gh) ent.push([["gw"], gw], [["gh"], gh]); }
@@ -555,11 +625,29 @@ export async function onRequestPost(context) {
       if (r.dm) {
         await fsSet(sa, "chatidx/" + uid, [[["c", r.peer], { name: r.pn, ts, last: snip, from: uid }]]);
         await fsSet(sa, "chatidx/" + r.peer, [[["c", uid], { name, ts, last: snip, from: uid }]]);
-      } else await fsSet(sa, metaPath(r.key), [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
-      if (!r.dm && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
+      } else {
+        await fsSet(sa, metaPath(r.key), [[["ts"], ts], [["last"], snip], [["name"], name], [["from"], uid]]);
+        if (r.group) await grpRows(sa, r.group.id, r.group.name || "Group chat", r.group.mem, snip, uid, name, ts);
+      }
+      if (!r.dm && !r.group && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
       if (r.dm) {
         // one alert per burst: nothing if they already heard from this player in the last 45 seconds
         if (!(r.prev && ts - r.prev < 45000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid }));
+      } else if (r.group) {
+        // members only. Someone @mentioned gets the mention alert; everyone else gets one alert per burst of messages.
+        const g = r.group, mentioned = new Set(), burst = !(gprev && ts - gprev < 45000), url = "?open=grp:" + g.id, gn = g.name || "Group chat";
+        const blocked = async (u) => !!((((await fsGet(sa, "chatidx/" + u)) || {}).b || {})[uid]);
+        await defer((async () => {
+          if (text && rate(uid, "men", 12, 60000)) {
+            const names = [...new Set([...text.matchAll(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g)].map((m) => m[2].toLowerCase()))].slice(0, 3);
+            for (const n of names) {
+              const tu = await uidOf(sa, n); if (!tu || tu === uid || !g.mem[tu] || (await blocked(tu))) continue;
+              mentioned.add(tu);
+              await notifyUser(sa, tu, { kind: "men", title: name + " mentioned you in " + gn, body: snip, url, tag: "men-" + g.id });
+            }
+          }
+          if (burst) await Promise.all(Object.keys(g.mem).filter((u) => u !== uid && !mentioned.has(u)).map(async (u) => { if (await blocked(u)) return; await notifyUser(sa, u, { kind: "dm", title: gn, body: name + ": " + snip, url, tag: "grp-" + g.id }); }));
+        })());
       } else if (text && rate(uid, "men", 12, 60000)) {
         const names = [...new Set([...text.matchAll(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g)].map((m) => m[2].toLowerCase()))].slice(0, 3);
         if (names.length) await defer((async () => {
@@ -599,7 +687,7 @@ export async function onRequestPost(context) {
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del) return json({ ok: true });
       if (m.k) return json({ error: "bad request" }, 400);
-      if (m.from !== uid && !(admin && !r.dm) && !(r.clan && isLeader(r.clan, name))) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
+      if (m.from !== uid && !(admin && !r.dm && !r.group) && !(r.clan && isLeader(r.clan, name)) && !(r.group && r.group.owner === uid)) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
       await removeMsg(sa, r.key, body.id);
       await unpinIf(sa, r.key, [body.id]);
       return json({ ok: true });
@@ -625,8 +713,8 @@ export async function onRequestPost(context) {
     }
     if (a === "pin") {
       const r = await roomFor(sa, uid, name, admin, body);
-      if (r.dm) return json({ error: "bad request", message: "Pins work in the room and in clan chats." }, 400);
-      if (!(admin || (r.clan && isLeader(r.clan, name)))) return json({ error: "admin", message: r.clan ? "Only admins and the clan leader can pin." : "Only admins can pin." }, 403);
+      if (r.dm) return json({ error: "bad request", message: "Pins work in the room, clan chats and group chats." }, 400);
+      if (!(r.group || admin || (r.clan && isLeader(r.clan, name)))) return json({ error: "admin", message: r.clan ? "Only admins and the clan leader can pin." : "Only admins can pin." }, 403);
       if (!rate(uid, "pin", 10, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const mp = metaPath(r.key), on = body.on !== false;
       if (!on) {
@@ -663,7 +751,7 @@ export async function onRequestPost(context) {
       let why = String(body.why || ""), note = oneLine(body.note, 140);
       if (!Object.prototype.hasOwnProperty.call(REP_WHY, why)) { if (!note) note = oneLine(why, 140); why = "other"; }
       const prev = await fsGet(sa, "chatreports/" + rid), rs = (prev && prev.rs) || {};
-      const ents = [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["ts"], Date.now()], [["dm"], r.dm], [["clan"], r.clan ? r.clan.tag : ""], [["why"], REP_WHY[why] + (note ? ": " + note : "")]];
+      const ents = [[["room"], r.key], [["mid"], body.id], [["from"], m.from], [["fromName"], m.name || ""], [["text"], String(m.text || "").slice(0, 500)], [["img"], !!m.img], [["gif"], m.gif && cleanGif(m.gif) ? m.gif : ""], [["ts"], Date.now()], [["dm"], r.dm], [["clan"], r.clan ? r.clan.tag : ""], [["grp"], r.group ? r.group.name || "Group chat" : ""], [["why"], REP_WHY[why] + (note ? ": " + note : "")]];
       if (!prev || !prev.by) ents.push([["by"], uid], [["byName"], name]);
       if (rs[uid] || Object.keys(rs).length < REP_MAXRS) ents.push([["rs", uid], { w: why, n: note, nm: name, t: Date.now() }]);
       ents.push([["n"], Object.keys(Object.assign({}, rs, { [uid]: 1 })).length]);
@@ -675,6 +763,83 @@ export async function onRequestPost(context) {
       if (!okUid(body.peer) || body.peer === uid) return json({ error: "bad request" }, 400);
       await fsSet(sa, "chatidx/" + uid, [[["b", body.peer], body.on ? true : undefined]]);
       return json({ ok: true });
+    }
+
+    // ---------- group chats ----------
+    if (a === "grpCreate" || a === "grpInfo" || a === "grpAdd" || a === "grpLeave" || a === "grpKick" || a === "grpRename" || a === "grpDelete") {
+      if (a === "grpCreate") {
+        if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+        if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted, so you can't start a group right now." }, 403);
+        if (!rate(uid, "grpchk", 30, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+        const mine = (await fsGet(sa, "chatidx/" + uid)) || {};
+        if (Object.keys(mine.g || {}).length >= GRP_MAXG) return json({ error: "full", message: "You're in too many groups. Leave one first." }, 403);
+        const others = await grpResolve(sa, uid, body, []);
+        if (!others.length) return json({ error: "bad request", message: "Pick at least one other player." }, 400);
+        if (others.length + 1 > GRP_MAXM) return json({ error: "bad request", message: "A group can have up to " + GRP_MAXM + " people." }, 400);
+        if (!rate(uid, "grpnew", 3, 600000)) return json({ error: "slow", message: "You've made a few groups just now. Try again in a few minutes." }, 429);
+        const gid = mkGid(), ts = Date.now(), mem = { [uid]: { n: name, t: ts } };
+        others.forEach((o, i) => { mem[o.uid] = { n: o.name, t: ts + i + 1 }; });
+        const gname = oneLine(body.name, 30) || others.map((o) => o.name).join(", ").slice(0, 30) || "Group chat";
+        await fsSet(sa, "chatgroups/" + gid, [[["name"], gname], [["owner"], uid], [["mem"], mem], [["ts"], ts]]);
+        await grpSay(sa, gid, gname, mem, uid, name, name + " created the group");
+        await defer(Promise.all(others.map((o) => notifyUser(sa, o.uid, { kind: "dm", title: gname, body: name + " added you to the group", url: "?open=grp:" + gid, tag: "grp-" + gid }))));
+        return json({ ok: true, group: grpPub({ id: gid, name: gname, owner: uid, mem }) });
+      }
+      const g = await grpFor(sa, uid, body.group), gid = g.id, owner = g.owner === uid;
+      if (a === "grpInfo") return json({ ok: true, group: grpPub(g) });
+      if (a !== "grpLeave" && a !== "grpDelete") {
+        if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+        if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now." }, 403);
+      }
+      if (!rate(uid, "grpedit", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (a === "grpAdd") {
+        const add = await grpResolve(sa, uid, body, Object.keys(g.mem));
+        if (!add.length) return json({ error: "bad request", message: "They're already in this group." }, 400);
+        if (Object.keys(g.mem).length + add.length > GRP_MAXM) return json({ error: "bad request", message: "A group can have up to " + GRP_MAXM + " people." }, 400);
+        const ts = Date.now(), mem = Object.assign({}, g.mem);
+        add.forEach((o, i) => { mem[o.uid] = { n: o.name, t: ts + i }; });
+        await fsSet(sa, "chatgroups/" + gid, add.map((o) => [["mem", o.uid], mem[o.uid]]));
+        await grpSay(sa, gid, g.name, mem, uid, name, name + " added " + add.map((o) => o.name).join(", "));
+        await defer(Promise.all(add.map((o) => notifyUser(sa, o.uid, { kind: "dm", title: g.name, body: name + " added you to the group", url: "?open=grp:" + gid, tag: "grp-" + gid }))));
+        return json({ ok: true, group: grpPub(Object.assign({}, g, { mem })) });
+      }
+      if (a === "grpLeave") {
+        const mem = Object.assign({}, g.mem); delete mem[uid];
+        const rest = Object.keys(mem);
+        await fsSet(sa, "chatidx/" + uid, [[["g", gid], undefined]]);
+        if (!rest.length) { await fsDelete(sa, "chatgroups/" + gid); await defer(wipeRoom(sa, "grp_" + gid)); return json({ ok: true, gone: true }); }
+        const ents = [[["mem", uid], undefined]]; let said = name + " left the group";
+        if (owner) { const nx = grpOrder({ mem })[0]; ents.push([["owner"], nx]); said += ". " + (mem[nx].n || "Someone") + " is now the owner"; }
+        await fsSet(sa, "chatgroups/" + gid, ents);
+        await grpSay(sa, gid, g.name, mem, uid, name, said);
+        return json({ ok: true });
+      }
+      if (a === "grpKick") {
+        const t = String(body.uid || "");
+        if (!owner) return json({ error: "admin", message: "Only the group's owner can remove people." }, 403);
+        if (!okUid(t) || t === uid || !g.mem[t]) return json({ error: "bad request", message: "They aren't in this group." }, 400);
+        const mem = Object.assign({}, g.mem), tn = (mem[t] && mem[t].n) || "Someone"; delete mem[t];
+        await fsSet(sa, "chatgroups/" + gid, [[["mem", t], undefined]]);
+        await fsSet(sa, "chatidx/" + t, [[["g", gid], undefined]]);
+        await grpSay(sa, gid, g.name, mem, uid, name, name + " removed " + tn);
+        return json({ ok: true, group: grpPub(Object.assign({}, g, { mem })) });
+      }
+      if (a === "grpRename") {
+        if (!owner) return json({ error: "admin", message: "Only the group's owner can rename it." }, 403);
+        const nn = oneLine(body.name, 30);
+        if (!nn) return json({ error: "bad request", message: "Give the group a name." }, 400);
+        if (nn === g.name) return json({ ok: true, group: grpPub(g) });
+        await fsSet(sa, "chatgroups/" + gid, [[["name"], nn]]);
+        await grpSay(sa, gid, nn, g.mem, uid, name, name + " renamed the group to \u201c" + nn + "\u201d");
+        return json({ ok: true, group: grpPub(Object.assign({}, g, { name: nn })) });
+      }
+      if (a === "grpDelete") {
+        if (!owner) return json({ error: "admin", message: "Only the group's owner can delete it." }, 403);
+        await fsDelete(sa, "chatgroups/" + gid);
+        await Promise.all(Object.keys(g.mem).map((u) => fsSet(sa, "chatidx/" + u, [[["g", gid], undefined]])));
+        await defer(wipeRoom(sa, "grp_" + gid));
+        return json({ ok: true, gone: true });
+      }
     }
 
     // ---------- voice calls (signalling only; the audio goes player to player over WebRTC) ----------
@@ -865,7 +1030,7 @@ export async function onRequestPost(context) {
       if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
       if (await isAdmin(sa, target)) return json({ error: "admin", message: "You can't do this to an admin." }, 400);
       const r = await roomFor(sa, uid, name, admin, body);
-      if (r.dm) return json({ error: "bad request" }, 400);
+      if (r.dm || r.group) return json({ error: "bad request" }, 400);
       if (!rate(uid, "purge", 4, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const hours = Math.min(Math.max(Number(body.hours) || 24, 1), 168), since = Date.now() - hours * 3600 * 1000;
       const rows = await fsMsgs(sa, r.key, "", 300), mine = rows.filter((m) => m.from === target && !m.k && !m.del && (m.ts || 0) > since).slice(-80);
