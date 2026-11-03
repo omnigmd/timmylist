@@ -27,6 +27,9 @@
 //   clipReport { id: <clip id | "L<level>">, cm?, why?, note? }   a clip, or a comment on a clip or level page
 //   notes {} / notes { clear: 1 }   your in-app alerts (replies, @mentions, comments on your videos)
 //   profGet { u } (no sign-in) / profSet { bio?, pin? } / profClear { u } (admin)   bio and pinned video
+//   progGet { u? } (no sign-in for someone else's) / progSet { lv, p?, c? } / progDel { lv } / progLevel { lv } (no sign-in)   levels you are working on (best %) and ones you say you beat
+//   chalGet {} (no sign-in) / chalPost { lv, p, clip? } / chalSet { lv, note } (admin) / chalDel { n } (admin)   this week's challenge level and everyone's best %
+//   pollGet {} (no sign-in) / pollVote { id, i } / pollSet { q, o } (admin) / pollEnd { clear? } (admin)   one community poll at a time
 //   frOnline {} / frHide { on } / frFeed {}   which friends are on the site now, hide yourself, friends' newest videos
 //   frList {} / frReq { to | uid } / frAccept { uid } / frDecline { uid } / frCancel { uid } / frRemove { uid }   friends
 //   ctlStop {}              a player ends any session an admin has opened on them
@@ -492,6 +495,19 @@ const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 const CLIP_CHUNK = 491520, CLIP_B64 = 655360, CLIP_MAX = 26 * 1024 * 1024, CLIP_KEEP = 6, CLIP_CMS = 300;
 const CLIP_TYPES = { "video/mp4": 1, "video/webm": 1, "video/quicktime": 1 };
 const okClip = (s) => /^c[a-z0-9]{11}$/.test(String(s || ""));
+// ---- v240: progress, weekly challenge, polls ----
+const okLv = (s) => /^-?\d{1,10}$/.test(String(s == null ? "" : s));
+const PROG_MAX = 40, CHAL_MAX = 300;
+const tidy = (s, n) => oneLine(String(s == null ? "" : s).replace(/[ 	]{2,}/g, " "), n);
+function weekOf(t) { // the Monday (UTC) that starts the week containing t, and when the week ends
+  const d = new Date(t), m = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return { key: new Date(m).toISOString().slice(0, 10), start: m, end: m + 7 * 86400000 };
+}
+async function chalNow(sa) {
+  const w = weekOf(Date.now()), ov = (await fsGet(sa, "chal/main")) || {}, doc = (await fsGet(sa, "chalw/" + w.key)) || {};
+  const set = ov.wk === w.key;
+  return { w, doc, e: doc.e || {}, lv: (set && ov.lv ? String(ov.lv) : "") || String(doc.lv || ""), forced: !!(set && ov.lv), note: set ? String(ov.note || "") : "" };
+}
 const mkClip = () => { const b = crypto.getRandomValues(new Uint8Array(11)); let s = "c"; for (const x of b) s += "abcdefghijklmnopqrstuvwxyz0123456789"[x % 36]; return s; };
 const okPoster = (s) => typeof s === "string" && s.length <= 30000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(s);
 // writes for one batch request (documents:commit): a few changes at once, or up to 400 deletes in one go
@@ -668,6 +684,47 @@ export async function onRequestPost(context) {
       return json({ ok: true, bio: String(d.bio || ""), pin });
     }
 
+    // ---------- progress: who is working on a level ----------
+    if (a === "progLevel") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "proglv", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const lv = String(body.lv == null ? "" : body.lv); if (!okLv(lv)) return json({ error: "bad request" }, 400);
+      const d = (await fsGet(sa, "proglv/" + lv)) || {}, u = d.u || {}, ks = Object.keys(u).filter((k) => u[k] && u[k].p);
+      const list = ks.map((k) => ({ n: String(u[k].n || ""), p: u[k].p | 0, t: u[k].t || 0, me: k === uid })).sort((x, y) => y.p - x.p || y.t - x.t);
+      return json({ ok: true, n: list.length, items: list.slice(0, 12) });
+    }
+    // ---------- progress: someone's profile (the levels they are working on), or your own ----------
+    if (a === "progGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "progget", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const who = oneLine(body.u, 20); let pu = uid;
+      if (who) { pu = await uidOf(sa, who); if (!pu) return json({ ok: true, items: [] }); }
+      if (!pu) return json({ error: "unauthorized", message: "Sign in first." }, 401);
+      const own = pu === uid, l = ((await fsGet(sa, "prog/" + pu)) || {}).l || {};
+      const items = Object.keys(l).map((k) => ({ lv: k, p: l[k].p | 0, c: own ? !!l[k].c : false, t: l[k].t || 0 })).filter((i) => (own ? i.p || i.c : i.p)).sort((x, y) => y.t - x.t);
+      return json({ ok: true, own, items });
+    }
+    // ---------- this week's challenge: anyone can look ----------
+    if (a === "chalGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "chalget", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const c = await chalNow(sa), ks = Object.keys(c.e);
+      const top = ks.map((k) => ({ n: String(c.e[k].n || ""), p: c.e[k].p | 0, t: c.e[k].t || 0, c: String(c.e[k].c || ""), me: k === uid })).sort((x, y) => y.p - x.p || x.t - y.t).slice(0, 20);
+      const mine = uid && c.e[uid] ? { p: c.e[uid].p | 0, c: String(c.e[uid].c || ""), t: c.e[uid].t || 0 } : null;
+      return json({ ok: true, wk: c.w.key, end: c.w.end, lv: c.lv, note: c.note, n: ks.length, top, mine, mod: uid ? await isAdmin(sa, uid) : false });
+    }
+    // ---------- the community poll: anyone can look ----------
+    if (a === "pollGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "pollget", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const d = await fsGet(sa, "polls/main");
+      if (!d || !d.q || !Array.isArray(d.o)) return json({ ok: true, poll: null, mod: uid ? await isAdmin(sa, uid) : false });
+      const v = ((await fsGet(sa, "pollv/" + d.id)) || {}).v || {}, counts = d.o.map(() => 0);
+      for (const k of Object.keys(v)) { const i = v[k] | 0; if (i >= 0 && i < counts.length) counts[i]++; }
+      const mine = uid && v[uid] !== undefined ? v[uid] | 0 : -1;
+      return json({ ok: true, poll: { id: d.id, q: d.q, o: d.o, ts: d.ts || 0, by: String(d.by || ""), end: !!d.end }, counts, total: counts.reduce((x, y) => x + y, 0), mine, mod: uid ? await isAdmin(sa, uid) : false });
+    }
+
     if (a === "clipList") {
       const ip = request.headers.get("cf-connecting-ip") || "local";
       if (!rate(ip, "cliplist", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
@@ -691,7 +748,7 @@ export async function onRequestPost(context) {
       await step("Database read", async () => { await fsGet(sa, "chatcfg/main"); return "ok"; });
       await step("Chat history", async () => { const r = await fsMsgs(sa, "main", "", 1); return r.length + " message(s) found"; });
       await step("Database write", async () => { await fsSet(sa, "chatdiag/" + uid, [[["ts"], Date.now()]]); return "ok"; });
-      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v239" });
+      return json({ ok: true, steps, allOk: steps.every((s) => s.ok), v: "v241" });
     }
 
     if (a === "vote") {
@@ -740,9 +797,15 @@ export async function onRequestPost(context) {
       if (!since && !before && metaPath(r.key)) { const meta = await fsGet(sa, metaPath(r.key)); out.pin = meta && meta.pin && okId(meta.pin.id) ? { id: meta.pin.id, name: String(meta.pin.name || ""), text: String(meta.pin.text || ""), by: String(meta.pin.by || "") } : null; }
       if (r.group && !before) {
         if (!since) out.grp = grpPub(r.group);
-        if (body.typ && rate(uid, "ty", 1, 1800)) await fsSet(sa, "chatst/" + r.key, [[["t", uid], Date.now()]]);
-        const sd = (await fsGet(sa, "chatst/" + r.key)) || {}, tt = sd.t || {};
-        out.st = { typs: Object.keys(tt).filter((u) => u !== uid && tt[u] > Date.now() - 6000 && r.group.mem[u]).map((u) => r.group.mem[u].n || "").filter(Boolean).slice(0, 3) };
+        const gw = [];
+        if (body.seen && okId(body.seen) && r.group.mem[uid] && rate(uid, "sn", 1, 900)) gw.push([["s", uid], String(body.seen)]);
+        if (body.typ && rate(uid, "ty", 1, 1800)) gw.push([["t", uid], Date.now()]);
+        if (gw.length) await fsSet(sa, "chatst/" + r.key, gw);
+        const sd = (await fsGet(sa, "chatst/" + r.key)) || {}, tt = sd.t || {}, ss = sd.s || {};
+        out.st = {
+          typs: Object.keys(tt).filter((u) => u !== uid && tt[u] > Date.now() - 6000 && r.group.mem[u]).map((u) => r.group.mem[u].n || "").filter(Boolean).slice(0, 3),
+          sn: Object.keys(ss).filter((u) => u !== uid && r.group.mem[u] && r.group.mem[u].n && okId(ss[u])).slice(0, 60).map((u) => [r.group.mem[u].n, String(ss[u])]),
+        };
       }
       if (r.dm && !before) {
         const w = [];
@@ -972,6 +1035,91 @@ export async function onRequestPost(context) {
       await modLog(sa, name, "bio cleared", oneLine(body.u, 20), "");
       return json({ ok: true });
     }
+    // ---------- progress: levels you are working on, and ones you say you beat ----------
+    if (a === "progSet" || a === "progDel") {
+      if (!rate(uid, "prog", 40, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const lv = String(body.lv == null ? "" : body.lv); if (!okLv(lv)) return json({ error: "bad request" }, 400);
+      const l = ((await fsGet(sa, "prog/" + uid)) || {}).l || {}, cur = l[lv] || null, now = Date.now();
+      let p = cur && cur.p ? cur.p | 0 : 0, c = !!(cur && cur.c);
+      if (a === "progDel") { p = 0; c = false; }
+      else {
+        if (body.p === undefined && body.c === undefined) return json({ error: "bad request" }, 400);
+        if (body.p !== undefined) {
+          const n = Number(body.p);
+          if (!Number.isFinite(n) || n < 0) return json({ error: "bad request" }, 400);
+          if (n >= 100) return json({ error: "full", message: "Got to 100%? Submit your record instead." }, 400);
+          p = Math.floor(n);
+        }
+        if (body.c !== undefined) c = !!body.c;
+        if (!cur && Object.keys(l).length >= PROG_MAX) return json({ error: "limit", message: "You can track up to " + PROG_MAX + " levels." }, 403);
+      }
+      if (!p && !c) { if (cur) await fsSet(sa, "prog/" + uid, [[["l", lv], undefined]]); }
+      else await fsSet(sa, "prog/" + uid, [[["l", lv], Object.assign({ t: now }, p ? { p } : {}, c ? { c: true } : {})]]);
+      try { await fsSet(sa, "proglv/" + lv, [[["u", uid], p ? { n: name, p, t: now } : undefined]]); } catch (e) {}
+      return json({ ok: true, p, c });
+    }
+    // ---------- this week's challenge ----------
+    if (a === "chalPost") {
+      if (!rate(uid, "chalpost", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now." }, 403);
+      const lv = String(body.lv == null ? "" : body.lv), n = Number(body.p); if (!okLv(lv) || !Number.isInteger(n) || n < 1 || n > 100) return json({ error: "bad request", message: "Enter a whole number from 1 to 100." }, 400);
+      const c = await chalNow(sa); if (c.lv && c.lv !== lv) return json({ error: "stale", message: "This week's challenge is a different level. Reload the page." }, 409);
+      let clip = "";
+      if (body.clip) { clip = String(body.clip); const cl = okClip(clip) ? await fsGet(sa, "clips/" + clip) : null; if (!cl || cl.st !== "ok" || cl.o !== uid) return json({ error: "forbidden", message: "You can only attach your own finished videos." }, 403); }
+      const old = c.e[uid], now = Date.now();
+      if (!old && Object.keys(c.e).length >= CHAL_MAX) return json({ error: "limit", message: "This week's challenge is full." }, 403);
+      if (old && n <= (old.p | 0) && (!clip || clip === old.c)) return json({ ok: true, same: true, mine: { p: old.p | 0, c: String(old.c || ""), t: old.t || 0 } });
+      const best = old && n < (old.p | 0) ? old.p | 0 : n, ents = [[["e", uid], { n: name, p: best, t: old && best === (old.p | 0) ? old.t || now : now }]];
+      if (clip) ents[0][1].c = clip; else if (old && old.c) ents[0][1].c = String(old.c);
+      if (!c.doc.lv) ents.push([["lv"], lv]);
+      await fsSet(sa, "chalw/" + c.w.key, ents);
+      return json({ ok: true, mine: { p: best, c: ents[0][1].c || "", t: ents[0][1].t } });
+    }
+    if (a === "chalSet" || a === "chalDel") {
+      if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      const c = await chalNow(sa);
+      if (a === "chalDel") {
+        const tu = await uidOf(sa, oneLine(body.n, 20)); if (!tu || !c.e[tu]) return json({ error: "gone", message: "That player has no entry this week." }, 404);
+        await fsSet(sa, "chalw/" + c.w.key, [[["e", tu], undefined]]);
+        await modLog(sa, name, "challenge entry removed", oneLine(body.n, 20), "");
+        return json({ ok: true });
+      }
+      const lv = String(body.lv == null ? "" : body.lv), note = tidy(body.note, 100);
+      if (lv && !okLv(lv)) return json({ error: "bad request" }, 400);
+      await fsSet(sa, "chal/main", [[["wk"], c.w.key], [["lv"], lv || undefined], [["note"], note || undefined]]);
+      if (lv && c.doc.lv && String(c.doc.lv) !== lv && Object.keys(c.e).length) await fsDelete(sa, "chalw/" + c.w.key);   // a different level means the old scores no longer apply
+      if (lv && String(c.doc.lv || "") !== lv) await fsSet(sa, "chalw/" + c.w.key, [[["lv"], lv]]);
+      await modLog(sa, name, "challenge set", lv || "automatic", note);
+      return json({ ok: true });
+    }
+    // ---------- the community poll ----------
+    if (a === "pollVote") {
+      if (!rate(uid, "pollvote", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const d = await fsGet(sa, "polls/main"), i = Number(body.i);
+      if (!d || !d.q || String(d.id) !== String(body.id)) return json({ error: "gone", message: "That poll is over." }, 404);
+      if (d.end) return json({ error: "closed", message: "This poll has closed." }, 403);
+      if (!Number.isInteger(i) || i < 0 || i >= (d.o || []).length) return json({ error: "bad request" }, 400);
+      await fsSet(sa, "pollv/" + d.id, [[["v", uid], i]]);
+      return json({ ok: true, mine: i });
+    }
+    if (a === "pollSet" || a === "pollEnd") {
+      if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      const d = await fsGet(sa, "polls/main");
+      if (a === "pollEnd") {
+        if (!d) return json({ ok: true });
+        if (body.clear) { await fsDelete(sa, "polls/main"); try { await fsDelete(sa, "pollv/" + d.id); } catch (e) {} await modLog(sa, name, "poll removed", "", d.q); }
+        else { await fsSet(sa, "polls/main", [[["end"], true]]); await modLog(sa, name, "poll closed", "", d.q); }
+        return json({ ok: true });
+      }
+      const q = tidy(body.q, 120), seen = new Set(), o = (Array.isArray(body.o) ? body.o : []).map((x) => tidy(x, 50)).filter((x) => { const k = x.toLowerCase(); if (!x || seen.has(k)) return false; seen.add(k); return true; }).slice(0, 5);
+      if (q.length < 3 || o.length < 2) return json({ error: "bad request", message: "A poll needs a question and at least two different answers." }, 400);
+      const id = mkId();
+      await fsSet(sa, "polls/main", [[["id"], id], [["q"], q], [["o"], o], [["ts"], Date.now()], [["by"], name], [["end"], undefined]]);
+      if (d && d.id) { try { await fsDelete(sa, "pollv/" + d.id); } catch (e) {} }
+      await modLog(sa, name, "poll started", "", q);
+      return json({ ok: true, id });
+    }
+
     // ---------- friends: who is on the site, and what they posted ----------
     if (a === "frOnline" || a === "frHide" || a === "frFeed") {
       if (a === "frHide") {
