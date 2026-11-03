@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked</title>
 <meta name="description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard.">
-<meta name="theme-color" content="#050a18">
+<meta name="theme-color" content="#0c4492">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -7664,6 +7664,14 @@ a.stp:hover,a.stl:hover,.stx-all:hover{text-decoration:underline}
 :root[data-theme="light"] .pwbell{background:#eef4ff;border-color:#b9cdf5}
 #pwfoot{cursor:pointer}
 #pwal,#pwin{display:grid;gap:10px}
+/* ================= v235: the page background is one plain blue (no glow, grid, orbs, shapes or motion) ================= */
+:root:root:root:root .bgfx{background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;animation:none!important}
+:root:root:root:root .bgfx::before,:root:root:root:root .bgfx::after,:root:root:root:root .bgfx *,:root:root:root:root .bgfx *::before,:root:root:root:root .bgfx *::after{display:none!important;animation:none!important}
+:root:root:root:root body::before,:root:root:root:root body::after,:root:root:root:root #bgx,:root:root:root:root .bgx{display:none!important;content:none!important;background:none!important}
+:root:root:root:root,:root:root:root:root body{background-color:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important}
+/* light theme: the same idea, a light plain blue so dark text stays readable */
+:root:root:root:root[data-theme="light"] .bgfx,:root:root:root:root[data-theme="light"],:root:root:root:root[data-theme="light"] body{background-color:hsl(var(--h) calc(var(--sat)*95%) 88%)!important;background-image:none!important}
+:root:root:root:root[data-theme="light"] .bgfx{background:hsl(var(--h) calc(var(--sat)*95%) 88%)!important}
 </style>
 <link rel="canonical" href="https://timmylist.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="The Timmylist"><meta property="og:title" content="The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked"><meta property="og:description" content="The Timmylist is a ranked list of the hardest Timmy levels in Geometry Dash, with records, verifiers and a points leaderboard."><meta property="og:url" content="https://timmylist.pages.dev/"><meta property="og:image" content="https://timmylist.pages.dev/icon-512.png">
@@ -13417,7 +13425,7 @@ var _sh=window.show;
 
 /* ---- v233: the living background (layers are styled in the CSS; this only adds them and follows the mouse) ---- */
 (function(){
-  if(document.getElementById("bgx")||!document.body) return;
+  if(1) return; /* v235: plain blue background, no animated layers */
   var d=document.createElement("div"); d.id="bgx"; d.className="bgx"; d.setAttribute("aria-hidden","true");
   d.innerHTML='<i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="bk b1"></i><i class="bk b2"></i><i class="bk b3"></i><i class="rays"></i><i class="geo g1"></i><i class="geo g2"></i><i class="cur"></i><i class="grain"></i>';
   document.body.insertBefore(d,document.body.firstChild);
@@ -13448,7 +13456,7 @@ var _sh=window.show;
   }
   var why="";
   function effective(){ var m=get(); if(m!=="auto") return m; why=lowByDevice(); return why?"low":"full"; }
-  var NOTE={auto:"Picks the best look for your device.",full:"Everything on: animated background, glass and glow.",low:"Calmer and lighter. Best for older phones and computers."};
+  var NOTE={auto:"Picks the best look for your device.",full:"Everything on: glass, glow and motion.",low:"Calmer and lighter. Best for older phones and computers."};
   function paint(){
     var m=get(), e=root.getAttribute("data-fx");
     Array.prototype.forEach.call(document.querySelectorAll("[data-fxset] button"),function(b){ var on=b.getAttribute("data-fx")===m; b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false"); });
