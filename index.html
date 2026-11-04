@@ -9137,98 +9137,16 @@ html:not(#x1):not(#x2):not(#x3):not(#x4)[data-theme="light"] body header #loginB
 :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .ulr:has(.ctag) .ulp>.av{position:relative!important;overflow:visible!important}
 :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .ulr:has(.ctag) .ulp>.av:after{content:""!important;display:block!important;position:absolute!important;right:-5px!important;bottom:-4px!important;width:19px!important;height:19px!important;border-radius:50%!important;background:var(--lbx) url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%203l8%203v6c0%204.5-3.4%208-8%209-4.6-1-8-4.5-8-9V6z'/%3E%3C/svg%3E") center/11px no-repeat!important;border:2px solid hsl(var(--h) 80% 16%)!important;box-shadow:none!important;z-index:3!important;pointer-events:none!important;opacity:1!important;inset:auto -5px -4px auto!important}
 :root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .ulr:has(.ctag) .ulp>.av:after{border-color:#fff!important}
-/* ===== v245: top bar — flat AREDL-style header, truly centered nav, no more drifting icons ===== */
-/* helper prefix: 6 ID-level :not()s beat every earlier header rule (look layer, a11y layer, fx layer) */
-:root{--tbx:hsl(var(--h) 100% 50%);--tbm:hsl(var(--h) 55% 86% / .82);--tbf:Poppins,Outfit,Inter,system-ui,sans-serif}
-:root[data-theme="light"]{--tbm:hsl(var(--h) 30% 34%)}
-
-/* ---- the bar itself: flat, same blue as the page, one thin inset line underneath ---- */
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header{
-  background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;
-  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:0!important;box-shadow:none!important;
-  transition:box-shadow .25s!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header.lk-sc{background:hsl(var(--h) calc(var(--sat)*85%) 28%)!important;background-image:none!important;box-shadow:0 14px 26px -22px rgba(0,8,34,.9)!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header:before{display:none!important;content:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header:after{display:block!important;content:""!important;position:absolute!important;left:28px!important;right:28px!important;bottom:0!important;height:1px!important;width:auto!important;
-  background:rgba(255,255,255,.2)!important;background-image:none!important;opacity:1!important;animation:none!important;filter:none!important;transform:none!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header{background:rgba(250,252,255,.96)!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header.lk-sc{background:#fff!important;box-shadow:0 14px 26px -22px hsl(var(--h) 80% 30% / .5)!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header:after{background:hsl(var(--h) 60% 40% / .22)!important}
-
-/* ---- layout: three explicit columns so the nav is centered on the PAGE, and hiding the nav can't shove the icons into the middle ---- */
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hin{display:grid!important;grid-template-columns:minmax(max-content,1fr) auto minmax(max-content,1fr)!important;align-items:center!important;
-  max-width:1400px!important;padding:14px 28px 15px!important;gap:16px!important;flex-wrap:nowrap!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #logo{grid-column:1!important;grid-row:1!important;justify-self:start!important;min-width:0!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header nav#nav{grid-column:2!important;grid-row:1!important;justify-self:center!important;min-width:0!important;max-width:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hact{grid-column:3!important;grid-row:1!important;justify-self:end!important;min-width:0!important}
-
-/* ---- logo ---- */
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo img{filter:none!important;animation:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo span{font:600 14px var(--tbf)!important;letter-spacing:.02em!important;text-transform:uppercase!important;color:hsl(var(--h) 55% 88%)!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo span b{font-weight:700!important;color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;animation:none!important;filter:none!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo span{color:hsl(var(--h) 30% 34%)!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo span b{color:#0b2457!important;-webkit-text-fill-color:#0b2457!important}
-
-/* ---- nav: plain uppercase text, the current page is a solid blue rounded block (AREDL's orange block, in blue) ---- */
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav{padding:0!important;gap:8px!important;border-radius:0!important;background:none!important;border:0!important;box-shadow:none!important;position:relative}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button{border-radius:8px!important;padding:11px 17px!important;min-height:0!important;
-  font:500 14px var(--tbf)!important;letter-spacing:.01em!important;text-transform:uppercase!important;line-height:1.35!important;color:var(--tbm)!important;background:none!important;box-shadow:none!important;text-shadow:none!important;transform:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button:hover:not(.on){color:#fff!important;background:rgba(255,255,255,.09)!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f)[data-theme] header #nav button.on,
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #nav button.on{color:#fff!important;font-weight:600!important;background:none!important;background-image:none!important;background-color:var(--tbx)!important;box-shadow:none!important;text-shadow:none!important;
-  transition:color .22s,background-color 0s linear .4s!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav .nind{top:0!important;bottom:0!important;border-radius:8px!important;background:var(--tbx)!important;background-image:none!important;box-shadow:none!important;transition:transform .4s cubic-bezier(.22,.8,.2,1),width .4s cubic-bezier(.22,.8,.2,1),opacity .2s!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button:hover:not(.on){color:#0b2457!important;background:hsl(var(--h) 80% 50% / .1)!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6)[data-theme="light"] body header #nav button.on{color:#fff!important;background-color:var(--tbx)!important}
-
-/* ---- right side: round icon buttons, one accent LOGIN button, one quiet avatar pill ---- */
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hact{gap:10px!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .htools,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #hacc{gap:8px!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib{
-  min-width:44px!important;height:44px!important;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.1)!important;border:0!important;box-shadow:none!important;color:#fff!important;transform:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn:hover,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib:hover{background:rgba(255,255,255,.2)!important;transform:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn svg,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib svg{width:20px!important;height:20px!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #bellN{top:-2px!important;right:-2px!important;box-shadow:0 0 0 2px hsl(var(--h) calc(var(--sat)*85%) 31%)!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #loginBtn{border-radius:8px!important;font:500 14px var(--tbf)!important;letter-spacing:.01em!important;text-transform:uppercase!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn:not(.in){background:none!important;background-image:none!important;background-color:var(--tbx)!important;color:#fff!important;border:0!important;height:44px!important;padding:0 24px!important;box-shadow:none!important;border-radius:8px!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn:not(.in):hover{background-color:hsl(var(--h) 100% 56%)!important;color:#fff!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn.in{background:none!important;background-image:none!important;background-color:rgba(255,255,255,.1)!important;border:0!important;height:44px!important;padding:0 16px 0 5px!important;gap:10px!important;color:#fff!important;border-radius:999px!important;text-transform:none!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn.in:hover{background-color:rgba(255,255,255,.2)!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #loginBtn.in .lav{width:34px!important;height:34px!important;border-radius:50%!important;box-shadow:none!important}
-:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #loginBtn.in .lnm{font:600 14px var(--tbf)!important;letter-spacing:0!important;max-width:130px}
-/* light theme versions */
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn,:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib{background:hsl(var(--h) 80% 50% / .1)!important;color:#16346f!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn:hover,:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib:hover{background:hsl(var(--h) 80% 50% / .2)!important}
-:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #bellN{box-shadow:0 0 0 2px #fff!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6)[data-theme="light"] body header #loginBtn:not(.in){background-color:var(--tbx)!important;background-image:none!important;color:#fff!important;box-shadow:none!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6)[data-theme="light"] body header #loginBtn.in{background-color:hsl(var(--h) 80% 50% / .1)!important;background-image:none!important;color:#0b2457!important}
-html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6)[data-theme="light"] body header #loginBtn.in .lnm{color:#0b2457!important}
-
-/* ---- narrower screens: shrink in steps so nothing ever collides ---- */
-@media(max-width:1280px){
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hin{padding:12px 20px 13px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header:after{left:20px!important;right:20px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav{gap:4px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button{padding:10px 13px!important;font-size:13px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .logo span{display:none!important}
-}
-@media(max-width:1080px){
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #nav button{padding:10px 9px!important;font-size:12px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #loginBtn.in .lnm{display:none!important}
-  html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn.in{padding:0 5px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hact{gap:6px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .htools,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #hacc{gap:6px!important}
-}
-/* phones + small tablets: the nav lives in the bottom tab bar, so the bar is just logo left, buttons right */
+/* ===== v245: top bar layout fixes ONLY — the look is untouched (same glass bar, capsule nav, buttons as before) ===== */
+/* 1) the nav sits truly in the middle of the bar: equal side columns, so it no longer drifts toward the logo */
+/* 2) at tablet widths (<=860px) the nav is hidden; the buttons used to land mid-bar — they now stay on the right */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hin{grid-template-columns:minmax(max-content,1fr) auto minmax(max-content,1fr)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header #logo{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header nav#nav{grid-column:2!important;grid-row:1!important;justify-self:center!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hact{grid-column:3!important;grid-row:1!important;justify-self:end!important}
 @media(max-width:860px){
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hin{grid-template-columns:minmax(0,1fr) auto!important;padding:9px 14px 10px!important;gap:10px!important}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hin{grid-template-columns:minmax(0,1fr) auto!important}
   :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hact{grid-column:2!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header nav#nav{display:none!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header:after{left:14px!important;right:14px!important}
-  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .hbtn,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) header .ib{min-width:40px!important;height:40px!important}
-  html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn:not(.in){height:40px!important;padding:0 18px!important}
-  html:not(#x1):not(#x2):not(#x3):not(#x4):not(#x5):not(#x6) body header #loginBtn.in{height:40px!important}
 }
 /* ===== v245: list page matched to the AREDL demon list — three cards (levels | details | records) on wide screens ===== */
 /* white + blue only. Scoped to #app:has(>.l3) so no other page changes; narrow screens keep the one-column page. */
