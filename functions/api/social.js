@@ -32,6 +32,8 @@
 //   pollGet {} (no sign-in) / pollVote { id, i } / pollSet { q, o } (admin) / pollEnd { clear? } (admin)   one community poll at a time
 //   frOnline {} / frHide { on } / frFeed {}   which friends are on the site now, hide yourself, friends' newest videos
 //   frList {} / frReq { to | uid } / frAccept { uid } / frDecline { uid } / frCancel { uid } / frRemove { uid }   friends
+//   sugGet {} (no sign-in) / sugAdd { n, l?, u?, t? } / sugVote { id, on } / sugDel { id } / sugPromote { id } (admin)   suggested levels with votes; an admin promotes a winner to the Pending tab
+//   audit { act, w?, n? } / auditList {}   admin only: a log of record and list changes (who did what, and when)
 //   ctlStop {}              a player ends any session an admin has opened on them
 //   admin only: mod, modDel, repimg, dismiss, mute, unmute, settings, ctlList, ctlStart { uid }, ctlSend { uid, cmd }, ctlEnd { uid }
 //   inbox also takes { pr: {r,sc,th,vw} } (which page the player is on) and { ca: sessionId } (the player's tab joined a session)
@@ -289,7 +291,8 @@ const okVideo = (u) => (/^https?:\/\/[^\s"'<>]{3,400}$/.test(String(u || "")) ? 
 const REC_KEEP = 40; // decided submissions kept per player
 // ---- chat moderation: report reasons and a short log of what admins did ----
 const REP_WHY = { spam: "Spam", harass: "Harassment or bullying", inappropriate: "Inappropriate content", scam: "Scam or suspicious link", other: "Something else" };
-const REP_MAXRS = 30, MODLOG_KEEP = 100;
+const REP_MAXRS = 30, MODLOG_KEEP = 300;
+const SUG_MAX = 60, AUDIT_ACTS = new Set(["recAccept", "recDecline", "recAdd", "recRemove", "lvlAdd", "lvlMove", "lvlRemove", "lvlEdit", "sugPromote", "listEdit", "recDate"]);
 let MODLOG_SEQ = 0; // keeps two entries made in the same millisecond in the order they happened
 async function modLog(sa, admin, act, who, note) {
   try {
@@ -726,6 +729,16 @@ export async function onRequestPost(context) {
       return json({ ok: true, poll: { id: d.id, q: d.q, o: d.o, ts: d.ts || 0, by: String(d.by || ""), end: !!d.end }, counts, total: counts.reduce((x, y) => x + y, 0), mine, mod: uid ? await isAdmin(sa, uid) : false });
     }
 
+    // ---------- suggested levels: anyone can look ----------
+    if (a === "sugGet") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "sugget", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const e = ((await fsGet(sa, "sug/main")) || {}).e || {};
+      const items = Object.keys(e).map((k) => { const x = e[k] || {}, v = x.v || {}; return { id: k, n: String(x.n || ""), l: String(x.l || ""), u: String(x.u || ""), t: String(x.t || ""), by: String(x.by || ""), ts: x.ts || 0, c: Object.keys(v).length, me: !!(uid && v[uid]), own: !!(uid && x.uid === uid) }; })
+        .filter((x) => x.n).sort((x, y) => y.c - x.c || y.ts - x.ts);
+      return json({ ok: true, items, mod: uid ? await isAdmin(sa, uid) : false });
+    }
+
     if (a === "clipList") {
       const ip = request.headers.get("cf-connecting-ip") || "local";
       if (!rate(ip, "cliplist", 120, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
@@ -1119,6 +1132,55 @@ export async function onRequestPost(context) {
       if (d && d.id) { try { await fsDelete(sa, "pollv/" + d.id); } catch (e) {} }
       await modLog(sa, name, "poll started", "", q);
       return json({ ok: true, id });
+    }
+
+    // ---------- suggested levels (sug/main: { e: { <id>: { n, l, u, t, by, uid, ts, v: { <uid>: 1 } } } }) ----------
+    if (a === "sugAdd") {
+      if (!rate(uid, "sugadd", 5, 600000)) return json({ error: "slow", message: "You are suggesting a lot. Try again in a few minutes." }, 429);
+      if (await muteState(sa, uid)) return json({ error: "muted", message: "You are muted right now." }, 403);
+      const n = tidy(body.n, 60), l = String(body.l == null ? "" : body.l).replace(/[^0-9]/g, "").slice(0, 10), t = tidy(body.t, 140), u = String(body.u == null ? "" : body.u).trim().slice(0, 200);
+      if (n.length < 2) return json({ error: "bad request", message: "Give the level a name." }, 400);
+      if (u && !/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(u)) return json({ error: "bad request", message: "The video link has to be a YouTube link." }, 400);
+      const e = ((await fsGet(sa, "sug/main")) || {}).e || {}, ks = Object.keys(e).filter((k) => e[k] && e[k].n);
+      if (ks.length >= SUG_MAX) return json({ error: "full", message: "The suggestion list is full right now. Try again once some have been reviewed." }, 429);
+      if (ks.some((k) => String(e[k].n).toLowerCase() === n.toLowerCase() || (l && String(e[k].l || "") === l))) return json({ error: "dup", message: "That level was already suggested. Vote for it instead." }, 409);
+      if (ks.filter((k) => e[k].uid === uid).length >= 3) return json({ error: "limit", message: "You already have 3 open suggestions. Wait for one to be reviewed." }, 429);
+      const id = mkId();
+      await fsSet(sa, "sug/main", [[["e", id], { n, l, u, t, by: name, uid, ts: Date.now(), v: { [uid]: 1 } }]]);
+      return json({ ok: true, id });
+    }
+    if (a === "sugVote") {
+      if (!rate(uid, "sugvote", 40, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const id = String(body.id || ""), x = (((await fsGet(sa, "sug/main")) || {}).e || {})[id];
+      if (!x || !x.n) return json({ error: "gone", message: "That suggestion is no longer there." }, 404);
+      await fsSet(sa, "sug/main", [[["e", id, "v", uid], body.on ? 1 : undefined]]);
+      return json({ ok: true });
+    }
+    if (a === "sugDel" || a === "sugPromote") {
+      if (!rate(uid, "sugdel", 40, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const id = String(body.id || ""), x = (((await fsGet(sa, "sug/main")) || {}).e || {})[id];
+      if (!x || !x.n) return json({ ok: true, gone: true });
+      if (a === "sugPromote" && !admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      if (a === "sugDel" && x.uid !== uid && !admin) return json({ error: "forbidden", message: "Only the person who suggested it, or an admin, can remove this." }, 403);
+      await fsSet(sa, "sug/main", [[["e", id], undefined]]);
+      if (a === "sugPromote") { await modLog(sa, name, "sugPromote", x.by, x.n); return json({ ok: true, item: { n: String(x.n), by: String(x.by || ""), l: String(x.l || ""), u: String(x.u || ""), t: String(x.t || ""), c: Object.keys(x.v || {}).length } }); }
+      if (admin && x.uid !== uid) await modLog(sa, name, "sugRemove", x.by, x.n);
+      return json({ ok: true });
+    }
+    // ---------- audit log: record and list changes made by admins ----------
+    if (a === "audit") {
+      if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      if (!rate(uid, "audit", 200, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const act = String(body.act || "");
+      if (!AUDIT_ACTS.has(act)) return json({ error: "bad request" }, 400);
+      await modLog(sa, name, act, tidy(body.w, 30), tidy(body.n, 80));
+      return json({ ok: true });
+    }
+    if (a === "auditList") {
+      if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
+      const ml = (await fsGet(sa, "modlog/main")) || {}, e = ml.e || {};
+      const log = Object.keys(e).sort().reverse().slice(0, Math.max(10, Math.min(200, Number(body.n) || 150))).map((k) => Object.assign({ id: k }, e[k]));
+      return json({ ok: true, log });
     }
 
     // ---------- friends: who is on the site, and what they posted ----------
