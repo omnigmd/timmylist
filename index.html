@@ -9485,6 +9485,135 @@ html:not(#x1):not(#x2):not(#x3):not(#x4)[data-theme="light"] body header #loginB
   :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .pxgrid{grid-template-columns:1fr!important}
   :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .pxlv{min-height:84px!important;padding:0 16px!important}
 }
+/* ===== v247: history button, record dates, Timmy Roulette, level suggestions, admin activity log =====
+   Source template: ":root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app " = the high-specificity #app prefix, ":root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app " = the light-theme one (expanded by gen247.py). Tokens come from the packs/list layers. */
+:root{--rlx:hsl(var(--h) 100% 50%);--rlm:hsl(var(--h) 45% 80% / .86);--rlt:#fff;--rlr:rgba(255,255,255,.07);--rll:rgba(255,255,255,.16);--rlf:Poppins,Outfit,Inter,system-ui,sans-serif}
+:root[data-theme="light"]{--rlm:hsl(var(--h) 25% 38%);--rlt:#0b2457;--rlr:hsl(var(--h) 80% 50% / .07);--rll:hsl(var(--h) 60% 40% / .22)}
+
+/* ---- history button (clock) beside the filter button ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app #l3hist{position:relative;flex:0 0 auto;width:46px!important;height:46px!important;min-width:0!important;padding:0!important;display:grid!important;place-items:center!important;border:0!important;border-radius:13px!important;background:none!important;box-shadow:none!important;color:var(--l3m)!important;cursor:pointer;transform:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app #l3hist:hover,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app #l3hist.on{color:#fff!important;background:rgba(255,255,255,.1)!important}
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app #l3hist:hover,:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app #l3hist.on{color:#0b2457!important;background:hsl(var(--h) 80% 50% / .12)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3hist{margin-left:0!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .fbar .vt .l3hist{display:inline-grid!important;place-items:center!important;width:40px!important;height:38px!important;padding:0!important;border-radius:10px!important}
+
+/* ---- record dates ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rcard .rinfo .rdt{display:inline-block;margin-left:8px;font:500 12px var(--rlf)!important;color:var(--rlm)!important;background:none!important;white-space:nowrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rm{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rm .l3rn{flex:0 0 auto}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rd{display:block;font:500 12px/1.2 var(--rlf)!important;color:var(--rlm)!important;white-space:nowrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec{gap:9px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rn img.fst{display:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rn{gap:4px!important;font-size:15px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rn img.fus{margin:0!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rn .ctag{margin:0!important;padding:0!important;flex:0 0 auto!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rn .ctag b{display:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rs{display:flex;align-items:center;gap:8px;min-height:18px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .l3rec .l3rs em{flex:0 0 auto}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .adm-rr .rdset{display:inline-flex;align-items:center;gap:6px;margin:0 8px 0 0!important;font:600 11px var(--rlf)!important;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .adm-rr .rdset input{height:32px!important;padding:0 8px!important;border-radius:8px!important;font:500 12px var(--rlf)!important}
+
+/* ---- shared small bits ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlerr{min-height:1.2em;margin:8px 0 0!important;font:600 13px var(--rlf)!important;color:#ffb4b4!important}
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlerr{color:#b3261e!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx :is(h1,h2,h3,b,strong,small,span,p,li,label,button,input,select,a),:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx :is(h2,h3,b,strong,small,span,p,li,label,button,input,a),:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl{font-family:var(--rlf)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .ghost.sm,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .btn.sm{min-height:0!important;height:34px!important;padding:0 14px!important;font-size:13px!important;border-radius:10px!important}
+
+/* ghost buttons inside the new panels stay readable on the light theme (white-on-white before) */
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx button.ghost,:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx button.ghost{background:#fff!important;background-image:none!important;color:#16346f!important;border:1px solid rgba(22,52,111,.24)!important;box-shadow:0 2px 8px rgba(22,52,111,.08)!important}
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx button.ghost:hover,:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx button.ghost:hover{background:#eef4ff!important}
+
+/* ---- Timmy Roulette ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx{display:grid!important;gap:14px!important;max-width:760px;margin:0 auto}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx>.panel{margin:0!important;padding:24px 26px!important;border-radius:20px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx h2,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx h2{letter-spacing:0!important;text-transform:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx h2{margin:0 0 12px!important;font:600 22px/1.2 var(--rlf)!important;color:var(--rlt)!important;-webkit-text-fill-color:var(--rlt)!important;background:none!important;text-shadow:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrules{margin:0 0 18px!important;font:400 15.5px/1.6 var(--rlf)!important;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrules b{color:var(--rlt)!important;font-weight:600}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlset{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:end;margin:0 0 18px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlset label{display:grid;gap:6px;font:600 12px var(--rlf)!important;letter-spacing:.06em;text-transform:uppercase;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlset select{height:46px!important;min-width:210px;padding:0 12px!important;border-radius:12px!important;font:500 15px var(--rlf)!important;text-transform:none;letter-spacing:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlset label.rlck{display:flex;align-items:center;gap:9px;height:46px;font:500 15px var(--rlf)!important;letter-spacing:0;text-transform:none;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlset label.rlck input{width:18px;height:18px;margin:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc span{display:grid;gap:3px;padding:12px 14px;border-radius:14px;background:var(--rlr);text-align:center}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc small{font:600 11px var(--rlf)!important;letter-spacing:.07em;text-transform:uppercase;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc b{font:600 28px/1.1 var(--rlf)!important;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc .need b{color:var(--rlx)!important}
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc .need b{color:hsl(var(--h) 100% 38%)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlcard{position:relative;min-height:190px;border-radius:18px;overflow:hidden;margin:0 0 16px;display:flex;align-items:flex-end;isolation:isolate}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlimg{position:absolute;inset:0;z-index:-2;background-size:cover!important;background-position:center!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsh{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,8,34,.05) 20%,rgba(0,8,34,.88))}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlin{padding:18px 20px;width:100%}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlnm{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlnm b{font:600 26px/1.15 var(--rlf)!important;color:#fff!important;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlnm img.face{width:34px;height:34px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlmeta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:8px;font:500 14px var(--rlf)!important;color:rgba(255,255,255,.88)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlmeta a{color:#fff!important;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlid{padding:3px 10px!important;min-height:0!important;height:auto!important;border:1px solid rgba(255,255,255,.4)!important;border-radius:8px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font:600 13px var(--rlf)!important;cursor:pointer;box-shadow:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlf label{display:block;margin:0 0 8px;font:600 13px var(--rlf)!important;letter-spacing:.06em;text-transform:uppercase;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow input{width:120px;height:52px!important;padding:0 14px!important;border-radius:12px!important;font:600 24px var(--rlf)!important;text-align:right}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlpct{font:600 22px var(--rlf)!important;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow .btn{height:52px!important;padding:0 26px!important;font-size:16px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlf .ghost{margin-top:14px!important;width:auto!important;display:inline-flex!important;justify-content:center}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow input::-webkit-outer-spin-button,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow input::-webkit-inner-spin-button{-webkit-appearance:none!important;margin:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow input[type=number]{-moz-appearance:textfield!important;appearance:textfield!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlhist,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlruns{list-style:none;margin:0!important;padding:0!important;display:grid;gap:6px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlhist li,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlruns li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:var(--rlr);font:500 15px var(--rlf)!important;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlhist li span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlhist li b{font:600 15px var(--rlf)!important;color:var(--rlx)!important}
+:root[data-theme="light"]:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlhist li b{color:hsl(var(--h) 100% 38%)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlruns li span{flex:1 1 auto}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlruns li small{color:var(--rlm)!important;font:500 12.5px var(--rlf)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlk{display:block;margin:0 0 6px;font:700 12px var(--rlf)!important;letter-spacing:.14em;color:var(--rlx)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlend .rlhist{margin-top:4px!important}
+
+/* ---- level suggestions ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx{margin:18px 0 0!important;padding:24px 26px!important;border-radius:20px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx h2{margin:0 0 6px!important;font:600 22px/1.2 var(--rlf)!important;color:var(--rlt)!important;-webkit-text-fill-color:var(--rlt)!important;background:none!important;text-shadow:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgh p{margin:0 0 16px!important;font:400 14.5px/1.55 var(--rlf)!important;color:var(--rlm)!important;max-width:60ch}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf{display:grid;grid-template-columns:2fr 1fr;gap:10px 12px;margin:0 0 20px;width:100%!important;max-width:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf label{display:grid;align-content:start;gap:5px;font:600 12px var(--rlf)!important;letter-spacing:.05em;text-transform:uppercase;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf label.wide{grid-column:1/-1}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf label small{font:500 11px var(--rlf)!important;letter-spacing:0;text-transform:none;opacity:.85}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf input{height:44px!important;padding:0 12px!important;border-radius:11px!important;font:500 15px var(--rlf)!important;text-transform:none;letter-spacing:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgsub{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgsub .rlerr{margin:0!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgnote{margin:0!important;font:500 14.5px var(--rlf)!important;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgl{list-style:none;margin:0!important;padding:0!important;display:grid;gap:8px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgi{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;border-radius:14px;background:var(--rlr)}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgv{flex:0 0 auto;display:grid!important;place-items:center;gap:0;width:52px;height:56px;padding:6px 0!important;border:1px solid var(--rll)!important;border-radius:12px!important;background:none!important;color:var(--rlm)!important;box-shadow:none!important;cursor:pointer;transform:none!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgv b{font:600 16px/1 var(--rlf)!important;color:inherit!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgv:hover{border-color:var(--rlx)!important;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgv.on{background:var(--rlx)!important;border-color:var(--rlx)!important;color:#fff!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgb{flex:1 1 auto;min-width:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgb strong{display:block;font:600 16.5px/1.3 var(--rlf)!important;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgb strong a{color:var(--rlt)!important;text-decoration:underline;text-underline-offset:3px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgb small{display:block;margin-top:2px;font:500 12.5px var(--rlf)!important;color:var(--rlm)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgb p{margin:6px 0 0!important;font:400 14px/1.5 var(--rlf)!important;color:var(--rlt)!important;opacity:.92}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sga{flex:0 0 auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+/* ---- admin activity log ---- */
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actf{margin:0 0 12px!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl{list-style:none;margin:0!important;padding:0!important;display:grid;gap:6px}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl li .actt{flex:1 1 auto;min-width:0}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl li{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 14px;border-radius:11px;background:var(--rlr);font:400 14.5px/1.45 var(--rlf)!important;color:var(--rlt)!important}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl li b{font-weight:600}
+:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl li small{flex:0 0 auto;font:500 12px var(--rlf)!important;color:var(--rlm)!important;white-space:nowrap}
+
+@media(max-width:700px){
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlx>.panel,:root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgx{padding:18px 16px!important}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlsc b{font-size:22px}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlnm b{font-size:21px}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlcard{min-height:160px}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .rlrow input{width:96px}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgf{grid-template-columns:1fr}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sgi{flex-wrap:wrap}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .sga{width:100%;justify-content:flex-start}
+  :root:not(#a):not(#b):not(#c):not(#d):not(#e):not(#f) #app .actl li{flex-direction:column;gap:2px}
+}
 /* ================= v235: the page background is one plain blue (no glow, grid, orbs, shapes or motion) ================= */
 :root:root:root:root .bgfx{background:hsl(var(--h) calc(var(--sat)*85%) 31%)!important;background-image:none!important;animation:none!important}
 :root:root:root:root .bgfx::before,:root:root:root:root .bgfx::after,:root:root:root:root .bgfx *,:root:root:root:root .bgfx *::before,:root:root:root:root .bgfx *::after{display:none!important;animation:none!important}
@@ -10753,6 +10882,7 @@ setTimeout(function(){
         if(o.user==="__unverified"){ var UL=lv(o.lvl); if(UL&&!cfg.levels){ UL.unverified=!o.rm; add=true; } return; }
         if(!lv(o.lvl)||!o.user) return;
         var u=String(o.user).toLowerCase(), has=BASE.some(function(r){ return r.lvl===o.lvl&&r.user.toLowerCase()===u; });
+        if(o.dt){ if(has&&+o.at>0){ BASE.forEach(function(r){ if(r.lvl===o.lvl&&r.user.toLowerCase()===u) r.at=+o.at; }); add=true; } return; }
         if(o.rm){ if(has){ BASE=BASE.filter(function(r){ return !(r.lvl===o.lvl&&r.user.toLowerCase()===u); }); add=true; } }
         else if(!has){ BASE.push({lvl:o.lvl,user:String(o.user).slice(0,30),video:okUrl(o.video)?o.video:"",at:+(o.at||o.ts)||0}); add=true; }
         else if(okUrl(o.video)){ BASE.forEach(function(r){ if(r.lvl===o.lvl&&r.user.toLowerCase()===u&&r.video!==o.video){ r.video=o.video; add=true; } }); }
@@ -14212,7 +14342,7 @@ var _sh=window.show;
     while((m=re.exec(text))&&out.length<3){
       var u=m[0].replace(/[.,;:!?)\]}'"]+$/,""), y=YT_RE.exec(u), lm;
       if(y){ var id=y[1]||y[2]; if(prevOn()){ if(!seenK["y"+id]){ seenK["y"+id]=1; out.push({k:"yt",id:id,url:u}); } rest=rest.replace(m[0],""); } continue; }
-      lm=/#\/level\/(\d{1,12})(?!\d)/.exec(u);
+      lm=/(?:#\/|\/)level\/(\d{1,12})(?!\d)/.exec(u);
       if(lm&&ourLink(u)&&levelById(lm[1])){ if(!seenK["l"+lm[1]]) { seenK["l"+lm[1]]=1; out.push({k:"lv",id:+lm[1]}); } rest=rest.replace(m[0],""); }
     }
     String(text).replace(/\[\[([^\]\[\n]{1,60})\]\]/g,function(all,nm){ var l=levelByName(nm); if(l&&out.length<3){ if(!seenK["l"+l.id]){ seenK["l"+l.id]=1; out.push({k:"lv",id:l.id}); } rest=rest.replace(all,""); } return all; });
@@ -14417,7 +14547,7 @@ var _sh=window.show;
   /* ---- share a level to chat, from the level's own page ---- */
   function shareTo(room,id){
     if(!gate("Chat")) return;
-    var url=location.href.split("#")[0]+"#/level/"+(+id);
+    var url=window.levelLink?levelLink(+id):location.href.split("#")[0]+"#/level/"+(+id);
     openChat(); go("thread",room);
     var tx=$("chtx"); tx.value=url+(tx.value?" "+tx.value:""); fitTx(); updCount();
     try{ tx.focus(); tx.setSelectionRange(tx.value.length,tx.value.length); }catch(e){}
@@ -16331,7 +16461,7 @@ var _sh=window.show;
       case 'dismiss': return by+' dismissed a report on '+w;
       case 'settings': return by+' changed chat settings'+(n?' ('+n+')':'');
     }
-    return by+' '+E(x.act||'did something');
+    return (window.TML247act&&TML247act(x))||(by+' '+E(x.act||'did something'));
   }
   function logHtml(log){
     log=log||[];
@@ -18831,7 +18961,7 @@ var _sh=window.show;
     var head=rc.length?'<h2>Records <small>'+rc.length+'</small></h2>':'<h2>No records</h2>';
     return head+(rc.length?'<div class="l3rl">'+rc.map(function(x){
       var isV=x.user===l.verifier, yid=ytId(x.video), has=/^https?:\/\//.test(x.video||"");
-      return '<div class="l3rec lk" data-p="'+esc(x.user)+'" tabindex="0" role="button">'+av(x.user,"sm")+'<span class="l3rn">'+flagPre(x.user)+esc(x.user)+flagPost(x.user)+'</span>'+(isV?'<em>Verifier</em>':'')+
+      return '<div class="l3rec lk" data-p="'+esc(x.user)+'" tabindex="0" role="button">'+av(x.user,"sm")+'<span class="l3rm"><span class="l3rn">'+flagPre(x.user)+esc(x.user)+flagPost(x.user)+'</span>'+((isV||(window.recDateLabel&&recDateLabel(x.lvl,x.user)))?'<span class="l3rs">'+(isV?'<em>Verifier</em>':'')+(window.recDateLabel&&recDateLabel(x.lvl,x.user)?'<small class="l3rd" title="Added to the list on this day">'+esc(recDateLabel(x.lvl,x.user))+'</small>':'')+'</span>':'')+'</span>'+
         (has?'<a class="l3w" target="_blank" rel="noopener" href="'+esc(x.video)+'"'+(yid?' data-yt="'+yid+'"':'')+' data-who="'+esc(x.user)+'" aria-label="Watch '+esc(x.user)+'\'s video" title="Watch">'+sv('<path d="M8 5v14l11-7z" fill="currentColor"/>',15)+'</a>':'')+'</div>';
     }).join("")+'</div>':'');
   }
@@ -18842,7 +18972,7 @@ var _sh=window.show;
     var pl=b.querySelector(".l3play"); if(pl) pl.onclick=function(){ playIn(this.getAttribute("data-yt"),this.getAttribute("data-u"),this.getAttribute("data-who")); };
     var ws=c.querySelectorAll("a.l3w[data-yt]"); for(var i=0;i<ws.length;i++) ws[i].onclick=function(e){ if(!document.getElementById("l3v")) return; e.preventDefault(); e.stopPropagation(); playIn(this.getAttribute("data-yt"),this.getAttribute("href"),this.getAttribute("data-who")); };
     var o=document.getElementById("l3open"); if(o) o.onclick=function(){ show("level",l.id); };
-    var s=document.getElementById("l3share"); if(s) s.onclick=function(){ copy(location.href.split("#")[0]+"#/level/"+l.id,"Link copied"); };
+    var s=document.getElementById("l3share"); if(s) s.onclick=function(){ copy(window.levelLink?levelLink(l.id):location.href.split("#")[0]+"#/level/"+l.id,"Link copied"); };
     var d=document.getElementById("l3id"); if(d) d.onclick=function(){ copy(String(l.id),"Level ID copied"); };
     tint(l,function(col){ var a=document.getElementById("app"); if(a) a.style.setProperty("--tint",col); });
   }
@@ -18860,13 +18990,14 @@ var _sh=window.show;
     app.innerHTML='<div class="l3" id="l3">'+
       '<section class="l3a" aria-label="Levels"><div class="l3tabs" role="tablist">'+tabs.map(function(t){ return '<button type="button" role="tab" data-lt="'+t[0]+'" class="'+(t[0]==="list"?'on':'')+'" aria-selected="'+(t[0]==="list")+'">'+t[1]+'<b>'+t[2]+'</b></button>'; }).join("")+'</div>'+
       '<div class="l3tool"><label class="l3s">'+sv('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',18)+'<input id="q" type="search" placeholder="Search" aria-label="Search levels, creators, IDs" autocomplete="off" value="'+esc(q||"")+'"></label>'+
-      '<button type="button" id="l3fb" title="Filters" aria-label="Filters" aria-controls="l3fp" aria-expanded="false">'+sv('<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',21)+'</button></div>'+
+      '<button type="button" id="l3fb" title="Filters" aria-label="Filters" aria-controls="l3fp" aria-expanded="false">'+sv('<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',21)+'</button><button type="button" id="l3hist" class="l3hist" title="List history" aria-label="List history: every placement, raise, drop and removal">'+sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',21)+'</button></div>'+
       '<div class="l3fp" id="l3fp" hidden></div><div class="l3cnt" id="l3n"></div>'+
       '<nav class="l3l" id="rows" aria-label="Levels, hardest first"></nav></section>'+
       '<section class="l3b" id="l3b" aria-live="polite"></section><aside class="l3c" id="l3c" aria-label="Records"></aside></div>';
     var ts=app.querySelectorAll("[data-lt]"); for(var i=0;i<ts.length;i++) ts[i].onclick=function(){ show(this.getAttribute("data-lt")); };
     document.getElementById("q").oninput=function(e){ q=e.target.value; drawList(); drawFp(); };
     document.getElementById("l3fb").onclick=function(){ fOpen=!fOpen; drawFp(); };
+    var hb=document.getElementById("l3hist"); if(hb) hb.onclick=function(){ show("stats","history"); };
     var rw=document.getElementById("rows");
     rw.onclick=function(e){ var t=e.target.closest&&e.target.closest("[data-l3]"); if(t) pick(+t.getAttribute("data-l3")); };
     rw.onkeydown=function(e){
@@ -18887,6 +19018,401 @@ var _sh=window.show;
   show=function(v,a){ if(v==="level"&&a&&lv(+a)) sel=+a; return _show.apply(this,arguments); };
   var rz=null;
   window.addEventListener("resize",function(){ clearTimeout(rz); rz=setTimeout(function(){ try{ if(cur&&cur.v==="list"&&isWide()!==lastWide) rList(); }catch(e){} },160); });
+})();
+/* ===== v247: real level links, list history button, record dates, Timmy Roulette, level suggestions with votes, admin activity log ===== */
+(function(){
+  'use strict';
+  var D=document, API=window.TML_SOCIAL_API||'/api/social', DAY=864e5;
+  function E(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function $(id){ return D.getElementById(id); }
+  function NT(){ return window.TMLNET; }
+  function signed(){ var n=NT(); return !!(n&&n.on&&n.user&&n.user.getIdToken&&n.prof); }
+  function me(){ var n=NT(); return (n&&n.prof&&n.prof.username)?String(n.prof.username):''; }
+  function isAdm(){ var n=NT(); return !!(n&&n.on&&n.isAdmin&&signed()); }
+  function say(t){ try{ toast(t); }catch(e){} }
+  function lsg(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lss(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function jget(k,d){ try{ var v=JSON.parse(lsg(k)||'null'); return v===null?d:v; }catch(e){ return d; } }
+  function call(a,body){
+    var n=NT(), tp=(n&&n.user&&n.user.getIdToken)?n.user.getIdToken().catch(function(){ return ''; }):Promise.resolve('');
+    return tp.then(function(t){
+      var h={'content-type':'application/json'}; if(t) h.Authorization='Bearer '+t;
+      return fetch(API,{method:'POST',headers:h,body:JSON.stringify(Object.assign({a:a},body||{}))});
+    }).then(function(r){ return r.json().catch(function(){ return {error:'bad response'}; }).then(function(j){ j.status=r.status; return j; }); },function(){ return {error:'offline',status:0}; });
+  }
+  function fmtD(t){ try{ return new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return ''; } }
+  function ago(t){ var s=Math.max(0,(Date.now()-t)/1000); if(s<90) return 'just now'; if(s<3600) return Math.round(s/60)+' min ago'; if(s<86400) return Math.round(s/3600)+' h ago'; var d=Math.round(s/86400); if(d<14) return d+' day'+(d===1?'':'s')+' ago'; return fmtD(t); }
+  function sv(d,w){ return '<svg viewBox="0 0 24 24" width="'+(w||18)+'" height="'+(w||18)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>'; }
+  function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(function(){ say(msg); },function(){ say('Copy blocked by the browser'); }); }catch(e){ say('Copy blocked by the browser'); } }
+  function myRecs(){ var n=me().toLowerCase(); return n?BASE.filter(function(r){ return String(r.user).toLowerCase()===n; }):[]; }
+
+  /* ---------------------------------------------------------------- real level links */
+  // On the live site a level has a real link (https://timmylist.pages.dev/level/<id>) that shows a preview in Discord and Google.
+  // Anywhere else (a preview, a copy on another host) the hash link keeps working as before.
+  window.levelLink=function(id){
+    id=+id;
+    try{ if(/(^|\.)timmylist\.pages\.dev$/i.test(location.hostname)) return location.origin+'/level/'+id; }catch(e){}
+    return location.href.split('#')[0]+'#/level/'+id;
+  };
+
+  /* ---------------------------------------------------------------- list history button */
+  var CLOCK=sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',21);
+  function goHistory(){ show('stats','history'); }
+  window.TML247hist=goHistory;
+  var _rList=rList;
+  rList=function(){
+    _rList.apply(this,arguments);
+    try{
+      if($('l3')||$('l3histn')) return;
+      var vt=app.querySelector('.fbar .vt'); if(!vt) return;
+      var b=D.createElement('button'); b.type='button'; b.id='l3histn'; b.className='l3hist'; b.title='List history'; b.setAttribute('aria-label','List history: every placement, raise, drop and removal');
+      b.innerHTML=CLOCK; b.onclick=goHistory; vt.appendChild(b);
+    }catch(e){}
+  };
+
+  /* ---------------------------------------------------------------- record dates */
+  // BASE records carry "at" (ms) when the site knows when they were added. Older records have no date and show none.
+  function recAt(lvl,user){ var u=String(user).toLowerCase(), r=BASE.filter(function(x){ return x.lvl===lvl&&String(x.user).toLowerCase()===u; })[0]; return r&&r.at>0?r.at:0; }
+  window.recDate=recAt; window.recDateLabel=function(lvl,user){ var t=recAt(lvl,user); return t?fmtD(t):''; };
+  function levelDates(id){
+    var cs=app.querySelectorAll('.rcards .rcard[data-p]'), i;
+    for(i=0;i<cs.length;i++){
+      var c=cs[i], at=recAt(+id,c.getAttribute('data-p')), info=c.querySelector('.rinfo');
+      if(at>0&&info&&!c.querySelector('.rdt')) info.insertAdjacentHTML('beforeend','<span class="rdt" title="Added to the list on '+E(fmtD(at))+'">'+E(fmtD(at))+'</span>');
+    }
+  }
+  var _rLevel=rLevel;
+  rLevel=function(id){ var r=_rLevel.apply(this,arguments); try{ levelDates(id); }catch(e){} return r; };
+  // packs: a player who finished every level of the pack shows the day they finished the last one
+  function packDates(){
+    var vs=app.querySelectorAll('.pxv[data-p]:not([data-dt])'); if(!vs.length) return;
+    var ids=[].map.call(app.querySelectorAll('.pxlvs .pxlv[data-lid]'),function(e){ return +e.getAttribute('data-lid'); }), i;
+    for(i=0;i<vs.length;i++){
+      var v=vs[i], u=v.getAttribute('data-p'), last=0, all=ids.length>0;
+      v.setAttribute('data-dt','1');
+      ids.forEach(function(id){ var at=recAt(id,u); if(!at) all=false; else if(at>last) last=at; });
+      var sm=v.querySelector('small'); if(all&&last&&sm) sm.textContent=sm.textContent+' · '+fmtD(last);
+    }
+  }
+  var mo=null;
+  function watchPacks(){ if(mo||!window.MutationObserver) return; mo=new MutationObserver(function(){ if(cur&&cur.v==='packs'){ try{ packDates(); }catch(e){} } }); mo.observe(app,{childList:true,subtree:true}); }
+  // admin: put a date on a record that has none (or fix one)
+  function netSetDate(lvl,user,at){
+    var N=NT(); if(!N||!N.on||!N.db) return Promise.reject(new Error('offline'));
+    return N.db.collection('approved').add({dt:true,lvl:lvl,user:String(user||'').slice(0,30),video:'',at:at,ts:Date.now()});
+  }
+  function adminDates(){
+    var rows=app.querySelectorAll('.adm-rr[data-l]'), i;
+    for(i=0;i<rows.length;i++){
+      var row=rows[i]; if(row.querySelector('.rdset')) continue;
+      var ac=row.querySelector('.adm-ac'), rm=ac&&ac.querySelector('[data-act="rmrec"]'); if(!rm) continue;
+      var r=BASE[+rm.getAttribute('data-i')]; if(!r) continue;
+      var d=r.at>0?new Date(r.at):null, val=d?d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2):'';
+      var w=D.createElement('label'); w.className='rdset'; w.title='The day this record was added (shown on level pages and in Stats)';
+      w.innerHTML='<span>Date</span><input type="date" value="'+val+'" data-ri="'+rm.getAttribute('data-i')+'" aria-label="Date for '+E(r.user)+' on this level">';
+      ac.insertBefore(w,ac.firstChild);
+    }
+  }
+  D.addEventListener('change',function(e){
+    var t=e.target; if(!t||!t.matches||!t.matches('input.rdset-in,.rdset input[type=date]')) return;
+    var r=BASE[+t.getAttribute('data-ri')]; if(!r||!t.value) return;
+    var p=t.value.split('-'), at=new Date(+p[0],+p[1]-1,+p[2],12,0,0).getTime(); if(!(at>0)) return;
+    if(at>Date.now()+DAY){ say('That date is in the future'); return; }
+    netSetDate(r.lvl,r.user,at).then(function(){ r.at=at; say('Date saved for everyone'); audit('recDate',r.user,(lv(r.lvl)||{}).name||''); },function(){ say('Could not save that date'); });
+  });
+
+  /* ---------------------------------------------------------------- audit log (admins) */
+  function audit(act,who,note){
+    if(!isAdm()) return;
+    call('audit',{act:act,w:who||'',n:note||''}).then(function(){},function(){});
+  }
+  window.TML247audit=audit;
+  function hook(name,fn){ try{ var o=window[name]; if(typeof o!=='function') return; window[name]=fn(o); }catch(e){} }
+  hook('netApprove',function(o){ return function(p){ try{ audit('recAccept',p&&p.user,(lv(p&&p.lvl)||{}).name||''); }catch(e){} return o.apply(this,arguments); }; });
+  hook('netRemove',function(o){ return function(r){ try{ audit('recRemove',r&&r.user,(lv(r&&r.lvl)||{}).name||''); }catch(e){} return o.apply(this,arguments); }; });
+  hook('netRec',function(o){ return function(l,u){ try{ audit('recAdd',u,(lv(l)||{}).name||''); }catch(e){} return o.apply(this,arguments); }; });
+  // placing, moving and removing levels all go through the changelog
+  hook('logC',function(o){ return function(c){
+    var r=o.apply(this,arguments);
+    try{ if(c){ var n=c.k==='placed'?'#'+c.to:(c.k==='removed'?'':'#'+c.from+' to #'+c.to); audit(c.k==='placed'?'lvlAdd':(c.k==='removed'?'lvlRemove':'lvlMove'),c.n||'',n); } }catch(e){}
+    return r;
+  }; });
+  try{
+    var rs=window.TML234rs;
+    if(rs&&typeof rs.decline==='function'){ var _dec=rs.decline; rs.decline=function(q){ try{ audit('recDecline',q&&q.user,(lv(q&&q.lvl)||{}).name||''); }catch(e){} return _dec.apply(this,arguments); }; }
+  }catch(e){}
+
+  /* ---------------------------------------------------------------- Timmy Roulette */
+  var RK='tml_rou_v1';
+  var POOLS=[['all','The whole list'],['top10','Top 10 (hardest)'],['top25','Top 25'],['top50','Top 50'],['hard','Harder half'],['easy','Easier half']];
+  function RS(){ var s=jget(RK,null); if(!s||typeof s!=='object') s={}; s.runs=Array.isArray(s.runs)?s.runs:[]; s.best=+s.best||0; return s; }
+  function RSave(s){ lss(RK,JSON.stringify(s)); }
+  function poolIds(pool,skip){
+    var L=LEVELS.slice(), n=L.length;
+    if(pool==='top10') L=L.slice(0,10); else if(pool==='top25') L=L.slice(0,25); else if(pool==='top50') L=L.slice(0,50);
+    else if(pool==='hard') L=L.slice(0,Math.ceil(n/2)); else if(pool==='easy') L=L.slice(Math.ceil(n/2));
+    var beaten={}; if(skip) myRecs().forEach(function(r){ beaten[r.lvl]=1; });
+    return L.filter(function(l){ return !beaten[l.id]; }).map(function(l){ return l.id; });
+  }
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function roBack(){ return '<button class="link gback" id="gback" type="button">&larr; Games</button>'; }
+  function ro(){ return RS().cur||null; }
+  function runText(run){
+    var done=run.done||[], head='Timmy Roulette: '+(run.won?'beat the whole roulette!':'cleared '+done.length+' level'+(done.length===1?'':'s')+(done.length?', reached '+done[done.length-1].p+'%':''));
+    var lines=done.slice(0,10).map(function(d,i){ var l=lv(d.id); return (i+1)+'. '+(l?l.name:'a level')+' — '+d.p+'%'; });
+    if(done.length>10) lines.push('...and '+(done.length-10)+' more');
+    return head+(lines.length?'\n'+lines.join('\n'):'')+'\nTry it: '+location.href.split('#')[0]+'#/roulette';
+  }
+  function roStart(){
+    var pool=($('rlpool')||{}).value||'all', skip=!!($('rlskip')||{}).checked, ids=poolIds(pool,skip);
+    if(ids.length<2){ var e=$('rlerr'); if(e) e.textContent=skip?'You have beaten almost everything here. Turn off "skip levels I\'ve beaten" or pick a bigger pool.':'That pool has fewer than 2 levels.'; return; }
+    var s=RS(); s.cur={pool:pool,skip:skip,order:shuffle(ids),i:0,req:1,got:[],t:Date.now()}; RSave(s); rRoulette();
+  }
+  function roFinish(won){
+    var s=RS(), c=s.cur; if(!c) return;
+    var run={t:Date.now(),pool:c.pool,won:!!won,done:c.got.slice()};
+    s.runs.unshift(run); s.runs=s.runs.slice(0,12);
+    var score=run.done.length, last=run.done.length?run.done[run.done.length-1].p:0;
+    if(score>s.best||(score===s.best&&last>(s.bestP||0))){ s.best=score; s.bestP=last; }
+    s.last=run; s.cur=null; RSave(s); lss('tml_rou_show','1'); rRoulette();
+  }
+  function roAdvance(p){
+    var s=RS(), c=s.cur; if(!c) return;
+    var id=c.order[c.i]; c.got.push({id:id,p:p}); c.i++; c.req=p+1;
+    RSave(s);
+    if(p>=100){ roFinish(true); return; }
+    if(c.i>=c.order.length){ roFinish(true); return; }
+    rRoulette();
+  }
+  function roLevelCard(l,c){
+    var rank=rk(l.id), vr=vidOf(l), cre=(l.creators&&l.creators.length)?l.creators.join(', '):(l.publisher||'');
+    return '<div class="rlcard"><div class="rlimg" style="background:'+grad(l)+'"></div><div class="rlsh"></div><div class="rlin"><div class="rlnm">'+faceImg(l)+'<b>'+E(l.name)+'</b>'+unvTag(l)+'</div>'+
+      '<div class="rlmeta"><span>#'+rank+' on the list</span>'+(l.id>0?'<button type="button" class="rlid" id="rlid" title="Copy level ID">ID '+l.id+'</button>':'')+(cre?'<span>by '+E(cre)+'</span>':'')+(vr?'<a href="'+E(vr.video)+'" target="_blank" rel="noopener">Watch a run &#8599;</a>':'')+'</div></div></div>';
+  }
+  function rRoulette(){
+    var s=RS(), c=s.cur;
+    var h='<div class="rlx">';
+    if(c&&lv(c.order[c.i])){
+      var l=lv(c.order[c.i]);
+      h+='<div class="panel rlp"><div class="rlsc"><span><small>Level</small><b>'+(c.i+1)+'</b></span><span class="need"><small>You need at least</small><b>'+c.req+'%</b></span><span><small>Cleared</small><b>'+c.got.length+'</b></span></div>'+roLevelCard(l,c)+
+        '<form id="rlf" class="rlf" novalidate><label for="rlpc">What did you get?</label><div class="rlrow"><input id="rlpc" type="number" inputmode="numeric" min="'+c.req+'" max="100" step="1" value="'+c.req+'" aria-describedby="rlerr"><span class="rlpct">%</span><button type="submit" class="btn">Next level</button></div>'+
+        '<p class="rlerr" id="rlerr" role="alert"></p><button type="button" class="ghost" id="rlgive">Give up and see my result</button></form></div>';
+      h+='<div class="panel"><h2>So far</h2>'+(c.got.length?'<ol class="rlhist">'+c.got.map(function(g){ var x=lv(g.id); return '<li><span>'+E(x?x.name:'A level')+'</span><b>'+g.p+'%</b></li>'; }).join('')+'</ol>':'<p class="note" style="margin:0">Nothing yet. Beat this level to at least '+c.req+'% and enter your percent.</p>')+'</div>';
+    } else if(s.last&&jget('tml_rou_show',0)){
+      var r=s.last, n=r.done.length, lp=n?r.done[n-1].p:0;
+      h+='<div class="panel rlp rlend"><small class="rlk">'+(r.won?'ROULETTE COMPLETE':'RUN OVER')+'</small><h2>'+(r.won?'You beat the whole roulette!':'You cleared '+n+' level'+(n===1?'':'s'))+'</h2>'+
+        '<div class="rlsc"><span><small>Levels cleared</small><b>'+n+'</b></span><span><small>Last percent</small><b>'+lp+'%</b></span><span><small>Best run</small><b>'+s.best+'</b></span></div>'+
+        (n?'<ol class="rlhist">'+r.done.map(function(g){ var x=lv(g.id); return '<li><span>'+E(x?x.name:'A level')+'</span><b>'+g.p+'%</b></li>'; }).join('')+'</ol>':'')+
+        '<div class="rlbtns"><button type="button" class="btn" id="rlshare">Copy my result</button><button type="button" class="ghost" id="rlagain">Play again</button></div></div>';
+    } else {
+      var sel=POOLS.map(function(p){ return '<option value="'+p[0]+'">'+E(p[1])+'</option>'; }).join('');
+      h+='<div class="panel rlp"><h2>How it works</h2><p class="rlrules">You get random levels from the list, one at a time. Beat each one to <b>at least the percent shown</b>, then enter what you got. The next level needs <b>1% more</b> than you just got. Reach 100% on a level and you win. Levels never repeat. Give up whenever you like.</p>'+
+        '<div class="rlset"><label>Draw levels from<select id="rlpool">'+sel+'</select></label>'+(me()?'<label class="rlck"><input type="checkbox" id="rlskip"> Skip levels I have beaten</label>':'')+'</div>'+
+        '<button type="button" class="btn" id="rlgo">Start roulette</button><p class="rlerr" id="rlerr" role="alert"></p></div>';
+      var runs=s.runs;
+      h+='<div class="panel"><h2>Your runs</h2>'+(runs.length?'<p class="note" style="margin:0 0 10px">Best so far: <b>'+s.best+'</b> level'+(s.best===1?'':'s')+'.</p><ul class="rlruns">'+runs.slice(0,8).map(function(r,i){ var n=r.done.length; return '<li><span><b>'+n+'</b> level'+(n===1?'':'s')+(r.won?' · completed':(n?' · reached '+r.done[n-1].p+'%':''))+'</span><small>'+ago(r.t)+'</small><button type="button" class="ghost sm" data-rcopy="'+i+'">Copy</button></li>'; }).join('')+'</ul>':'<p class="note" style="margin:0">No runs yet. Your results show up here.</p>')+'</div>';
+    }
+    h+='</div>';
+    app.innerHTML=roBack()+'<div class="shead"><h2>Timmy Roulette</h2><span>HOW FAR CAN YOU GET?</span></div>'+h;
+    $('gback').onclick=function(){ show('games'); };
+    var go=$('rlgo'); if(go) go.onclick=roStart;
+    var f=$('rlf');
+    if(f){
+      f.onsubmit=function(e){
+        e.preventDefault();
+        var cc=ro(); if(!cc) return; var v=Math.floor(+($('rlpc').value)), er=$('rlerr');
+        if(!(v>=cc.req)||v>100){ er.textContent=(v>100)?'The most you can get is 100%.':'You need at least '+cc.req+'% to move on. If you did not get there, give up to see your result.'; return; }
+        roAdvance(v);
+      };
+      $('rlgive').onclick=function(){ roFinish(false); };
+      var idb=$('rlid'); if(idb) idb.onclick=function(){ copyText(this.textContent.replace('ID ',''),'Level ID copied'); };
+      var pc=$('rlpc'); if(pc){ try{ pc.focus(); pc.select(); }catch(e){} }
+    }
+    var sh=$('rlshare'); if(sh) sh.onclick=function(){ copyText(runText(RS().last),'Result copied. Paste it anywhere.'); };
+    var ag=$('rlagain'); if(ag) ag.onclick=function(){ lss('tml_rou_show','0'); rRoulette(); };
+    var rc=app.querySelectorAll('[data-rcopy]'); for(var i=0;i<rc.length;i++) rc[i].onclick=function(){ copyText(runText(RS().runs[+this.getAttribute('data-rcopy')]),'Result copied. Paste it anywhere.'); };
+  }
+  window.TML247rou={state:RS,start:roStart,text:runText,pool:poolIds};
+
+  // games hub: a fourth card
+  function roCard(){
+    var s=RS(), art='<svg viewBox="0 0 220 220" aria-hidden="true"><defs><linearGradient id="gmr1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2468ff"/><stop offset="1" stop-color="#9fd0ff"/></linearGradient></defs>'+[0,1,2,3,4,5].map(function(k){ var hh=34+k*24; return '<rect x="'+(18+k*32)+'" y="'+(196-hh)+'" width="24" height="'+hh+'" rx="6" fill="url(#gmr1)" opacity="'+(0.35+k*0.12).toFixed(2)+'"/>'; }).join('')+'<path d="M24 120L66 98 100 108 140 70 190 34" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><circle cx="190" cy="34" r="9" fill="#fff"/></svg>';
+    return '<button type="button" class="gm g4" data-g="roulette" style="animation-delay:270ms"><span class="gma" aria-hidden="true">'+art+'</span><span class="gmi">'+sv('<path d="M4 20h4v-5H4zM10 20h4v-9h-4zM16 20h4V6h-4z"/>',30)+'</span><small class="gme">04 &middot; CHALLENGE</small><b>Timmy Roulette</b><p>Random levels, and the percent you need goes up each time. How far can you get?</p><span class="gmf"><i>'+(s.best?'Best run '+s.best+' level'+(s.best===1?'':'s'):'Not played yet')+'</i><em>Play <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em></span></button>';
+  }
+  function addRouCard(){
+    var g=app.querySelector('.gamegrid'); if(!g||g.querySelector('[data-g="roulette"]')) return;
+    g.insertAdjacentHTML('beforeend',roCard());
+    var b=g.querySelector('[data-g="roulette"]'); b.onclick=function(){ show('roulette'); };
+    b.addEventListener('pointermove',function(e){ if(e.pointerType==='touch') return; var r=this.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; this.style.setProperty('--mx',x+'px'); this.style.setProperty('--my',y+'px'); this.style.setProperty('--ry',((x/r.width-.5)*8).toFixed(2)+'deg'); this.style.setProperty('--rx',((.5-y/r.height)*7).toFixed(2)+'deg'); });
+    b.addEventListener('pointerleave',function(){ this.style.setProperty('--rx','0deg'); this.style.setProperty('--ry','0deg'); });
+  }
+
+  /* ---------------------------------------------------------------- level suggestions with votes (Pending page) */
+  var SG={items:null,err:'',busy:false};
+  function sgLoad(){
+    if(SG.busy) return; SG.busy=true;
+    call('sugGet').then(function(r){
+      SG.busy=false;
+      if(r&&r.ok){ SG.items=r.items||[]; SG.err=''; } else { SG.items=SG.items||[]; SG.err=(r&&r.status===0)?'You look offline.':'Suggestions are not available right now.'; }
+      sgPaint();
+    });
+  }
+  function sgExisting(n,id){
+    n=String(n||'').trim().toLowerCase();
+    var hit=LEVELS.filter(function(l){ return (n&&String(l.name).toLowerCase()===n)||(id&&String(l.id)===String(id)); })[0];
+    if(hit) return 'That level is already on the list (#'+rk(hit.id)+').';
+    var sn=(STATE.soon||[]).filter(function(x){ return x&&String(x.name).toLowerCase()===n; })[0];
+    if(sn) return 'That level is already pending.';
+    return '';
+  }
+  function sgForm(){
+    if(!signed()) return '<p class="note sgnote">Sign in to suggest a level or vote on one.</p>';
+    return '<form id="sgf" class="sgf" novalidate><label><span>Level name</span><input id="sgn" maxlength="60" autocomplete="off" required></label>'+
+      '<label><span>Level ID <small>optional</small></span><input id="sgl" inputmode="numeric" maxlength="10" autocomplete="off"></label>'+
+      '<label class="wide"><span>YouTube link <small>optional</small></span><input id="sgu" type="url" maxlength="200" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off"></label>'+
+      '<label class="wide"><span>Why it belongs <small>optional</small></span><input id="sgt" maxlength="140" autocomplete="off"></label>'+
+      '<div class="sgsub"><button class="btn" type="submit">Suggest this level</button><span class="rlerr" id="sgerr" role="alert"></span></div></form>';
+  }
+  function sgInner(){
+    var it=SG.items, h='<div class="sgh"><h2>Suggested levels</h2><p>Know a Timmy level that belongs on the list? Suggest it, and vote on the ones you want to see. The most voted get looked at first.</p></div>'+sgForm();
+    if(it===null) return h+'<p class="note sgnote">Loading suggestions...</p>';
+    if(SG.err&&!it.length) return h+'<p class="note sgnote">'+E(SG.err)+'</p>';
+    if(!it.length) return h+'<p class="note sgnote">Nothing suggested yet. Be the first.</p>';
+    var adm=isAdm();
+    return h+'<ol class="sgl">'+it.map(function(x){
+      var name=x.u?'<a href="'+E(x.u)+'" target="_blank" rel="noopener">'+E(x.n)+'</a>':'<span>'+E(x.n)+'</span>';
+      return '<li class="sgi" data-id="'+E(x.id)+'"><button type="button" class="sgv'+(x.me?' on':'')+'" data-sv="'+E(x.id)+'" aria-pressed="'+(x.me?'true':'false')+'" aria-label="'+(x.me?'Remove your vote for ':'Vote for ')+E(x.n)+'">'+sv('<path d="M12 5l7 8H5z" fill="currentColor"/>',16)+'<b>'+x.c+'</b></button>'+
+        '<div class="sgb"><strong>'+name+'</strong><small>Suggested by '+E(x.by||'a player')+' · '+E(ago(x.ts))+(x.l?' · ID '+E(x.l):'')+'</small>'+(x.t?'<p>'+E(x.t)+'</p>':'')+'</div>'+
+        '<div class="sga">'+(adm?'<button type="button" class="btn sm" data-sp="'+E(x.id)+'">Add to Pending</button>':'')+((adm||x.own)?'<button type="button" class="ghost sm" data-sd="'+E(x.id)+'" aria-label="Remove the suggestion '+E(x.n)+'">Remove</button>':'')+'</div></li>';
+    }).join('')+'</ol>';
+  }
+  function sgPaint(){
+    var box=$('sgx'); if(!box) return;
+    var keep={}; ['sgn','sgl','sgu','sgt'].forEach(function(k){ var e=$(k); if(e) keep[k]=e.value; });
+    var had=D.activeElement&&D.activeElement.id;
+    box.innerHTML=sgInner();
+    Object.keys(keep).forEach(function(k){ var e=$(k); if(e) e.value=keep[k]; });
+    if(had&&$(had)&&/^sg[nltu]$/.test(had)){ try{ $(had).focus(); }catch(e){} }
+    sgWire(box);
+  }
+  function sgSort(){ SG.items.sort(function(a,b){ return b.c-a.c||b.ts-a.ts; }); }
+  function sgWire(box){
+    var f=$('sgf');
+    if(f) f.onsubmit=function(e){
+      e.preventDefault();
+      var n=$('sgn').value.trim(), l=$('sgl').value.replace(/[^0-9]/g,''), u=$('sgu').value.trim(), t=$('sgt').value.trim(), er=$('sgerr');
+      er.textContent='';
+      if(n.length<2){ er.textContent='Give the level a name.'; return; }
+      var ex=sgExisting(n,l); if(ex){ er.textContent=ex; return; }
+      if(u&&!/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(u)){ er.textContent='The video link has to be a YouTube link.'; return; }
+      var btn=f.querySelector('button[type=submit]'); btn.disabled=true;
+      call('sugAdd',{n:n,l:l,u:u,t:t}).then(function(r){
+        btn.disabled=false;
+        if(r&&r.ok){ say('Suggestion added'); ['sgn','sgl','sgu','sgt'].forEach(function(k){ $(k).value=''; }); SG.items=null; sgPaint(); sgLoad(); }
+        else er.textContent=(r&&r.message)||'Could not add that right now.';
+      });
+    };
+    box.onclick=function(e){
+      var v=e.target.closest&&e.target.closest('[data-sv]'), p=e.target.closest&&e.target.closest('[data-sp]'), d=e.target.closest&&e.target.closest('[data-sd]');
+      if(v){
+        if(!signed()){ say('Sign in to vote'); return; }
+        var id=v.getAttribute('data-sv'), x=SG.items.filter(function(z){ return z.id===id; })[0]; if(!x) return;
+        var on=!x.me; x.me=on; x.c+=on?1:-1; sgSort(); sgPaint();
+        call('sugVote',{id:id,on:on}).then(function(r){ if(!(r&&r.ok)){ x.me=!on; x.c+=on?-1:1; sgSort(); sgPaint(); say((r&&r.message)||'Could not save your vote'); if(r&&r.error==='gone') sgLoad(); } });
+      } else if(p){
+        var pid=p.getAttribute('data-sp'); p.disabled=true;
+        call('sugPromote',{id:pid}).then(function(r){
+          if(r&&r.ok&&r.item){
+            var it=r.item; STATE.soon=(STATE.soon||[]).concat([{name:String(it.n).slice(0,60),by:String(it.by||'').slice(0,30),note:('Suggested by '+(it.by||'a player')+' · '+it.c+' vote'+(it.c===1?'':'s')).slice(0,120)}]);
+            try{ dirty(); }catch(er){}
+            say('Added to Pending'); SG.items=SG.items.filter(function(z){ return z.id!==pid; }); show('pending');
+          } else { p.disabled=false; say((r&&r.message)||'Could not do that'); }
+        });
+      } else if(d){
+        var did=d.getAttribute('data-sd'); d.disabled=true;
+        call('sugDel',{id:did}).then(function(r){ if(r&&r.ok){ SG.items=SG.items.filter(function(z){ return z.id!==did; }); sgPaint(); say('Suggestion removed'); } else { d.disabled=false; say((r&&r.message)||'Could not remove that'); } });
+      }
+    };
+  }
+  function sgMount(){
+    if($('sgx')) return;
+    var s=D.createElement('section'); s.id='sgx'; s.className='panel sgx'; s.setAttribute('aria-label','Suggested levels'); app.appendChild(s);
+    sgPaint(); sgLoad();
+  }
+
+  /* ---------------------------------------------------------------- admin: activity log */
+  function actLine(x){
+    var by='<b>'+E(x.by||'An admin')+'</b>', w='<b>'+E(x.w||'a player')+'</b>', n=x.n?E(x.n):'', nb=n?'<b>'+n+'</b>':'a level';
+    switch(x.act){
+      case 'recAccept': return by+' accepted '+w+'’s record on '+nb;
+      case 'recDecline': return by+' declined '+w+'’s record on '+nb;
+      case 'recAdd': return by+' added a record for '+w+' on '+nb;
+      case 'recRemove': return by+' removed '+w+'’s record on '+nb;
+      case 'recDate': return by+' changed the date of '+w+'’s record on '+nb;
+      case 'lvlAdd': return by+' placed '+w+(n?' at <b>'+n+'</b>':' on the list');
+      case 'lvlMove': return by+' moved '+w+(n?' ('+n+')':'');
+      case 'lvlRemove': return by+' removed '+w+' from the list';
+      case 'sugPromote': return by+' moved the suggestion '+nb+' (by '+w+') to Pending';
+      case 'sugRemove': return by+' removed the suggestion '+nb+' (by '+w+')';
+    }
+    return null;
+  }
+  window.TML247act=actLine;
+  function actKind(a){ return /^rec/.test(a)?'rec':(/^lvl|^list/.test(a)?'lvl':(/^sug/.test(a)?'sug':'chat')); }
+  var AL={rows:null,f:'all',busy:false};
+  function actHtml(){
+    var rows=AL.rows;
+    var chips='<div class="chips actf" role="group" aria-label="Filter the log">'+[['all','All'],['rec','Records'],['lvl','Levels'],['sug','Suggestions'],['chat','Chat']].map(function(c){ return '<button type="button" class="chip'+(AL.f===c[0]?' on':'')+'" data-af="'+c[0]+'" aria-pressed="'+(AL.f===c[0])+'">'+c[1]+'</button>'; }).join('')+'</div>';
+    if(rows===null) return chips+'<p class="note">Loading...</p>';
+    var list=rows.filter(function(x){ return AL.f==='all'||actKind(x.act)===AL.f; });
+    if(!list.length) return chips+'<p class="note">Nothing here yet. Accepting or removing records, moving levels and moderating chat show up here.</p>';
+    return chips+'<ul class="actl">'+list.map(function(x){
+      var line=actLine(x); if(line===null) line=(window.TML234mod&&TML234mod._line)?TML234mod._line(x):E(x.act);
+      return '<li><span class="actt">'+line+'</span><small title="'+E(new Date(x.t).toLocaleString())+'">'+E(ago(x.t))+'</small></li>';
+    }).join('')+'</ul>';
+  }
+  function actPaint(){ var b=$('actlog'); if(b) b.innerHTML=actHtml(); }
+  function actLoad(){
+    if(AL.busy) return; AL.busy=true;
+    call('auditList',{n:150}).then(function(r){ AL.busy=false; AL.rows=(r&&r.ok)?(r.log||[]):[]; if(!(r&&r.ok)) say((r&&r.message)||'Could not load the log'); actPaint(); });
+  }
+  var ACTI=sv('<path d="M3 12h4l3 8 4-16 3 8h4"/>',20);
+  function adminExtras(){
+    var nav=$('admnav'), main=app.querySelector('.adm-main'); if(!nav||!main||$('actlog')) return;
+    if(!isAdm()) return;
+    nav.insertAdjacentHTML('beforeend','<button data-t="activity" class="">'+ACTI+'<span>Activity</span></button>');
+    main.insertAdjacentHTML('beforeend','<section class="adm-pane" data-pane="activity" hidden><div class="adm-ph"><h1>Activity</h1><p>Who accepted, removed or moved what, and when. Newest first.</p></div><div class="panel"><div id="actlog">'+actHtml()+'</div></div></section>');
+    nav.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('button[data-t="activity"]'); if(t){ AL.rows=null; actPaint(); actLoad(); } });
+    $('actlog').addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('[data-af]'); if(c){ AL.f=c.getAttribute('data-af'); actPaint(); } });
+    adminDates();
+  }
+  var _rAdmin=window.rAdmin||rAdmin;
+  rAdmin=function(){ var r=_rAdmin.apply(this,arguments); try{ adminExtras(); }catch(e){ try{ console.error('v247 admin',e); }catch(x){} } return r; };
+  // the admin record list is re-filtered as you type: keep the date boxes in step
+  D.addEventListener('input',function(e){ if(e.target&&(e.target.id==='adm-rq')) setTimeout(function(){ try{ adminDates(); }catch(x){} },0); });
+
+  /* ---------------------------------------------------------------- routing + hooks into existing pages */
+  var _route=route, _show=show;
+  route=function(){
+    var p=location.hash.replace(/^#\/?/,'').split('/');
+    if(p[0]==='roulette') return {v:'roulette',a:null};
+    return _route.apply(this,arguments);
+  };
+  show=function(v,a,fromHash){
+    if(v==='roulette'){
+      window.curId=null; app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation='';
+      rRoulette(); cur={v:'roulette',a:null}; D.title='Timmy Roulette · The Timmylist';
+      var nb=D.querySelectorAll('#nav button, #tabbar button'); for(var i=0;i<nb.length;i++) nb[i].className=nb[i].getAttribute('data-v')==='games'?'on':'';
+      window.scrollTo(0,0);
+      if(!fromHash){ try{ if(location.hash!=='#/roulette') location.hash='#/roulette'; }catch(e){} }
+      return;
+    }
+    var r=_show.apply(this,arguments);
+    try{ if(v==='games') addRouCard(); else if(v==='pending') sgMount(); else if(v==='packs') watchPacks(); }catch(e){ try{ console.error('v247 show',e); }catch(x){} }
+    return r;
+  };
+  try{ if(/^#\/roulette/.test(location.hash)){ var r0=route(); show(r0.v,r0.a,true); } else if(cur){ if(cur.v==='games') addRouCard(); else if(cur.v==='pending') sgMount(); else if(cur.v==='packs') watchPacks(); } }catch(e){}
+  window.TML247={sg:SG,sgLoad:sgLoad,al:AL,actLoad:actLoad,recAt:recAt,adminDates:adminDates,call:call};
 })();
 </script>
 </body>
