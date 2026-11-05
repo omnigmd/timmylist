@@ -3,7 +3,7 @@
    2) Offline: the page you last loaded still opens without a connection.
    It never caches /api/ calls, and the page itself is always fetched fresh when you are online,
    so an update is never held back by this file. */
-const VER = "v250", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
+const VER = "v252", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(self.navigator.userAgent) && !/Chrome|Chromium|Edg\//.test(self.navigator.userAgent);
 
 self.addEventListener("install", () => { self.skipWaiting(); });
