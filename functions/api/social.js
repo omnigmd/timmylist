@@ -293,6 +293,28 @@ const REC_KEEP = 40; // decided submissions kept per player
 const REP_WHY = { spam: "Spam", harass: "Harassment or bullying", inappropriate: "Inappropriate content", scam: "Scam or suspicious link", other: "Something else" };
 const REP_MAXRS = 30, MODLOG_KEEP = 300;
 const SUG_MAX = 60, AUDIT_ACTS = new Set(["recAccept", "recDecline", "recAdd", "recRemove", "lvlAdd", "lvlMove", "lvlRemove", "lvlEdit", "sugPromote", "listEdit", "recDate"]);
+
+// ---------- Discord posts: records and list changes, sent to a channel webhook ----------
+// Set DISCORD_WEBHOOK_URL (Cloudflare Pages > Settings > Variables and Secrets). Without it nothing is posted.
+const DC_POST = { recAccept: 1, recAdd: 1, lvlAdd: 1, lvlMove: 1, lvlRemove: 1 };
+const DC_SENT = [];
+const dcEsc = (t) => String(t == null ? "" : t).replace(/[\\*_`~|>@#<]/g, (c) => "\\" + c).slice(0, 90);
+async function discordPost(env, act, who, note) {
+  try {
+    const hook = String((env && env.DISCORD_WEBHOOK_URL) || "").trim();
+    if (!DC_POST[act] || !/^https:\/\/(discord|discordapp)\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(hook)) return;
+    const now = Date.now(); while (DC_SENT.length && now - DC_SENT[0] > 60000) DC_SENT.shift();
+    if (DC_SENT.length >= 8) return; // a bulk edit should not flood the channel
+    DC_SENT.push(now);
+    const w = dcEsc(who), n = dcEsc(note);
+    let title, text;
+    if (act === "recAccept" || act === "recAdd") { title = "New record"; text = "**" + w + "** beat **" + n + "**."; }
+    else if (act === "lvlAdd") { title = "Level placed"; text = "**" + w + "** was placed at **" + n + "** on the list."; }
+    else if (act === "lvlMove") { title = "Level moved"; text = "**" + w + "** moved " + (/^#\d+ to #\d+$/.test(String(note || "")) ? "from " + n : n) + "."; }
+    else { title = "Level removed"; text = "**" + w + "** was removed from the list."; }
+    await fetch(hook, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: "The Timmylist", allowed_mentions: { parse: [] }, embeds: [{ title, description: text, color: 0x3b86ff, url: "https://timmylist.pages.dev/", footer: { text: "timmylist.pages.dev" } }] }) });
+  } catch (e) {}
+}
 let MODLOG_SEQ = 0; // keeps two entries made in the same millisecond in the order they happened
 async function modLog(sa, admin, act, who, note) {
   try {
@@ -1174,6 +1196,7 @@ export async function onRequestPost(context) {
       const act = String(body.act || "");
       if (!AUDIT_ACTS.has(act)) return json({ error: "bad request" }, 400);
       await modLog(sa, name, act, tidy(body.w, 30), tidy(body.n, 80));
+      defer(discordPost(env, act, tidy(body.w, 30), tidy(body.n, 80)));
       return json({ ok: true });
     }
     if (a === "auditList") {
