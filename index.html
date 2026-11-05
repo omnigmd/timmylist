@@ -20383,9 +20383,7 @@ var _sh=window.show;
     var side=D.createElement('div'); side.className='hcol h6side';
     side.innerHTML=topHtml()+recentHtml()+'<div class="hcol h6live"></div>'+teamHtml();
     ng.appendChild(main); ng.appendChild(side);
-    var ex=D.createElement('section'); ex.setAttribute('aria-label','Explore');
-    ex.innerHTML='<div class="h6h"><h2><small>Explore</small>Everything on the site</h2></div><div class="h6x">'+exploreHtml()+'</div>';
-    hero.parentNode.insertBefore(strip,g); g.parentNode.insertBefore(ng,g); g.parentNode.insertBefore(ex,g); g.parentNode.removeChild(g);
+    hero.parentNode.insertBefore(strip,g); g.parentNode.insertBefore(ng,g); g.parentNode.removeChild(g);
     if(note&&note.parentNode) note.parentNode.appendChild(note);
     countUp(strip);
     // the "This week" and "Latest clips" panels load by themselves and add themselves to the live column
@@ -20807,6 +20805,7 @@ var _sh=window.show;
   var P={
     clue:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9.2 9.3a2 2 0 1 1 3 1.7c-.7.4-1.2.8-1.2 1.6"/><path d="M11 15h.01"/>',
     time:'<path d="M3 17l5-6 4 4 8-9"/><path d="M15 6h5v5"/>',
+    play:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/>',
     ppl:'<path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.5-3.3M15.5 4.7a3.5 3.5 0 0 1 0 6.6"/>',
     press:'<path d="M4 5h13a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2z"/><path d="M19 9h2v8a2 2 0 0 1-2 2M8 9h7M8 13h7M8 17h4"/>',
     rss:'<path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.4"/>',
@@ -21349,7 +21348,7 @@ var _sh=window.show;
   }
   function footerLinks(){
     var f=D.querySelector('#foot .fcol .fl'); if(!f||f.querySelector('[data-x5]')) return;
-    [['#/timeline','time','Timeline'],['#/creators','ppl','Creators'],['#/press','press','Press kit'],['/feed.xml','rss','List feed']].forEach(function(c){
+    [['#/watch','play','Watch'],['#/timeline','time','Timeline'],['#/creators','ppl','Creators'],['#/press','press','Press kit'],['/feed.xml','rss','List feed']].forEach(function(c){
       var a=D.createElement('a'); a.href=c[0]; a.setAttribute('data-x5','1'); if(c[0].charAt(0)==='/'){ a.target='_blank'; a.rel='noopener'; }
       a.innerHTML=svg(c[1],18)+' '+c[2]+'<i>→</i>'; f.appendChild(a);
     });
