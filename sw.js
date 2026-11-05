@@ -3,7 +3,7 @@
    2) Offline: the page you last loaded still opens without a connection.
    It never caches /api/ calls, and the page itself is always fetched fresh when you are online,
    so an update is never held back by this file. */
-const VER = "v234", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
+const VER = "v250", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(self.navigator.userAgent) && !/Chrome|Chromium|Edg\//.test(self.navigator.userAgent);
 
 self.addEventListener("install", () => { self.skipWaiting(); });
@@ -19,6 +19,7 @@ self.addEventListener("fetch", (e) => {
   if (r.method !== "GET") return;
   const u = new URL(r.url);
   if (u.origin !== self.location.origin || u.pathname.startsWith("/api/")) return;
+  if (/\.mp4$/i.test(u.pathname)) return; // let the browser stream the trailer itself (range requests)
   if (r.mode === "navigate") {
     // online: always the newest page. offline: the last one that loaded.
     e.respondWith(fetch(r).then((res) => { if (res && res.ok) { const c = res.clone(); caches.open(SHELL).then((ca) => ca.put("/", c)).catch(() => {}); } return res; })
