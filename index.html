@@ -10668,35 +10668,36 @@ html:not(#x1):not(#x2):not(#x3):not(#x4)[data-theme="light"] body header #loginB
 :root[data-theme="light"]{--h9base:#eef3fb;--h9card:rgba(255,255,255,.78);--h9t:#1c2233;--h9w:#0b1530;--h9m:#6d7891;--h9a:#1f6fe8;--h9ah:#2f8cff;--h9line:rgba(20,50,110,.14);--h9swirl:rgba(31,111,232,.09);--h9glow:rgba(47,140,255,.16)}
 
 /* ---------- page shell on the home page ---------- */
-:root:root:root:root:root.h9on{background:var(--h9base)!important;background-image:none!important}
-:root:root:root:root:root.h9on body{background:transparent!important;background-image:none!important}
-:root:root:root:root:root.h9on .bgfx,:root:root:root:root:root.h9on #fx{display:none!important}
+:root:root:root:root:root.h9all{background:var(--h9base)!important;background-image:none!important}
+:root:root:root:root:root.h9all body{background:transparent!important;background-image:none!important}
+:root:root:root:root:root.h9all .bgfx,:root:root:root:root:root.h9all #fx{display:none!important}
 :root:root:root:root:root.h9on #foot{display:none!important}
 .h9bg{display:none;position:fixed;inset:0;z-index:-1;pointer-events:none;color:var(--h9swirl);overflow:hidden}
 .h9bg svg{position:absolute;inset:0;width:100%;height:100%}
 .h9bg::after{content:"";position:absolute;inset:0;background:radial-gradient(55% 45% at 72% 108%,var(--h9glow),transparent 70%),radial-gradient(40% 35% at 0% 100%,rgba(47,140,255,.08),transparent 70%)}
-:root:root:root:root:root.h9on .h9bg{display:block}
-:root:root:root:root:root.h9on::before,:root:root:root:root:root.h9on::after,:root:root:root:root:root.h9on body::before,:root:root:root:root:root.h9on body::after{display:none!important}
+:root:root:root:root:root.h9all .h9bg{display:block}
+:root:root:root:root:root.h9all::before,:root:root:root:root:root.h9all::after,:root:root:root:root:root.h9all body::before,:root:root:root:root:root.h9all body::after{display:none!important}
 :root:root:root:root:root.h9on #app{max-width:none!important;width:auto!important;margin:0!important;padding:16px 56px 32px!important;font-family:Poppins,Inter,system-ui,sans-serif;color:var(--h9t)}
 :root:root:root:root:root.h9on #app .h9keep{display:none!important}
 
 /* ---------- header, AREDL style (home page only) ---------- */
-:root:root:root:root:root.h9on header{background:transparent!important;border-bottom:0!important;box-shadow:none!important;backdrop-filter:none!important}
-:root:root:root:root:root.h9on header::before,:root:root:root:root:root.h9on header::after{display:none!important}
-:root:root:root:root:root.h9on header .logo>span{display:none!important}
-:root:root:root:root:root.h9on #nav{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:0!important;gap:4px!important}
-:root:root:root:root:root.h9on #nav .nind,:root:root:root:root:root.h9on #nav .ind{display:none!important}
-:root:root:root:root:root.h9on #nav button{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:6px!important;padding:8px 16px!important;height:40px!important;color:var(--h9m)!important;font:600 16px/24px Poppins,Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:uppercase}
-:root:root:root:root:root.h9on #nav button span{font:inherit!important;letter-spacing:0!important;color:inherit!important}
-:root:root:root:root:root.h9on #nav button svg{display:none!important}
-:root:root:root:root:root.h9on #nav button:hover,:root:root:root:root:root.h9on #nav button:focus-visible{color:var(--h9w)!important;background:rgba(255,255,255,.04)!important}
-html:not(#y1):not(#y2):not(#y3):not(#y4):not(#y5).h9on body header #loginBtn{background-image:none!important;background:var(--h9a)!important;color:#fff!important;border:0!important;border-radius:6px!important;padding:8px 16px!important;height:40px!important;font:500 16px/24px Poppins,Inter,system-ui,sans-serif!important;letter-spacing:0!important;box-shadow:none!important}
-html:not(#y1):not(#y2):not(#y3):not(#y4):not(#y5).h9on body header #loginBtn:hover{background:var(--h9ah)!important}
-:root:root:root:root:root.h9on header .hbtn,:root:root:root:root:root.h9on header .ib:not(#loginBtn){background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:var(--h9m)!important}
-:root:root:root:root:root.h9on header .hbtn:hover,:root:root:root:root:root.h9on header .ib:not(#loginBtn):hover{color:var(--h9w)!important}
+:root:root:root:root:root.h9all header{background:transparent!important;border-bottom:0!important;box-shadow:none!important;backdrop-filter:none!important}
+:root:root:root:root:root.h9all header::before,:root:root:root:root:root.h9all header::after{display:none!important}
+:root:root:root:root:root.h9all header .logo>span{display:none!important}
+:root:root:root:root:root.h9all #nav{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:0!important;gap:4px!important}
+:root:root:root:root:root.h9all #nav .nind,:root:root:root:root:root.h9all #nav .ind{display:none!important}
+:root:root:root:root:root.h9all #nav button{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:6px!important;padding:8px 16px!important;height:40px!important;color:var(--h9m)!important;font:600 16px/24px Poppins,Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:uppercase}
+:root:root:root:root:root.h9all #nav button span{font:inherit!important;letter-spacing:0!important;color:inherit!important}
+:root:root:root:root:root.h9all #nav button svg{display:none!important}
+:root:root:root:root:root.h9all #nav button:hover,:root:root:root:root:root.h9all #nav button:focus-visible{color:var(--h9w)!important;background:rgba(255,255,255,.04)!important}
+html:not(#y1):not(#y2):not(#y3):not(#y4):not(#y5).h9all body header #loginBtn{background-image:none!important;background:var(--h9a)!important;color:#fff!important;border:0!important;border-radius:6px!important;padding:8px 16px!important;height:40px!important;font:500 16px/24px Poppins,Inter,system-ui,sans-serif!important;letter-spacing:0!important;box-shadow:none!important}
+html:not(#y1):not(#y2):not(#y3):not(#y4):not(#y5).h9all body header #loginBtn:hover{background:var(--h9ah)!important}
+:root:root:root:root:root.h9all header .hbtn,:root:root:root:root:root.h9all header .ib:not(#loginBtn){background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:var(--h9m)!important}
+:root:root:root:root:root.h9all header .hbtn:hover,:root:root:root:root:root.h9all header .ib:not(#loginBtn):hover{color:var(--h9w)!important}
 
-:root:root:root:root:root.h9on header .hin{border-bottom:1px solid var(--h9line)!important}
+:root:root:root:root:root.h9all header .hin{border-bottom:1px solid var(--h9line)!important}
 :root:root:root:root:root #app .h9 h1::before,:root:root:root:root:root #app .h9 h1::after,:root:root:root:root:root #app .h9 h2::before,:root:root:root:root:root #app .h9 h2::after{display:none!important;content:none!important}
+html:not(#y1):not(#y2):not(#y3):not(#y4):not(#y5).h9all body header #nav button.on{background:transparent!important;background-image:none!important;box-shadow:none!important;color:var(--h9w)!important}
 /* ---------- grid ---------- */
 :root:root:root:root:root #app .h9{display:grid;grid-template-columns:minmax(0,2.154fr) minmax(0,1fr);gap:32px;align-items:start;font-family:Poppins,Inter,system-ui,sans-serif;font-size:16px;line-height:24px;color:var(--h9t)}
 :root:root:root:root:root #app .h9l{min-width:0}
@@ -22597,6 +22598,7 @@ var _sh=window.show;
   }
   var bg=D.createElement('div'); bg.className='h9bg'; bg.setAttribute('aria-hidden','true'); bg.innerHTML=bgSvg();
   D.body.insertBefore(bg,D.body.firstChild);
+  ROOT.classList.add('h9all');   // AREDL header + background on every page
   function sync(){ try{ ROOT.classList.toggle('h9on',!!(W.cur&&cur.v==='home')); }catch(e){} }
 
   var _home=W.rHome;
