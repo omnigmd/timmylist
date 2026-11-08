@@ -11210,85 +11210,72 @@ html:not(#y1):not(#y2) body #app .h12sf form#f :is(input,select){width:100%!impo
 <style id="v263">/* v263: badges removed, only the Moderator badge stays */
 #b8p,#app .b8m,#app .w8bd,#app .pfbd{display:none!important}
 #app .h12pid .pbadges{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:8px 0 2px}</style>
-<style id="v264">/* v264: visual polish only (depth, contrast, motion, focus). Layout and features unchanged. */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]){--h9base:#17181d;--h9m:#878c99;--h11bd:#363944;--h12row:rgba(255,255,255,.035);--h12p:rgba(6,8,14,.3);--h12c:rgba(6,8,14,.4);--h9swirl:rgba(70,150,255,.095)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) ::selection{background:rgba(47,140,255,.38);color:#fff}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]){scrollbar-color:#2c3140 transparent}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) ::-webkit-scrollbar{width:11px;height:11px}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) ::-webkit-scrollbar-track{background:transparent}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) ::-webkit-scrollbar-thumb{background:#2a2f3c;border:3px solid transparent;border-radius:99px;background-clip:padding-box}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) ::-webkit-scrollbar-thumb:hover{background-color:#2f8cff}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all :focus-visible{outline:2px solid #5aa6ff!important;outline-offset:2px!important}
+<style id="v265">/* v265: the chat drawer in the AREDL style (flat dark panels, Poppins, #404040 borders, blue accent). Dark theme only. */
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr{background:#1b1a1e!important;background-image:none!important;border-left:1px solid #404040!important;box-shadow:-24px 0 48px -24px rgba(0,0,0,.7)!important;backdrop-filter:none!important;font-family:Poppins,Inter,system-ui,sans-serif!important;color:#e6e6e6!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr::before,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr::after{display:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr *{font-family:Poppins,Inter,system-ui,sans-serif}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chh{background:rgba(0,0,0,.17)!important;background-image:none!important;border-bottom:1px solid #404040!important;box-shadow:none!important;backdrop-filter:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .cht b{font:700 18px/26px Poppins,Inter,sans-serif!important;color:#fff!important;text-transform:uppercase;letter-spacing:0!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .cht small{color:#616062!important;font:400 13px/18px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chb{background:transparent!important;background-image:none!important;border:0!important;border-radius:6px!important;box-shadow:none!important;color:#616062!important;transition:color .15s,background-color .15s}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chb:hover{color:#fff!important;background:rgba(255,255,255,.04)!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chbody{background:transparent!important;background-image:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chbody::before,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chbody::after{display:none!important}
+/* inbox list */
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chsec span{color:#616062!important;font:600 13px/20px Poppins,Inter,sans-serif!important;letter-spacing:0!important;text-transform:uppercase}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chnewb{background:transparent!important;background-image:none!important;border:1px solid #404040!important;border-radius:6px!important;color:#e6e6e6!important;box-shadow:none!important;font:500 13px/18px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chnewb:hover{background:rgba(255,255,255,.03)!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrm{background:rgba(255,255,255,.03)!important;background-image:none!important;border:0!important;border-radius:6px!important;box-shadow:none!important;transform:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrm::before,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrm::after{display:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrm:hover{background:rgba(255,255,255,.06)!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrt b{color:#e6e6e6!important;font:500 15px/22px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrt small{color:#616062!important;font:400 13px/18px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrm.un .chrt small{color:#e6e6e6!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrr{color:#616062!important;font:400 12px/16px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chud{background:#2f8cff!important;box-shadow:none!important;border:0!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrav{background:#2f8cff!important;background-image:none!important;border:0!important;box-shadow:none!important;border-radius:50%!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrav .av{box-shadow:none!important;border:0!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.chfind,.chnf input,.chsrch input){background:#1b1a1e!important;border:1px solid #404040!important;border-radius:6px!important;color:#e6e6e6!important;box-shadow:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chempty{color:#616062!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chempty b{color:#e6e6e6!important}
+/* thread */
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chday span{background:transparent!important;border:0!important;box-shadow:none!important;color:#616062!important;font:600 12px/18px Poppins,Inter,sans-serif!important;letter-spacing:0!important;text-transform:uppercase}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chday::before,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chday::after{background:#404040!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chsys span,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chsys{background:transparent!important;border:0!important;box-shadow:none!important;color:#616062!important;font-size:13px!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chbub{background:rgba(255,255,255,.06)!important;background-image:none!important;border:0!important;border-radius:6px!important;box-shadow:none!important;color:#e6e6e6!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chm.me .chbub{background:#2f8cff!important;background-image:none!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chbub p{font:400 15px/22px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chnm{color:#2f8cff!important;font:600 13px/18px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmeta,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmeta time{color:#616062!important;font-size:11px!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chm.me .chmeta,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chm.me .chmeta time{color:rgba(255,255,255,.75)!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chq{background:rgba(0,0,0,.25)!important;border:0!important;border-left:3px solid #2f8cff!important;border-radius:4px!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chm.me .chq{background:rgba(0,0,0,.18)!important;border-left-color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmen{background:rgba(47,140,255,.18)!important;color:#5aa6ff!important;border-radius:4px!important;box-shadow:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmen.me{background:#2f8cff!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chm.me .chmen{background:rgba(255,255,255,.22)!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chav .av{box-shadow:none!important;border:0!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.chnew,.chdown){background:#2f8cff!important;background-image:none!important;border:0!important;border-radius:6px!important;box-shadow:none!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.chpin,.chbanner){background:rgba(0,0,0,.17)!important;background-image:none!important;border:0!important;border-bottom:1px solid #404040!important;box-shadow:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmenu{background:#1b1a1e!important;background-image:none!important;border:1px solid #404040!important;border-radius:6px!important;box-shadow:0 12px 30px rgba(0,0,0,.6)!important;backdrop-filter:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmenu button{border-radius:4px!important;color:#e6e6e6!important;background:transparent!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chmenu button:hover{background:rgba(255,255,255,.04)!important}
+/* composer */
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chcomp{background:rgba(0,0,0,.17)!important;background-image:none!important;border-top:1px solid #404040!important;box-shadow:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrow{background:transparent!important;border:0!important;box-shadow:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrow textarea{background:#1b1a1e!important;border:1px solid #404040!important;border-radius:6px!important;color:#e6e6e6!important;box-shadow:none!important;font:400 15px/22px Poppins,Inter,sans-serif!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrow textarea::placeholder{color:#616062!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chrow textarea:focus{border-color:#2f8cff!important;outline:0!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chsend{background:#2f8cff!important;background-image:none!important;border:0!important;border-radius:6px!important;box-shadow:none!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr .chsend:hover{background:#5aa6ff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.chemo,.chgifp,.chment,.chprev,.chrbar){background:#1b1a1e!important;background-image:none!important;border:1px solid #404040!important;border-radius:6px!important;box-shadow:0 12px 30px rgba(0,0,0,.6)!important;backdrop-filter:none!important}
+/* chat button */
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chfab{background:#2f8cff!important;background-image:none!important;border:0!important;box-shadow:0 6px 16px rgba(0,0,0,.45)!important;color:#fff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chfab::before,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chfab::after{display:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chfab:hover{background:#5aa6ff!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chfab .chdot{background:#1b1a1e!important;color:#fff!important;border:2px solid #2f8cff!important;box-shadow:none!important;font-family:Poppins,Inter,sans-serif!important}
 
-/* panels: hairline edge, top sheen, soft drop shadow */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.h9card,.panel,.h12p,.h12sl,.h12sr,.pxl,.pxd,.h11wrap),html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app #l3>section,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app #l3>aside,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"])[data-h12="lb"] #app{border:1px solid rgba(255,255,255,.055)!important;background-image:linear-gradient(180deg,rgba(110,165,255,.04),rgba(255,255,255,0) 180px)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 22px 44px -26px rgba(0,0,0,.85)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all[data-theme="light"] #app :is(.h9card,.h12p,.h12sl,.h12sr){box-shadow:0 14px 34px -22px rgba(20,60,140,.35)!important}
-
-/* header */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header #nav button{transition:color .18s,background-color .18s,box-shadow .18s,transform .12s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header #nav button:active{transform:translateY(1px)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header #nav button.on,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:is([data-h12="games"],[data-h12="community"],[data-h12="clips"],[data-h12="watch"],[data-h12="stats"],[data-h12="timeline"],[data-h12="top5"],[data-h12="wrapped"],[data-h12="progress"],[data-h12="compare"],[data-h12="friends"],[data-h12="clans"],[data-h12="creators"],[data-h12="team"],[data-h12="press"]) body header #nav button[data-v="games"]{background-color:#2f8cff!important;background-image:linear-gradient(180deg,#43a0ff,#2580f0)!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 20px -8px rgba(47,140,255,.75)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:is([data-h12="games"],[data-h12="community"],[data-h12="clips"],[data-h12="watch"],[data-h12="stats"],[data-h12="timeline"],[data-h12="top5"],[data-h12="wrapped"],[data-h12="progress"],[data-h12="compare"],[data-h12="friends"],[data-h12="clans"],[data-h12="creators"],[data-h12="team"],[data-h12="press"]) body header #nav button.on:not([data-v="games"]){background:transparent!important;background-image:none!important;box-shadow:none!important;color:var(--h9m)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:is([data-h12="games"],[data-h12="community"],[data-h12="clips"],[data-h12="watch"],[data-h12="stats"],[data-h12="timeline"],[data-h12="top5"],[data-h12="wrapped"],[data-h12="progress"],[data-h12="compare"],[data-h12="friends"],[data-h12="clans"],[data-h12="creators"],[data-h12="team"],[data-h12="press"]) body header #nav button.on:not([data-v="games"]):hover{color:#fff!important;background:rgba(255,255,255,.04)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header :is(#cmdBtn,#bellBtn,#loginBtn){background-image:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 20px -9px rgba(47,140,255,.8)!important;transition:filter .18s,transform .12s,box-shadow .18s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header :is(#cmdBtn,#bellBtn,#loginBtn):hover{filter:brightness(1.1)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all body header :is(#cmdBtn,#bellBtn,#loginBtn):active{transform:translateY(1px)}
-
-/* primary (blue) buttons anywhere in the page */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h13pri{background-image:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,0))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 20px -10px rgba(47,140,255,.85)!important;transition:filter .18s,transform .12s,box-shadow .18s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h13pri:hover{filter:brightness(1.08)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h13pri:active{transform:translateY(1px)}
-
-/* outline buttons */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.h12ob,.h9pg button,.h9pg a){transition:background-color .15s,border-color .15s,color .15s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app .h12ob:hover{border-color:rgba(47,140,255,.65)!important;color:#fff!important;background:rgba(47,140,255,.08)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12pacts{align-items:center!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12pacts .h12ob{margin:0!important;vertical-align:middle!important}
-
-/* tabs */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app :is(.h9tab,.h12rtabs button){transition:color .2s,border-color .2s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app :is(.h9tab,.h12rtabs button):not(.on):hover{color:#c9ced8!important}
-
-/* search fields and inputs */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.l3s,.ulsearch,.pxsr){background:rgba(255,255,255,.035)!important;background-image:none!important;border:1px solid rgba(255,255,255,.07)!important;transition:border-color .18s,box-shadow .18s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.l3s,.ulsearch,.pxsr):focus-within{border-color:rgba(47,140,255,.75)!important;box-shadow:0 0 0 3px rgba(47,140,255,.18)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.l3s,.ulsearch,.pxsr) input{outline:0!important;box-shadow:none!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body #app :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not(:is(.l3s,.ulsearch,.pxsr) *){transition:border-color .18s,box-shadow .18s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body #app :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not(:is(.l3s,.ulsearch,.pxsr) *):focus{border-color:#2f8cff!important;box-shadow:0 0 0 3px rgba(47,140,255,.2)!important;outline:0!important}
-
-/* list page */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app #l3 .l3r{transition:background-color .15s,color .15s,box-shadow .15s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app #l3 .l3r:not(.on):hover{background:rgba(255,255,255,.065)!important;color:#fff!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app #l3 .l3r.on{background-image:linear-gradient(90deg,#3896ff,#2479ea)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px -14px rgba(47,140,255,.95)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app #l3 .l3r b,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulk b,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12rcn{font-variant-numeric:tabular-nums}
-
-/* leaderboard */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulh{background-image:linear-gradient(180deg,#3d9bff,#2580f0)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important;border-radius:8px 8px 0 0!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulr{transition:background-color .15s,box-shadow .15s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulr:hover{box-shadow:inset 3px 0 0 #2f8cff!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app .ulv b{color:#cdd3de!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.ulhd,.ulc) b{color:#a9afbb!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulr:nth-child(1 of .ulr) .ulk b{color:#ffcf4d!important;text-shadow:0 0 18px rgba(255,200,60,.35)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulr:nth-child(2 of .ulr) .ulk b{color:#dfe6f0!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .ulr:nth-child(3 of .ulr) .ulk b{color:#f0a467!important}
-
-/* profile */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12pid .av.big{box-shadow:0 0 0 4px rgba(47,140,255,.22),0 16px 36px -14px rgba(0,0,0,.85)!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12rc{box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 12px 26px -18px rgba(0,0,0,.9);transition:transform .18s,box-shadow .18s!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12rc:hover{box-shadow:inset 0 0 0 1px rgba(47,140,255,.55),0 14px 30px -16px rgba(47,140,255,.45)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h12rc :is(.h12rcn,.h12rct,.h12rcv){text-shadow:0 2px 10px rgba(0,0,0,.75)}
-
-/* home */
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app .h9chip{background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.05)}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app .h9chip:hover{color:#fff!important;border-color:rgba(47,140,255,.5);background:rgba(47,140,255,.1)!important}
-
-/* gentle page entrance */
-@keyframes h13in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app.h13enter>*:not([hidden]){animation:h13in .32s cubic-bezier(.2,.7,.2,1) both}
-@media (prefers-reduced-motion:reduce){html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app.h13enter>*{animation:none!important}html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all *{transition-duration:.01ms!important}}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h13pri:disabled,html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all #app .h13pri[aria-disabled="true"]{box-shadow:none!important;filter:none!important;transform:none!important}
-html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) #app :is(.l3s,.ulsearch,.pxsr) input{background:transparent!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.cht b,.cht small,.chrt b,.chnm,.chday span,.chsys span){text-shadow:none!important;filter:none!important}
+html:not(#r1):not(#r2):not(#r3):not(#r4):not(#r5):not(#r6):not(#r7):not(#r8).h9all:not([data-theme="light"]) body .chdr :is(.chrav,.chav) :is(.av,img){box-shadow:none!important;filter:none!important}
 </style>
 </head>
 <body>
@@ -23592,25 +23579,8 @@ var _sh=window.show;
   try{ rPlayer=window.rPlayer; }catch(e){}
   try{ if(window.cur&&cur.v==='player') rPlayer(cur.a); }catch(e){}
 })();</script>
-<script id="v264js">
-(function(){
-  /* v264: mark blue primary buttons for the polish styles, and play a short entrance on page change */
-  var BLUE=/^rgb\((4[5-8]), (13[8-9]|14[0-2]), 255\)$/;
-  function tag(){
-    var app=document.getElementById('app'); if(!app) return;
-    var els=app.querySelectorAll('button,a,[role="button"]');
-    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.classList.contains('h13pri')||e.classList.contains('l3r')) continue;
-      var bg=getComputedStyle(e).backgroundColor; if(BLUE.test(bg)&&e.offsetWidth>0) e.classList.add('h13pri'); }
-  }
-  function enter(){
-    var app=document.getElementById('app'); if(!app) return;
-    app.classList.remove('h13enter'); void app.offsetWidth; app.classList.add('h13enter');
-    clearTimeout(enter.t); enter.t=setTimeout(function(){ app.classList.remove('h13enter'); },450);
-  }
-  window.addEventListener('hashchange',function(){ enter(); setTimeout(tag,250); setTimeout(tag,900); });
-  document.addEventListener('click',function(){ setTimeout(tag,200); },true);
-  setTimeout(tag,600); setTimeout(tag,2000); setInterval(tag,4000);
-})();
+<script id="v265js">
+/* v265: chat restyled in the AREDL look (CSS only); v264 polish reverted */
 </script>
 </body>
 </html>
