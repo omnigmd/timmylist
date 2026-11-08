@@ -22795,7 +22795,13 @@ var _sh=window.show;
     f.__h11=1; W.openProfile=f; try{ openProfile=f; }catch(e){}
   }
   install();
-  var tries=0, iv=setInterval(function(){ install(); if(++tries>40) clearInterval(iv); },500);
+  setInterval(install,1000);
+  // the gear button goes straight to the page, whatever else has wrapped openProfile
+  D.addEventListener('click',function(e){
+    var g=e.target&&e.target.closest?e.target.closest('#setBtn'):null; if(!g||!signedIn()) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if(!(W.cur&&cur.v==='settings')) location.hash='#/settings';
+  },true);
 
   /* ---------- small builders ---------- */
   function section(id,title,body,extra){ return '<section class="h11s'+(extra?' '+extra:'')+'" id="'+id+'"><h2>'+X(title)+'</h2><div class="h11bar" aria-hidden="true"></div>'+body+'</section>'; }
@@ -22979,7 +22985,17 @@ var _sh=window.show;
   };
   // the saved-profile handler re-shows the current page; on the settings page that rebuilds it with fresh values
 
-  if(/^#\/settings/.test(location.hash)){ var go=function(){ try{ show('settings',null,true); }catch(e){} }; if(signedIn()) go(); else setTimeout(go,1500); }
+  // opened straight from a #/settings link: show it now, and again once sign-in finishes
+  if(/^#\/settings/.test(location.hash)){
+    var tries=0, shown=null;
+    (function go(){
+      if(!/^#\/settings/.test(location.hash)) return;
+      var si=signedIn();
+      if(!(W.cur&&cur.v==='settings')||si!==shown){ shown=si; try{ show('settings',null,true); }catch(e){} }
+      if(!si&&++tries<40) setTimeout(go,500);
+    })();
+    setTimeout(function(){ if(/^#\/settings/.test(location.hash)&&!(W.cur&&cur.v==='settings')) try{ show('settings',null,true); }catch(e){} },6000);
+  }
 })();
 </script>
 </body>
