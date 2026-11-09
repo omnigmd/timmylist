@@ -217,6 +217,15 @@ function changeLine(c) {
 
 // each command returns a message object; `ctx` = { env, origin, opts }
 const COMMANDS = {
+  // v274: talk in the Timmylist chat room from Discord
+  async say({ env, origin, opts, it }) {
+    const u = (it && ((it.member && it.member.user) || it.user)) || {}, text = String(opts.message || "").trim();
+    if (!text) return Object.assign(note("Type a message to send."), { flags: FLAG_EPHEMERAL });
+    if (!env.DISCORD_REGISTER_KEY) return Object.assign(note("The chat bridge isn't set up yet (DISCORD_REGISTER_KEY is missing)."), { flags: FLAG_EPHEMERAL });
+    const r = await fetch(origin + "/api/social", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ a: "dcSay", key: env.DISCORD_REGISTER_KEY, du: String(u.id || ""), name: String(u.global_name || u.username || "Discord user"), text }) });
+    const j = await r.json().catch(() => ({}));
+    return Object.assign(note(j && j.ok ? "Sent to the Timmylist room: \u201c" + clip(md(text), 180) + "\u201d" : (j && j.message) || "That didn't go through. Try again in a moment."), { flags: FLAG_EPHEMERAL });
+  },
   async top({ env, origin, opts }) {
     const list = await loadList(env, origin), n = clampN(opts.count, 10, 15);
     const lines = list.levels.slice(0, n).map((l) => "`#" + l.rank + "` **" + md(clip(l.name, 60)) + "** \u2014 " + P2(l.points) + " pts" + (l.verifier ? " \u00b7 " + md(l.verifier) : ""));
@@ -276,6 +285,7 @@ const COMMAND_DEFS = [
   { name: "player", description: "Look up a player", type: 1, options: [{ type: 3, name: "name", description: "Player name", required: true, autocomplete: true }] },
   { name: "leaderboard", description: "Top players by points", type: 1, options: [{ type: 4, name: "count", description: "How many players (1-15, default 10)", min_value: 1, max_value: 15 }] },
   { name: "random", description: "Get a random level from the list", type: 1 },
+  { name: "say", description: "Send a message to the Timmylist chat room", type: 1, options: [{ type: 3, name: "message", description: "What to say", required: true, max_length: 400 }] },
   { name: "changes", description: "The latest changes to the list", type: 1, options: [{ type: 4, name: "count", description: "How many changes (1-15, default 8)", min_value: 1, max_value: 15 }] },
 ];
 
@@ -324,7 +334,7 @@ async function handleInteraction(it, context, origin) {
     try { return json(await autocomplete(it.data || {}, env, origin)); } catch (e) { return json({ type: 8, data: { choices: [] } }); }
   }
   if (it.type === 2) {
-    const name = (it.data || {}).name, work = runCommand(name, { env, origin, opts: optionsOf(it.data || {}) });
+    const name = (it.data || {}).name, work = runCommand(name, { env, origin, opts: optionsOf(it.data || {}), it });
     const quick = await Promise.race([work, sleep(1800).then(() => null)]);
     if (quick) return json({ type: 4, data: quick });
     // slower than Discord's 3 second window: say "thinking" now and fill the answer in when it's ready
