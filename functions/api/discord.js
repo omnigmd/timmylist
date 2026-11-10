@@ -141,6 +141,9 @@ async function loadRecords(env, origin, list) {
         if (d.rm) { if (i >= 0) all.splice(i, 1); }
         else if (i < 0) all.push({ lvl, user: String(d.user), video: d.video || "" });
       });
+      // players an admin removed from the list (approved/cfg_bans) don't show up anywhere
+      const bans = docs.find((d) => d && d.cfg === "bans"), bn = bans && bans.names && typeof bans.names === "object" ? bans.names : {};
+      if (Object.keys(bn).length) for (let i = all.length - 1; i >= 0; i--) if (bn[String(all[i].user).toLowerCase()]) all.splice(i, 1);
       live = true;
     }
   } catch (e) { /* baked records only */ }
