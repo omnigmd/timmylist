@@ -228,7 +228,8 @@ async function muteState(sa, uid) {
 async function settings(sa) {
   if (CFG.v && CFG.t > Date.now()) return CFG.v;
   const d = (await fsGet(sa, "chatcfg/main")) || {};
-  CFG = { v: { chat: d.chat !== false, images: d.images !== false, slow: SLOWS.includes(d.slow) ? d.slow : 0, mods: d.mods && typeof d.mods === "object" ? d.mods : {} }, t: Date.now() + 15 * 1000 };
+  CFG = { v: { chat: d.chat !== false, images: d.images !== false, slow: SLOWS.includes(d.slow) ? d.slow : 0, mods: d.mods && typeof d.mods === "object" ? d.mods : {}, lock: !!d.lock, words: Array.isArray(d.words) ? d.words.map(String).slice(0, 200) : [] }, t: Date.now() + 15 * 1000 };
+      setExtraWords(CFG.v.words);
   return CFG.v;
 }
 
@@ -286,7 +287,12 @@ let PL = { t: 0, v: null }, AL = { t: 0, v: null };
 const LASTTXT = new Map(), RAID = { hits: [], until: 0, last: new Map() };
 const BADW = ["bmlnZ2Vy", "bmlnZ2E=", "ZmFnZ290", "a2lrZQ==", "Y2hpbms=", "c3BpYw==", "dHJhbm55", "cmV0YXJk", "d2V0YmFjaw==", "Y29vbg=="].map((b) => (typeof atob === "function" ? atob(b) : Buffer.from(b, "base64").toString()));
 const BADRE = new RegExp("\\b(" + BADW.map((w) => w.split("").map((c) => c + "+").join("[\\W_]*")).join("|") + ")(s|z|es)?\\b", "gi");
-function modText(t) { t = String(t || ""); return t ? t.replace(BADRE, (m) => m.charAt(0) + "\u2022".repeat(Math.max(2, m.length - 1))) : t; }
+let XRE = null;
+function setExtraWords(ws) {
+  const w = (ws || []).map((x) => String(x).trim().toLowerCase()).filter((x) => x.length >= 2 && x.length <= 40).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  XRE = w.length ? new RegExp("\\b(" + w.join("|") + ")\\b", "gi") : null;
+}
+function modText(t) { t = String(t || ""); if (!t) return t; const mask = (m) => m.charAt(0) + "\u2022".repeat(Math.max(2, m.length - 1)); t = t.replace(BADRE, mask); if (XRE) t = t.replace(XRE, mask); return t; }
 function raidWait(uid, key) {
   if (key !== "main" && !String(key).startsWith("lv_")) return 0;
   const now = Date.now();
@@ -300,6 +306,30 @@ function luLine(act, w, n) {
   if (act === "lvlAdd") return w + " was placed at " + n;
   if (act === "lvlMove") return w + " moved " + (/^#\d+ to #\d+$/.test(String(n || "")) ? "from " + n : n);
   return w + " was removed from the list";
+}
+// ---- v279 helpers: presence + streaks ----
+async function presenceList(sa) { if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 4000, v: await fsList(sa, "presence", 400) }; return PRC.v; }
+const STC = new Map();
+async function stCached(sa, u) { const c = STC.get(u); if (c && c.t > Date.now()) return c.v; const v = await fsGet(sa, "status/" + u); STC.set(u, { t: Date.now() + 15000, v }); return v; }
+function presOf(d, pres, self) {
+  const now = Date.now(), p = (d && d.p) || "", hidden = p === "inv" || (pres && pres.ho);
+  const live = !!(pres && pres.ts && pres.ts > now - ONLINE) && (!hidden || self);
+  const o = { on: live ? (p === "dnd" ? "dnd" : p === "idle" ? "idle" : "on") : "off" };
+  if (self && p) o.p = p;
+  if (!hidden && pres && pres.ts) o.seen = pres.ts;
+  if (d && d.ts > now - 12 * 3600e3 && (d.t || d.lv)) { o.t = String(d.t || ""); o.lv = String(d.lv || ""); o.ts = d.ts; }
+  const day = Math.floor(now / 86400000);
+  if (d && d.sk && d.sd >= day - 1) o.sk = d.sk;
+  return o;
+}
+async function bumpStreak(sa, uid, name, ts) {
+  try {
+    const day = Math.floor(ts / 86400000), d = (await stCached(sa, uid)) || {};
+    if (d.sd === day) return;
+    const sk = d.sd === day - 1 ? (d.sk || 1) + 1 : 1;
+    await fsSet(sa, "status/" + uid, [[["sd"], day], [["sk"], sk], [["n"], name]]);
+    STC.delete(uid);
+  } catch (e) {}
 }
 const DCCHAT = [];
 async function dcChat(env, name, text) {
@@ -411,6 +441,7 @@ const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k
 async function notifyUser(sa, uid, msg) {
   try {
     if (!okUid(uid) || !PUSH_KINDS[msg.kind]) return 0;
+    try { const st = await fsGet(sa, "status/" + uid); if (st && st.p === "dnd") return 0; } catch (e) {}
     const d = await fsGet(sa, "push/" + uid); if (!d || !d.s || (d.k && d.k[msg.kind] === false)) return 0;
     const payload = { title: oneLine(msg.title, 60) || "The Timmylist", body: oneLine(msg.body, 140), url: String(msg.url || "#/").slice(0, 60), tag: String(msg.tag || "").slice(0, 40), kind: msg.kind };
     let sent = 0; const dead = [];
@@ -532,6 +563,7 @@ function pubMsg(m) {
   if (m.k === "re") { o.e = m.e || ""; o.u = m.u || ""; o.on = !!m.on; }
   if (m.k === "call") o.dur = m.dur || 0;
   if (m.ed && !m.del && !m.k) o.ed = m.ed;
+  if (m.eh && !m.del && !m.k && Array.isArray(m.eh) && m.eh.length) o.eh = m.eh.length;
   if (m.k === "ed") { o.t = m.t || ""; o.ed = m.ts || 0; }
   if (m.k === "pin") { o.t = m.t || ""; o.on = !!m.on; o.snip = m.snip || ""; o.pn = m.pn || ""; o.pby = m.pby || ""; }
   if (m.rt && !m.del) { o.rt = m.rt; o.rn = m.rn || ""; o.rq = m.rq || ""; }
@@ -693,6 +725,21 @@ export async function onRequestPost(context) {
   const a = body.a, bearer = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
   try {
     const uid = bearer ? await verifyIdToken(bearer, FIREBASE_API_KEY, sa.project_id) : null;
+
+    // ---------- v279: online status (public, like Discord) ----------
+    if (a === "presence") {
+      const names = (Array.isArray(body.names) ? body.names : []).map((n) => oneLine(n, 30)).filter(Boolean).slice(0, 20), out = {};
+      if (!rate("ip" + (request.headers.get("cf-connecting-ip") || "x"), "prs", 30, 60000)) return json({ error: "slow" }, 429);
+      const pr = await presenceList(sa);
+      await Promise.all(names.map(async (n) => { const u = await uidOf(sa, n); if (!u) return; const d = await fsGet(sa, "status/" + u), o = presOf(d, pr.find((x) => x._id === u), false); out[n.toLowerCase()] = Object.assign({ uid: u }, o || { on: "off" }); }));
+      return json({ ok: true, st: out });
+    }
+    if (a === "online") {
+      const pr = await presenceList(sa), now = Date.now();
+      const live = pr.filter((d) => d.ts && d.ts > now - ONLINE && !d.ho && d.name).slice(0, 80);
+      const rows = await Promise.all(live.map(async (d) => { const st = await stCached(sa, d._id); if (st && st.p === "inv") return null; return { uid: d._id, name: String(d.name), p: (st && st.p) || "" }; }));
+      return json({ ok: true, on: rows.filter(Boolean).slice(0, 60) });
+    }
 
     // ---------- v274: messages from Discord (the bot's /say command) ----------
     if (a === "dcSay") {
@@ -877,7 +924,7 @@ export async function onRequestPost(context) {
         const cl = await clanOfName(sa, name);
         if (cl) { const cm = (await fsGet(sa, "chatmeta/clan_" + cl.id)) || {}; clan = { id: cl.id, tag: cl.tag, name: cl.name, lead: isLeader(cl, name), ts: cm.ts || 0, last: cm.last || "", from: cm.from || "", fromName: cm.name || "" }; }
       }
-      return json({ ok: true, pr: wrote, fri: frRows(frOf(idx).i, 20), frn: Object.keys(frOf(idx).f).length, me: { uid, name, admin, mod: !!(cfg.mods && cfg.mods[uid]) }, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      return json({ ok: true, pr: wrote, fri: frRows(frOf(idx).i, 20), frn: Object.keys(frOf(idx).f).length, me: { uid, name, admin, mod: !!(cfg.mods && cfg.mods[uid]) }, lock: !!cfg.lock, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -943,6 +990,7 @@ export async function onRequestPost(context) {
         r = { key: dmKey(uid, peer), dm: true, peer, pn, prev: ((theirs.c || {})[uid] || {}).ts || 0 };
       } else if ((body.clan != null && body.clan !== "") || (body.group != null && body.group !== "") || (body.level != null && body.level !== "")) r = await roomFor(sa, uid, name, admin, body);
       else r = { key: "main", dm: false };
+      if (cfg.lock && !admin && !(cfg.mods && cfg.mods[uid]) && (r.key === "main" || r.key.startsWith("lv_"))) return json({ error: "locked", message: "The chat is locked by an admin right now. You can still read it." }, 403);
       if (!r.dm && !r.group && !admin) { const rw = raidWait(uid, r.key); if (rw > 0) return json({ error: "slowmode", message: "Lots of messages right now, so the room slowed down for a minute. You can send again in " + rw + " second" + (rw === 1 ? "" : "s") + ".", wait: rw }, 429); }
       if (!r.dm && !r.group && cfg.slow > 0 && !admin) {
         const mineS = (await fsGet(sa, "chatidx/" + uid)) || {}, lastS = (mineS.st && mineS.st[r.key]) || 0, left = Math.ceil((lastS + cfg.slow * 1000 - Date.now()) / 1000);
@@ -1000,12 +1048,13 @@ export async function onRequestPost(context) {
         })());
       }
       const echo = { id, from: uid, name, text, img: !!img, ts }; if (aud) { echo.aud = true; echo.adur = adur; }
+      await defer(bumpStreak(sa, uid, name, ts));
       if (r.key === "main" && (text || aud) && env.DISCORD_CHAT_WEBHOOK_URL) await defer(dcChat(env, name, text || "\ud83c\udfa4 sent a voice message")); ent.forEach(([p, v]) => { if (["rt", "rn", "rq", "gif", "gw", "gh"].includes(p[0])) echo[p[0]] = v; });
       return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
     }
     if (a === "react") {
       const r = await roomFor(sa, uid, name, admin, body);
-      if (!okId(body.id) || !(REACT.includes(body.e) || /^o[0-5]$/.test(String(body.e)))) return json({ error: "bad request" }, 400);
+      if (!okId(body.id) || !(REACT.includes(body.e) || /^o[0-5]$/.test(String(body.e)) || /^g([1-9]\d?|1\d\d|200)$/.test(String(body.e)))) return json({ error: "bad request" }, 400);
       if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
       if (!rate(uid, "react", 20, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
@@ -1048,8 +1097,8 @@ export async function onRequestPost(context) {
       const text = cleanText(body.text);
       if (!text && !m.img && !m.gif) return json({ error: "empty", message: "A message can't be empty. Delete it instead." }, 400);
       if (text === String(m.text || "")) return json({ ok: true, text, ed: m.ed || 0 });
-      const ts = Date.now();
-      await fsSet(sa, "chat/" + r.key + "/m/" + body.id, [[["text"], text], [["ed"], ts]]);
+      const ts = Date.now(), eh = (Array.isArray(m.eh) ? m.eh : []).concat([{ t: String(m.text || "").slice(0, 1000), ts: m.ed || m.ts || 0 }]).slice(-5);
+      await fsSet(sa, "chat/" + r.key + "/m/" + body.id, [[["text"], text], [["ed"], ts], [["eh"], eh]]);
       await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "ed"], [["t"], body.id], [["text"], text], [["ts"], ts]]);
       return json({ ok: true, text, ed: ts });
     }
@@ -1059,8 +1108,14 @@ export async function onRequestPost(context) {
       if (!(r.group || admin || (r.clan && isLeader(r.clan, name)))) return json({ error: "admin", message: r.clan ? "Only admins and the clan leader can pin." : "Only admins can pin." }, 403);
       if (!rate(uid, "pin", 10, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const mp = metaPath(r.key), on = body.on !== false;
+      const meta0 = (await fsGet(sa, mp)) || {}, pins0 = Array.isArray(meta0.pins) ? meta0.pins : [];
+      if (!on && okId(body.id) && pins0.some((p) => p && p.id === body.id)) {
+        const left = pins0.filter((p) => p && p.id !== body.id);
+        await fsSet(sa, mp, [[["pins"], left], [["pin"], meta0.pin && meta0.pin.id === body.id ? (left[left.length - 1] || undefined) : meta0.pin]]);
+        return json({ ok: true });
+      }
       if (!on) {
-        await fsSet(sa, mp, [[["pin"], undefined]]);
+        await fsSet(sa, mp, [[["pin"], undefined], [["pins"], pins0.filter((p) => p && (!meta0.pin || p.id !== meta0.pin.id))]]);
         await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "pin"], [["t"], ""], [["on"], false], [["ts"], Date.now()]]);
         return json({ ok: true });
       }
@@ -1068,7 +1123,8 @@ export async function onRequestPost(context) {
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del || m.k) return json({ error: "gone", message: "That message is gone." }, 404);
       const snip = String(m.text || (m.gif ? "GIF" : m.img ? "Photo" : "")).slice(0, 100), ts = Date.now();
-      await fsSet(sa, mp, [[["pin"], { id: body.id, name: String(m.name || "").slice(0, 30), text: snip, by: name, ts }]]);
+      const pin = { id: body.id, name: String(m.name || "").slice(0, 30), text: snip, by: name, ts };
+      await fsSet(sa, mp, [[["pin"], pin], [["pins"], pins0.filter((p) => p && p.id !== body.id).concat([pin]).slice(-25)]]);
       await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "pin"], [["t"], body.id], [["on"], true], [["snip"], snip], [["pn"], String(m.name || "").slice(0, 30)], [["pby"], name], [["ts"], ts]]);
       return json({ ok: true });
     }
@@ -1751,15 +1807,33 @@ export async function onRequestPost(context) {
     if (a === "stSet") {
       if (!rate(uid, "st", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const t = modText(oneLine(body.t, 60)), lv = /^\d{1,12}$/.test(String(body.lv || "")) ? String(body.lv) : "";
-      if (!t && !lv) { await fsDelete(sa, "status/" + uid); return json({ ok: true, st: null }); }
-      const st = { t, lv, ts: Date.now(), n: name };
-      await fsSet(sa, "status/" + uid, [[["t"], st.t], [["lv"], st.lv], [["ts"], st.ts], [["n"], name]]);
-      return json({ ok: true, st });
+      const onlyP = body.t === undefined && body.lv === undefined && body.p !== undefined;
+      const ent = onlyP ? [[["n"], name]] : [[["t"], t], [["lv"], lv], [["ts"], Date.now()], [["n"], name]];
+      if (body.p !== undefined) ent.push([["p"], ["dnd", "idle", "inv"].includes(String(body.p)) ? String(body.p) : ""]);
+      await fsSet(sa, "status/" + uid, ent); PRC.t = 0;
+      const d = (await fsGet(sa, "status/" + uid)) || {};
+      STC.delete(uid);
+      return json({ ok: true, st: d.t || d.lv ? { t: String(d.t || ""), lv: String(d.lv || ""), ts: d.ts } : null, p: d.p || "" });
     }
     if (a === "stGet") {
       const ids = (Array.isArray(body.uids) ? body.uids : []).map(String).filter(okUid).slice(0, 40), out = {};
-      await Promise.all(ids.map(async (u) => { const d = await fsGet(sa, "status/" + u); if (d && d.ts > Date.now() - 12 * 3600e3 && (d.t || d.lv)) out[u] = { t: String(d.t || ""), lv: String(d.lv || ""), ts: d.ts }; }));
+      const pr = await presenceList(sa);
+      await Promise.all(ids.map(async (u) => { const d = await fsGet(sa, "status/" + u), o = presOf(d, pr.find((x) => x._id === u), u === uid); if (o) out[u] = o; }));
       return json({ ok: true, st: out });
+    }
+    if (a === "hist") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!okId(body.id)) return json({ error: "bad request" }, 400);
+      const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
+      if (!m || m.del) return json({ error: "gone", message: "That message is gone." }, 404);
+      return json({ ok: true, now: String(m.text || ""), ed: m.ed || 0, eh: Array.isArray(m.eh) ? m.eh.map((x) => ({ t: String((x && x.t) || ""), ts: (x && x.ts) || 0 })) : [] });
+    }
+    if (a === "pins") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (r.dm) return json({ ok: true, pins: [] });
+      const meta = (await fsGet(sa, metaPath(r.key))) || {}, list = Array.isArray(meta.pins) ? meta.pins.slice() : [];
+      if (meta.pin && meta.pin.id && !list.some((p) => p && p.id === meta.pin.id)) list.push(meta.pin);
+      return json({ ok: true, pins: list.filter(Boolean).reverse() });
     }
     if (a === "appeal") {
       const mu = await muteState(sa, uid);
@@ -1785,6 +1859,21 @@ export async function onRequestPost(context) {
 
     // ---------- admin only ----------
     if (!admin) return json({ error: "admin", message: "Only admins can use this." }, 403);
+    if (a === "setLock") {
+      await fsSet(sa, "chatcfg/main", [[["lock"], !!body.on]]); CFG.t = 0;
+      await modLog(sa, name, body.on ? "lockOn" : "lockOff", "", "");
+      return json({ ok: true, lock: !!body.on });
+    }
+    if (a === "setWords") {
+      const ws = (Array.isArray(body.words) ? body.words : String(body.words || "").split(/[\n,]+/)).map((w) => oneLine(w, 40).toLowerCase()).filter((w) => w.length >= 2).slice(0, 200);
+      await fsSet(sa, "chatcfg/main", [[["words"], ws]]); CFG.t = 0; setExtraWords(ws);
+      await modLog(sa, name, "words", "", ws.length + " words");
+      return json({ ok: true, words: ws });
+    }
+    if (a === "chatCfg") {
+      const d = (await fsGet(sa, "chatcfg/main")) || {};
+      return json({ ok: true, lock: !!d.lock, words: Array.isArray(d.words) ? d.words : [] });
+    }
     if (a === "setMod") {
       const target = body.uid ? String(body.uid) : await uidOf(sa, body.name);
       if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
