@@ -331,6 +331,7 @@ async function bumpStreak(sa, uid, name, ts) {
     STC.delete(uid);
   } catch (e) {}
 }
+let UNR = { t: 0, v: null };
 const DCCHAT = [];
 async function dcChat(env, name, text) {
   try {
@@ -726,6 +727,11 @@ export async function onRequestPost(context) {
   try {
     const uid = bearer ? await verifyIdToken(bearer, FIREBASE_API_KEY, sa.project_id) : null;
 
+    // ---------- v286: leaderboard status (public list of accounts that chose Unranked) ----------
+    if (a === "unranked") {
+      if (!UNR.v || UNR.t < Date.now()) { const d = (await fsGet(sa, "chatcfg/unranked")) || {}; UNR = { t: Date.now() + 20000, v: Object.values(d.u || {}).map(String).filter(Boolean) }; }
+      return json({ ok: true, names: UNR.v });
+    }
     // ---------- v279: online status (public, like Discord) ----------
     if (a === "presence") {
       const names = (Array.isArray(body.names) ? body.names : []).map((n) => oneLine(n, 30)).filter(Boolean).slice(0, 20), out = {};
@@ -1820,6 +1826,11 @@ export async function onRequestPost(context) {
       const pr = await presenceList(sa);
       await Promise.all(ids.map(async (u) => { const d = await fsGet(sa, "status/" + u), o = presOf(d, pr.find((x) => x._id === u), u === uid); if (o) out[u] = o; }));
       return json({ ok: true, st: out });
+    }
+    if (a === "setUnranked") {
+      if (!rate(uid, "unr", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      await fsSet(sa, "chatcfg/unranked", [[["u", uid], body.on ? name : undefined]]); UNR.t = 0;
+      return json({ ok: true, on: !!body.on, name });
     }
     if (a === "hist") {
       const r = await roomFor(sa, uid, name, admin, body);
