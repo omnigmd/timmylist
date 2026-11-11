@@ -1827,6 +1827,33 @@ export async function onRequestPost(context) {
       await Promise.all(ids.map(async (u) => { const d = await fsGet(sa, "status/" + u), o = presOf(d, pr.find((x) => x._id === u), u === uid); if (o) out[u] = o; }));
       return json({ ok: true, st: out });
     }
+    if (a === "mergeReq") {
+      if (!rate(uid, "merge", 4, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const target = oneLine(body.target, 40);
+      if (!target) return json({ error: "bad request", message: "Pick the player to merge with." }, 400);
+      if (target.toLowerCase() === String(name).toLowerCase()) return json({ error: "self", message: "That is already your name." }, 400);
+      const prev = await fsGet(sa, "mergereq/" + uid);
+      await fsSet(sa, "mergereq/" + uid, [[["uid"], uid], [["name"], name], [["target"], target], [["ts"], Date.now()], [["st"], "pending"]]);
+      if (!prev || prev.target !== target) await defer(notifyAdmins(sa, { kind: "merge", title: "New merge request", body: name + " wants to be merged with " + target, url: "#/settings", tag: "merge" }, uid));
+      return json({ ok: true, target });
+    }
+    if (a === "mergeMine") {
+      const d = await fsGet(sa, "mergereq/" + uid);
+      return json({ ok: true, req: d ? { target: d.target || "", ts: d.ts || 0, st: d.st || "pending" } : null });
+    }
+    if (a === "mergeList") {
+      if (!admin) return json({ error: "forbidden" }, 403);
+      const list = (await fsList(sa, "mergereq", 200)).map((x) => ({ uid: x._id, name: x.name || "", target: x.target || "", ts: x.ts || 0, st: x.st || "pending" })).sort((p, q) => q.ts - p.ts);
+      return json({ ok: true, list });
+    }
+    if (a === "mergeSet") {
+      if (!admin) return json({ error: "forbidden" }, 403);
+      if (!/^[A-Za-z0-9_-]{4,64}$/.test(String(body.id || ""))) return json({ error: "bad request" }, 400);
+      const st = body.st === "done" ? "done" : body.st === "declined" ? "declined" : "";
+      if (!st) { await fsDelete(sa, "mergereq/" + body.id); return json({ ok: true }); }
+      await fsSet(sa, "mergereq/" + body.id, [[["st"], st]]);
+      return json({ ok: true });
+    }
     if (a === "setUnranked") {
       if (!rate(uid, "unr", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       await fsSet(sa, "chatcfg/unranked", [[["u", uid], body.on ? name : undefined]]); UNR.t = 0;
