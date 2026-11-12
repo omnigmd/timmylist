@@ -815,7 +815,15 @@ export async function onRequestPost(context) {
       const d = (await fsGet(sa, "profx/" + pu)) || {};
       let pin = null;
       if (okClip(d.pin)) { const c = await fsGet(sa, "clips/" + d.pin); if (c && c.st === "ok" && c.o === pu) pin = { id: d.pin, by: String(c.on || ""), ts: c.ts || 0, dur: c.dur || 0, lv: String(c.lv || ""), p: c.p || "", likes: clipLikes(c), cn: c.cn || 0 }; }
-      return json({ ok: true, bio: String(d.bio || ""), pin });
+      return json({ ok: true, bio: String(d.bio || ""), pin, badge: String(d.badge || "") });
+    }
+    // ---------- profile badges everyone picked (public) ----------
+    if (a === "badgeAll") {
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!rate(ip, "badgeall", 60, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const e = ((await fsGet(sa, "badgesel/main")) || {}).e || {}, map = {};
+      for (const k of Object.keys(e)) { const x = e[k] || {}; if (x.n && x.b) map[String(x.n).toLowerCase()] = String(x.b); }
+      return json({ ok: true, map });
     }
 
     // ---------- progress: who is working on a level ----------
@@ -1182,8 +1190,14 @@ export async function onRequestPost(context) {
     // ---------- profile: bio and pinned video ----------
     if (a === "profSet") {
       if (!rate(uid, "profset", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
-      if (await muteState(sa, uid)) return json({ error: "muted", message: "You're muted right now, so you can't change your bio." }, 403);
+      if (body.bio !== undefined && (await muteState(sa, uid))) return json({ error: "muted", message: "You're muted right now, so you can't change your bio." }, 403);
       const ents = [];
+      let badge = null;
+      if (body.badge !== undefined) {
+        badge = String(body.badge || "");
+        if (badge && !/^[a-z0-9_]{1,24}(:\d{1,2})?$/.test(badge)) return json({ error: "bad request" }, 400);
+        ents.push([["badge"], badge || undefined]);
+      }
       if (body.bio !== undefined) ents.push([["bio"], oneLine(String(body.bio == null ? "" : body.bio).replace(/[ 	]{2,}/g, " "), 160) || undefined]);
       if (body.pin !== undefined) {
         const pin = String(body.pin || "");
@@ -1192,8 +1206,9 @@ export async function onRequestPost(context) {
       }
       if (!ents.length) return json({ error: "bad request" }, 400);
       await fsSet(sa, "profx/" + uid, ents.concat([[["ts"], Date.now()]]));
+      if (badge !== null) { try { await fsSet(sa, "badgesel/main", [[["e", uid], badge ? { n: name, b: badge, t: Date.now() } : undefined]]); } catch (e) {} }
       const d = (await fsGet(sa, "profx/" + uid)) || {};
-      return json({ ok: true, bio: String(d.bio || ""), pin: String(d.pin || "") });
+      return json({ ok: true, bio: String(d.bio || ""), pin: String(d.pin || ""), badge: String(d.badge || "") });
     }
     if (a === "profClear") {
       if (!admin) return json({ error: "forbidden", message: "Admins only." }, 403);
