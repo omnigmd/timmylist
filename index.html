@@ -31592,7 +31592,7 @@ var _sh=window.show;
   /* ---------- the poll loop (with auto-reconnect) ---------- */
   function iOffer(x){ var m=myPart(); if(!m) return false; if(m.j!==x.j) return m.j>x.j; return m.uid>x.uid; }
   function settled(){ return G.parts.filter(function(x){ return x.uid!==G.me; }).every(function(x){ var p=G.peers[x.uid]; return p&&p.state==='connected'; }); }
-  function nextPoll(g,ms){ if(G.gen!==g||G.st!=='live') return; clearTimeout(G.poll); G.poll=setTimeout(pollNow,ms||(settled()?3500:1500)); }
+  function nextPoll(g,ms){ if(G.gen!==g||G.st!=='live') return; clearTimeout(G.poll); G.poll=setTimeout(pollNow,ms||(settled()?(D.hidden?8000:6000):1500)); }
   function pollNow(){
     if(G.st!=='live') return; var g=G.gen;
     call('gcPoll',body()).then(function(r){
@@ -32214,7 +32214,7 @@ var _sh=window.show;
     if(G.infoFor!==r.gid){ G.infoFor=r.gid; G.info={}; G.infoAt=0; }
     ensureBtn(r); paintBar();
     if(!signed()||!netOn()) return;
-    if(!G.infoBusy&&(force||Date.now()-G.infoAt>4000)){
+    if(!G.infoBusy&&(force||(!D.hidden&&Date.now()-G.infoAt>15000))){
       G.infoBusy=true; var rid=r.gid, k=keyFor(r);
       call('gcInfo',k).then(function(x){ G.infoBusy=false; G.infoAt=Date.now(); if(x&&x.ok&&G.infoFor===rid){ G.info=x; ensureBtn(r); paintBar(); } },function(){ G.infoBusy=false; });
     }
