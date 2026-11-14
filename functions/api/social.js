@@ -308,7 +308,9 @@ function luLine(act, w, n) {
   return w + " was removed from the list";
 }
 // ---- v279 helpers: presence + streaks ----
-async function presenceList(sa) { if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 4000, v: await fsList(sa, "presence", 400) }; return PRC.v; }
+// v318b: keep the cached presence list up to date with this server's own writes, so it rarely needs a full re-read
+function presPatch(uid, o) { if (!PRC.v) return; let d = PRC.v.find((x) => x._id === uid); if (!d) { d = { _id: uid }; PRC.v.push(d); } for (const k in o) { if (o[k] === undefined) delete d[k]; else d[k] = o[k]; } }
+async function presenceList(sa) { if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 60000, v: await fsList(sa, "presence", 400) }; return PRC.v; }   // v318b: 60 s, it was 4 s (up to 400 reads each time)
 const STC = new Map();
 async function stCached(sa, u) { const c = STC.get(u); if (c && c.t > Date.now()) return c.v; const v = await fsGet(sa, "status/" + u); STC.set(u, { t: Date.now() + 15000, v }); return v; }
 function presOf(d, pres, self) {
@@ -317,7 +319,7 @@ function presOf(d, pres, self) {
   const o = { on: live ? (p === "dnd" ? "dnd" : p === "idle" ? "idle" : "on") : "off" };
   if (self && p) o.p = p;
   if (!hidden && pres && pres.ts) o.seen = pres.ts;
-  if (!hidden && pres && Number(pres.ic) > now - 25000) o.call = true;
+  if (!hidden && pres && Number(pres.ic) > now - 150000) o.call = true;
   if (d && d.ts > now - 12 * 3600e3 && (d.t || d.lv)) { o.t = String(d.t || ""); o.lv = String(d.lv || ""); o.ts = d.ts; }
   const day = Math.floor(now / 86400000);
   if (d && d.sk && d.sd >= day - 1) o.sk = d.sk;
@@ -651,6 +653,7 @@ function clipPub(c, id, uid) {
 const CLIPIDX = "clipidx/main", CL_PAGE = 12;
 const idxEnt = (c) => ({ t: c.ts || 0, lv: String(c.lv || ""), by: String(c.on || ""), d: c.dur || 0, k: clipLikes(c), cn: c.cn || 0 });
 let CLC = { t: 0, e: null }, PRC = { t: 0, v: null };
+const ICW = new Map(), GCI = new Map();   // v318b: fewer database reads/writes for calls
 async function clipIdx(sa) {
   if (CLC.e && CLC.t > Date.now()) return CLC.e;
   let d = await fsGet(sa, CLIPIDX);
@@ -744,7 +747,7 @@ export async function onRequestPost(context) {
     if (a === "online") {
       const pr = await presenceList(sa), now = Date.now();
       const live = pr.filter((d) => d.ts && d.ts > now - ONLINE && !d.ho && d.name).slice(0, 80);
-      const rows = await Promise.all(live.map(async (d) => { const st = await stCached(sa, d._id); if (st && st.p === "inv") return null; return { uid: d._id, name: String(d.name), p: (st && st.p) || "", c: Number(d.ic) > now - 25000 ? 1 : 0 }; }));
+      const rows = await Promise.all(live.map(async (d) => { const st = await stCached(sa, d._id); if (st && st.p === "inv") return null; return { uid: d._id, name: String(d.name), p: (st && st.p) || "", c: Number(d.ic) > now - 150000 ? 1 : 0 }; }));
       return json({ ok: true, on: rows.filter(Boolean).slice(0, 60) });
     }
 
@@ -767,7 +770,7 @@ export async function onRequestPost(context) {
       if (!VC.v || VC.t < Date.now()) {
         const docs = await fsList(sa, "votes", 1500), all = {};
         for (const d of docs) all[d._id] = d.v || {};
-        VC = { t: Date.now() + 8000, v: all };
+        VC = { t: Date.now() + 10 * 60 * 1000, v: all };   // v318b: 10 minutes (up to 1500 reads each time); votes update it in place
       }
       const c = {}, mine = {};
       for (const id in VC.v) {
@@ -910,7 +913,7 @@ export async function onRequestPost(context) {
       if (!rate(uid, "vote", 30, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       if (!(await userName(sa, uid))) return json({ error: "profile", message: "Finish creating your account first." }, 403);
       await fsSet(sa, "votes/" + lvl, [[["v", uid], v === 0 ? undefined : v]]);
-      VC.t = 0;
+      if (VC.v) { const m = VC.v[lvl] = VC.v[lvl] || {}; if (v === 0) delete m[uid]; else m[uid] = v; }
       return json({ ok: true });
     }
 
@@ -930,6 +933,7 @@ export async function onRequestPost(context) {
       if (p && typeof p === "object" && rate(uid, "pres", 1, ctl ? 2500 : 12000)) {
         wrote = true;
         await fsSet(sa, "presence/" + uid, [[["name"], name], [["r"], routeOk(p.r) ? p.r : "other"], [["sc"], clampInt(p.sc, 0, 100)], [["vw"], clampInt(p.vw, 200, 6000)], [["th"], p.th === "light" ? "light" : "dark"], [["ts"], Date.now()]]);
+        presPatch(uid, { name, r: routeOk(p.r) ? p.r : "other", ts: Date.now() });
       }
       if (ctl && body.ca === ctl.id && !(idx.ctl && idx.ctl.ok) && rate(uid, "ctlack", 2, 60000)) {
         await fsSet(sa, "chatidx/" + uid, [[["ctl", "ok"], true]]); await fsSet(sa, "presence/" + uid, [[["ctl", "ok"], true]]);
@@ -1365,13 +1369,13 @@ export async function onRequestPost(context) {
       if (a === "frHide") {
         if (!rate(uid, "frhide", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
         await fsSet(sa, "presence/" + uid, [[["ho"], body.on ? true : undefined]]);
-        PRC.t = 0;
+        if (PRC.v) { const me = PRC.v.find((d) => d._id === uid); if (me) me.ho = body.on ? true : undefined; }
         return json({ ok: true, ho: !!body.on });
       }
       const idx = (await fsGet(sa, "chatidx/" + uid)) || {}, fr = frOf(idx).f;
       if (a === "frOnline") {
         if (!rate(uid, "fronline", 30, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
-        if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 4000, v: await fsList(sa, "presence", 400) };
+        if (!PRC.v || PRC.t < Date.now()) PRC = { t: Date.now() + 60000, v: await fsList(sa, "presence", 400) };
         const now = Date.now(), me = PRC.v.find((d) => d._id === uid);
         return json({ ok: true, ho: !!(me && me.ho), on: PRC.v.filter((d) => fr[d._id] && d.ts && d.ts > now - ONLINE && !d.ho).map((d) => d._id) });
       }
@@ -1686,14 +1690,16 @@ export async function onRequestPost(context) {
         g = { id: "r_" + rk, room: rk, name: rk === "main" ? "Timmylist Room" : "", mem: null };
       } else g = await grpFor(sa, uid, body.group);
       const gid = g.id, gk = "gcalls/" + gid, now = Date.now(), isMem = (u) => !g.mem || !!g.mem[u];
+      if (a === "gcInfo") { const c = GCI.get(gid); if (c && c.t > now) return json(Object.assign({}, c.v, { me: c.v.uids.indexOf(uid) >= 0, uids: undefined })); }
       const d = await fsGet(sa, gk), cur = {}, dp = (d && d.p) || {};
       for (const u of Object.keys(dp)) if (isMem(u) && dp[u] && dp[u].j && dp[u].t > now - GC_STALE) cur[u] = dp[u];
       const pub = (o) => Object.keys(o).map((u) => ({ uid: u, name: (g.mem && g.mem[u] && g.mem[u].n) || String(o[u].n || ""), j: Number(o[u].j) || 0 })).sort((x, y) => x.j - y.j || (x.uid < y.uid ? -1 : 1));
       const hostOf = () => { const l = pub(cur); return l.length ? l[0].uid : ""; };
       // members see "call going on" in their chat list (refreshed once a minute by the host while the call runs)
       const markRows = async (n) => { if (!g.mem) return; const v = n > 0 ? { n, t: now } : undefined; await Promise.all(Object.keys(g.mem).map((u) => fsSet(sa, "chatidx/" + u, [[["g", gid, "cn"], v]]).catch(() => {}))); };
-      const inCall = async (u, on) => { try { await fsSet(sa, "presence/" + u, [[["ic"], on ? now : undefined]]); } catch (e) {} PRC.t = 0; };
-      if (a === "gcInfo") return json({ ok: true, n: Object.keys(cur).length, names: pub(cur).map((x) => x.name).filter(Boolean), me: !!cur[uid], st: Object.keys(cur).length && d.st ? Number(d.st) : 0, max: GC_MAX, host: hostOf() });
+      const inCall = async (u, on) => { const k = String(u), last = ICW.get(k) || 0; if (on && now - last < 60000) return; if (!on && !last) return; ICW.set(k, on ? now : 0); if (ICW.size > 2000) ICW.clear(); try { await fsSet(sa, "presence/" + u, [[["ic"], on ? now : undefined]]); presPatch(u, { ic: on ? now : undefined }); } catch (e) {} };
+      if (a === "gcInfo") { const v = { ok: true, n: Object.keys(cur).length, names: pub(cur).map((x) => x.name).filter(Boolean), uids: Object.keys(cur), st: Object.keys(cur).length && d.st ? Number(d.st) : 0, max: GC_MAX, host: hostOf() }; GCI.set(gid, { t: now + 10000, v }); if (GCI.size > 500) GCI.clear(); return json(Object.assign({}, v, { me: !!cur[uid], uids: undefined })); }
+      GCI.delete(gid);
       if (a === "gcKick") {
         const to = String(body.to || "");
         if (!cur[uid] || !cur[to] || to === uid) return json({ error: "bad request" }, 400);
@@ -1727,7 +1733,7 @@ export async function onRequestPost(context) {
       if (a === "gcPoll") {
         if (!cur[uid]) return json({ ok: true, in: false, parts: pub(cur), kicked: !!(d && d.kb && Number(d.kb[uid]) > now) });
         if (now - (Number(cur[uid].t) || 0) > 6000) { await fsSet(sa, gk, [[["p", uid, "t"], now]]); await inCall(uid, true); }   // a beat every few seconds is plenty (people count as gone after 20 s)
-        if (hostOf() === uid && now - (Number(d.ct) || 0) > 60000) { await fsSet(sa, gk, [[["ct"], now]]); await defer(markRows(Object.keys(cur).length)); }
+        if (hostOf() === uid && now - (Number(d.ct) || 0) > 180000) { await fsSet(sa, gk, [[["ct"], now]]); await defer(markRows(Object.keys(cur).length)); }
         const sg = (await fsGet(sa, "gcsig/" + gid + "_" + uid)) || {};
         return json({ ok: true, in: true, parts: pub(cur), o: sg.o || {}, a: sg.a || {}, host: hostOf() });
       }
@@ -1859,7 +1865,7 @@ export async function onRequestPost(context) {
       const onlyP = body.t === undefined && body.lv === undefined && body.p !== undefined;
       const ent = onlyP ? [[["n"], name]] : [[["t"], t], [["lv"], lv], [["ts"], Date.now()], [["n"], name]];
       if (body.p !== undefined) ent.push([["p"], ["dnd", "idle", "inv"].includes(String(body.p)) ? String(body.p) : ""]);
-      await fsSet(sa, "status/" + uid, ent); PRC.t = 0;
+      await fsSet(sa, "status/" + uid, ent); STC.delete(uid);
       const d = (await fsGet(sa, "status/" + uid)) || {};
       STC.delete(uid);
       return json({ ok: true, st: d.t || d.lv ? { t: String(d.t || ""), lv: String(d.lv || ""), ts: d.ts } : null, p: d.p || "" });
@@ -2172,7 +2178,7 @@ export async function onRequestPost(context) {
       if (!PL.v || PL.t < Date.now()) {
         const [docs, adms] = await Promise.all([fsList(sa, "presence", 400), AL.v && AL.t > Date.now() ? Promise.resolve(null) : fsList(sa, "admins", 100)]);
         if (adms) AL = { t: Date.now() + 60000, v: new Set(adms.map((x) => x._id)) };
-        PL = { t: Date.now() + 4000, v: docs.filter((d) => d.ts && d.ts > Date.now() - ONLINE && !AL.v.has(d._id) && d._id !== uid).sort((x, y) => String(x.name).toLowerCase() < String(y.name).toLowerCase() ? -1 : 1).map((d) => ({ uid: d._id, name: d.name || "", r: typeof d.r === "string" ? d.r : "other", sc: d.sc || 0, vw: d.vw || 0, th: d.th || "dark", ts: d.ts, ctl: d.ctl && d.ctl.exp > Date.now() ? { by: d.ctl.by || "", ok: !!d.ctl.ok } : null })) };
+        PL = { t: Date.now() + 60000, v: docs.filter((d) => d.ts && d.ts > Date.now() - ONLINE && !AL.v.has(d._id) && d._id !== uid).sort((x, y) => String(x.name).toLowerCase() < String(y.name).toLowerCase() ? -1 : 1).map((d) => ({ uid: d._id, name: d.name || "", r: typeof d.r === "string" ? d.r : "other", sc: d.sc || 0, vw: d.vw || 0, th: d.th || "dark", ts: d.ts, ctl: d.ctl && d.ctl.exp > Date.now() ? { by: d.ctl.by || "", ok: !!d.ctl.ok } : null })) };
       }
       return json({ ok: true, users: PL.v, now: Date.now() });
     }
