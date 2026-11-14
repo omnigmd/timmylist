@@ -200,10 +200,14 @@ async function fsMsgs(sa, room, since, limit, before) {
 async function isAdmin(sa, uid) {
   const hit = ADM.get(uid);
   if (hit && hit.exp > Date.now()) return hit.v;
-  const v = !!(await fsGet(sa, "admins/" + uid));
+  const v = !!(await fsGet(sa, "admins/" + uid)) || (await isOwnerUid(sa, uid));
   ADM.set(uid, { v, exp: Date.now() + 60 * 1000 });
   return v;
 }
+// v319: Omnicost owns the Timmylist. The owner can do everything an admin can, and admins can't moderate the owner.
+const OWNER_NAME = "omnicost"; let OWN = { t: 0, v: "" };
+async function ownerUid(sa) { if (OWN.v && OWN.t > Date.now()) return OWN.v; try { const u = await uidOf(sa, OWNER_NAME); if (u) OWN = { t: Date.now() + 3600000, v: u }; } catch (e) {} return OWN.v; }
+async function isOwnerUid(sa, uid) { const o = await ownerUid(sa); return !!o && o === uid; }
 async function userName(sa, uid) {
   const hit = NAMES.get(uid);
   if (hit && hit.exp > Date.now()) return hit.v;
@@ -653,6 +657,7 @@ function clipPub(c, id, uid) {
 const CLIPIDX = "clipidx/main", CL_PAGE = 12;
 const idxEnt = (c) => ({ t: c.ts || 0, lv: String(c.lv || ""), by: String(c.on || ""), d: c.dur || 0, k: clipLikes(c), cn: c.cn || 0 });
 let CLC = { t: 0, e: null }, PRC = { t: 0, v: null };
+const SEED319 = { done: false, t: 0 };
 const ICW = new Map(), GCI = new Map();   // v318b: fewer database reads/writes for calls
 async function clipIdx(sa) {
   if (CLC.e && CLC.t > Date.now()) return CLC.e;
@@ -725,6 +730,8 @@ export async function onRequestPost(context) {
   const { FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY } = env;
   if (!FIREBASE_SERVICE_ACCOUNT) return json({ error: "setup", message: "Chat and likes aren't set up on this site yet." }, 500);
   let sa; try { sa = JSON.parse(FIREBASE_SERVICE_ACCOUNT); } catch (e) { return json({ error: "setup", message: "Chat and likes are misconfigured." }, 500); }
+  // v319: one-time change asked for by the owner: 0orange0 is removed from the list (an admin can restore them later)
+  if (!SEED319.done && SEED319.t < Date.now()) { SEED319.t = Date.now() + 120000; defer((async () => { const d = await fsGet(sa, "approved/cfg_bans"); if (d && d.seed319) { SEED319.done = true; return; } await fsSet(sa, "approved/cfg_bans", [[["cfg"], "bans"], [["names", "0orange0"], { n: "0orange0", t: Date.now(), by: "Omnicost" }], [["seed319"], true], [["ts"], Date.now()]]); SEED319.done = true; })()); }
   let body; try { body = await request.json(); } catch (e) { return json({ error: "bad request" }, 400); }
   if (!body || typeof body !== "object") return json({ error: "bad request" }, 400);
   const a = body.a, bearer = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
@@ -943,7 +950,7 @@ export async function onRequestPost(context) {
         const cl = await clanOfName(sa, name);
         if (cl) { const cm = (await fsGet(sa, "chatmeta/clan_" + cl.id)) || {}; clan = { id: cl.id, tag: cl.tag, name: cl.name, lead: isLeader(cl, name), ts: cm.ts || 0, last: cm.last || "", from: cm.from || "", fromName: cm.name || "" }; }
       }
-      return json({ ok: true, pr: wrote, fri: frRows(frOf(idx).i, 20), frn: Object.keys(frOf(idx).f).length, me: { uid, name, admin, mod: !!(cfg.mods && cfg.mods[uid]) }, lock: !!cfg.lock, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
+      return json({ ok: true, pr: wrote, fri: frRows(frOf(idx).i, 20), frn: Object.keys(frOf(idx).f).length, me: { uid, name, admin, owner: await isOwnerUid(sa, uid), mod: !!(cfg.mods && cfg.mods[uid]) }, lock: !!cfg.lock, chat: cfg.chat, images: cfg.images, slow: cfg.slow, muted: mu ? mu.until : 0, dms, groups, call, ctl, blocked: Object.keys(idx.b || {}).filter((k) => idx.b[k]), clan: body.lite ? undefined : clan, main: body.lite ? undefined : main ? { ts: main.ts || 0, last: main.last || "", name: main.name || "", from: main.from || "" } : null });
     }
     if (a === "msgs") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
@@ -1096,6 +1103,7 @@ export async function onRequestPost(context) {
       const m = await fsGet(sa, "chat/" + r.key + "/m/" + body.id);
       if (!m || m.del) return json({ ok: true });
       if (m.k) return json({ error: "bad request" }, 400);
+      if (m.from !== uid && (await isOwnerUid(sa, m.from)) && !(await isOwnerUid(sa, uid))) return json({ error: "owner", message: "You can't delete the owner's messages." }, 403);
       if (m.from !== uid && !(admin && !r.dm && !r.group) && !(cfg.mods && cfg.mods[uid] && (r.key === "main" || r.key.startsWith("lv_"))) && !(r.clan && isLeader(r.clan, name)) && !(r.group && r.group.owner === uid)) return json({ error: "admin", message: "You can only delete your own messages." }, 403);
       if (m.from !== uid && !admin && cfg.mods && cfg.mods[uid]) await modLog(sa, name + " (mod)", "del", m.name || "", String(m.text || "").slice(0, 60));
       await removeMsg(sa, r.key, body.id);
@@ -1703,6 +1711,7 @@ export async function onRequestPost(context) {
       if (a === "gcKick") {
         const to = String(body.to || "");
         if (!cur[uid] || !cur[to] || to === uid) return json({ error: "bad request" }, 400);
+        if (await isOwnerUid(sa, to)) return json({ error: "owner", message: "You can't remove the owner from a call." }, 403);
         if (!admin && hostOf() !== uid) return json({ error: "host", message: "Only the person who started the call can remove people." }, 403);
         await fsSet(sa, gk, [[["p", to], undefined], [["kb", to], now + 60000]]);
         try { await fsDelete(sa, "gcsig/" + gid + "_" + to); } catch (e) {}
@@ -2134,10 +2143,25 @@ export async function onRequestPost(context) {
       if (rep) await modLog(sa, name, "dismiss", rep.fromName, "");
       return json({ ok: true });
     }
+    // ---------- v319: remove a player from the list (or bring them back). approved/cfg_bans: { cfg, names: { key: { n, t, by } }, ts } ----------
+    if (a === "banSet") {
+      const nm = oneLine(body.name, 30), key = String(body.key || nm).trim().toLowerCase().slice(0, 40), on = !!body.on;
+      if (!nm || !key || /[.`]/.test(key)) return json({ error: "bad request", message: "Type a player name." }, 400);
+      if (!rate(uid, "banset", 30, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (on) {
+        const tu = await uidOf(sa, nm);
+        if (key === OWNER_NAME || nm.toLowerCase() === OWNER_NAME || (tu && (await isOwnerUid(sa, tu)))) return json({ error: "owner", message: "You can't remove the owner from the list." }, 403);
+        if (tu && (await isAdmin(sa, tu)) && !(await isOwnerUid(sa, uid))) return json({ error: "admin", message: "Only the owner can remove an admin from the list." }, 403);
+      }
+      await fsSet(sa, "approved/cfg_bans", [[["cfg"], "bans"], [["names", key], on ? { n: nm, t: Date.now(), by: name } : undefined], [["ts"], Date.now()]]);
+      await modLog(sa, name, on ? "banAdd" : "banRemove", nm, "");
+      return json({ ok: true, key, on });
+    }
     if (a === "mute") {
       const target = body.uid ? String(body.uid) : await uidOf(sa, body.name);
       if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
-      if (await isAdmin(sa, target)) return json({ error: "admin", message: "You can't mute an admin." }, 400);
+      if (await isOwnerUid(sa, target)) return json({ error: "owner", message: "You can't mute the owner." }, 400);
+      if ((await isAdmin(sa, target)) && !(await isOwnerUid(sa, uid))) return json({ error: "admin", message: "Only the owner can mute an admin." }, 400);
       const hours = Math.min(Math.max(Number(body.hours) || 24, 1), 24 * 365);
       const tname = (await userName(sa, target)) || "";
       await fsSet(sa, "chatmod/" + target, [[["until"], Date.now() + hours * 3600 * 1000], [["name"], tname], [["by"], uid]]);
@@ -2163,7 +2187,8 @@ export async function onRequestPost(context) {
     if (a === "purge") {
       const target = body.uid ? String(body.uid) : await uidOf(sa, body.name);
       if (!target || !okUid(target)) return json({ error: "nouser", message: "No player with that name." }, 404);
-      if (await isAdmin(sa, target)) return json({ error: "admin", message: "You can't do this to an admin." }, 400);
+      if (await isOwnerUid(sa, target)) return json({ error: "owner", message: "You can't do this to the owner." }, 400);
+      if ((await isAdmin(sa, target)) && !(await isOwnerUid(sa, uid))) return json({ error: "admin", message: "Only the owner can do this to an admin." }, 400);
       const r = await roomFor(sa, uid, name, admin, body);
       if (r.dm || r.group) return json({ error: "bad request" }, 400);
       if (!rate(uid, "purge", 4, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
