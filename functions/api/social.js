@@ -317,6 +317,7 @@ function presOf(d, pres, self) {
   const o = { on: live ? (p === "dnd" ? "dnd" : p === "idle" ? "idle" : "on") : "off" };
   if (self && p) o.p = p;
   if (!hidden && pres && pres.ts) o.seen = pres.ts;
+  if (!hidden && pres && Number(pres.ic) > now - 25000) o.call = true;
   if (d && d.ts > now - 12 * 3600e3 && (d.t || d.lv)) { o.t = String(d.t || ""); o.lv = String(d.lv || ""); o.ts = d.ts; }
   const day = Math.floor(now / 86400000);
   if (d && d.sk && d.sd >= day - 1) o.sk = d.sk;
@@ -347,7 +348,7 @@ const okId = (s) => /^\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okRep = (s) => /^(main|dm_[A-Za-z0-9_-]+|clan_[a-z0-9-]{1,40}|grp_g[a-z0-9]{10}|lv_\d{1,12})__\d{13}-[a-z0-9]{1,6}$/.test(String(s || ""));
 const okGid = (s) => /^g[a-z0-9]{10}$/.test(String(s || ""));
 const mkGid = () => { const b = crypto.getRandomValues(new Uint8Array(10)); let s = "g"; for (const x of b) s += "abcdefghijklmnopqrstuvwxyz0123456789"[x % 36]; return s; };
-const GC_MAX = 6, GC_STALE = 20000;   // people in one group voice call, ms without a heartbeat before somebody counts as gone
+const GC_MAX = 8, GC_STALE = 20000;   // people in one group voice call, ms without a heartbeat before somebody counts as gone
 const GRP_MAXM = 8, GRP_MAXG = 20;   // people in one group, groups one player can be in
 const okUid = (s) => /^[A-Za-z0-9_-]{6,128}$/.test(String(s || ""));
 const okPid = (s) => /^[A-Za-z0-9_-]{6,64}$/.test(String(s || ""));
@@ -743,7 +744,7 @@ export async function onRequestPost(context) {
     if (a === "online") {
       const pr = await presenceList(sa), now = Date.now();
       const live = pr.filter((d) => d.ts && d.ts > now - ONLINE && !d.ho && d.name).slice(0, 80);
-      const rows = await Promise.all(live.map(async (d) => { const st = await stCached(sa, d._id); if (st && st.p === "inv") return null; return { uid: d._id, name: String(d.name), p: (st && st.p) || "" }; }));
+      const rows = await Promise.all(live.map(async (d) => { const st = await stCached(sa, d._id); if (st && st.p === "inv") return null; return { uid: d._id, name: String(d.name), p: (st && st.p) || "", c: Number(d.ic) > now - 25000 ? 1 : 0 }; }));
       return json({ ok: true, on: rows.filter(Boolean).slice(0, 60) });
     }
 
@@ -1673,26 +1674,50 @@ export async function onRequestPost(context) {
     }
 
     // ---------- voice calls (signalling only; the audio goes player to player over WebRTC) ----------
-    if (a === "gcInfo" || a === "gcJoin" || a === "gcSig" || a === "gcPoll" || a === "gcLeave") {
+    if (a === "gcInfo" || a === "gcJoin" || a === "gcSig" || a === "gcPoll" || a === "gcLeave" || a === "gcKick") {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
       if (!rate(uid, "gcany", 240, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
-      const g = await grpFor(sa, uid, body.group), gid = g.id, gk = "gcalls/" + gid, now = Date.now();
+      // v318: a call can belong to a group chat, or to a room everyone can see (the Timmylist Room, a level chat, a clan chat)
+      let g;
+      if (body.room != null && body.room !== "") {
+        const rk = String(body.room);
+        if (!/^(main|lv_-?\d{1,12}|clan_[a-z0-9-]{1,40})$/.test(rk)) return json({ error: "bad request" }, 400);
+        if (rk.startsWith("clan_") && !admin) { const mine = await clanOfName(sa, name); if (!mine || "clan_" + mine.id !== rk) return json({ error: "clan", message: "Only members of this clan can join its calls." }, 403); }
+        g = { id: "r_" + rk, room: rk, name: rk === "main" ? "Timmylist Room" : "", mem: null };
+      } else g = await grpFor(sa, uid, body.group);
+      const gid = g.id, gk = "gcalls/" + gid, now = Date.now(), isMem = (u) => !g.mem || !!g.mem[u];
       const d = await fsGet(sa, gk), cur = {}, dp = (d && d.p) || {};
-      for (const u of Object.keys(dp)) if (g.mem[u] && dp[u] && dp[u].j && dp[u].t > now - GC_STALE) cur[u] = dp[u];
-      const pub = (o) => Object.keys(o).map((u) => ({ uid: u, name: (g.mem[u] && g.mem[u].n) || "", j: Number(o[u].j) || 0 })).sort((x, y) => x.j - y.j || (x.uid < y.uid ? -1 : 1));
-      if (a === "gcInfo") return json({ ok: true, n: Object.keys(cur).length, names: pub(cur).map((x) => x.name).filter(Boolean), me: !!cur[uid], st: Object.keys(cur).length && d.st ? Number(d.st) : 0, max: GC_MAX });
+      for (const u of Object.keys(dp)) if (isMem(u) && dp[u] && dp[u].j && dp[u].t > now - GC_STALE) cur[u] = dp[u];
+      const pub = (o) => Object.keys(o).map((u) => ({ uid: u, name: (g.mem && g.mem[u] && g.mem[u].n) || String(o[u].n || ""), j: Number(o[u].j) || 0 })).sort((x, y) => x.j - y.j || (x.uid < y.uid ? -1 : 1));
+      const hostOf = () => { const l = pub(cur); return l.length ? l[0].uid : ""; };
+      // members see "call going on" in their chat list (refreshed once a minute by the host while the call runs)
+      const markRows = async (n) => { if (!g.mem) return; const v = n > 0 ? { n, t: now } : undefined; await Promise.all(Object.keys(g.mem).map((u) => fsSet(sa, "chatidx/" + u, [[["g", gid, "cn"], v]]).catch(() => {}))); };
+      const inCall = async (u, on) => { try { await fsSet(sa, "presence/" + u, [[["ic"], on ? now : undefined]]); } catch (e) {} PRC.t = 0; };
+      if (a === "gcInfo") return json({ ok: true, n: Object.keys(cur).length, names: pub(cur).map((x) => x.name).filter(Boolean), me: !!cur[uid], st: Object.keys(cur).length && d.st ? Number(d.st) : 0, max: GC_MAX, host: hostOf() });
+      if (a === "gcKick") {
+        const to = String(body.to || "");
+        if (!cur[uid] || !cur[to] || to === uid) return json({ error: "bad request" }, 400);
+        if (!admin && hostOf() !== uid) return json({ error: "host", message: "Only the person who started the call can remove people." }, 403);
+        await fsSet(sa, gk, [[["p", to], undefined], [["kb", to], now + 60000]]);
+        try { await fsDelete(sa, "gcsig/" + gid + "_" + to); } catch (e) {}
+        await inCall(to, false);
+        return json({ ok: true });
+      }
       if (a === "gcJoin") {
         const mu = await muteState(sa, uid);
         if (mu) return json({ error: "muted", message: "You're muted, so you can't join a call right now." }, 403);
-        if (!rate(uid, "gcj", 8, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+        if (d && d.kb && Number(d.kb[uid]) > now) return json({ error: "removed", message: "You were removed from this call. Try again in a minute." }, 403);
+        if (!rate(uid, "gcj", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
         if (!cur[uid] && Object.keys(cur).length >= GC_MAX) return json({ error: "full", message: "The call is full (" + GC_MAX + " people)." }, 409);
-        const first = !Object.keys(cur).length, w = [[["p", uid], { n: name, t: now, j: now }]];
+        const first = !Object.keys(cur).length, w = [[["p", uid], { n: name, t: now, j: (cur[uid] && body.re) ? Number(cur[uid].j) || now : now }]];
         for (const u of Object.keys(dp)) if (!cur[u] && u !== uid) w.push([["p", u], undefined]);
-        if (first) w.push([["st"], now]);
+        if (first) { w.push([["st"], now]); w.push([["ct"], now]); }
         await fsSet(sa, gk, w);
+        await inCall(uid, true);
+        await defer(markRows(Object.keys(cur).length + (cur[uid] ? 0 : 1)));
         await fsSet(sa, "gcsig/" + gid + "_" + uid, [[["o"], undefined], [["a"], undefined]]);
         for (const u of Object.keys(cur)) { if (u !== uid) await fsSet(sa, "gcsig/" + gid + "_" + u, [[["o", uid], undefined], [["a", uid], undefined]]); }   // nothing left over from an earlier visit
-        if (first) {
+        if (first && g.mem) {
           await grpSay(sa, gid, g.name, g.mem, uid, name, name + " started a voice call");
           await defer(Promise.all(Object.keys(g.mem).filter((u) => u !== uid).map((u) => notifyUser(sa, u, { kind: "dm", title: g.name, body: name + " started a voice call", url: "?open=grp:" + gid, tag: "gc-" + gid }))));
         }
@@ -1700,10 +1725,11 @@ export async function onRequestPost(context) {
         return json({ ok: true, me: uid, peers, max: GC_MAX });
       }
       if (a === "gcPoll") {
-        if (!cur[uid]) return json({ ok: true, in: false, parts: pub(cur) });
-        if (now - (Number(cur[uid].t) || 0) > 6000) await fsSet(sa, gk, [[["p", uid, "t"], now]]);   // a beat every few seconds is plenty (people count as gone after 20 s)
+        if (!cur[uid]) return json({ ok: true, in: false, parts: pub(cur), kicked: !!(d && d.kb && Number(d.kb[uid]) > now) });
+        if (now - (Number(cur[uid].t) || 0) > 6000) { await fsSet(sa, gk, [[["p", uid, "t"], now]]); await inCall(uid, true); }   // a beat every few seconds is plenty (people count as gone after 20 s)
+        if (hostOf() === uid && now - (Number(d.ct) || 0) > 60000) { await fsSet(sa, gk, [[["ct"], now]]); await defer(markRows(Object.keys(cur).length)); }
         const sg = (await fsGet(sa, "gcsig/" + gid + "_" + uid)) || {};
-        return json({ ok: true, in: true, parts: pub(cur), o: sg.o || {}, a: sg.a || {} });
+        return json({ ok: true, in: true, parts: pub(cur), o: sg.o || {}, a: sg.a || {}, host: hostOf() });
       }
       if (a === "gcSig") {
         const to = String(body.to || ""), k = body.k;
@@ -1716,9 +1742,11 @@ export async function onRequestPost(context) {
       const rest = Object.keys(cur).filter((u) => u !== uid), w = [[["p", uid], undefined]];
       if (!rest.length) w.push([["st"], undefined]);
       await fsSet(sa, gk, w);
+      await inCall(uid, false);
+      await defer(markRows(rest.length));
       try { await fsDelete(sa, "gcsig/" + gid + "_" + uid); } catch (e) {}
       for (const u of rest) await fsSet(sa, "gcsig/" + gid + "_" + u, [[["o", uid], undefined], [["a", uid], undefined]]);
-      if (!rest.length) { const dur = d && d.st ? Math.max(0, Math.round((now - Number(d.st)) / 1000)) : 0; await grpSay(sa, gid, g.name, g.mem, uid, name, "Voice call ended" + (dur ? " · " + mmss(dur) : "")); }
+      if (!rest.length && g.mem) { const dur = d && d.st ? Math.max(0, Math.round((now - Number(d.st)) / 1000)) : 0; await grpSay(sa, gid, g.name, g.mem, uid, name, "Voice call ended" + (dur ? " · " + mmss(dur) : "")); }
       return json({ ok: true });
     }
     if (a === "callStart") {
