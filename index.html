@@ -29288,7 +29288,7 @@ var _sh=window.show;
     if(!matchMedia('(min-width:1024px)').matches){ if(g.style.width) g.style.removeProperty('width'); return; }
     var bs=g.querySelectorAll('button'); if(!bs.length) return;
     var s=0; for(var i=0;i<bs.length;i++) s+=tw(bs[i]); s+=parseFloat(getComputedStyle(g).columnGap||16)*(bs.length-1);
-    var v=Math.ceil(s)+'px'; if(g.style.width!==v) g.style.setProperty('width',v,'important');
+    var v=Math.ceil(s)+'px'; if(g.style.width!==v){ g.style.setProperty('width',v,'important'); setTimeout(function(){ window.dispatchEvent(new Event('resize')); },0); }
   }
   var q=0; function soon(){ if(!q) q=requestAnimationFrame(function(){ q=0; run(); }); }
   function go(){ new MutationObserver(soon).observe(document.body,{childList:true,subtree:true}); run(); window.addEventListener('resize',soon); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(soon); }
