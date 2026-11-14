@@ -1869,6 +1869,70 @@ export async function onRequestPost(context) {
       await fsSet(sa, "mergereq/" + body.id, [[["st"], st]]);
       return json({ ok: true });
     }
+    // ---------- v315: a clan's leader manages the clan (save details, invite, remove a member, delete); invited players accept or decline ----------
+    if (a === "clanLead") {
+      if (!rate(uid, "clanlead", 12, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const op = String(body.op || ""), low = (x) => String(x == null ? "" : x).trim().toLowerCase();
+      const d = (await fsGet(sa, "approved/cfg_clans")) || {}, arr = Array.isArray(d.clans) ? d.clans.filter((k) => k && typeof k === "object") : [];
+      const me = low(name), mep = playerOf(name);
+      const memOf = (k) => (Array.isArray(k.members) ? k.members : []).map((m) => String(m && m.name || m));
+      const invOf = (k) => (Array.isArray(k.inv) ? k.inv : []).map((m) => String(m));
+      const idOf = (k) => String(k.id || slugOf(k.tag || k.name));
+      const inClan = (n) => arr.find((k) => memOf(k).some((m) => low(m) === low(n) || low(m) === playerOf(n)));
+      const save = async () => { await fsSet(sa, "approved/cfg_clans", [[["cfg"], "clans"], [["clans"], arr], [["ts"], Date.now()]]); CL.t = 0; CL.v = null; };
+      if (op === "accept" || op === "decline") {
+        const k = arr.find((c) => idOf(c) === String(body.id || ""));
+        if (!k || !invOf(k).some((m) => low(m) === me)) return json({ error: "noinvite", message: "That invitation is no longer there." }, 404);
+        if (op === "accept") {
+          if (inClan(name)) return json({ error: "inclan", message: "You are already in a clan." }, 409);
+          if (memOf(k).length >= 100) return json({ error: "full", message: "That clan is full." }, 409);
+          k.members = memOf(k).concat([name]);
+          for (const c of arr) if (Array.isArray(c.inv)) c.inv = invOf(c).filter((m) => low(m) !== me);
+        } else k.inv = invOf(k).filter((m) => low(m) !== me);
+        await save();
+        return json({ ok: true, op });
+      }
+      const k = arr.find((c) => { const l = low(c.leader); return !!l && (l === me || l === mep); });
+      if (!k) return json({ error: "leader", message: "Only the clan leader can do that." }, 403);
+      if (!k.id) k.id = idOf(k);
+      if (op === "save") {
+        const nm = String(body.name || "").trim().slice(0, 40), tag = String(body.tag || "").trim().slice(0, 5), desc = String(body.desc || "").trim().slice(0, 160);
+        if (!nm || !/^[A-Za-z0-9]{1,5}$/.test(tag)) return json({ error: "bad request", message: "A clan needs a name and a tag of 1 to 5 letters or numbers." }, 400);
+        if (arr.some((c) => c !== k && low(c.tag) === low(tag))) return json({ error: "taken", message: "Another clan already uses that tag." }, 409);
+        k.name = nm; k.tag = tag; k.desc = desc;
+        await save();
+        return json({ ok: true, op });
+      }
+      if (op === "invite") {
+        const who = String(body.user || "").trim(), tu = await uidOf(sa, who);
+        if (!tu) return json({ error: "nouser", message: "No account with that name." }, 404);
+        const tn = (await userName(sa, tu)) || who;
+        if (inClan(tn)) return json({ error: "inclan", message: tn + " is already in a clan." }, 409);
+        const inv = invOf(k);
+        if (inv.some((m) => low(m) === low(tn))) return json({ ok: true, op, name: tn, already: true });
+        if (inv.length >= 20) return json({ error: "full", message: "Too many open invitations. Wait for some to be answered." }, 409);
+        k.inv = inv.concat([tn]);
+        await save();
+        try { await notifyUser(sa, tu, { kind: "cl", title: "Clan invitation", body: name + " invited you to join [" + k.tag + "] " + (k.name || k.tag), url: "#/clan", tag: "clinv-" + k.id }); } catch (e) {}
+        return json({ ok: true, op, name: tn });
+      }
+      if (op === "uninvite") { k.inv = invOf(k).filter((m) => low(m) !== low(body.user)); await save(); return json({ ok: true, op }); }
+      if (op === "kick") {
+        const who = low(body.user);
+        if (!who || who === low(k.leader) || who === me || who === mep) return json({ error: "bad request", message: "The leader cannot be removed." }, 400);
+        const before = memOf(k), after = before.filter((m) => low(m) !== who);
+        if (after.length === before.length) return json({ error: "nouser", message: "That player is not in the clan." }, 404);
+        k.members = after;
+        await save();
+        return json({ ok: true, op });
+      }
+      if (op === "delete") {
+        const at = arr.indexOf(k); if (at >= 0) arr.splice(at, 1);
+        await save();
+        return json({ ok: true, op });
+      }
+      return json({ error: "bad request" }, 400);
+    }
     if (a === "setUnranked") {
       if (!rate(uid, "unr", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       await fsSet(sa, "chatcfg/unranked", [[["u", uid], body.on ? name : undefined]]); UNR.t = 0;
