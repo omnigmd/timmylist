@@ -29017,7 +29017,7 @@ var _sh=window.show;
 
   /* ---------- tab labels shrink to fit, like AREDL ---------- */
   var FIT=['#l3 .l3a .h89lt','.h12pl .h12tabs','.h12pr .h12rtabs','.pxl .pxtabs','.lbh .lbm','.ulx .lbtabs','#h9 .h9tabs','.h12stabs'];
-  function r311tw(b){ var cs=getComputedStyle(b), m=r311tw.m; if(!m){ var hst=document.createElement('div'); hst.setAttribute('aria-hidden','true'); hst.style.cssText='position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden'; document.body.appendChild(hst); var sr=hst.attachShadow?hst.attachShadow({mode:'open'}):hst; m=r311tw.m=document.createElement('span'); m.style.cssText='position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;padding:0;margin:0;border:0'; sr.appendChild(m); } m.style.font=cs.font; m.style.letterSpacing=cs.letterSpacing; m.style.textTransform=cs.textTransform; m.textContent=(b.textContent||'').replace(/\s+/g,' ').trim(); return m.getBoundingClientRect().width; }
+  function r311tw(b){ var cs=getComputedStyle(b), m=r311tw.m; if(!m){ var hst=document.createElement('div'); hst.setAttribute('aria-hidden','true'); hst.style.cssText='position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden'; document.body.appendChild(hst); var sr=hst.attachShadow?hst.attachShadow({mode:'open'}):hst; m=r311tw.m=document.createElement('span'); m.style.cssText='position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;padding:0;margin:0;border:0'; sr.appendChild(m); } m.style.font=cs.font; m.style.letterSpacing=cs.letterSpacing; var ic=b.firstElementChild?getComputedStyle(b.firstElementChild):cs; m.style.textTransform=(cs.textTransform!=='none'?cs.textTransform:ic.textTransform); m.style.letterSpacing=(cs.letterSpacing!=='normal'?cs.letterSpacing:ic.letterSpacing); m.textContent=(b.textContent||'').replace(/\s+/g,' ').trim(); return m.getBoundingClientRect().width; }
   function fitTabs(){
     FIT.forEach(function(sel){
       var g=document.querySelector('#app '+sel); if(!g) return;
@@ -29280,7 +29280,7 @@ var _sh=window.show;
   var m=null;
   function tw(b){
     if(!m){ var h=document.createElement('div'); h.setAttribute('aria-hidden','true'); h.style.cssText='position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden'; document.body.appendChild(h); var r=h.attachShadow?h.attachShadow({mode:'open'}):h; m=document.createElement('span'); m.style.cssText='position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap'; r.appendChild(m); }
-    var cs=getComputedStyle(b); m.style.font=cs.font; m.style.fontSize='28px'; m.style.letterSpacing=cs.letterSpacing; m.style.textTransform=cs.textTransform; m.textContent=(b.textContent||'').replace(/\s+/g,' ').trim();
+    var cs=getComputedStyle(b); m.style.font=cs.font; m.style.fontSize='28px'; var ic=b.firstElementChild?getComputedStyle(b.firstElementChild):cs; m.style.letterSpacing=(cs.letterSpacing!=='normal'?cs.letterSpacing:ic.letterSpacing); m.style.textTransform=(cs.textTransform!=='none'?cs.textTransform:ic.textTransform); m.textContent=(b.textContent||'').replace(/\s+/g,' ').trim();
     return m.getBoundingClientRect().width+parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight);
   }
   function run(){
