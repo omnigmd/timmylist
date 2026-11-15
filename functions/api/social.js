@@ -384,7 +384,7 @@ async function discordPost(env, act, who, note) {
     else if (act === "lvlAdd") { title = "Level placed"; text = "**" + w + "** was placed at **" + n + "** on the list."; }
     else if (act === "lvlMove") { title = "Level moved"; text = "**" + w + "** moved " + (/^#\d+ to #\d+$/.test(String(note || "")) ? "from " + n : n) + "."; }
     else { title = "Level removed"; text = "**" + w + "** was removed from the list."; }
-    await fetch(hook, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: "The Timmylist", allowed_mentions: { parse: [] }, embeds: [{ title, description: text, color: 0x3b86ff, url: "https://timmylist.pages.dev/", footer: { text: "timmylist.pages.dev" } }] }) });
+    await fetch(hook, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: "The Timmylist", allowed_mentions: { parse: [] }, embeds: [{ title, description: text, color: 0x3b86ff, url: "https://www.timmylist.org/", footer: { text: "timmylist.org" } }] }) });
   } catch (e) {}
 }
 let MODLOG_SEQ = 0; // keeps two entries made in the same millisecond in the order they happened

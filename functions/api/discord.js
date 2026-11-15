@@ -14,14 +14,14 @@
 //   DISCORD_BOT_TOKEN     the bot's token (Bot > Reset Token)                                         only for registering the commands
 //   DISCORD_REGISTER_KEY  any long random text you choose; it guards the register link                only for registering the commands
 //
-// Setup: set the app's "Interactions Endpoint URL" to https://timmylist.pages.dev/api/discord (Discord sends a signed ping and this
-// function answers it), then open  https://timmylist.pages.dev/api/discord?register=<your DISCORD_REGISTER_KEY>  once.
+// Setup: set the app's "Interactions Endpoint URL" to https://www.timmylist.org/api/discord (Discord sends a signed ping and this
+// function answers it), then open  https://www.timmylist.org/api/discord?register=<your DISCORD_REGISTER_KEY>  once.
 // Opening /api/discord with no key shows which secrets are set (never their values).
 //
 // Data comes from the same place the site reads: the list and change log baked into index.html, plus the online copy the admin
 // panel saves (approved/cfg_levels) and the records people got accepted (approved/*). If the online copy can't be reached the bot
 // still answers from index.html and says so.
-const SITE = "https://timmylist.pages.dev";
+const SITE = "https://www.timmylist.org";
 const BLUE = 0x2f7bff;
 const FLAG_EPHEMERAL = 64;
 
