@@ -1,10 +1,10 @@
-// Cloudflare Pages Function for real level links:  https://timmylist.pages.dev/level/<id>
+// Cloudflare Pages Function for real level links:  https://www.timmylist.org/level/<id>
 // It answers with a tiny page that carries the level's name, rank and picture as Open Graph / Twitter tags
 // (so Discord, Google and friends show a proper preview), then sends the visitor on to the app at /#/level/<id>.
 // Data comes from the same index.html the site serves (so it is always in step with a deploy), and, when
 // reachable, the saved online copy of the list ("approved/cfg_levels" in Firestore) so edits made in the admin
 // panel show up too. If the online copy can't be read the page still works from index.html alone.
-const SITE = "https://timmylist.pages.dev";
+const SITE = "https://www.timmylist.org";
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ytId = (u) => { const m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/.exec(String(u || "")); return m ? m[1] : ""; };
 
