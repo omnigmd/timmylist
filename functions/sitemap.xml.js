@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: /sitemap.xml lists the home page and a real link for every level (see functions/level/[id].js).
-const SITE = "https://timmylist.pages.dev";
+const SITE = "https://www.timmylist.org";
 export async function onRequest({ request, env }) {
   const origin = new URL(request.url).origin;
   let ids = [];

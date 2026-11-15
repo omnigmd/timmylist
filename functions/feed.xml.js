@@ -1,7 +1,7 @@
 // Cloudflare Pages Function: /feed.xml is an Atom feed of the list changes (placed, moved, removed), newest first.
 // It reads the same change log the site shows: the one baked into index.html, plus the newer entries the admin panel saves
 // online ("approved/cfg_levels" in Firestore, field "cl"). If the online copy can't be reached the feed still works from index.html.
-const SITE = "https://timmylist.pages.dev";
+const SITE = "https://www.timmylist.org";
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" }[c]));
 
 function fromFs(v) {
