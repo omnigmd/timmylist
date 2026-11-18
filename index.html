@@ -33926,12 +33926,17 @@ var _sh=window.show;
   (function(){
     var bg=D.getElementById('tml349bg');
     if(!bg){ bg=D.createElement('div'); bg.id='tml349bg'; bg.setAttribute('aria-hidden','true'); bg.hidden=true; D.body.insertBefore(bg,D.body.firstChild); }
-    var last='', q=0;
+    var last='', q=0, cache={};
     function sync(){
       q=0;
       var el=D.querySelector('#app #l3:not(.wip) .l3v');
+      var on=D.querySelector('#app #l3:not(.wip) .l3r.on'), id=on?on.getAttribute('data-l3'):'';
       var bi=el?getComputedStyle(el).backgroundImage:'';
-      if(!bi||bi==='none'||bi.indexOf('url(')<0){ if(!bg.hidden) bg.hidden=true; last=''; return; }
+      var ok=bi&&bi!=='none'&&bi.indexOf('url(')>=0;
+      /* while the video is playing the thumbnail is replaced by the player, so remember each level's image */
+      if(ok&&id) cache[id]=bi;
+      if(!ok&&el&&id&&cache[id]){ bi=cache[id]; ok=true; }
+      if(!ok){ if(!bg.hidden) bg.hidden=true; last=''; return; }
       if(bi!==last){ last=bi; bg.style.backgroundImage=bi; }
       if(bg.hidden) bg.hidden=false;
     }
