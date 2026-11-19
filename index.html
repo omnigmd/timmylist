@@ -14437,7 +14437,7 @@ var STATE=JSON.parse(document.getElementById("state").textContent);
       var perP=Promise.resolve(); try{ perP=N.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){}); }catch(e){}
       var hm=/^#dt=([^&]+)&dn=([^&]*)/.exec(location.hash), pre=perP;
       if(hm){ try{ sessionStorage.setItem("tml_dn",decodeURIComponent(hm[2])); }catch(e){} try{ history.replaceState(null,"",location.pathname+location.search+"#/"); }catch(e){}
-        N.viaDiscord=true; pre=perP.then(function(){ return N.auth.signInWithCustomToken(hm[1]); }).catch(function(){ N.dcErr="Discord sign-in failed. Please try again."; }); }
+        N.viaDiscord=true; pre=perP.then(function(){ return N.auth.signInWithCustomToken(hm[1]); }).catch(function(){ N.dcErr="Sign-in failed. Please try again."; }); }
       return pre.then(function(){ return new Promise(function(res){ var un=N.auth.onAuthStateChanged(function(u){ un(); res(u); }); }); });
     });
   }).then(function(u){
@@ -15469,7 +15469,7 @@ setTimeout(function(){
   window.netRec=function(lvl,user,video){
     N.db.collection("approved").add({lvl:lvl,user:String(user||"").slice(0,30),video:okUrl(video)?video:"",ts:Date.now()}).catch(function(e){ toast(errText(e)); });
   };
-  var DSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+  var SSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="15" cy="9" r="6.2" stroke-width="2"/><circle cx="15" cy="9" r="2.3" fill="#fff" stroke="none"/><circle cx="7" cy="17" r="3.6" stroke-width="2"/><path d="M9.6 14.8l3-2" stroke-width="2"/></svg>'; var DSVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
   var GSVG='<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
   function acct(){ return document.getElementById("acct"); }
   function open(){ document.getElementById("modal").className="modal on"; var c=document.getElementById("closeM"); if(c) c.onclick=closeAcct; var f=acct().querySelector("input,button"); if(f) f.focus(); }
@@ -15505,7 +15505,7 @@ setTimeout(function(){
     mode=mode||"in"; var up=mode==="up";
     acct().innerHTML='<div class="ahead"><img class="alogo" alt="" src="'+(typeof LOGO_BIG!=="undefined"?LOGO_BIG:"")+'"><h2>'+(up?"Create your account":"Welcome back")+'</h2><p>'+(up?"Join The Timmylist to submit records and get your own profile.":"Sign in to submit records and manage your profile.")+'</p></div>'+
       '<div class="atabs'+(up?" up":"")+(sw?" sw":"")+'"><button type="button" data-m="in" class="'+(up?"":"on")+'">Sign in</button><button type="button" data-m="up" class="'+(up?"on":"")+'">Create account</button></div>'+
-      '<button type="button" class="gbtn" id="gsign">'+GSVG+'<span>Continue with Google</span></button>'+(N.discord?'<button type="button" class="gbtn dbtn" id="dsign">'+DSVG+'<span>Continue with Discord</span></button>':'')+'<div class="adiv"><span>or use a username</span></div>'+
+      '<button type="button" class="gbtn" id="gsign">'+GSVG+'<span>Continue with Google</span></button>'+(N.discord?'<button type="button" class="gbtn dbtn" id="dsign">'+DSVG+'<span>Continue with Discord</span></button>':'')+'<button type="button" class="gbtn dbtn sbtn" id="ssign">'+SSVG+'<span>Continue with Steam</span></button>'+'<div class="adiv"><span>or use a username</span></div>'+
       '<form id="af" class="aform"><label>Username<input name="u" autocomplete="username" maxlength="20" required placeholder="3-20 letters, numbers, _ or -"></label>'+
       '<label>Password<input name="p" type="password" autocomplete="'+(up?"new-password":"current-password")+'" required minlength="'+(up?8:1)+'" placeholder="'+(up?"At least 8 characters":"Your password")+'"></label>'+
       (up?'<label>Confirm password<input name="p2" type="password" autocomplete="new-password" required></label>':"")+
@@ -15513,7 +15513,7 @@ setTimeout(function(){
       '<div class="abtns" style="margin-top:12px"><button class="ib" id="closeM">Close</button></div>';
     open();
     [].forEach.call(acct().querySelectorAll(".atabs button"),function(b){ b.onclick=function(){ authForm(b.getAttribute("data-m"),true); }; });
-    var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href=(window.TML_DISCORD_AUTH||"/.netlify/functions/discord-auth"); };
+    var ssb=document.getElementById("ssign"); if(ssb) ssb.onclick=function(){ busy(true); location.href="/api/steam?a=login"; }; var dsb=document.getElementById("dsign"); if(dsb) dsb.onclick=function(){ busy(true); location.href=(window.TML_DISCORD_AUTH||"/.netlify/functions/discord-auth"); };
     document.getElementById("gsign").onclick=function(){
       setErr(""); busy(true);
       var prov=new firebase.auth.GoogleAuthProvider();
@@ -15562,7 +15562,7 @@ setTimeout(function(){
     N.ready.then(function(){
       if(!N.on) return unconfigured();
       if(N.user&&N.prof){
-        _open(); var el=acct(), n=el.querySelector(".note"); if(n) n.textContent="Signed in as "+N.prof.username+(String(N.user.uid).indexOf("discord_")===0?" with Discord.":(N.user.providerData&&N.user.providerData[0]&&N.user.providerData[0].providerId==="google.com"?" with Google.":"."));
+        _open(); var el=acct(), n=el.querySelector(".note"); if(n) n.textContent="Signed in as "+N.prof.username+(String(N.user.uid).indexOf("steam_")===0?" with Steam.":String(N.user.uid).indexOf("discord_")===0?" with Discord.":(N.user.providerData&&N.user.providerData[0]&&N.user.providerData[0].providerId==="google.com"?" with Google.":"."));
         var bt=el.querySelector(".abtns"); if(bt){ var so=document.createElement("button"); so.className="ib"; so.id="signout"; so.textContent="Sign out"; bt.insertBefore(so,bt.firstChild); so.onclick=function(){ N.auth.signOut().then(done); }; }
         { var d=document.createElement("p"); d.className="note"; d.style.cssText="margin:12px 0 0;word-break:break-all"; d.textContent="Account ID (needed to make an owner): "+N.user.uid; el.appendChild(d); }
         return;
