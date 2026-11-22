@@ -729,14 +729,15 @@ async function frMake(sa, uid, name, peer, pname) {
 const GD_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function gdNewCode() { const u = new Uint8Array(20); crypto.getRandomValues(u); let s = ""; for (let i = 0; i < 20; i++) s += GD_ALPHA[u[i] % GD_ALPHA.length]; return s; }
 let GDIDS = { t: 0, v: null };
+let GDINFO = [];
 // the ids of the levels on the list (index.html plus the admin panel's saved online copy), so the mod only reports levels that are on the list
 async function gdIds(env, origin, sa) {
   if (GDIDS.v && GDIDS.t > Date.now()) return GDIDS.v;
-  const keys = [], idmap = {};
+  const keys = [], idmap = {}, meta = {};
   try {
     const html = await (await env.ASSETS.fetch(new Request(origin + "/", { headers: { accept: "text/html" } }))).text();
     const SO = '<script id="state" type="application/json">', i = html.indexOf(SO);
-    if (i >= 0) { const st = JSON.parse(html.slice(i + SO.length, html.indexOf("</script>", i))); for (const l of st.levels || []) keys.push(String(l.id)); }
+    if (i >= 0) { const st = JSON.parse(html.slice(i + SO.length, html.indexOf("</script>", i))); for (const l of st.levels || []) { keys.push(String(l.id)); meta[String(l.id)] = { n: String(l.name || "").slice(0, 60), p: Number(l.points) || 0 }; } }
   } catch (e) {}
   try {
     const c = (await fsGet(sa, "approved/cfg_levels")) || {};
@@ -745,6 +746,7 @@ async function gdIds(env, origin, sa) {
     for (const k of Object.keys(c.idmap || {})) idmap[String(k)] = String(c.idmap[k]);
   } catch (e) {}
   const ids = [...new Set(keys.map((k) => idmap[k] || k).filter((x) => /^\d{1,10}$/.test(x)))];
+  GDINFO = ids.map((id, i) => { const m = meta[id] || meta[Object.keys(idmap).find((k) => idmap[k] === id)] || {}; return { i: Number(id), n: m.n || ("Level " + id), r: i + 1, p: m.p || 0 }; });
   GDIDS = { t: Date.now() + 120000, v: ids };
   return ids;
 }
@@ -930,7 +932,8 @@ export async function onRequestPost(context) {
     // ---------- v352: live Geometry Dash tracking, the mod's side (a link code instead of a sign-in) ----------
     if (a === "gdLevels") {
       if (!rate("ip" + (request.headers.get("cf-connecting-ip") || "x"), "gdlv", 60, 60000)) return json({ error: "slow" }, 429);
-      return json({ ok: true, ids: await gdIds(env, new URL(request.url).origin, sa) });
+      const gids = await gdIds(env, new URL(request.url).origin, sa);
+      return json({ ok: true, ids: gids, lv: GDINFO });
     }
     if (a === "gdSync") {
       const code = String(body.code == null ? "" : body.code).toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -956,7 +959,10 @@ export async function onRequestPost(context) {
       const nw = body.now && typeof body.now === "object" ? body.now : null, nlv = nw && /^\d{1,10}$/.test(String(nw.lv)) ? String(nw.lv) : "", np = nw ? Math.max(0, Math.min(100, Math.floor(Number(nw.p)) || 0)) : 0;
       const gdn = String(body.gd && body.gd.n || "").replace(/[^\w .-]/g, "").slice(0, 24);
       if (ents.length || (nlv && (!lk.last || now - (lk.last.t || 0) > 20000))) await fsSet(sa, "gdlink/" + code, [[["last"], { t: now, lv: nlv || String((lk.last && lk.last.lv) || ""), p: nlv ? np : ((lk.last && lk.last.p) | 0) }], [["gd"], gdn || undefined]]);
-      return json({ ok: true, applied: ents.length, user: nm });
+      // v354: the mod shows your progress, so send back your best % per list level, the completed count and your points
+      const prog = {}; let cc = 0, ptn = 0, ptt = 0; const pm = {}; for (const x of GDINFO) pm[String(x.i)] = x.p;
+      for (const id of ids) { const r = l[id]; ptt += pm[id] || 0; if (r && (r.p || r.c)) { prog[id] = r.c ? 100 : (r.p | 0); if (r.c) { cc++; ptn += pm[id] || 0; } } }
+      return json({ ok: true, applied: ents.length, user: nm, prog, c: cc, t: ids.size, pt: Math.round(ptn * 100) / 100, ptt: Math.round(ptt * 100) / 100 });
     }
 
     if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
