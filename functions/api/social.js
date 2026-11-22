@@ -28,6 +28,7 @@
 //   notes {} / notes { clear: 1 }   your in-app alerts (replies, @mentions, comments on your videos)
 //   profGet { u } (no sign-in) / profSet { bio?, pin? } / profClear { u } (admin)   bio and pinned video
 //   progGet { u? } (no sign-in for someone else's) / progSet { lv, p?, c? } / progDel { lv } / progLevel { lv } (no sign-in)   levels you are working on (best %) and ones you say you beat
+//   gdLink { peek?, reset?, off? } / gdSync { code, ev:[{lv,p,c}], now?, gd? } (link code, no sign-in) / gdLevels {} (no sign-in)   live Geometry Dash tracking: the Timmylist Live Geode mod sends best % and completions
 //   chalGet {} (no sign-in) / chalPost { lv, p, clip? } / chalSet { lv, note } (admin) / chalDel { n } (admin)   this week's challenge level and everyone's best %
 //   pollGet {} (no sign-in) / pollVote { id, i } / pollSet { q, o } (admin) / pollEnd { clear? } (admin)   one community poll at a time
 //   frOnline {} / frHide { on } / frFeed {}   which friends are on the site now, hide yourself, friends' newest videos
@@ -723,6 +724,31 @@ async function frMake(sa, uid, name, peer, pname) {
   await fsSet(sa, "chatidx/" + peer, [[["fr", "f", uid], { n: name, t: now }], [["fr", "o", uid], undefined], [["fr", "i", uid], undefined]]);
 }
 
+
+// ---- v352: live Geometry Dash tracking ----
+const GD_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function gdNewCode() { const u = new Uint8Array(20); crypto.getRandomValues(u); let s = ""; for (let i = 0; i < 20; i++) s += GD_ALPHA[u[i] % GD_ALPHA.length]; return s; }
+let GDIDS = { t: 0, v: null };
+// the ids of the levels on the list (index.html plus the admin panel's saved online copy), so the mod only reports levels that are on the list
+async function gdIds(env, origin, sa) {
+  if (GDIDS.v && GDIDS.t > Date.now()) return GDIDS.v;
+  const keys = [], idmap = {};
+  try {
+    const html = await (await env.ASSETS.fetch(new Request(origin + "/", { headers: { accept: "text/html" } }))).text();
+    const SO = '<script id="state" type="application/json">', i = html.indexOf(SO);
+    if (i >= 0) { const st = JSON.parse(html.slice(i + SO.length, html.indexOf("</script>", i))); for (const l of st.levels || []) keys.push(String(l.id)); }
+  } catch (e) {}
+  try {
+    const c = (await fsGet(sa, "approved/cfg_levels")) || {};
+    for (const k of c.removed || []) { const j = keys.indexOf(String(k)); if (j >= 0) keys.splice(j, 1); }
+    for (const k of Object.keys(c.added || {})) if (!keys.includes(String(k))) keys.push(String(k));
+    for (const k of Object.keys(c.idmap || {})) idmap[String(k)] = String(c.idmap[k]);
+  } catch (e) {}
+  const ids = [...new Set(keys.map((k) => idmap[k] || k).filter((x) => /^\d{1,10}$/.test(x)))];
+  GDIDS = { t: Date.now() + 120000, v: ids };
+  return ids;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   // alerts finish after the reply when the platform allows it; otherwise (tests, local runs) they are awaited
@@ -899,6 +925,38 @@ export async function onRequestPost(context) {
       const items = [];
       rows.forEach((c, i) => { if (c && c.st === "ok") items.push({ id: page[i], by: String(c.on || ""), ts: c.ts || 0, dur: c.dur || 0, lv: String(c.lv || ""), p: c.p || "", likes: clipLikes(c), cn: c.cn || 0 }); });
       return json({ ok: true, items, more: off + CL_PAGE < ids.length, total: ids.length });
+    }
+
+    // ---------- v352: live Geometry Dash tracking, the mod's side (a link code instead of a sign-in) ----------
+    if (a === "gdLevels") {
+      if (!rate("ip" + (request.headers.get("cf-connecting-ip") || "x"), "gdlv", 60, 60000)) return json({ error: "slow" }, 429);
+      return json({ ok: true, ids: await gdIds(env, new URL(request.url).origin, sa) });
+    }
+    if (a === "gdSync") {
+      const code = String(body.code == null ? "" : body.code).toUpperCase().replace(/[^A-Z0-9]/g, "");
+      if (!/^[A-Z0-9]{20}$/.test(code)) return json({ error: "code", message: "That link code isn't valid." }, 401);
+      if (!rate("ip" + (request.headers.get("cf-connecting-ip") || "x"), "gdip", 300, 60000) || !rate("gd" + code, "gdsync", 90, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const lk = await fsGet(sa, "gdlink/" + code);
+      if (!lk || !lk.u) return json({ error: "code", message: "That link code isn't valid. Make a new one in Settings." }, 401);
+      const u = String(lk.u), nm = String(lk.n || ""), now = Date.now();
+      const ids = new Set(await gdIds(env, new URL(request.url).origin, sa));
+      const l = ((await fsGet(sa, "prog/" + u)) || {}).l || {}, ents = [], lvs = [];
+      for (const e of (Array.isArray(body.ev) ? body.ev : []).slice(0, 25)) {
+        if (!e || typeof e !== "object") continue;
+        const lv = String(e.lv == null ? "" : e.lv); if (!/^\d{1,10}$/.test(lv) || !ids.has(lv)) continue;
+        let n = Math.floor(Number(e.p)); if (!Number.isFinite(n) || n < 0) n = 0; if (n > 100) n = 100;
+        const full = e.c === true || n >= 100, cur = l[lv] || null;
+        const p0 = cur && cur.p ? cur.p | 0 : 0, c0 = !!(cur && cur.c), p1 = !full && n > p0 ? n : p0, c1 = c0 || full;
+        if (p1 === p0 && c1 === c0) continue;
+        if (!cur && Object.keys(l).length >= PROG_MAX) continue;
+        const rec = Object.assign({ t: now }, p1 ? { p: p1 } : {}, c1 ? { c: true } : {});
+        l[lv] = rec; ents.push([["l", lv], rec]); if (p1) lvs.push([lv, p1]);
+      }
+      if (ents.length) { await fsSet(sa, "prog/" + u, ents); for (const [lv, p1] of lvs) { try { await fsSet(sa, "proglv/" + lv, [[["u", u], { n: nm, p: p1, t: now }]]); } catch (e) {} } }
+      const nw = body.now && typeof body.now === "object" ? body.now : null, nlv = nw && /^\d{1,10}$/.test(String(nw.lv)) ? String(nw.lv) : "", np = nw ? Math.max(0, Math.min(100, Math.floor(Number(nw.p)) || 0)) : 0;
+      const gdn = String(body.gd && body.gd.n || "").replace(/[^\w .-]/g, "").slice(0, 24);
+      if (ents.length || (nlv && (!lk.last || now - (lk.last.t || 0) > 20000))) await fsSet(sa, "gdlink/" + code, [[["last"], { t: now, lv: nlv || String((lk.last && lk.last.lv) || ""), p: nlv ? np : ((lk.last && lk.last.p) | 0) }], [["gd"], gdn || undefined]]);
+      return json({ ok: true, applied: ents.length, user: nm });
     }
 
     if (!uid) return json({ error: "auth", message: "Please sign in again." }, 401);
@@ -1229,6 +1287,24 @@ export async function onRequestPost(context) {
       await fsSet(sa, "profx/" + tu, [[["bio"], undefined], [["ts"], Date.now()]]);
       await modLog(sa, name, "bio cleared", oneLine(body.u, 20), "");
       return json({ ok: true });
+    }
+    // ---------- v352: live Geometry Dash tracking, your link code ----------
+    if (a === "gdLink") {
+      if (!rate(uid, "gdlink", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const cur = (await fsGet(sa, "gdcode/" + uid)) || {};
+      if (body.off) { if (cur.code) await fsDelete(sa, "gdlink/" + cur.code); await fsDelete(sa, "gdcode/" + uid); return json({ ok: true, code: "" }); }
+      if (body.peek && !/^[A-Z0-9]{20}$/.test(String(cur.code || ""))) return json({ ok: true, code: "", last: null, gd: "" });
+      let code = String(cur.code || "");
+      if (!/^[A-Z0-9]{20}$/.test(code) || body.reset) {
+        if (code) await fsDelete(sa, "gdlink/" + code);
+        code = gdNewCode();
+        await fsSet(sa, "gdlink/" + code, [[["u"], uid], [["n"], name], [["t"], Date.now()]]);
+        await fsSet(sa, "gdcode/" + uid, [[["code"], code]]);
+      }
+      const lk = (await fsGet(sa, "gdlink/" + code)) || {};
+      if (lk.u !== uid) { await fsSet(sa, "gdlink/" + code, [[["u"], uid], [["n"], name], [["t"], Date.now()]]); }
+      else if (lk.n !== name) await fsSet(sa, "gdlink/" + code, [[["n"], name]]);
+      return json({ ok: true, code, last: lk.last || null, gd: String(lk.gd || "") });
     }
     // ---------- progress: levels you are working on, and ones you say you beat ----------
     if (a === "progSet" || a === "progDel") {
