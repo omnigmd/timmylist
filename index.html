@@ -34031,7 +34031,7 @@ var _sh=window.show;
   function signed(){ var v=V(); try{ return !!(v&&v.signed&&v.signed()); }catch(e){ return false; } }
   function ago(t){ var s=Math.max(0,Math.round((Date.now()-t)/1000)); if(s<45) return 'just now'; if(s<3600) return Math.max(1,Math.round(s/60))+' min ago'; if(s<86400) return Math.round(s/3600)+' h ago'; return Math.round(s/86400)+' d ago'; }
   function lvName(id){ try{ var L=W.LEVELS||(typeof LEVELS!=='undefined'?LEVELS:null); if(L) for(var i=0;i<L.length;i++) if(String(L[i].id)===String(id)) return L[i].name||''; }catch(e){} return ''; }
-  var ICON='<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><rect x="7.4" y="8.4" width="3" height="3" fill="currentColor" stroke="none"/><rect x="13.6" y="8.4" width="3" height="3" fill="currentColor" stroke="none"/><path d="M7.5 15.6h9"/></svg>';
+  var ICON='<img class="gdlogo" src="/a/gd-logo.png" alt="" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px">';
   var HTML='<div class="h11acr" id="gdlv"><div class="h11acl"><span class="h11dc">'+ICON+'</span><div class="h11acm"><h3>Geometry Dash</h3><p id="gdlvw"></p><div class="h11acb" id="gdlvb"></div></div></div>'+
     '<p class="h11m h11acd">Track your progress live while you play. Install the Timmylist Live mod (needs Geode), paste your link code into its settings, and your best % and completions on the list’s levels are saved here automatically, the same ones as the checklist on each level.</p></div>';
 
