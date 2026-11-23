@@ -3,6 +3,7 @@
 //   GET  ?code&state   Discord sends the player back here; we read their Discord name and save it in
 //                      Firestore at discord/<uid> using the service account, then send them to the site.
 //   POST ?step=unlink  (Authorization: Bearer <Firebase ID token>) -> { ok:true }
+//   POST ?step=refresh (Authorization: Bearer <Firebase ID token>, body {uid}) -> { ok, d }  re-reads the linked Discord profile (max once an hour per player); needs DISCORD_BOT_TOKEN
 // Secrets: DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY
 const enc = new TextEncoder();
 const b64u = (bytes) => { let s = ""; bytes = new Uint8Array(bytes); for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_"); };
@@ -40,6 +41,32 @@ async function googleToken(sa) {
 }
 const docUrl = (sa, uid) => "https://firestore.googleapis.com/v1/projects/" + sa.project_id + "/databases/(default)/documents/discord/" + encodeURIComponent(uid);
 
+// Maps a Discord user object to the fields we store. Only fields Discord actually sent are returned, so a missing field never wipes what is saved.
+function mapUser(me) {
+  const cdn = "https://cdn.discordapp.com/";
+  const ext = (h) => (String(h).startsWith("a_") ? "gif" : "png");
+  const clean = (v) => String(v || "").replace(/[^A-Za-z0-9_\-\/]/g, "");
+  const o = {};
+  const name = String(me.global_name || me.username || "").slice(0, 40);
+  if (name) o.name = name;
+  if ("avatar" in me) o.avatar = me.avatar ? cdn + "avatars/" + me.id + "/" + me.avatar + "." + ext(me.avatar) + "?size=256" : "";
+  if ("banner" in me) o.banner = me.banner ? cdn + "banners/" + me.id + "/" + me.banner + "." + ext(me.banner) + "?size=600" : "";
+  if ("avatar_decoration_data" in me) o.deco = me.avatar_decoration_data && me.avatar_decoration_data.asset ? cdn + "avatar-decoration-presets/" + clean(me.avatar_decoration_data.asset) + ".png?size=256&passthrough=true" : "";
+  if ("accent_color" in me) o.accent = Number.isInteger(me.accent_color) ? "#" + (me.accent_color >>> 0).toString(16).padStart(6, "0").slice(-6) : "";
+  if ("collectibles" in me) {
+    const np = me.collectibles && me.collectibles.nameplate ? me.collectibles.nameplate : null;
+    o.nameplate = np && np.asset ? cdn + "assets/collectibles/" + clean(np.asset) + "static.png" : "";
+    o.npPal = np && np.palette ? clean(np.palette) : "";
+  }
+  if ("primary_guild" in me) {
+    const pg = me.primary_guild && me.primary_guild.identity_enabled && me.primary_guild.tag ? me.primary_guild : null;
+    o.tag = pg ? String(pg.tag).replace(/[<>&"']/g, "").slice(0, 4) : "";
+    o.tagBadge = pg && pg.badge && pg.identity_guild_id ? cdn + "guild-tag-badges/" + clean(pg.identity_guild_id) + "/" + clean(pg.badge) + ".png?size=64" : "";
+  }
+  return o;
+}
+const REFRESH_MS = 60 * 60 * 1000;
+
 export async function onRequest({ request, env }) {
   const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, FIREBASE_SERVICE_ACCOUNT, FIREBASE_API_KEY } = env;
   if (!DISCORD_CLIENT_ID || !DISCORD_CLIENT_SECRET || !FIREBASE_SERVICE_ACCOUNT || !FIREBASE_API_KEY)
@@ -50,6 +77,33 @@ export async function onRequest({ request, env }) {
   const step = q.get("step");
 
   try {
+    // Keeps a linked player's Discord picture, banner and decoration current (called by the site when a profile is opened).
+    // Needs the bot token (DISCORD_BOT_TOKEN); without it this quietly does nothing and the saved copy stays as it was.
+    if (request.method === "POST" && step === "refresh") {
+      const who = bearer && (await verifyIdToken(bearer, FIREBASE_API_KEY));
+      if (!who) return json({ error: "Please sign in again." }, 401);
+      if (!env.DISCORD_BOT_TOKEN) return json({ ok: false, reason: "no-bot" });
+      let target = ""; try { target = String(((await request.json()) || {}).uid || ""); } catch (e) {}
+      if (!/^[A-Za-z0-9:_-]{1,128}$/.test(target)) return json({ error: "Bad request." }, 400);
+      const gt = await googleToken(sa);
+      const dr = await fetch(docUrl(sa, target), { headers: { Authorization: "Bearer " + gt } });
+      if (!dr.ok) return json({ ok: false, reason: "not-linked" });
+      const f = ((await dr.json()) || {}).fields || {};
+      const did = f.id && f.id.stringValue, ts = f.ts ? Number(f.ts.integerValue || 0) : 0;
+      if (!did || !/^\d{5,25}$/.test(did)) return json({ ok: false, reason: "not-linked" });
+      if (ts && Date.now() - ts < REFRESH_MS) return json({ ok: true, fresh: true });
+      const ur = await fetch("https://discord.com/api/v10/users/" + did, { headers: { Authorization: "Bot " + env.DISCORD_BOT_TOKEN } });
+      if (!ur.ok) return json({ ok: false, reason: "discord-" + ur.status });
+      const d = mapUser(await ur.json());
+      const keys = Object.keys(d);
+      const fields = { ts: { integerValue: String(Date.now()) } };
+      keys.forEach((k) => { fields[k] = { stringValue: d[k] }; });
+      const mask = ["ts"].concat(keys).map((k) => "updateMask.fieldPaths=" + encodeURIComponent(k)).join("&");
+      const w = await fetch(docUrl(sa, target) + "?" + mask, { method: "PATCH", headers: { Authorization: "Bearer " + gt, "content-type": "application/json" }, body: JSON.stringify({ fields }) });
+      if (!w.ok) return json({ ok: false, reason: "save" });
+      return json({ ok: true, d });
+    }
+
     if (request.method === "POST" && (step === "start" || step === "unlink")) {
       const uid = bearer && (await verifyIdToken(bearer, FIREBASE_API_KEY));
       if (!uid) return json({ error: "Please sign in again." }, 401);
