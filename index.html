@@ -17215,12 +17215,8 @@ function chip(){ var lg=document.getElementById("loginBtn"); if(!lg) return; var
 var _pl=window.paintLogin; if(typeof _pl==="function"){ window.paintLogin=paintLogin=function(){ var r=_pl.apply(this,arguments); chip(); return r; }; }
 
 // submit page: locked for guests
-function lock(){ if(!guest()) return; var f=document.getElementById("f"); if(!f||f.parentNode.classList.contains("glock")) return; var p=f.parentNode; p.classList.add("glock");
- var b=document.createElement("div"); b.className="gbanner"; b.innerHTML=LK+'<div><b>Guests can\'t submit records</b><span>Sign in to send a completion to the owner for review.</span><br><button type="button">Sign in to submit</button></div>';
- b.querySelector("button").onclick=signIn; p.insertBefore(b,f);
- [].forEach.call(f.querySelectorAll("input,select,button,textarea"),function(x){ x.disabled=true; });
- f.onsubmit=function(e){ e.preventDefault(); sheet(); return false; }; }
-function tick(){ chip(); if(document.getElementById("f")&&document.querySelector(".subgrid")){ if(guest()) lock(); else if(document.querySelector(".glock")&&typeof rSub==="function") rSub(); } }
+function lock(){ /* v375: no guest box on the submit page (AREDL shows the plain form); submitting as a guest opens sign-in */ var f=document.getElementById("f"); if(!f||f.__g375) return; f.__g375=1; f.addEventListener("submit",function(e){ if(guest()){ e.preventDefault(); e.stopImmediatePropagation(); try{ toast("Sign in to submit a record"); }catch(x){} signIn(); } },true); [].forEach.call(document.querySelectorAll(".gbanner"),function(x){ x.remove(); }); }
+function tick(){ chip(); if(document.getElementById("f")&&document.querySelector(".subgrid")){ lock(); if(!guest()&&document.querySelector(".glock")&&typeof rSub==="function") rSub(); } }
 var n=0, iv=setInterval(function(){ tick(); if(++n>40) clearInterval(iv); },250); setInterval(tick,1000);
 var _rs=window.rSub; if(typeof _rs==="function"){ window.rSub=rSub=function(){ var r=_rs.apply(this,arguments); lock(); return r; }; }
 // the "Submit a record" shortcut in the account menu / any direct call stays blocked too
