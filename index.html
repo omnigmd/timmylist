@@ -26797,7 +26797,7 @@ var _sh=window.show;
         a.setAttribute('data-g','1'); m.appendChild(a); m.appendChild(sub);
       } else {
         if(b.id==='navAdmin'&&(b.hidden||!b.offsetParent&&b.getAttribute('hidden')!==null)) return;
-        if(dv==='list'){
+        if(false&&dv==='list'){
           var la=item(label,v==='list'||v==='wip'||v==='level',function(){},'<i class="h19c">'+CHEV+'</i>'); la.setAttribute('aria-expanded','false');
           var ls=D.createElement('div'); ls.className='h19sub'; ls.hidden=true; ls.setAttribute('data-wipsub','1');
           [['list','Timmy List'],['wip','WIP List']].forEach(function(g){ ls.appendChild(item(g[1],v===g[0]||(g[0]==='list'&&v==='level'),function(){ show(g[0]); })); });
@@ -33782,246 +33782,7 @@ var _sh=window.show;
   D.documentElement.setAttribute('data-c348cs',ST.cs);
 })();
 </script>
-<script id="v349js">
-/* v349: WIP List. A red twin of the main list, reached from the TIMMY LIST button. */
-(function(){
-  'use strict';
-  var D=document, W=window, ROOT=D.documentElement;
-  if(W.TML349) return;
-  function $(id){ return D.getElementById(id); }
-  function X(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
-  /* Flip to true to show the secret level's real name. */
-  var SHOW_SECRET=true;
-  var DASH='–';
-  /* lo/hi: the position range the level is planned for. */
-  var WIP=[
-    {slug:'secret',name:SHOW_SECRET?'TIMBAWAMBA':'??? (secret)',lo:1,hi:1,secret:true},
-    {slug:'kingdom-of-timacalis',name:'Kingdom of Timacalis',lo:1,hi:2},
-    {slug:'timmy-bullet',name:'Timmy Bullet',lo:1,hi:2},
-    {slug:'defeated-timmycles',name:'Defeated Timmycles',lo:1,hi:2},
-    {slug:'timmoc',name:'TIMMOC',lo:3,hi:3},
-    {slug:'timmythyst',name:'Timmythyst',lo:4,hi:4},
-    {slug:'timterminal-point',name:'Timterminal Point',lo:5,hi:5},
-    {slug:'timvernus',name:'Timvernus',lo:6,hi:6},
-    {slug:'timcheron',name:'Timcheron',lo:8,hi:8},
-    {slug:'timturus',name:'timturus',lo:9,hi:9},
-    {slug:'abyss-of-timmyness',name:'Abyss of Timmyness',lo:10,hi:10}
-  ];
-  function label(l){ return l.lo===l.hi?'#'+l.lo:'#'+l.lo+DASH+l.hi; }
-  function planned(l){ return l.lo===l.hi?'Planned for position #'+l.lo:'Planned for the top '+l.hi+' (#'+l.lo+DASH+l.hi+')'; }
-  function find(s){ for(var i=0;i<WIP.length;i++) if(WIP[i].slug===s) return WIP[i]; return null; }
-
-  var SV={
-    search:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
-    down:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
-    link:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
-    hammer:'<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 7 3-3 3 3-3 3"/><path d="m16 8-9 9"/><path d="M5 19l2-2"/><path d="M4 20l3-3 2 2-3 3z"/></svg>'
-  };
-
-  var sel=null, q='';
-
-  function rowsHtml(){
-    var s=q.trim().toLowerCase(), out='', n=0;
-    WIP.forEach(function(l){
-      if(s&&(l.secret&&!SHOW_SECRET?'secret':l.name).toLowerCase().indexOf(s)<0&&label(l).toLowerCase().indexOf(s)<0) return;
-      n++;
-      out+='<button type="button" class="l3r wipr'+(sel===l.slug?' on':'')+(l.secret&&!SHOW_SECRET?' wips':'')+'" data-wip="'+l.slug+'"'+(sel===l.slug?' aria-current="true"':'')+'><b>'+label(l)+'</b><span>'+X(l.name)+'</span></button>';
-    });
-    return {html:out||'<p class="wipnone">No WIP levels match that search.</p>',n:n};
-  }
-  function detailHtml(l){
-    var tags='<span class="l3t wipt">WIP</span><span class="l3t">Unreleased</span><span class="l3t">'+(l.hi<=2&&l.lo<l.hi?'Top '+l.hi+' planned':(l.lo===l.hi?'Top '+l.lo+' planned':'Top '+l.hi+' planned'))+'</span>';
-    var preview='<div class="l3v wipv" role="img" aria-label="'+X(l.secret&&!SHOW_SECRET?'Secret level, not shown yet':l.name+' is still in progress')+'"><div><b class="wipq" aria-hidden="true">?</b></div></div>';
-    return '<div class="l3h"><h1><span class="wipb">WIP</span><span>'+X(l.name)+'</span></h1><div class="l3ha"><button type="button" id="wipcopy" title="Copy link" aria-label="Copy link to '+X(l.name)+'">'+SV.link+'</button></div></div>'+
-      '<div class="z300sc"><div class="z300col">'+preview+'<div class="l3ts">'+tags+'</div>'+
-      '<div class="h84grid"><div><small>Level ID</small><b>TBA</b></div><div><small>List points</small><b>TBA</b></div><div><small>Enjoyment</small><b>-</b></div><div><small>Song</small><b>TBA</b></div><div><small>Rank</small><b>'+label(l)+'</b></div><div><small>Records</small><b>0</b></div></div>'+
-      '<div class="h84ppl"><div><span>Publisher</span><p><em>-</em></p></div><div><span>Verifier</span><p><em>-</em></p></div><div><span>Creators</span><p><em>-</em></p></div></div>'+
-      '<div class="l3hs h84hs"><button type="button" class="h84hh wiph" aria-expanded="true">Position History</button><div class="l3hr placed"><i>+</i><span>Planned</span><em>'+X(planned(l))+'</em></div></div>'+
-      '</div></div>';
-  }
-  function recordsHtml(){
-    return '<h2 class="z300rh">Records (0)</h2><div class="l3rl z300rl"><p class="wipnone">No records yet. Nobody has beaten this level, because it is not out yet.</p></div>';
-  }
-  function paintDetail(){
-    var l=find(sel), b=$('l3b'), c=$('l3c'); if(!l||!b) return;
-    b.innerHTML=detailHtml(l); if(c) c.innerHTML=recordsHtml();
-    D.title=(l.secret&&!SHOW_SECRET?'Secret level':l.name)+' · WIP List · The Timmylist';
-  }
-  function paintRows(){
-    var r=rowsHtml(), box=$('rows'), n=$('l3n'); if(!box) return;
-    box.innerHTML=r.html; if(n) n.textContent=r.n+' of '+WIP.length+' WIP levels';
-  }
-  function page(){
-    var r=rowsHtml();
-    return '<div class="l3 wip" id="l3"><section class="l3a" aria-label="WIP levels">'+
-      '<div class="h89lt" role="tablist"><button type="button" role="tab" class="on" aria-selected="true">WIP List</button></div>'+
-      '<div class="l3tool"><label class="l3s">'+SV.search+'<input id="wipq" type="search" placeholder="Search" aria-label="Search WIP levels" autocomplete="off" value="'+X(q)+'"></label></div>'+
-      '<div class="l3cnt" id="l3n">'+r.n+' of '+WIP.length+' WIP levels</div>'+
-      '<nav class="l3l" id="rows" aria-label="WIP levels, hardest first">'+r.html+'</nav></section>'+
-      '<section class="l3b sw" id="l3b" aria-live="polite"></section>'+
-      '<aside class="l3c" id="l3c" aria-label="Records"></aside></div>';
-  }
-  function rWip(a){
-    var app=W.app||$('app'); if(!app) return;
-    q=''; sel=find(a)?a:WIP[0].slug;
-    app.innerHTML=page(); paintDetail();
-    if(!find(a)) D.title='WIP List \u00b7 The Timmylist';
-    ROOT.setAttribute('data-h12','wip');
-  }
-
-  /* clicks and typing inside the WIP page. Capture phase, so the real list's handlers never see these rows. */
-  function appEl(){ return W.app||$('app'); }
-  var wired=false;
-  function wire(){
-    if(wired) return; var app=appEl(); if(!app) return; wired=true;
-    app.addEventListener('click',function(e){
-      if(!app.querySelector('#l3.wip')) return;
-      var r=e.target.closest&&e.target.closest('.wipr');
-      if(r){
-        e.stopPropagation(); e.preventDefault();
-        sel=r.getAttribute('data-wip'); if(W.cur) cur.a=sel;
-        var rows=app.querySelectorAll('.wipr'); for(var i=0;i<rows.length;i++){ var on=rows[i]===r; rows[i].classList.toggle('on',on); if(on) rows[i].setAttribute('aria-current','true'); else rows[i].removeAttribute('aria-current'); }
-        paintDetail();
-        try{ history.replaceState(null,'','#/wip/'+sel); }catch(_){}
-        return;
-      }
-      var cp=e.target.closest&&e.target.closest('#wipcopy');
-      if(cp){
-        e.stopPropagation(); e.preventDefault();
-        var url=location.origin+location.pathname+'#/wip/'+sel;
-        function done(){ cp.classList.add('ok'); setTimeout(function(){ cp.classList.remove('ok'); },1200); }
-        try{ navigator.clipboard.writeText(url).then(done,function(){}); }catch(_){}
-      }
-    },true);
-    app.addEventListener('input',function(e){
-      if(e.target&&e.target.id==='wipq'){ e.stopPropagation(); q=e.target.value; paintRows(); }
-    },true);
-  }
-
-  /* router: #/wip and #/wip/<slug> */
-  var _route=W.route, _show=W.show;
-  W.route=function(){
-    var p=location.hash.replace(/^#\/?/,'').split('/');
-    if(p[0]==='wip') return {v:'wip',a:p[1]?decodeURIComponent(p[1]):null};
-    return _route.apply(this,arguments);
-  };
-  W.show=function(v,a,fromHash){
-    if(v!=='wip'){ var out=_show.apply(this,arguments); if(ROOT.getAttribute('data-wipnav')) markNav(false); return out; }
-    var app=appEl(); if(!app) return;
-    wire();
-    W.curId=null; try{ app.style.removeProperty('--tint'); app.style.animation='none'; void app.offsetWidth; app.style.animation=''; }catch(_){}
-    rWip(a); cur={v:'wip',a:sel};
-    markNav(true);
-    W.scrollTo(0,0);
-    if(!fromHash){ try{ var h='#/wip'+(a?'/'+encodeURIComponent(a):''); if(location.hash!==h) location.hash=h; }catch(_){} }
-  };
-  function markNav(on){
-    if(on) ROOT.setAttribute('data-wipnav','1'); else ROOT.removeAttribute('data-wipnav');
-    var b=D.querySelectorAll('#nav button, #tabbar button');
-    for(var i=0;i<b.length;i++){
-      var v=b[i].getAttribute('data-v');
-      if(on) b[i].className=(v==='list')?'on':'';
-    }
-  }
-  function keepNav(){ if(W.cur&&cur.v==='wip'){ markNav(true); ROOT.setAttribute('data-h12','wip'); } }
-  addEventListener('hashchange',function(){ setTimeout(keepNav,0); setTimeout(keepNav,80); setTimeout(keepNav,400); });
-
-  /* TIMMY LIST button: a small menu with Timmy List and WIP List */
-  var menu=null;
-  function phoneMode(){ var n=$('nav'); return !n||getComputedStyle(n).display==='none'; }
-  function buildMenu(){
-    if(menu) return menu;
-    menu=D.createElement('div'); menu.id='wipmw'; menu.className='h12menu'; menu.setAttribute('role','menu'); menu.hidden=true;
-    menu.innerHTML='<a role="menuitem" href="#/list" data-nomodal data-wm="list">Timmy List</a><a role="menuitem" href="#/wip" data-nomodal data-wm="wip" class="wipmi">WIP List</a>';
-    D.body.appendChild(menu);
-    menu.addEventListener('click',function(e){
-      var a=e.target.closest('a'); if(!a) return; e.preventDefault(); openMenu(false,null);
-      var v=a.getAttribute('data-wm'); if(W.show) show(v);
-    });
-    return menu;
-  }
-  var anchor=null;
-  function place(){
-    if(!menu||menu.hidden||!anchor) return;
-    var r=anchor.getBoundingClientRect(), w=menu.offsetWidth, h=menu.offsetHeight;
-    var left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));
-    var below=!phoneMode();
-    menu.style.left=left+'px';
-    menu.style.top=(below?(r.bottom+8+scrollY):(r.top-8-h+scrollY))+'px';
-  }
-  function openMenu(on,btn){
-    buildMenu(); anchor=btn||anchor; menu.hidden=!on;
-    var all=D.querySelectorAll('#nav button[data-v="list"], #tabbar button[data-v="list"]');
-    for(var i=0;i<all.length;i++){ all[i].setAttribute('aria-haspopup','true'); all[i].setAttribute('aria-expanded',on?'true':'false'); }
-    if(on){ var cu=W.cur&&cur.v==='wip'; var as=menu.querySelectorAll('a'); for(var j=0;j<as.length;j++) as[j].classList.toggle('cur',(as[j].getAttribute('data-wm')==='wip')===cu); place(); }
-  }
-  function chev(){
-    var n=D.querySelector('#nav button[data-v="list"]'); if(!n||n.querySelector('.h12chev')) return;
-    n.insertAdjacentHTML('beforeend','<i class="h12chev">'+SV.down+'</i>');
-  }
-  function bindNav(){
-    var tb=D.querySelectorAll('#nav button[data-v="list"], #tabbar button[data-v="list"]');
-    for(var i=0;i<tb.length;i++){
-      var b=tb[i]; if(b.getAttribute('data-wipb')) continue; b.setAttribute('data-wipb','1');
-      b.addEventListener('click',function(e){
-        var inTab=!!this.closest('#tabbar');
-        /* the phone drawer clicks the hidden nav button itself: let that through */
-        if(!inTab&&!this.offsetParent) return;
-        /* on a phone the tab bar button still goes straight to the list, unless you are already on the list or WIP page */
-        if(inTab){
-          var onl=W.cur&&(cur.v==='list'||cur.v==='wip'||cur.v==='level');
-          if(!onl&&(!menu||menu.hidden)) return;
-        }
-        e.preventDefault(); e.stopImmediatePropagation();
-        buildMenu(); openMenu(menu.hidden,this);
-      },true);
-    }
-    chev();
-  }
-  D.addEventListener('click',function(e){
-    if(menu&&!menu.hidden&&!menu.contains(e.target)&&!(e.target.closest&&e.target.closest('button[data-v="list"]'))) openMenu(false,null);
-  });
-  D.addEventListener('keydown',function(e){ if(e.key==='Escape'&&menu&&!menu.hidden) openMenu(false,null); });
-  addEventListener('resize',place);
-  addEventListener('hashchange',function(){ if(menu&&!menu.hidden) openMenu(false,null); });
-  bindNav(); setTimeout(bindNav,400); setTimeout(bindNav,1500);
-  try{ new MutationObserver(function(){ bindNav(); }).observe(D.body,{childList:true,subtree:false}); }catch(_){}
-
-
-  /* AREDL-style level backdrop: the selected level's image, faint and blurred, fixed behind the whole page */
-  (function(){
-    var bg=D.getElementById('tml349bg');
-    if(!bg){ bg=D.createElement('div'); bg.id='tml349bg'; bg.setAttribute('aria-hidden','true'); bg.hidden=true; D.body.insertBefore(bg,D.body.firstChild); }
-    var last='', q=0, cache={};
-    function sync(){
-      q=0;
-      var el=D.querySelector('#app #l3:not(.wip) .l3v');
-      var on=D.querySelector('#app #l3:not(.wip) .l3r.on'), id=on?on.getAttribute('data-l3'):'';
-      var bi=el?getComputedStyle(el).backgroundImage:'';
-      var ok=bi&&bi!=='none'&&bi.indexOf('url(')>=0;
-      if(!ok&&id&&W.LEVELS){ for(var li=0;li<LEVELS.length;li++){ if(String(LEVELS[li].id)===id&&LEVELS[li].img){ bi='url("'+String(LEVELS[li].img).replace(/"/g,'%22')+'")'; ok=true; break; } } }
-      /* while the video is playing the thumbnail is replaced by the player, so remember each level's image */
-      if(ok&&id) cache[id]=bi;
-      if(!ok&&el&&id&&cache[id]){ bi=cache[id]; ok=true; }
-      if(!ok){ if(!bg.hidden) bg.hidden=true; last=''; return; }
-      if(bi!==last){ last=bi; bg.style.backgroundImage=bi; }
-      if(bg.hidden) bg.hidden=false;
-    }
-    function sched(){ if(!q) q=requestAnimationFrame(sync); }
-    var app=appEl();
-    try{ if(app) new MutationObserver(sched).observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']}); }catch(_){}
-    addEventListener('hashchange',sched);
-    setInterval(sched,700);
-    sched();
-  })();
-
-  W.TML349={WIP:WIP,rWip:rWip,get sel(){ return sel; }};
-
-  /* open straight away if the page was loaded on #/wip */
-  try{ var r0=route(); if(r0.v==='wip') show('wip',r0.a,true); }catch(e){ if(W.console) console.error(e); }
-})();
-</script>
 <script id="v352js">
 /* v352: live Geometry Dash tracking. A card in Settings > Connected Accounts that makes your link code for the Timmylist Live mod
    and shows when it last synced. The mod sends your best % and completions; the server saves them to the same progress as the
@@ -34030,7 +33791,9 @@ var _sh=window.show;
   'use strict';
   var D=document, W=window;
   if(W.TML352) return;
-  var MOD_URL='https://github.com/omnigmd/timmylist-live/releases/latest';
+  /* v358: the Geometry Dash mod is no longer advertised. The link card only shows in a browser that opened the site once with ?mod=1 (for people who were given the mod). */
+  var MODOK=false; try{ if(/[?&]mod=1\b/.test(location.search)) localStorage.setItem('tml_mod','1'); MODOK=localStorage.getItem('tml_mod')==='1'; }catch(e){}
+  if(!MODOK) return;
   var ST={code:'',last:null,gd:'',loaded:false,busy:false,err:'',arm:''}, armT=0, pollT=0, inFlight=false;
   function $(id){ return D.getElementById(id); }
   function X(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -34067,7 +33830,6 @@ var _sh=window.show;
       else wt='Linked, waiting for your first sync';
       h+='<div class="gdcode" title="Your link code. Keep it private.">'+X(ST.code)+'</div>';
       h+='<button type="button" class="h11btn" data-gd="copy">Copy code</button>';
-      h+='<a class="h11ob" href="'+MOD_URL+'" target="_blank" rel="noopener">Get the mod</a>';
       h+='<button type="button" class="h11ob" data-gd="reset"'+(ST.busy?' disabled':'')+'>'+(ST.arm==='reset'?'Click again to confirm':'New code')+'</button>';
       h+='<button type="button" class="h11ob" data-gd="off"'+(ST.busy?' disabled':'')+'>'+(ST.arm==='off'?'Click again to confirm':'Unlink')+'</button>';
       h+='<p class="h11m">Paste the code into Timmylist Live’s settings in Geometry Dash. Anyone with this code can add progress to your account, so keep it private; “New code” cuts off the old one.</p>';
@@ -34104,6 +33866,7 @@ var _sh=window.show;
     var h=location.hash.replace(/^#\/?/,''), p=h.split('/'), t=null;
     if(p[0]==='leaderboard') t='#/lb';
     else if(p[0]==='submissions') t='#/sub';
+    else if(p[0]==='wip') t='#/list';
     else if(p[0]==='profile'&&p[1]==='user'&&p[2]) t='#/player/'+p[2];
     else if(p[0]==='list'&&p[1]) t='#/level/'+p[1];
     if(t&&location.hash!==t){ try{ location.replace(location.pathname+location.search+t); }catch(e){ location.hash=t; } }
