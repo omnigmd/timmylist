@@ -14397,7 +14397,7 @@ html:not(#zz0):not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6):not(#
 /* v359: leaderboard columns line up in every row (fixed fractions, like AREDL's table) */
 @media (min-width:900px){html:not(#q1):not(#q2):not(#q3):not(#q4):not(#q5):not(#q6):not(#q7):not(#q8):not(#q9):not(#q10):not(#q11):not(#q12):not(#q13):not(#q14) body #app .ulx .ultbl .ulh,html:not(#q1):not(#q2):not(#q3):not(#q4):not(#q5):not(#q6):not(#q7):not(#q8):not(#q9):not(#q10):not(#q11):not(#q12):not(#q13):not(#q14) body #app .ulx .ultbl .ulr{grid-template-columns:minmax(0,200fr) minmax(0,894fr) minmax(0,453fr) minmax(0,559fr) minmax(0,422fr)!important}}
 /* v360: AREDL has no curved lines or blue glow behind the list page */
-html.tml-lst .h9bg{display:none!important}
+html .h9bg,html.h9all .h9bg{display:none!important}
 /* v359: the faded level picture behind the list, like AREDL's .image-bg-overlay */
 .image-bg-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;background-size:cover;background-position:50% 50%;background-repeat:no-repeat;opacity:0;filter:blur(1px);transition:opacity .35s ease}
 </style>
@@ -33908,29 +33908,34 @@ var _sh=window.show;
 
 </script>
 <script id="v359js">
-/* v359: the selected level's thumbnail sits behind the list page at 5% opacity, blurred 1px (AREDL does exactly this) */
+/* v361: the page background works like AREDL's .image-bg-overlay: the list page shows the selected level's picture at 5% opacity, blurred 1px; every other page shows the AREDL background picture (tinted to the site's blue). The curved-line layer is gone. */
 (function(){
   'use strict';
   var D=document, W=window;
   if(W.TML359) return; W.TML359=1;
+  var BG='https://aredl.net/assets/background.webp';
   var ov=D.createElement('div'); ov.className='image-bg-overlay'; ov.setAttribute('aria-hidden','true');
   D.body.appendChild(ov);
   var last='', raf=0;
   function tick(){
     raf=0;
-    var img='', on=D.querySelector('#app #l3 .l3r.on[data-l3]');
-    D.documentElement.classList.toggle('tml-lst', !!D.querySelector('#app #l3'));
-    if(on){
-      var id=on.getAttribute('data-l3'), L=(W.LEVELS||[]).filter(function(l){ return String(l.id)===String(id); })[0];
-      img=(L&&L.img)||'';
-    }
-    if(img===last) return; last=img;
-    if(img){ ov.style.backgroundImage='url("'+String(img).replace(/"/g,'%22')+'")'; ov.style.opacity='0.05'; }
-    else ov.style.opacity='0';
+    var lst=!!D.querySelector('#app #l3');
+    D.documentElement.classList.toggle('tml-lst', lst);
+    var img='', op='0', flt='none', key='';
+    if(lst){
+      var on=D.querySelector('#app #l3 .l3r.on[data-l3]');
+      if(on){
+        var id=on.getAttribute('data-l3'), L=(W.LEVELS||[]).filter(function(l){ return String(l.id)===String(id); })[0];
+        img=(L&&L.img)||'';
+      }
+      op=img?'0.05':'0'; flt='blur(1px)'; key='L'+img;
+    } else { img=BG; op='1'; flt='hue-rotate(190deg)'; key='B'; }
+    if(key===last) return; last=key;
+    ov.style.backgroundImage=img?'url("'+String(img).replace(/"/g,'%22')+'")':'none';
+    ov.style.opacity=op; ov.style.filter=flt;
   }
   function sched(){ if(!raf) raf=requestAnimationFrame(tick); }
-  var app=D.getElementById('app');
-  if(app) new MutationObserver(sched).observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-current']});
+  var app=D.getElementById('app'); if(app) new MutationObserver(sched).observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-current']});
   W.addEventListener('hashchange',sched);
   sched();
 })();
