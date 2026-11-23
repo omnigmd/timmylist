@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<style id="tmlhold-css">html.tmlhold #app,html.tmlhold header,html.tmlhold footer,html.tmlhold #tabbar{visibility:hidden!important}</style><script id="tmlhold">try{ if(!window.claude){ document.documentElement.classList.add("tmlhold"); setTimeout(function(){ document.documentElement.classList.remove("tmlhold"); },3600); } }catch(e){}</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Timmylist | Hardest Timmy Levels in Geometry Dash, Ranked</title>
@@ -14472,6 +14474,7 @@ var LOGO_BIG=(document.querySelector("#logo img")||{}).src||LOGO;
 document.getElementById("flogo").src=LOGO_BIG;
 // Add more levels to this array, in rank order. Leave a field empty ("" or []) to hide it.
 var STATE=JSON.parse(document.getElementById("state").textContent);
+STATE.faces={}; /* v357: no demon faces anywhere on the list */
 // ================= v93: accounts for self-hosted sites (Firebase) =================
 // On claude.ai the page already has window.claude. Anywhere else (Netlify etc.) this small shim gives the same
 // "user" and "db" objects, backed by Firebase Auth + Firestore, if firebase-config.js is filled in.
@@ -14479,6 +14482,8 @@ var STATE=JSON.parse(document.getElementById("state").textContent);
   if(window.claude) return;
   /* v356: hold the intro cover until the saved online edits are applied, so the old baked-in list never flashes */
   window.TML_WAIT=true; setTimeout(function(){ window.TML_WAIT=false; },3000);
+  var _rel=function(){ window.TML_WAIT=false; try{ document.documentElement.classList.remove('tmlhold'); }catch(e){} };
+  window.TML_RELEASE=_rel; setTimeout(_rel,3200);
   var N=window.TMLNET={on:false,configured:false,user:null,prof:null,isAdmin:false,auth:null,db:null};
   var V="10.12.5", CDN="https://www.gstatic.com/firebasejs/"+V+"/";
   function loadJS(src){ return new Promise(function(res,rej){ var s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=function(){ rej(new Error("load "+src)); }; document.head.appendChild(s); }); }
@@ -14516,16 +14521,15 @@ var LEVELS=STATE.levels, BASE=STATE.records;
 
 // Points come from difficulty rank: #1 is worth 1000 and each step down keeps 87.5% of the one above (min 10). Reordering levels in Admin re-scores everything automatically.
 // Points use Pointercrate's own demonlist formula (completion at 100%): #1 is worth 350 and the curve eases off down the list.
+var AREDL_PTS=[5000,4937,4877,4818,4762,4705,4652,4599,4548,4499,4450,4403,4358,4313,4269,4229,4185,4148,4105,4067,4029,3992,3956,3924,3885,3855,3818,3790,3758,3726,3696,3666,3636,3607,3579,3551,3524,3497,3470,3444,3419,3394,3369,3345,3321,3298,3275,3252,3230,3208,3186,3165,3144,3123,3103,3083,3063,3043,3024,3005,2986,2968,2950,2932,2914,2897,2880,2863,2846,2829,2813,2797,2781,2765,2750,2734,2719,2704,2689,2675,2660,2646,2632,2618,2604,2590,2577,2564,2550,2537,2525,2512,2499,2487,2474,2462,2450,2438,2426,2414,2403,2391,2380,2369,2358,2347,2336,2325,2314,2304,2293,2283,2272,2262,2252,2242,2232,2222,2213,2203,2193,2184,2174,2166,2156,2147,2138,2129,2120,2111,2103,2094,2085,2077,2068,2060,2051,2043,2035,2027,2019,2011,2003,1995,1987,1979,1972,1964,1956,1949,1941,1934,1926,1919,1912,1905,1898,1890];
 function ptsRaw(p){
-  if(p<1||p>150) return 0;
-  if(p<=3) return -18.2899079915*p+368.2899079915;
-  if(p<=20) return ((326.1*Math.exp(-0.0871*p))+51.09)*1.037117142;
-  if(p<=35) return ((250-83.389)*Math.pow(1.0099685,2-p)-31.152)*1.0371139743;
-  if(p<=55) return 1.0371139743*((212.61*Math.pow(1.036,1-p))+25.071);
-  return 1.039035131*((185.7*Math.exp(-0.02715*p))+14.84);
+  /* v357: the exact AREDL points table (#1 = 5000), looked up by rank */
+  p=Math.round(p); if(p<1) return 0;
+  if(p<=AREDL_PTS.length) return AREDL_PTS[p-1];
+  return Math.max(1,AREDL_PTS[AREDL_PTS.length-1]-7.5*(p-AREDL_PTS.length));
 }
 function pts(r){ return Math.round(ptsRaw(r)*100)/100; }
-function P2(n){ return (Math.round(n*100)/100).toFixed(2); }
+function P2(n){ return String(Math.round(n*100)/100); }
 function lv(id){ return LEVELS.filter(function(l){return l.id===id;})[0]; }
 function rk(id){ return LEVELS.indexOf(lv(id))+1; }
 function load(){ try{ return JSON.parse(localStorage.getItem("timmylist_v39")||"[]"); }catch(e){ return []; } }
@@ -15639,7 +15643,7 @@ setTimeout(function(){
   };
   window.netPend=function(o){ if(N.user) o.uid=N.user.uid; if(N.prof) o.by=N.prof.username; return o; };
   N.ready.then(function(){
-    if(!N.on){ window.TML_WAIT=false; return; }
+    if(!N.on){ window.TML_RELEASE(); return; }
     N.db.collection("approved").get().then(function(s){
       var add=false, ds=s.docs.map(function(d){ return d.data()||{}; }).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
       var cfg={}, cimgs=[]; ds.forEach(function(o){ if(o.cfg==="img") cimgs.push(o); else if(o.cfg) cfg[o.cfg]=o; });
@@ -15657,9 +15661,9 @@ setTimeout(function(){
       });
       if(add&&cur&&cur.v!=="admin") show(cur.v,cur.a,true);
       else if(add&&cur&&cur.v==="admin"&&IS_OWNER) rAdmin();
-      window.TML_WAIT=false;
-    },function(){ window.TML_WAIT=false; });
-  },function(){ window.TML_WAIT=false; });
+      window.TML_RELEASE();
+    },function(){ window.TML_RELEASE(); });
+  },function(){ window.TML_RELEASE(); });
 })();
 
 // ================= owner admin (accept / decline records, add & edit levels) =================
@@ -16363,7 +16367,7 @@ function dcDeco(name){ var d=DCD[DCU[String(name).toLowerCase()]]; return d&&d.d
       '<div class="ln"><span>Beaten by</span><b>'+done+' of '+n+' players</b></div>'+
       '<div class="ln"><span>Worth to each player</span><b>+'+P2(p)+'</b></div>'+
       '<div class="ladder">'+lad+'</div>'+
-      '<p class="note" style="margin:6px 0 0">Points use the same formula as the Geometry Dash Demonlist on Pointercrate: #1 is worth 350, and each rank down is worth less.</p></div>';
+      '<p class="note" style="margin:6px 0 0">Points use the same point table as the AREDL: #1 is worth 5000, and each rank down is worth less.</p></div>';
   }
   function near(r){
     var h='<div class="panel nearby"><h2>Nearby levels</h2>';
