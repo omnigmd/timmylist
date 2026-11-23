@@ -16277,6 +16277,33 @@ function dcDeco(name){ var d=DCD[DCU[String(name).toLowerCase()]]; return d&&d.d
     var hm=/^#dl=ok&dn=([^&]*)/.exec(location.hash), he=/^#dl_err=(.*)$/.exec(location.hash);
     if(hm||he){ try{ history.replaceState(null,"",location.pathname+location.search+"#/"); }catch(e){} setTimeout(function(){ toast(hm?"Discord linked: "+decodeURIComponent(hm[1]):decodeURIComponent(he[1])); },900); }
   });
+  /* v366: keep Discord picture / banner / decoration current (the server re-reads Discord at most once an hour per player) */
+  var DCR={};
+  function dcRefresh(uid){
+    var T=window.TMLNET, base=window.TML_DISCORD_LINK||"";
+    if(!(T&&T.on&&T.user&&base&&uid&&DCD[uid])) return;
+    var ts=+DCD[uid].ts||0; if(ts&&Date.now()-ts<3600000) return;
+    if(DCR[uid]&&Date.now()-DCR[uid]<600000) return; DCR[uid]=Date.now();
+    T.user.getIdToken().then(function(tok){ return fetch(base+"?step=refresh",{method:"POST",headers:{Authorization:"Bearer "+tok,"content-type":"application/json"},body:JSON.stringify({uid:uid})}); })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j||!j.ok) return;
+        var o=DCD[uid]; if(!o) return;
+        if(j.fresh){ o.ts=Date.now(); return; }
+        if(!j.d) return;
+        var ch=false; Object.keys(j.d).forEach(function(k){ if(o[k]!==j.d[k]){ o[k]=j.d[k]; ch=true; } });
+        o.ts=Date.now(); if(j.d.name) DCN[uid]=j.d.name;
+        if(ch){ dcOverlay(); try{ if(cur&&cur.v!=="admin") show(cur.v,cur.a,true); }catch(e){} }
+      }).catch(function(){});
+  }
+  setInterval(function(){
+    try{
+      var T=window.TMLNET; if(!(T&&T.on&&T.user)||document.hidden) return;
+      dcRefresh(T.user.uid);
+      var m=/^#\/player\/(.+)$/.exec(location.hash);
+      if(m){ var u=DCU[decodeURIComponent(m[1]).toLowerCase()]; if(u) dcRefresh(u); }
+    }catch(e){}
+  },4000);
   var _rp=rPlayer;
   rPlayer=function(name){
     _rp(name);
