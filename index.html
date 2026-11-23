@@ -14477,6 +14477,8 @@ var STATE=JSON.parse(document.getElementById("state").textContent);
 // "user" and "db" objects, backed by Firebase Auth + Firestore, if firebase-config.js is filled in.
 (function(){
   if(window.claude) return;
+  /* v356: hold the intro cover until the saved online edits are applied, so the old baked-in list never flashes */
+  window.TML_WAIT=true; setTimeout(function(){ window.TML_WAIT=false; },3000);
   var N=window.TMLNET={on:false,configured:false,user:null,prof:null,isAdmin:false,auth:null,db:null};
   var V="10.12.5", CDN="https://www.gstatic.com/firebasejs/"+V+"/";
   function loadJS(src){ return new Promise(function(res,rej){ var s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=function(){ rej(new Error("load "+src)); }; document.head.appendChild(s); }); }
@@ -15058,7 +15060,7 @@ document.addEventListener("mousemove",function(e){
   i.addEventListener("touchstart",go,{passive:true,once:true});
   document.addEventListener("keydown",go,{once:true});
   /* v298: like AREDL, no splash: leave as soon as the page has content */
-  (function wait(){ var a=document.getElementById("app"); if(a&&a.children.length) go(); else if(!done) setTimeout(wait,40); })();
+  (function wait(){ var a=document.getElementById("app"); if(a&&a.children.length&&!window.TML_WAIT) go(); else if(!done) setTimeout(wait,40); })();
   setTimeout(go,4000);
 })();
 // player links + keyboard activation
@@ -15637,7 +15639,7 @@ setTimeout(function(){
   };
   window.netPend=function(o){ if(N.user) o.uid=N.user.uid; if(N.prof) o.by=N.prof.username; return o; };
   N.ready.then(function(){
-    if(!N.on) return;
+    if(!N.on){ window.TML_WAIT=false; return; }
     N.db.collection("approved").get().then(function(s){
       var add=false, ds=s.docs.map(function(d){ return d.data()||{}; }).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
       var cfg={}, cimgs=[]; ds.forEach(function(o){ if(o.cfg==="img") cimgs.push(o); else if(o.cfg) cfg[o.cfg]=o; });
@@ -15655,8 +15657,9 @@ setTimeout(function(){
       });
       if(add&&cur&&cur.v!=="admin") show(cur.v,cur.a,true);
       else if(add&&cur&&cur.v==="admin"&&IS_OWNER) rAdmin();
-    },function(){});
-  });
+      window.TML_WAIT=false;
+    },function(){ window.TML_WAIT=false; });
+  },function(){ window.TML_WAIT=false; });
 })();
 
 // ================= owner admin (accept / decline records, add & edit levels) =================
