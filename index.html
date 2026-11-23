@@ -26633,7 +26633,7 @@ var _sh=window.show;
   function recCard(r,name){
     var l=lv(r.lvl), n=rk(l.id), ver=lower(l.verifier)===lower(name), v=ytId(r.video), dt=dateOf(r);
     return '<a class="h12rc" href="#/level/'+l.id+'" style="--bg:'+X(grad(l))+'"><span class="h12rcb" style="background:'+grad(l)+'"></span>'+
-      '<b class="h12rcn">#'+n+'</b><span class="h12rct"><b>'+X(l.name)+'</b><small>+'+P2(pts(n)).replace(/\.?0+$/,'')+' points'+(dt?' | '+X(dt):'')+'</small></span>'+
+      '<b class="h12rcn">#'+n+'</b><span class="h12rct"><b>'+X(l.name)+'</b><small>+'+P2(pts(n))+' points'+(dt?' | '+X(dt):'')+'</small></span>'+
       (ver?'<em class="h12rcv">Verifier</em>':'')+
       (v?'<span class="h12yt" role="link" data-yt="'+X(r.video)+'" title="Watch on YouTube">'+SV(IC.yt,30,true)+'</span>':'')+'</a>';
   }
