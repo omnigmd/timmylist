@@ -3,7 +3,7 @@
    2) Offline: the page you last loaded still opens without a connection.
    It never caches /api/ calls, and the page itself is always fetched fresh when you are online,
    so an update is never held back by this file. */
-const VER = "v255", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
+const VER = "v381", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(self.navigator.userAgent) && !/Chrome|Chromium|Edg\//.test(self.navigator.userAgent);
 
 self.addEventListener("install", () => { self.skipWaiting(); });
@@ -36,10 +36,17 @@ self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : "" }; }
   const title = String(d.title || "The Timmylist").slice(0, 80);
-  const opts = { body: String(d.body || "").slice(0, 200), icon: "icon-192.png", badge: "badge-96.png", tag: d.tag || undefined, renotify: !!d.tag, data: { url: String(d.url || "#/"), kind: d.kind || "" } };
+  const isCall = d.kind === "call";
+  const opts = { body: String(d.body || "").slice(0, 200), icon: "icon-192.png", badge: "badge-96.png", tag: d.tag || undefined, renotify: !!d.tag, timestamp: Date.now(), data: { url: String(d.url || "#/"), kind: d.kind || "" } };
+  // a call stays on screen until you act on it, buzzes, and has an Answer button. Everything else disappears by itself.
+  if (isCall) { opts.requireInteraction = true; opts.vibrate = [300, 150, 300, 150, 300]; opts.actions = [{ action: "open", title: "Answer" }]; }
+  else if (d.kind === "dm" || d.kind === "men") opts.vibrate = [120, 60, 120];
   e.waitUntil((async () => {
+    const cl = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    // v381: wake every open tab right now so it fetches the new message or call at once instead of waiting for its next check
+    for (const c of cl) { try { c.postMessage({ t: "poke", kind: d.kind || "" }); } catch (_) {} }
     // if you are looking at the site right now the page already shows it. Apple's browsers insist on a notification every time.
-    if (!APPLE) { const cl = await self.clients.matchAll({ type: "window", includeUncontrolled: true }); if (cl.some((c) => c.focused && c.visibilityState === "visible")) return; }
+    if (!APPLE && cl.some((c) => c.focused && c.visibilityState === "visible")) return;
     await self.registration.showNotification(title, opts);
   })());
 });
