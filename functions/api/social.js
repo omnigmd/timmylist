@@ -452,6 +452,8 @@ async function notifyUser(sa, uid, msg) {
     if (!okUid(uid) || !PUSH_KINDS[msg.kind]) return 0;
     try { const st = await fsGet(sa, "status/" + uid); if (st && st.p === "dnd") return 0; } catch (e) {}
     const d = await fsGet(sa, "push/" + uid); if (!d || !d.s || (d.k && d.k[msg.kind] === false)) return 0;
+    if (d.qh && d.qh.on && !(msg.kind === "call" && !d.qh.c)) { const o = Number(d.qh.o) || 0, m = (((Math.floor(Date.now() / 60000) - o) % 1440) + 1440) % 1440, qs = d.qh.s | 0, qe = d.qh.e | 0; if (qs <= qe ? (m >= qs && m < qe) : (m >= qs || m < qe)) return 0; }
+    if (msg.room && msg.kind !== "men" && msg.kind !== "call" && d.nm && d.nm[msg.room] > Date.now()) return 0;
     const payload = { title: oneLine(msg.title, 60) || "The Timmylist", body: oneLine(msg.body, 140), url: String(msg.url || "#/").slice(0, 60), tag: String(msg.tag || "").slice(0, 40), kind: msg.kind };
     let sent = 0; const dead = [];
     await Promise.all(Object.keys(d.s).slice(0, PUSH_MAXDEV).map(async (id) => { try { const st = await sendPush(sa, d.s[id], payload); if (st === 404 || st === 410) dead.push(id); else if (st >= 200 && st < 300) sent++; } catch (e) {} }));
@@ -461,6 +463,59 @@ async function notifyUser(sa, uid, msg) {
 }
 async function notifyAdmins(sa, msg, except) {
   try { const adms = await fsList(sa, "admins", 100); await Promise.all(adms.filter((x) => x._id !== except).slice(0, 20).map((x) => notifyUser(sa, x._id, msg))); } catch (e) {}
+}
+
+// ---------- room options: disappearing timer + scheduled sends (chatopt/<room>), cached briefly ----------
+const OPT = new Map(), DELIV = new Set();
+async function optGet(sa, key, fresh) {
+  const c = OPT.get(key); if (!fresh && c && c.t > Date.now()) return c.v;
+  const v = (await fsGet(sa, "chatopt/" + key)) || {};
+  if (OPT.size > 500) OPT.clear(); OPT.set(key, { v, t: Date.now() + 15000 }); return v;
+}
+const SCH_MAX = 8, SCH_MIN = 25 * 1000, SCH_SPAN = 30 * 86400 * 1000, DIS_OK = [0, 3600, 86400, 604800];
+function schMine(opt, uid) { const o = (opt && opt.sc) || {}; return Object.keys(o).filter((k) => o[k] && o[k].u === uid).map((k) => ({ id: k, t: String(o[k].t || ""), at: o[k].at || 0 })).sort((x, y) => x.at - y.at); }
+// deliver scheduled messages that are due in this room (whoever opens the room first does it)
+async function deliverDue(sa, r, opt, defer) {
+  const now = Date.now(), sc = (opt && opt.sc) || {}, due = Object.keys(sc).filter((k) => sc[k] && sc[k].at <= now && !DELIV.has(k)).slice(0, 5);
+  if (!due.length) return false;
+  for (const sid of due) {
+    const it = sc[sid]; DELIV.add(sid); if (DELIV.size > 400) DELIV.clear();
+    try {
+      let peer = "", pn = "";
+      if (r.dm) {
+        peer = dmPeer(r.key, it.u);
+        const theirs = peer ? (await fsGet(sa, "chatidx/" + peer)) || {} : {};
+        if (!peer || (theirs.b && theirs.b[it.u])) { await fsSet(sa, "chatopt/" + r.key, [[["sc", sid], undefined]]); continue; }
+        pn = (await userName(sa, peer)) || "";
+      }
+      const id = mkId(), ts = Date.now(), text = String(it.t || "").slice(0, 500), snip = text.slice(0, 60);
+      const ent = [[["from"], it.u], [["name"], it.n], [["text"], text], [["img"], false], [["ts"], ts], [["sch"], true]];
+      if (opt.dis) ent.push([["exp"], ts + opt.dis * 1000]);
+      await fsSet(sa, "chat/" + r.key + "/m/" + id, ent);
+      await fsSet(sa, "chatopt/" + r.key, [[["sc", sid], undefined]]);
+      if (r.dm) {
+        await fsSet(sa, "chatidx/" + it.u, [[["c", peer], { name: pn, ts, last: snip, from: it.u }]]);
+        await fsSet(sa, "chatidx/" + peer, [[["c", it.u], { name: it.n, ts, last: snip, from: it.u }]]);
+        await defer(notifyUser(sa, peer, { kind: "dm", title: it.n, body: snip, url: "?open=dm:" + it.u, tag: "dm-" + it.u, room: r.key }));
+      } else {
+        await fsSet(sa, metaPath(r.key), [[["ts"], ts], [["last"], snip], [["name"], it.n], [["from"], it.u]]);
+        if (r.group) {
+          await grpRows(sa, r.group.id, r.group.name || "Group chat", r.group.mem, snip, it.u, it.n, ts);
+          const gn = r.group.name || "Group chat";
+          await defer(Promise.all(Object.keys(r.group.mem).filter((u) => u !== it.u).slice(0, 40).map((u) => notifyUser(sa, u, { kind: "dm", title: gn, body: it.n + ": " + snip, url: "?open=grp:" + r.group.id, tag: "grp-" + r.group.id, room: r.key }))));
+        }
+      }
+    } catch (e) { DELIV.delete(sid); }
+  }
+  OPT.delete(r.key);
+  return true;
+}
+const dmPeer = (key, u) => { const rest = String(key).slice(3); return rest.startsWith(u + "_") ? rest.slice(u.length + 1) : rest.endsWith("_" + u) ? rest.slice(0, -(u.length + 1)) : ""; };
+const okYt = (s) => /^[A-Za-z0-9_-]{11}$/.test(String(s || ""));
+const WP_TTL = 6 * 3600 * 1000;
+function wpPub(d, now) {
+  if (!d || !d.on || !d.v || !(d.ts > now - WP_TTL)) return null;
+  return { rev: d.rev | 0, v: d.v, pos: Number(d.pos) || 0, pl: !!d.pl, at: d.at || 0, by: String(d.by || ""), bu: String(d.bu || ""), q: Array.isArray(d.q) ? d.q.slice(0, 20) : [], m: d.m === "host" ? "host" : "all", end: !!d.end };
 }
 const dmKey = (a, b) => "dm_" + [a, b].sort().join("_");
 // Clans are saved by the site in approved/cfg_clans. A player belongs to a clan when their account name (or the player it is linked to) is on its member list.
@@ -571,6 +626,10 @@ function pubMsg(m) {
   if (m.k === "del" || m.k === "re") { o.t = m.t || ""; }
   if (m.k === "re") { o.e = m.e || ""; o.u = m.u || ""; o.on = !!m.on; }
   if (m.k === "call") o.dur = m.dur || 0;
+  if (m.k === "sys" && m.dt != null) o.dt = m.dt | 0;
+  if (m.k === "sys" && m.wp) o.wp = m.wp | 0;
+  if (m.exp && !m.del && !m.k) o.exp = m.exp;
+  if (m.sch && !m.del && !m.k) o.sch = true;
   if (m.ed && !m.del && !m.k) o.ed = m.ed;
   if (m.eh && !m.del && !m.k && Array.isArray(m.eh) && m.eh.length) o.eh = m.eh.length;
   if (m.k === "ed") { o.t = m.t || ""; o.ed = m.ts || 0; }
@@ -1020,8 +1079,13 @@ export async function onRequestPost(context) {
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
       const r = await roomFor(sa, uid, name, admin, body), since = body.since == null || body.since === "" ? "" : String(body.since), before = body.before == null || body.before === "" ? "" : String(body.before);
       if ((since && !okId(since)) || (before && !okId(before))) return json({ error: "bad request" }, 400);
-      const rows = await fsMsgs(sa, r.key, since, since ? 100 : 60, before);
+      let opt = {};
+      if (r.dm || r.group || r.clan) { opt = await optGet(sa, r.key); if (opt.sc && (await deliverDue(sa, r, opt, defer))) opt = await optGet(sa, r.key, true); }
+      let rows = await fsMsgs(sa, r.key, since, since ? 100 : 60, before);
+      const nowX = Date.now(), gone = rows.filter((m) => m.exp && m.exp <= nowX);
+      if (gone.length) { rows = rows.filter((m) => !(m.exp && m.exp <= nowX)); await defer(Promise.all(gone.slice(0, 12).map(async (m) => { try { await fsDelete(sa, "chat/" + r.key + "/m/" + m.id); if (m.img || m.aud) await fsDelete(sa, "chatimg/" + m.id); } catch (e) {} }))); }
       const out = { ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 };
+      if (!since && !before && (r.dm || r.group)) { out.dis = opt.dis | 0; out.sc = schMine(opt, uid); out.wp = wpPub(await fsGet(sa, "watch/" + r.key), nowX); if (out.wp) out.wp = { v: out.wp.v, by: out.wp.by, rev: out.wp.rev }; }
       if (!since && !before && metaPath(r.key)) { const meta = await fsGet(sa, metaPath(r.key)); out.pin = meta && meta.pin && okId(meta.pin.id) ? { id: meta.pin.id, name: String(meta.pin.name || ""), text: String(meta.pin.text || ""), by: String(meta.pin.by || "") } : null; }
       if (r.group && !before) {
         if (!since) out.grp = grpPub(r.group);
@@ -1094,6 +1158,7 @@ export async function onRequestPost(context) {
       let gprev = 0;
       if (r.group) { const gm = await fsGet(sa, metaPath(r.key)); gprev = (gm && gm.ts) || 0; }
       const id = mkId(), ts = Date.now(); ent.push([["ts"], ts]);
+      if (r.dm || r.group) { const oo = await optGet(sa, r.key); if (oo.dis) ent.push([["exp"], ts + oo.dis * 1000]); }
       const gw = cleanDim(body.gw), gh = cleanDim(body.gh);
       if (gif) { ent.push([["gif"], gif]); if (gw && gh) ent.push([["gw"], gw], [["gh"], gh]); }
       if (aud) ent.push([["aud"], true], [["adur"], adur]);
@@ -1110,7 +1175,7 @@ export async function onRequestPost(context) {
       if (!r.dm && !r.group && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
       if (r.dm) {
         // one alert per burst: nothing if they already heard from this player in the last 45 seconds
-        if (!(r.prev && ts - r.prev < 8000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid }));
+        if (!(r.prev && ts - r.prev < 8000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid, room: r.key }));
       } else if (r.group) {
         // members only. Someone @mentioned gets the mention alert; everyone else gets one alert per burst of messages.
         const g = r.group, mentioned = new Set(), burst = !(gprev && ts - gprev < 10000), url = "?open=grp:" + g.id, gn = g.name || "Group chat";
@@ -1124,7 +1189,7 @@ export async function onRequestPost(context) {
               await notifyUser(sa, tu, { kind: "men", title: name + " mentioned you in " + gn, body: snip, url, tag: "men-" + g.id });
             }
           }
-          if (burst) await Promise.all(Object.keys(g.mem).filter((u) => u !== uid && !mentioned.has(u)).map(async (u) => { if (await blocked(u)) return; await notifyUser(sa, u, { kind: "dm", title: gn, body: name + ": " + snip, url, tag: "grp-" + g.id }); }));
+          if (burst) await Promise.all(Object.keys(g.mem).filter((u) => u !== uid && !mentioned.has(u)).map(async (u) => { if (await blocked(u)) return; await notifyUser(sa, u, { kind: "dm", title: gn, body: name + ": " + snip, url, tag: "grp-" + g.id, room: r.key }); }));
         })());
       } else if (text && rate(uid, "men", 12, 60000)) {
         const names = [...new Set([...text.matchAll(/(^|[\s(])@([A-Za-z0-9_-]{3,20})/g)].map((m) => m[2].toLowerCase()))].slice(0, 3);
@@ -1141,6 +1206,117 @@ export async function onRequestPost(context) {
       await defer(bumpStreak(sa, uid, name, ts));
       if (r.key === "main" && (text || aud) && env.DISCORD_CHAT_WEBHOOK_URL) await defer(dcChat(env, name, text || "\ud83c\udfa4 sent a voice message")); ent.forEach(([p, v]) => { if (["rt", "rn", "rq", "gif", "gw", "gh"].includes(p[0])) echo[p[0]] = v; });
       return json({ ok: true, peer: r.dm ? r.peer : null, msg: pubMsg(echo) });
+    }
+    if (a === "chatMute" || a === "quiet") {
+      if (!rate(uid, "cmu", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      if (a === "quiet") {
+        const on = !!body.on, sM = Math.max(0, Math.min(1439, Math.round(Number(body.s) || 0))), eM = Math.max(0, Math.min(1439, Math.round(Number(body.e) || 0))), oM = Math.max(-840, Math.min(840, Math.round(Number(body.o) || 0)));
+        await fsSet(sa, "push/" + uid, [[["qh"], on ? { on: true, s: sM, e: eM, o: oM, c: !!body.c } : undefined]]);
+        return json({ ok: true });
+      }
+      const r = await roomFor(sa, uid, name, admin, body), hrs = Number(body.hours);
+      const until = !hrs || hrs <= 0 ? 0 : hrs >= 8760 ? Date.now() + 8760 * 3600 * 1000 : Date.now() + hrs * 3600 * 1000;
+      await fsSet(sa, "push/" + uid, [[["nm", r.key], until || undefined]]);
+      return json({ ok: true, key: r.key, until });
+    }
+    if (a === "disSet") {
+      const r = await roomFor(sa, uid, name, admin, body), secs = Number(body.secs) | 0;
+      if (!(r.dm || r.group) || !DIS_OK.includes(secs)) return json({ error: "bad request", message: "Disappearing messages work in direct messages and group chats." }, 400);
+      if (r.group && r.group.owner !== uid && !admin) return json({ error: "owner", message: "Only the group owner can change this." }, 403);
+      if (!rate(uid, "dis", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const before = (await optGet(sa, r.key, true)).dis | 0;
+      if (before === secs) return json({ ok: true, dis: secs });
+      await fsSet(sa, "chatopt/" + r.key, [[["dis"], secs || undefined]]); OPT.delete(r.key);
+      const lbl = secs >= 604800 ? "7 days" : secs >= 86400 ? "24 hours" : "1 hour";
+      await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "sys"], [["from"], uid], [["name"], name], [["text"], secs ? name + " turned on disappearing messages. New messages are deleted after " + lbl + "." : name + " turned off disappearing messages."], [["dt"], secs], [["ts"], Date.now()]]);
+      return json({ ok: true, dis: secs });
+    }
+    if (a === "schedSet") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!cfg.chat) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      if (!(r.dm || r.group || r.clan)) return json({ error: "bad request", message: "You can schedule messages in direct messages, groups and clan chats." }, 400);
+      const opt = await optGet(sa, r.key, true);
+      if (body.cancel) {
+        const sid = String(body.cancel);
+        if (opt.sc && opt.sc[sid] && opt.sc[sid].u === uid) { await fsSet(sa, "chatopt/" + r.key, [[["sc", sid], undefined]]); delete opt.sc[sid]; OPT.delete(r.key); }
+        return json({ ok: true, sc: schMine(opt, uid) });
+      }
+      const mu = await muteState(sa, uid); if (mu) return json({ error: "muted", message: "You're muted right now." }, 403);
+      if (!rate(uid, "sch", 6, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const text = modText(cleanText(body.text)), at = Number(body.at) || 0, now = Date.now();
+      if (!text) return json({ error: "empty", message: "Type a message first." }, 400);
+      if (at < now + SCH_MIN || at > now + SCH_SPAN) return json({ error: "bad request", message: "Pick a time between a minute and 30 days from now." }, 400);
+      if (schMine(opt, uid).length >= SCH_MAX) return json({ error: "limit", message: "You can have " + SCH_MAX + " scheduled messages in a chat at once." }, 400);
+      if (r.dm) { const peer = dmPeer(r.key, uid), mine = (await fsGet(sa, "chatidx/" + uid)) || {}; if (peer && mine.b && mine.b[peer]) return json({ error: "blocked", message: "You blocked this player. Unblock them first." }, 403); }
+      const sid = Math.random().toString(36).slice(2, 8) + now.toString(36).slice(-3);
+      await fsSet(sa, "chatopt/" + r.key, [[["sc", sid], { u: uid, n: name, t: text, at: Math.round(at), c: now }]]); OPT.delete(r.key);
+      return json({ ok: true, sc: schMine(await optGet(sa, r.key, true), uid) });
+    }
+    if (a === "schedRun") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!(r.dm || r.group || r.clan) || !rate(uid, "schr", 6, 20000)) return json({ ok: true });
+      const opt = await optGet(sa, r.key, true), did = opt.sc ? await deliverDue(sa, r, opt, defer) : false;
+      return json({ ok: true, did });
+    }
+    if (a === "wpGet" || a === "wpSet") {
+      const r = await roomFor(sa, uid, name, admin, body);
+      if (!(r.dm || r.group || r.clan)) return json({ error: "bad request", message: "Watch together works in direct messages, groups and clan chats." }, 400);
+      if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      const now = Date.now(), path = "watch/" + r.key, raw = await fsGet(sa, path), cur = wpPub(raw, now);
+      if (a === "wpGet") {
+        if (!rate(uid, "wpg", 24, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+        if (cur && body.rev != null && Number(body.rev) === cur.rev && body.v === cur.v) return json({ ok: true, now, same: true });
+        return json({ ok: true, now, st: cur });
+      }
+      if (!rate(uid, "wps", 30, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
+      const op = String(body.op || ""), can = !cur || cur.m === "all" || cur.bu === uid || admin;
+      const w = (o) => { const e = []; for (const k in o) e.push([[k], o[k]]); return e; };
+      const bump = (o) => { const n = Object.assign({ rev: ((cur && cur.rev) | 0) + 1, ts: now, on: true }, o); return n; };
+      let ns = null, notify = false;
+      const clipQ = (q) => (Array.isArray(q) ? q : []).filter((x) => x && okYt(x.id)).slice(0, 20).map((x) => ({ id: x.id, by: String(x.by || "").slice(0, 30) }));
+      if (op === "start") {
+        const id = String(body.id || ""); if (!okYt(id)) return json({ error: "bad request", message: "That isn't a YouTube link." }, 400);
+        if (cur && !can) { ns = bump({ q: clipQ(cur.q.concat([{ id, by: name }])) }); }
+        else { ns = bump({ v: id, pos: 0, pl: true, at: now, by: name, bu: uid, m: body.m === "host" ? "host" : "all", q: [], end: false }); notify = !cur; }
+      } else if (!cur) return json({ ok: true, now, st: null });
+      else if (op === "add") {
+        const id = String(body.id || ""); if (!okYt(id)) return json({ error: "bad request", message: "That isn't a YouTube link." }, 400);
+        if (!can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change what is playing." }, 403);
+        if (cur.q.length >= 20) return json({ error: "limit", message: "The queue is full." }, 400);
+        ns = bump({ q: clipQ(cur.q.concat([{ id, by: name }])) });
+      } else if (op === "state") {
+        if (!can) return json({ ok: true, now, st: cur });
+        if (body.v !== cur.v) return json({ ok: true, now, st: cur });
+        const pos = Math.max(0, Math.min(86400, Number(body.pos) || 0));
+        ns = bump({ pos, pl: !!body.pl, at: now, end: false });
+      } else if (op === "next" || op === "playq") {
+        if (op === "playq" && !can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change what is playing." }, 403);
+        if (op === "next" && !body.ended && !can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change what is playing." }, 403);
+        if (op === "next" && body.v !== cur.v) return json({ ok: true, now, st: cur });
+        const q = cur.q.slice(), i = op === "playq" ? Math.max(0, Math.min(q.length - 1, Number(body.i) | 0)) : 0;
+        if (!q.length) ns = bump({ pl: false, pos: 0, at: now, end: true });
+        else { const it = q.splice(i, 1)[0]; ns = bump({ v: it.id, pos: 0, pl: true, at: now, q, end: false }); }
+      } else if (op === "rm") {
+        if (!can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change the queue." }, 403);
+        const q = cur.q.slice(); q.splice(Math.max(0, Number(body.i) | 0), 1); ns = bump({ q });
+      } else if (op === "mode") {
+        if (cur.bu !== uid && !admin) return json({ error: "host", message: "Only the host can change who controls playback." }, 403);
+        ns = bump({ m: body.m === "host" ? "host" : "all" });
+      } else if (op === "stop") {
+        if (!can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can stop it." }, 403);
+        await fsSet(sa, path, [[["on"], false], [["rev"], cur.rev + 1], [["ts"], now]]);
+        await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "sys"], [["from"], uid], [["name"], name], [["text"], name + " ended the watch together."], [["wp"], 2], [["ts"], now]]);
+        return json({ ok: true, now, st: null });
+      } else return json({ error: "bad request" }, 400);
+      await fsSet(sa, path, w(ns));
+      if (notify) await fsSet(sa, "chat/" + r.key + "/m/" + mkId(), [[["k"], "sys"], [["from"], uid], [["name"], name], [["text"], name + " started a watch together."], [["wp"], 1], [["ts"], now]]);
+      const out = wpPub(Object.assign({}, raw || {}, ns), now);
+      if (notify) await defer((async () => {
+        const msg = (to) => ({ kind: "dm", title: name, body: "Started a watch together. Tap to join.", url: to, tag: "wp-" + r.key, room: r.key });
+        if (r.dm) { const peer = dmPeer(r.key, uid); if (peer && !((((await fsGet(sa, "chatidx/" + peer)) || {}).b || {})[uid])) await notifyUser(sa, peer, msg("?open=dm:" + uid)); }
+        else if (r.group) await Promise.all(Object.keys(r.group.mem).filter((u) => u !== uid).slice(0, 40).map((u) => notifyUser(sa, u, { kind: "dm", title: r.group.name || "Group chat", body: name + " started a watch together.", url: "?open=grp:" + r.group.id, tag: "wp-" + r.key, room: r.key })));
+      })());
+      return json({ ok: true, now, st: out });
     }
     if (a === "react") {
       const r = await roomFor(sa, uid, name, admin, body);
@@ -1222,11 +1398,15 @@ export async function onRequestPost(context) {
     if (a === "search") {
       const r = await roomFor(sa, uid, name, admin, body);
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
-      const q = cleanText(body.q).toLowerCase().slice(0, 60);
-      if (q.length < 2) return json({ error: "bad request", message: "Type at least 2 letters." }, 400);
+      const q = cleanText(body.q).toLowerCase().slice(0, 60), fromF = oneLine(body.from, 30).toLowerCase(), hasF = ["link", "img", "gif", "voice"].includes(String(body.has || "")) ? String(body.has) : "", sinceF = Math.max(0, Number(body.after) || 0);
+      if (q.length < 2 && !fromF && !hasF && !sinceF) return json({ error: "bad request", message: "Type at least 2 letters." }, 400);
       if (!rate(uid, "srch", 2, 5000)) return json({ error: "slow", message: "Slow down a little." }, 429);
       const rows = await fsMsgs(sa, r.key, "", 300);
-      const hits = rows.filter((m) => !m.k && !m.del && (String(m.text || "").toLowerCase().includes(q) || String(m.name || "").toLowerCase().includes(q))).reverse().slice(0, 30);
+      const hits = rows.filter((m) => !m.k && !m.del && !(m.exp && m.exp <= Date.now())
+        && (!q || String(m.text || "").toLowerCase().includes(q) || String(m.name || "").toLowerCase().includes(q))
+        && (!fromF || String(m.name || "").toLowerCase().includes(fromF))
+        && (!sinceF || (m.ts || 0) >= sinceF)
+        && (!hasF || (hasF === "link" ? /https?:\/\//i.test(String(m.text || "")) : hasF === "img" ? !!m.img : hasF === "gif" ? !!m.gif : !!m.aud))).reverse().slice(0, 30);
       return json({ ok: true, msgs: hits.map((m) => pubMsg(m)), scanned: rows.length, more: rows.length >= 300 });
     }
     if (a === "report") {
@@ -1918,7 +2098,8 @@ export async function onRequestPost(context) {
     if (a === "pushKey") return json({ ok: true, key: (await vapid(sa)).pub });
     if (a === "pushState") {
       const d = (await fsGet(sa, "push/" + uid)) || {}, ep = typeof body.endpoint === "string" ? body.endpoint : "";
-      return json({ ok: true, devices: Object.keys(d.s || {}).length, here: !!(ep && d.s && d.s[await subId(ep)]), k: pushPrefs(d), admin });
+      const nm = {}; for (const k in (d.nm || {})) if (d.nm[k] > Date.now()) nm[k] = d.nm[k];
+      return json({ ok: true, devices: Object.keys(d.s || {}).length, here: !!(ep && d.s && d.s[await subId(ep)]), k: pushPrefs(d), admin, nm, qh: d.qh && d.qh.on ? { on: true, s: d.qh.s | 0, e: d.qh.e | 0, c: !!d.qh.c } : null });
     }
     if (a === "pushSub") {
       if (!rate(uid, "psub", 20, 60000)) return json({ error: "slow", message: "Slow down a little." }, 429);
