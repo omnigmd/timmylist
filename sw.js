@@ -3,7 +3,7 @@
    2) Offline: the page you last loaded still opens without a connection.
    It never caches /api/ calls, and the page itself is always fetched fresh when you are online,
    so an update is never held back by this file. */
-const VER = "v381", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
+const VER = "v382", SHELL = "tml-shell-" + VER, ASSETS = "tml-assets";
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(self.navigator.userAgent) && !/Chrome|Chromium|Edg\//.test(self.navigator.userAgent);
 
 self.addEventListener("install", () => { self.skipWaiting(); });
@@ -43,7 +43,7 @@ self.addEventListener("push", (e) => {
   else if (d.kind === "dm" || d.kind === "men") opts.vibrate = [120, 60, 120];
   e.waitUntil((async () => {
     const cl = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-    // v381: wake every open tab right now so it fetches the new message or call at once instead of waiting for its next check
+    // v382: wake every open tab right now so it fetches the new message or call at once instead of waiting for its next check
     for (const c of cl) { try { c.postMessage({ t: "poke", kind: d.kind || "" }); } catch (_) {} }
     // if you are looking at the site right now the page already shows it. Apple's browsers insist on a notification every time.
     if (!APPLE && cl.some((c) => c.focused && c.visibilityState === "visible")) return;
