@@ -400,7 +400,7 @@ async function modLog(sa, admin, act, who, note) {
 }
 // ---------- push alerts: standard Web Push (RFC 8030 delivery, RFC 8291 encryption, RFC 8292 VAPID) ----------
 // The signing key is made once, on first use, and kept in the server-only collection pushcfg. Nothing secret reaches the page.
-const PUSH_KINDS = { dm: 1, men: 1, rec: 1, rep: 1, fr: 1, cl: 1, test: 1 };
+const PUSH_KINDS = { dm: 1, men: 1, rec: 1, rep: 1, fr: 1, cl: 1, call: 1, test: 1 }; // v381: call = someone is ringing you
 const PUSH_HOSTS = [/(^|\.)googleapis\.com$/, /(^|\.)push\.services\.mozilla\.com$/, /(^|\.)push\.apple\.com$/, /(^|\.)notify\.windows\.com$/];
 const PUSH_MAXDEV = 5;
 const okEndpoint = (u) => { try { const x = new URL(String(u)); return String(u).length <= 700 && x.protocol === "https:" && !x.port && !x.username && !x.password && PUSH_HOSTS.some((r) => r.test(x.hostname)); } catch (e) { return false; } };
@@ -440,12 +440,12 @@ async function encryptPush(sub, plain) {
 async function sendPush(sa, sub, payload) {
   const body = await encryptPush(sub, enc.encode(JSON.stringify(payload))), ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
   try {
-    const r = await fetch(sub.e, { method: "POST", signal: ctl.signal, body, headers: { Authorization: await vapidAuth(sa, sub.e), "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", TTL: "86400", Urgency: "normal" } });
+    const r = await fetch(sub.e, { method: "POST", signal: ctl.signal, body, headers: { Authorization: await vapidAuth(sa, sub.e), "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", TTL: payload.kind === "call" ? "45" : "86400", Urgency: payload.kind === "call" || payload.kind === "dm" ? "high" : "normal" } });
     return r.status;
   } finally { clearTimeout(tm); }
 }
 const subId = async (e) => b64u(new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(String(e))))).slice(0, 22);
-const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k && d.k.men === false), rec: !(d && d.k && d.k.rec === false), rep: !(d && d.k && d.k.rep === false), fr: !(d && d.k && d.k.fr === false), cl: !(d && d.k && d.k.cl === false) });
+const pushPrefs = (d) => ({ dm: !(d && d.k && d.k.dm === false), men: !(d && d.k && d.k.men === false), rec: !(d && d.k && d.k.rec === false), rep: !(d && d.k && d.k.rep === false), fr: !(d && d.k && d.k.fr === false), cl: !(d && d.k && d.k.cl === false), call: !(d && d.k && d.k.call === false) });
 // Send one alert to every device a player turned alerts on for. Never throws; returns how many devices accepted it.
 async function notifyUser(sa, uid, msg) {
   try {
@@ -1110,10 +1110,10 @@ export async function onRequestPost(context) {
       if (!r.dm && !r.group && cfg.slow > 0 && !admin) await fsSet(sa, "chatidx/" + uid, [[["st", r.key], ts]]);
       if (r.dm) {
         // one alert per burst: nothing if they already heard from this player in the last 45 seconds
-        if (!(r.prev && ts - r.prev < 45000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid }));
+        if (!(r.prev && ts - r.prev < 8000)) await defer(notifyUser(sa, r.peer, { kind: "dm", title: name, body: snip, url: "?open=dm:" + uid, tag: "dm-" + uid }));
       } else if (r.group) {
         // members only. Someone @mentioned gets the mention alert; everyone else gets one alert per burst of messages.
-        const g = r.group, mentioned = new Set(), burst = !(gprev && ts - gprev < 45000), url = "?open=grp:" + g.id, gn = g.name || "Group chat";
+        const g = r.group, mentioned = new Set(), burst = !(gprev && ts - gprev < 10000), url = "?open=grp:" + g.id, gn = g.name || "Group chat";
         const blocked = async (u) => !!((((await fsGet(sa, "chatidx/" + u)) || {}).b || {})[uid]);
         await defer((async () => {
           if (text && rate(uid, "men", 12, 60000)) {
@@ -1861,6 +1861,7 @@ export async function onRequestPost(context) {
       const id = mkId(), ts = Date.now();
       await fsSet(sa, "calls/" + id, [[["from"], uid], [["to"], peer], [["fromName"], name], [["toName"], pn], [["offer"], body.offer], [["state"], "ring"], [["ts"], ts]]);
       await fsSet(sa, "chatidx/" + peer, [[["call"], { id, from: uid, name, ts }]]);
+      await defer(notifyUser(sa, peer, { kind: "call", title: name + " is calling you", body: "Incoming voice call. Tap to answer.", url: "?open=call:" + id, tag: "call-" + uid }));
       return json({ ok: true, id });
     }
     if (a === "callGet" || a === "callAnswer" || a === "callEnd") {
@@ -1927,7 +1928,7 @@ export async function onRequestPost(context) {
       const id = await subId(e), d = (await fsGet(sa, "push/" + uid)) || {}, ents = [[["s", id], { e, p: String(kk.p256dh), a: String(kk.auth), t: Date.now(), ua: oneLine(body.ua, 60) }]];
       const old = Object.keys(d.s || {}).filter((k) => k !== id).sort((x, y) => ((d.s[x] || {}).t || 0) - ((d.s[y] || {}).t || 0));
       for (const k of old.slice(0, Math.max(0, old.length + 1 - PUSH_MAXDEV))) ents.push([["s", k], undefined]);
-      if (!d.k) ents.push([["k"], { dm: true, men: true, rec: true, rep: true, fr: true, cl: true }]);
+      if (!d.k) ents.push([["k"], { dm: true, men: true, rec: true, rep: true, fr: true, cl: true, call: true }]);
       await fsSet(sa, "push/" + uid, ents);
       return json({ ok: true, k: pushPrefs(d) });
     }
@@ -1939,7 +1940,7 @@ export async function onRequestPost(context) {
     }
     if (a === "pushPrefs") {
       const k = body.k && typeof body.k === "object" ? body.k : {}, ents = [];
-      for (const kind of ["dm", "men", "rec", "rep", "fr", "cl"]) if (typeof k[kind] === "boolean") ents.push([["k", kind], k[kind]]);
+      for (const kind of ["dm", "men", "rec", "rep", "fr", "cl", "call"]) if (typeof k[kind] === "boolean") ents.push([["k", kind], k[kind]]);
       if (ents.length) await fsSet(sa, "push/" + uid, ents);
       return json({ ok: true, k: pushPrefs(Object.assign({}, (await fsGet(sa, "push/" + uid)) || {})) });
     }
