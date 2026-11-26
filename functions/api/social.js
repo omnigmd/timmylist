@@ -1085,6 +1085,7 @@ export async function onRequestPost(context) {
       const nowX = Date.now(), gone = rows.filter((m) => m.exp && m.exp <= nowX);
       if (gone.length) { rows = rows.filter((m) => !(m.exp && m.exp <= nowX)); await defer(Promise.all(gone.slice(0, 12).map(async (m) => { try { await fsDelete(sa, "chat/" + r.key + "/m/" + m.id); if (m.img || m.aud) await fsDelete(sa, "chatimg/" + m.id); } catch (e) {} }))); }
       const out = { ok: true, msgs: rows.map((m) => pubMsg(m)), more: !since && rows.length >= 60 };
+      if (!since && !before && (r.clan || r.key === "main")) { const w0 = wpPub(await fsGet(sa, "watch/" + r.key), nowX); out.wp = w0 ? { v: w0.v, by: w0.by, rev: w0.rev } : null; }
       if (!since && !before && (r.dm || r.group)) { out.dis = opt.dis | 0; out.sc = schMine(opt, uid); out.wp = wpPub(await fsGet(sa, "watch/" + r.key), nowX); if (out.wp) out.wp = { v: out.wp.v, by: out.wp.by, rev: out.wp.rev }; }
       if (!since && !before && metaPath(r.key)) { const meta = await fsGet(sa, metaPath(r.key)); out.pin = meta && meta.pin && okId(meta.pin.id) ? { id: meta.pin.id, name: String(meta.pin.name || ""), text: String(meta.pin.text || ""), by: String(meta.pin.by || "") } : null; }
       if (r.group && !before) {
@@ -1260,8 +1261,10 @@ export async function onRequestPost(context) {
     }
     if (a === "wpGet" || a === "wpSet") {
       const r = await roomFor(sa, uid, name, admin, body);
-      if (!(r.dm || r.group || r.clan)) return json({ error: "bad request", message: "Watch together works in direct messages, groups and clan chats." }, 400);
+      const pubRoom = r.key === "main";
+      if (!(r.dm || r.group || r.clan || pubRoom)) return json({ error: "bad request", message: "Watch together works in the Timmylist Room, direct messages, groups and clan chats." }, 400);
       if (!cfg.chat && !admin) return json({ error: "off", message: "Chat is turned off right now." }, 403);
+      if (pubRoom && a === "wpSet") { const mu = await muteState(sa, uid); if (mu) return json({ error: "muted", message: "You're muted until " + new Date(mu.until).toUTCString().replace(" GMT", " UTC") + "." }, 403); }
       const now = Date.now(), path = "watch/" + r.key, raw = await fsGet(sa, path), cur = wpPub(raw, now);
       if (a === "wpGet") {
         if (!rate(uid, "wpg", 24, 10000)) return json({ error: "slow", message: "Slow down a little." }, 429);
@@ -1277,11 +1280,11 @@ export async function onRequestPost(context) {
       if (op === "start") {
         const id = String(body.id || ""); if (!okYt(id)) return json({ error: "bad request", message: "That isn't a YouTube link." }, 400);
         if (cur && !can) { ns = bump({ q: clipQ(cur.q.concat([{ id, by: name }])) }); }
-        else { ns = bump({ v: id, pos: 0, pl: true, at: now, by: name, bu: uid, m: body.m === "host" ? "host" : "all", q: [], end: false }); notify = !cur; }
+        else { ns = bump({ v: id, pos: 0, pl: true, at: now, by: name, bu: uid, m: pubRoom || body.m === "host" ? "host" : "all", q: [], end: false }); notify = !cur; }
       } else if (!cur) return json({ ok: true, now, st: null });
       else if (op === "add") {
         const id = String(body.id || ""); if (!okYt(id)) return json({ error: "bad request", message: "That isn't a YouTube link." }, 400);
-        if (!can) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change what is playing." }, 403);
+        if (!can && !pubRoom) return json({ error: "host", message: "Only " + (cur.by || "the host") + " can change what is playing." }, 403);
         if (cur.q.length >= 20) return json({ error: "limit", message: "The queue is full." }, 400);
         ns = bump({ q: clipQ(cur.q.concat([{ id, by: name }])) });
       } else if (op === "state") {
